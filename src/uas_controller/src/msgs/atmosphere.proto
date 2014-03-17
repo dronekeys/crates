@@ -1,0 +1,10 @@
+package uas_controller.msgs;
+
+message Atmosphere
+{
+	required double 	starttime		= 1 [default = 0.00];
+	required double 	temperature		= 2 [default = 0.00];
+	required double 	humidity	    = 3 [default = 0.00];
+  	required double 	wind_direction 	= 4 [default = 0.00];
+  	required double 	wind_speed 		= 5 [default = 0.00];
+}

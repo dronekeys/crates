@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <model name="pelican">
+      
+    <static>true</static>
+    <pose>0 0 2  0 0 0</pose>
+
+    <!-- Platform frame + sensors //-->
+    <link name="platform">
+      <pose>0 0 0  0 0 0</pose>
+      <gravity>false</gravity>
+      <collision name="collision">
+        <pose>0 0 0.035 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.35</radius>
+            <length>.08</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="frame">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_pelican/meshes/pelican.dae</uri></mesh>
+        </geometry>
+      </visual>
+      <sensor name="camera" type="camera">
+        <always_on>0</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <pose>0 0 0 0 1.570 0</pose>
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <pose>0 0 0 0 3.141 0</pose>
+          <image>
+            <width>1024</width>
+            <height>768</height>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+      </sensor>
+      <sensor name="imu" type="imu">
+        <always_on>0</always_on>
+        <update_rate>512</update_rate>
+        <visualize>false</visualize>
+        <imu>
+          <noise>
+            <type>gaussian</type>
+            <rate>
+              <mean>0.0</mean>
+              <stddev>2e-4</stddev>
+              <bias_mean>0.0000075</bias_mean>
+              <bias_stddev>0.0000008</bias_stddev>
+            </rate>
+            <accel>
+              <mean>0.0</mean>
+              <stddev>1.7e-2</stddev>
+              <bias_mean>0.1</bias_mean>
+              <bias_stddev>0.001</bias_stddev>
+            </accel>
+          </noise>
+        </imu>
+      </sensor>
+    </link>
+
+    <!-- These are the four blades //-->
+    <link name="blade_left">
+     <pose>-0.241 0.0 0.05 0 0 0</pose>
+      <gravity>false</gravity>
+      <collision name="blade_left_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_left_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_pelican/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name="blade_right">
+     <pose>0.241 0.0 0.05 0 0 0</pose>
+      <gravity>false</gravity>
+      <collision name="blade_left_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_right_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_pelican/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name="blade_top">
+     <pose>0.0 0.241 0.05 0 0 0</pose>
+      <gravity>false</gravity>
+      <collision name="blade_left_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_top_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_pelican/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name="blade_bottom">
+     <pose>0 -0.241 0.05 0 0 0</pose>
+      <gravity>false</gravity>
+      <collision name="blade_bottom_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_bottom_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_pelican/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    
+    <!-- These joints allow animated blades //-->
+    <joint type="revolute" name="blade_left_motor">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_left</child>
+      <parent>platform</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <joint type="revolute" name="blade_right_motor">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_right</child>
+      <parent>platform</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <joint type="revolute" name="blade_top_motor">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_top</child>
+      <parent>platform</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    <joint type="revolute" name="blade_bottom_motor">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_bottom</child>
+      <parent>platform</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <!-- This plugin provides the dynamics //-->
+    <plugin name="dynamics_genetic" filename="libdynamics_genetic.so" />
+
+  </model>
+
+</sdf>

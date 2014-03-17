@@ -1,0 +1,10 @@
+<model>
+	<name>Ascending Technologies Hummingbird</name>
+	<version>1.0</version>
+	<sdf version="1.4">model.sdf</sdf>
+	<author>
+		<name>Andrew Symington</name>
+		<email>andrew.c.symington@gmail.com</email>
+	</author>
+	<description>A model of an Ascending Technologies Hummingbird quadcopter.</description>
+</model>

@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <model name="hummingbird">
+    
+    <!-- Are there any moving parts -->  
+    <static>false</static>
+
+    <!-- Initial pose -->
+    <pose>0 0 1  0 0 0</pose>
+
+    <!-- Frame -->
+    <link name="body">
+      <pose>0 0 0  0 0 0</pose>
+      <inertial>
+        <mass>1.68</mass>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 0.035 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.35</radius>
+            <length>.08</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="frame">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_hummingbird/meshes/hummingbird.dae</uri></mesh>
+        </geometry>
+      </visual>
+
+      <!-- GPS receiver that uses pseudoranges -->
+      <sensor name='gpsreceiver' type='gpsreceiver' always_on='1' update_rate='50'>
+        <origin pose='0 0 0 0 0 0'/>
+        <plugin name='gpsreceiver' filename='libgpsreceiver.so'/>
+      </sensor>
+      
+      <!-- Inertial measurement unit -->
+      <sensor name='inertial' type='inertial' always_on='1' update_rate='50'>
+        <origin pose='0 0 0 0 0 0'/>
+        <plugin name='inertial' filename='libinertial.so'/>
+      </sensor>
+
+      <!-- Three axis compass -->
+      <sensor name='compass' type='compass' always_on='1' update_rate='50'>
+        <origin pose='0 0 0 0 0 0'/>
+        <plugin name='compass' filename='libcompass.so'/>
+      </sensor>
+
+      <!-- Barometric pressure sensor -->
+      <sensor name='altimeter' type='altimeter' always_on='1' update_rate='50'>
+        <origin pose='0 0 0 0 0 0'/>
+        <plugin name='camera_dump' filename='libaltimeter.so'/>
+      </sensor>
+
+      <!-- Orientation sensor -->
+      <sensor name='orientation' type='orientation' always_on='1' update_rate='50'>
+        <origin pose='0 0 0 0 0 0'/>
+        <plugin name='camera_dump' filename='liborientation.so'/>
+      </sensor>
+
+    <!-- West blade and motor -->
+    <link name="blade_w">
+     <pose>-0.241 0.0 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+      </inertial>
+      <collision name="blade_w_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_w_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint type="revolute" name="motor_w">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_w</child>
+      <parent>body</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>    
+
+    <!-- East blade and motor -->
+    <link name="blade_e">
+     <pose>0.241 0.0 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+      </inertial>
+      <collision name="blade_e_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_e_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint type="revolute" name="motor_e">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_e</child>
+      <parent>body</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <!-- North blade and motor -->
+    <link name="blade_n">
+     <pose>0.0 0.241 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+      </inertial>
+      <collision name="blade_n_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_n_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint type="revolute" name="motor_n">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_n</child>
+      <parent>body</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <!-- South blade and motor -->
+    <link name="blade_s">
+     <pose>0 -0.241 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.002</mass>
+      </inertial>
+      <collision name="blade_s_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.10</radius>
+            <length>.02</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="blade_s_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint type="revolute" name="motor_s">
+      <pose>0 0 0 0 0 0</pose>
+      <child>blade_s</child>
+      <parent>body</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+    
+    <!-- Provides second-order platform dynamics (respects net wind) -->
+    <plugin name="quadrotor" filename="libquadrotor.so">
+      <low_throttle>300</low_throttle>
+      <max_angvel>2.617993877991494</max_angvel>
+      <pq0>-3.25060e-04</pq0>
+      <pq1>1.79797e+02</pq1>
+      <pq2>-24.3536</pq2>
+      <r0>-4.81783e-03</r0>
+      <r1>-5.08944</r1>
+      <Cth0>6.63881e-01</Cth0>
+      <Cth1>7.44649e-04</Cth1>
+      <Cth2>2.39855e-06</Cth2>
+      <Cvb0>-18.0007</Cvb0>
+      <Cvb1>4.23754</Cvb1>
+      <tau0>3.07321</tau0>
+      <tau1>46.8004</tau1>
+      <kuv>-4.97391e-01</kuv>
+      <kw>-1.35341</kw>
+    </plugin>
+
+    <!-- Models wind shear effects (uses global wind speed and direction) -->
+    <plugin name="shear" filename="libshear.so">
+      <z0>0.15</z0>
+    </plugin>
+
+    <!-- Models wind turbulence effects (uses global wind speed and direction) -->
+    <plugin name="turbulence" filename="libturbulence.so">
+      <z0>0.15</z0>
+    </plugin>
+
+  </model>
+
+</sdf>

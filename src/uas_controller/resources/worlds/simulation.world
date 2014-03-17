@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.4">
+
+  <world name="simulation">
+
+    <!-- Set the physics properties -->
+    <physics type="ode">
+      <max_step_size>0.02</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>50</real_time_update_rate>
+    </physics>
+
+    <!-- Set the scene properties -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>51.71190</latitude_deg>
+      <longitude_deg>-0.21052</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- Setup a basic scene -->
+    <scene>
+      <sky>
+        <time>10.00</time>
+        <sunrise>06.23</sunrise>
+        <sunset>17.59</sunset>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>false</shadows>
+    </scene>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://location_rvc</uri>
+    </include>
+
+    <include>
+      <uri>model://platform_hummingbird</uri>
+    </include>
+
+    <!-- Setup a basic scene -->
+    <plugin name="simulation" filename="libsimulation.so">
+      <utc>1395087482</utc>
+      <model_temperature>15 0 0.1 0.1</model_temperature>
+      <model_humidity>23 4 5 2</model_humidity>
+      <model_wind_speed>15 0 0.1 0.1</model_wind_speed>
+      <model_wind_direction>15 0 0.1 0.1</model_wind_direction>
+    </plugin>
+
+    <!-- Add some GPS satellites -->
+    <plugin name="gpsorbits" filename="libgpsorbits.so">
+      <orbit>file://media/orbits/ngs15992_16to17.sp3</orbit>
+      <model_pseudorange>15 0 0.1 0.1</model_pseudorange>
+    </plugin>
+
+  </world>
+
+</sdf>

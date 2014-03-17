@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.4">
+
+  <world name="experiment">
+
+    <!-- Set the default camera pose -->
+    <gui>
+      <camera name="user_camera">
+        <pose>0 0 0 0 0 0</pose>
+      </camera>
+    </gui>  
+
+    <!-- Set the physics properties -->
+    <physics type="ode">
+      <max_step_size>0.02</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>50</real_time_update_rate>
+    </physics>
+
+    <!-- Setup a basic scene -->
+    <!--
+    <scene>
+      <sky>
+        <time>10.00</time>
+        <sunrise>06.23</sunrise>
+        <sunset>17.59</sunset>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>false</shadows>
+    </scene>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://location_rvc</uri>
+    </include>
+    
+    
+    <plugin name="experiment" filename="libexperiment.so"/>
+     This -->
+
+  </world>
+
+</sdf>
