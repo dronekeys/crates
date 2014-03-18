@@ -27,7 +27,14 @@ namespace uas_hal
         void initialize(const char *name);
 
         // Send altitude immediately with current time stamp
-        void post();
+        void post(
+            const double &lin_acc_x,
+            const double &lin_acc_y,
+            const double &lin_acc_z,
+            const double &ang_vel_x,
+            const double &ang_vel_y,
+            const double &ang_vel_z
+        );
     };
 }
 

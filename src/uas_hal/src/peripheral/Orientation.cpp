@@ -14,13 +14,20 @@ void Orientation::initialize(const char *name)
 }
 
 // Send some 
-void Orientation::post()
+void Orientation::post(const double &x, const double &y, const double &z)
 {
 	if (!isBound())
 		ROS_WARN("Cannot send Orientation message, because not bound to ROS");
 	else
 	{
+		// Set the message parameters
+		msg.tick = ros::Time::now();
+		msg.x = x;
+		msg.y = y;
+		msg.z = z;
+
 		// Send the message
 		pub.publish(msg);
 	}
 }
+

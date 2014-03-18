@@ -27,7 +27,11 @@ namespace uas_hal
         void initialize(const char *name);
         
         // Send altitude immediately with current time stamp
-        void post();
+        void post(
+            const double &x,    // Body-frame magnetic field X (Gauss)
+            const double &y,    // Body-frame Magnetic field Y (Gauss)
+            const double &z     // Body-frame Magnetic field Z (Gauss)
+        );
     };
 }
 

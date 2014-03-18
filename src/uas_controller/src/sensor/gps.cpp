@@ -27,6 +27,9 @@ namespace uas_controller
 	    // Listen to broadcasts from the atmosphere
 		ros::Timer timer;
 
+	    // Prevents needless allocation
+	    gazebo::math::Vector3 pos, vel, err_pos, err_vel;
+
 	public:
 
 		// On initial load
@@ -36,7 +39,9 @@ namespace uas_controller
 			modPtr = _model;
 
 			// Initialise the HAL
-			initialize("gps");			      
+			initialize(((std::string) "/hal/" 
+				+		(std::string) modPtr->GetName() 
+				+ 		(std::string) "/gps").c_str());			      
 
 			// Set up callback for updating the model
             timer = node.createTimer(
@@ -49,8 +54,35 @@ namespace uas_controller
 		// When called published the data
 		void Update(const ros::TimerEvent& event)
 		{
-			// Immediately post the z position and speed
-			//post(modPtr->GetWorldPose().pos.z, modPtr->GetWorldLinearVel().z);
+			// Get the WGS84 position and velocity
+			pos = modPtr->GetWorld()->GetSphericalCoordinates()->SphericalFromLocal(
+				modPtr->GetWorldPose().pos
+			);
+			vel = modPtr->GetWorld()->GetSphericalCoordinates()->GlobalFromLocal(
+				modPtr->GetWorldLinearVel()
+			);
+			
+			// Get the errors
+			err_pos = gazebo::math::Vector3(0,0,0);
+			err_vel = gazebo::math::Vector3(0,0,0);
+
+			// Immediately post the GPS message
+			post(	"Simulated, L1 code-phase GPS",
+                    "Fix (6 satellites)",
+                   	"WGS84",
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    vel.x,
+                    vel.y,
+                    vel.z,
+                    err_pos.x,
+                    err_pos.y,
+                    err_pos.z,
+                    err_vel.x,
+                    err_vel.y,
+                    err_vel.z,
+                    0.0);
 		}
 	};
 

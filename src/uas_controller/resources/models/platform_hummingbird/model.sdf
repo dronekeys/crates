@@ -155,12 +155,30 @@
       </axis>
     </joint>
     
-    <!-- Sensor... because gazebo doens't support plugins for NEW sensors -->
-    <plugin name='imu' filename='libimu.so'/>
-    <plugin name='gps' filename='libgps.so'/>
-    <plugin name='compass' filename='libcompass.so'/>
-    <plugin name='inclinometer' filename='libinclinometer.so'/>
-    <plugin name='altimeter' filename='libaltimeter.so'/>
+    <!-- Inertial sensor -->
+    <plugin name='imu' filename='libimu.so'>
+      <rate>128</rate>
+    </plugin>
+
+    <!-- Magnetic sensor -->
+    <plugin name='compass' filename='libcompass.so'>
+      <rate>8</rate>
+    </plugin>
+
+    <!-- Orientation sensor -->
+    <plugin name='inclinometer' filename='libinclinometer.so'>
+      <rate>8</rate>
+    </plugin>
+
+    <!-- Altitude sensor -->
+    <plugin name='altimeter' filename='libaltimeter.so'>
+      <rate>8</rate>
+    </plugin>
+
+    <!-- Position sensor -->
+    <plugin name='gps' filename='libgps.so'>
+      <rate>8</rate>
+    </plugin>
 
     <!-- Provides second-order platform dynamics (respects net wind) -->
     <plugin name="quadrotor" filename="libquadrotor.so">

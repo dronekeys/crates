@@ -14,12 +14,27 @@ void Inertial::initialize(const char *name)
 }
 
 // Send some 
-void Inertial::post()
+void Inertial::post(
+            const double &gyr_x,
+            const double &gyr_y,
+            const double &gyr_z,
+            const double &acc_x,
+            const double &acc_y,
+            const double &acc_z)
 {
 	if (!isBound())
 		ROS_WARN("Cannot send Inertial message, because not bound to ROS");
 	else
 	{
+		// Set the message parameters
+		msg.tick  = ros::Time::now();
+		msg.gyr_x = gyr_x;
+		msg.gyr_y = gyr_y;
+		msg.gyr_z = gyr_z;
+		msg.acc_x = acc_x;
+		msg.acc_y = acc_y;
+		msg.acc_z = acc_z;
+
 		// Send the message
 		pub.publish(msg);
 	}

@@ -45,7 +45,7 @@
       <uri>model://platform_hummingbird</uri>
     </include>
 
-    <!-- Setup a basic scene -->
+    <!--
     <plugin name="simulation" filename="libsimulation.so">
       <utc>1395087482</utc>
       <model_temperature>15 0 0.1 0.1</model_temperature>
@@ -54,11 +54,12 @@
       <model_wind_direction>15 0 0.1 0.1</model_wind_direction>
     </plugin>
 
-    <!-- Add some GPS satellites -->
+    
     <plugin name="gpsorbits" filename="libgpsorbits.so">
       <orbit>file://media/orbits/ngs15992_16to17.sp3</orbit>
       <model_pseudorange>15 0 0.1 0.1</model_pseudorange>
     </plugin>
+    -->
 
   </world>
 

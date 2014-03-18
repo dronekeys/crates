@@ -1,7 +1,7 @@
 time    tick      # Time
 string  source	  # Source, eg. 'Differential GPS - L1 / L2'
 string  status	  # Status, eg. 'Fix (5 satellites)''
-string  ref_frame # Reference frame (cartesian, WGS84)
+string  cframe    # Reference frame (cartesian, WGS84)
 float64 x         # Position X Estimate
 float64 y	      # Position Y Estimate
 float64 z	      # Position Z Estimate
@@ -14,4 +14,4 @@ float64 err_z	  # Position Z Precision
 float64 err_dx	  # Velocity X Precision
 float64 err_dy	  # Velocity Y Precision
 float64 err_dz	  # Velocity Z Precision
-float64 clk_err	  # Clock Precision
+float64 err_clk	  # Clock Precision

@@ -27,6 +27,9 @@ namespace uas_controller
 	    // Listen to broadcasts from the atmosphere
 		ros::Timer timer;
 
+	    // Magnetic field
+	    gazebo::math::Vector3 mag;
+
 	public:
 
 		// On initial load
@@ -36,21 +39,35 @@ namespace uas_controller
 			modPtr = _model;
 
 			// Initialise the HAL
-			initialize("compass");			      
+			initialize(((std::string) "/hal/" 
+				+		(std::string) modPtr->GetName() 
+				+ 		(std::string) "/compass").c_str());			      
 
-			// Set up callback for updating the model
+			// Set up callback for updating the model (respects sim time)
             timer = node.createTimer(
-                ros::Duration(1.0),  				     		 	// duration
+                ros::Duration(1.0),  				     	// duration
                 boost::bind(&Compass::Update, this, _1),  	// callback
-                false                                       		// oneshot?
+                false                                       // oneshot?
             );
 	    }
 
 		// When called published the data
 		void Update(const ros::TimerEvent& event)
 		{
-			// Immediately post the z position and speed
-			//post(modPtr->GetWorldPose().pos.z, modPtr->GetWorldLinearVel().z);
+		  	// Magnetic field
+			mag.x = 1;
+			mag.y = 0;
+			mag.z = 0;
+
+			// Rotate world magnetic vector from global to local
+			mag = modPtr->GetWorldPose().rot.GetInverse().RotateVector(mag);
+
+			// Immediately post the euler angles
+			post(
+				mag.x,  // Magnetic field strength X (Gauss)
+				mag.y,  // Magnetic field strength Y (Gauss)
+				mag.z   // Magnetic field strength Z (Gauss)
+			);
 		}
 	};
 

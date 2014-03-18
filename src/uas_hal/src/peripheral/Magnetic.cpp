@@ -14,12 +14,21 @@ void Magnetic::initialize(const char *name)
 }
 
 // Send some 
-void Magnetic::post()
+void Magnetic::post(
+            const double &x,    // Body-frame magnetic field X (Gauss)
+            const double &y,    // Body-frame Magnetic field Y (Gauss)
+            const double &z)    // Body-frame Magnetic field Z (Gauss)
 {
 	if (!isBound())
 		ROS_WARN("Cannot send Magnetic message, because not bound to ROS");
 	else
 	{
+		// Set the message parameters
+		msg.tick = ros::Time::now();
+		msg.mag_x = x;
+		msg.mag_y = y;
+		msg.mag_z = z;
+
 		// Send the message
 		pub.publish(msg);
 	}

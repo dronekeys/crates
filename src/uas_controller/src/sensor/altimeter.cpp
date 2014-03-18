@@ -35,8 +35,10 @@ namespace uas_controller
 			// Save the model pointer
 			modPtr = _model;
 
-			// Initialise the HAL
-			initialize("altimeter");			      
+			// Initialise the HAL using the model name
+			initialize(((std::string) "/hal/" 
+				+		(std::string) modPtr->GetName() 
+				+ 		(std::string) "/altimeter").c_str());		      
 
 			// Set up callback for updating the model
             timer = node.createTimer(
@@ -50,7 +52,10 @@ namespace uas_controller
 		void Update(const ros::TimerEvent& event)
 		{
 			// Immediately post the z position and speed
-			post(modPtr->GetWorldPose().pos.z, modPtr->GetWorldLinearVel().z);
+			post(
+				modPtr->GetWorldPose().pos.z, 	// Height (m)
+				modPtr->GetWorldLinearVel().z	// Velocity (m/s)
+			);
 		}
 	};
 
