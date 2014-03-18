@@ -6,23 +6,28 @@
 
 // Base HAL type
 #include <uas_hal/HAL.h>
+#include <uas_hal/MsgInertial.h>
 
 namespace uas_hal
 {
     class Inertial : public HAL
     {
-    public:
-
-        // Connstructor
-        Inertial();
-
-        // Initialise the Hardware Abstraction Layer
-        void bind(ros::NodeHandle& nh);
 
     private:
 
-        // HAL state
-        bool bound;
+        // Message to be published
+        MsgInertial     msg;
+
+        // Publisher for the message
+        ros::Publisher  pub;
+
+    public:
+
+        // Setup the altitude sensor
+        void initialize(const char *name);
+
+        // Send altitude immediately with current time stamp
+        void post();
     };
 }
 

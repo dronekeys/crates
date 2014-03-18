@@ -105,12 +105,6 @@ add_library(FlightControlSystem
   src/aci/asctecCommIntf.c
   src/FlightControlSystem.cpp
 )
-add_library(PointGrey
-  src/PointGrey.cpp
-)
-add_library(WiFi
-  src/WiFi.cpp
-)
 
 ## Declare a cpp executable
 #add_executable(platform_asctec 
@@ -122,19 +116,9 @@ add_library(WiFi
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(FlightControlSystem uas_hal)
-add_dependencies(PointGrey uas_hal)
-add_dependencies(WiFi uas_hal)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(FlightControlSystem 
-	${catkin_LIBRARIES} 
-	${Boost_LIBRARIES}
-)
-target_link_libraries(PointGrey
-	${catkin_LIBRARIES} 
-	${Boost_LIBRARIES}
-)
-target_link_libraries(WiFi 
 	${catkin_LIBRARIES} 
 	${Boost_LIBRARIES}
 )

@@ -6,23 +6,28 @@
 
 // Base HAL type
 #include <uas_hal/HAL.h>
+#include <uas_hal/MsgAltitude.h>
 
 namespace uas_hal
 {
     class Altitude : public HAL
     {
-    public:
-
-        // Connstructor
-        Altitude();
-
-        // Initialise the Hardware Abstraction Layer
-        void bind(ros::NodeHandle& nh);
 
     private:
 
-        // HAL state
-        bool bound;
+        // Message to be published
+        MsgAltitude     msg;
+
+        // Publisher for the message
+        ros::Publisher  pub;
+
+    public:
+
+        // Setup the altitude sensor
+        void initialize(const char *name);
+        
+        // Send altitude immediately with current time stamp
+        void post(const double &height, const double &speed);
     };
 }
 

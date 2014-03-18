@@ -4,20 +4,37 @@
 // ROS includes
 #include <ros/ros.h>
 
-// All HAL have some verson information
-#include <uas_hal/Information.h>
-
 namespace uas_hal
 {
     class HAL
     {
 
+    protected: 
+
+        // Is the HAL bound to 
+        bool bound;
+
+    	// Handle to the ROS node
+		ros::NodeHandle node;
+
+        // Constructor
+        HAL();
+
+    	// Perform binding to the HAL
+    	void bind(const char *name);
+
+    	// Is this HAL bounded?
+    	bool isBound();
+
+        // Get a handle to the ROS node
+        ros::NodeHandle& getNodeHandle();
+
     public:
 
-    	// Initialise the Hardware Abstraction Layer
-    	virtual void bind(ros::NodeHandle& nh) = 0;
+        // Default initialization (should be overloaded)
+        void initialize(const char *name);
 
-    };
+	};
 
 }
 

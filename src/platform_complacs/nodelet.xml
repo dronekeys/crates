@@ -5,19 +5,3 @@
     </description>
   </class>
 </library>
-
-<library path="lib/libPointGrey">
-  <class name="platform_complacs/PointGrey" type="platform_complacs::PointGrey" base_class_type="nodelet::Nodelet">
-    <description> 
-		The objective of this class is to provide an interface to aa Point Grey video camera, which provides a camera.
-    </description>
-  </class>
-</library>
-
-<library path="lib/libWiFi">
-  <class name="platform_complacs/WiFi" type="platform_complacs::WiFi" base_class_type="nodelet::Nodelet">
-    <description> 
-		This is an abstraction away from an IEEE 802.11 adapter. In the background each UAV runs Optimized Links State Routing (OLSR) to discover and associate with peers, as they connect and disconnect. This class sits on top of this layer, and continually scans for peers in communication range. When a peer platform is discovered this nodelet registers its own /hal/xxx on the foreign platform, which allows the foreign platform to access local messages, services and actions.
-    </description>
-  </class>
-</library>

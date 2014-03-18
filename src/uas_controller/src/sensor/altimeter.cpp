@@ -1,103 +1,59 @@
-/* 
-
-  The barometric altimeter is modelled using information from:
-
-    http://www.hills-database.co.uk/altim.html
-
-  Barometric pressure sensors operate on the following principle:
-
-    change in height = (RT/gM).ln(s/p)
-
-  Where
-
-    s = reference height            [m]
-    p = height                      [m]
-    R = gas constant                [] 
-    T = measured air temperature    [Kelvin]
-    g = acceleration due to gravity []
-    M = molar mass of air           []
-  
-*/
-
-
-// Required to bind to non-static methods
+//  Boost includes
 #include <boost/bind.hpp>
 
-// Required simulation API  
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/sensors/CameraSensor.hh>
-#include <gazebo/rendering/Camera.hh>
+// ROS includes
+#include <ros/ros.h>
+
+// Gazebo includes
+#include <gazebo/physics/Model.hh>
 #include <gazebo/gazebo.hh>
+
+// HAL includes
+#include <uas_hal/peripheral/Altitude.h>
 
 namespace uas_controller
 {
-  class Altimeter : public gazebo::SensorPlugin
-  {
-    public: CameraPlugin();
+	class Altimeter : public uas_hal::Altitude,  public gazebo::ModelPlugin
+	{
 
-    /// \brief Destructor
-    public: virtual ~CameraPlugin();
+	private:
 
-    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+	    // Pointer to the current model
+	    gazebo::physics::ModelPtr	 modPtr;
 
-    public: virtual void OnNewFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height,
-                              unsigned int _depth, const std::string &_format);
+	    // Pointer to the update event connection
+	    gazebo::event::ConnectionPtr conPtr;
+	    
+	    // Listen to broadcasts from the atmosphere
+		ros::Timer timer;
 
-    protected: unsigned int width, height, depth;
-    protected: std::string format;
+	public:
 
-    protected: sensors::CameraSensorPtr parentSensor;
-    protected: rendering::CameraPtr camera;
+		// On initial load
+	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
+	    {
+			// Save the model pointer
+			modPtr = _model;
 
-    private: event::ConnectionPtr newFrameConnection;
-  };
-}
-#endif
+			// Initialise the HAL
+			initialize("altimeter");			      
 
+			// Set up callback for updating the model
+            timer = node.createTimer(
+                ros::Duration(1.0),  				     		 	// duration
+                boost::bind(&Altimeter::Update, this, _1),  	// callback
+                false                                       		// oneshot?
+            );
+	    }
 
+		// When called published the data
+		void Update(const ros::TimerEvent& event)
+		{
+			// Immediately post the z position and speed
+			post(modPtr->GetWorldPose().pos.z, modPtr->GetWorldLinearVel().z);
+		}
+	};
 
-
-// Required to bind to non-static methods
-#include <boost/bind.hpp>
-
-// Gazebo API
-#include <gazebo/physics/physics.hh>
-#include <gazebo/common/common.hh>
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/gazebo.hh>
-
-namespace uas_controller
-{
-  class Altimeter : public gazebo::ModelPlugin
-  {
-
-  private:
-
-    // Pointer to the current model
-    gazebo::physics::ModelPtr         modelPtr;
-
-  public: 
-
-    // On initial plugin load
-    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
-    {
-      // Save pointer to the model
-      this->modelPtr = _model;
-    }
-
-    // When an update is called 
-    void Update(ConstWorldStatisticsPtr &_msg)
-    {
-     
-
-
-    }
-
-  };
-
-  // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(Altimeter)
+	// Register this plugin with the simulator
+	GZ_REGISTER_MODEL_PLUGIN(Altimeter)
 }

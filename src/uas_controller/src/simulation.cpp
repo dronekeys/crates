@@ -16,7 +16,7 @@
 
 namespace uas_controller
 {
-    class Simulator : public gazebo::WorldPlugin
+    class Simulation : public gazebo::WorldPlugin
     {
   
     private:
@@ -53,12 +53,12 @@ namespace uas_controller
         nh = ros::NodeHandle("controller"); 
 
         // Initialise services
-        ser_Pause       = nh.advertiseService("Pause",      &Simulator::Pause,      this);  // pause simulation
-        ser_Resume      = nh.advertiseService("Resume",     &Simulator::Resume,     this);  // resume simulation
-        ser_Reset       = nh.advertiseService("Reset",      &Simulator::Reset,      this);  // reset simulation
-        ser_Insert      = nh.advertiseService("Insert",     &Simulator::Insert,     this);  // insert a model
-        ser_Remove      = nh.advertiseService("Remove",     &Simulator::Remove,     this);  // remove a model
-        ser_Step        = nh.advertiseService("Step",       &Simulator::Step,       this);  // step the simulation
+        ser_Pause       = nh.advertiseService("Pause",      &Simulation::Pause,      this);  // pause simulation
+        ser_Resume      = nh.advertiseService("Resume",     &Simulation::Resume,     this);  // resume simulation
+        ser_Reset       = nh.advertiseService("Reset",      &Simulation::Reset,      this);  // reset simulation
+        ser_Insert      = nh.advertiseService("Insert",     &Simulation::Insert,     this);  // insert a model
+        ser_Remove      = nh.advertiseService("Remove",     &Simulation::Remove,     this);  // remove a model
+        ser_Step        = nh.advertiseService("Step",       &Simulation::Step,       this);  // step the simulation
       }
 
       // Pause the simulator
@@ -207,6 +207,6 @@ namespace uas_controller
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_WORLD_PLUGIN(Simulator)
+  GZ_REGISTER_WORLD_PLUGIN(Simulation)
 
 }

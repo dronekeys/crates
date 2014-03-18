@@ -425,14 +425,14 @@ namespace platform_complacs
 
             // The moment the nodelet is initialised, set up the HAL
             ROS_INFO("Binding HAL");
-            halUAV.bind(this->getPrivateNodeHandle());
+            halUAV.initialize("uav");
 
             // Then, bind all of the peripherals
             ROS_INFO("Binding peripherals");
-            halPosition.bind(this->getPrivateNodeHandle());
-            halInertial.bind(this->getPrivateNodeHandle());
-            halMagnetic.bind(this->getPrivateNodeHandle());
-            halAltitude.bind(this->getPrivateNodeHandle());
+            halPosition.initialize("position");
+            halInertial.initialize("inertial");
+            halMagnetic.initialize("magnetic");
+            halAltitude.initialize("altitude");
 
             /////////////////////////////////////////
             // Get parameters from the launch file //

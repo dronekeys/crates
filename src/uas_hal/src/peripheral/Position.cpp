@@ -3,12 +3,24 @@
 
 using namespace uas_hal;
 
-Position::Position() : bound(false) {}
-
-void Position::bind(ros::NodeHandle& nh)
+// Setup the altitude sensor
+void Position::initialize(const char *name)
 {
-	ROS_WARN("This is a dummy function that is not yet implemented");
+	// First, bind the ROS HAL
+	bind(name);
 
-	// Everything is now bound
-	bound = true;
+	// Then, advertise altitude information with a max queue length of 10
+	pub = getNodeHandle().advertise<uas_hal::MsgPosition>("Position", 10);
+}
+
+// Send some 
+void Position::post()
+{
+	if (!isBound())
+		ROS_WARN("Cannot send Position message, because not bound to ROS");
+	else
+	{
+		// Send the message
+		pub.publish(msg);
+	}
 }

@@ -1,22 +1,22 @@
-#ifndef UAS_HAL_POSITION_H
-#define UAS_HAL_POSITION_H
+#ifndef UAS_HAL_ORIENTATION_H
+#define UAS_HAL_ORIENTATION_H
 
 // ROS includes
 #include <ros/ros.h>
 
 // Base HAL type
 #include <uas_hal/HAL.h>
-#include <uas_hal/MsgPosition.h>
+#include <uas_hal/MsgOrientation.h>
 
 namespace uas_hal
 {
-    class Position : public HAL
+    class Orientation : public HAL
     {
 
     private:
 
         // Message to be published
-        MsgPosition     msg;
+        MsgOrientation  msg;
 
         // Publisher for the message
         ros::Publisher  pub;

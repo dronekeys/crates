@@ -58,10 +58,14 @@ find_package(GeographicLib REQUIRED)
 add_message_files(
   DIRECTORY
     msg
-  FILES
-    Information.msg
-    Inertial.msg
-    State.msg
+  FILES  
+    MsgAltitude.msg
+    MsgInertial.msg
+    MsgInformation.msg
+    MsgMagnetic.msg
+    MsgOrientation.msg
+    MsgPosition.msg
+    MsgState.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -123,16 +127,11 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${Geogra
 ## Declare a cpp library
 add_library(hal 
   src/peripheral/Altitude.cpp
-  src/peripheral/Camera.cpp
-  src/peripheral/Position.cpp
   src/peripheral/Inertial.cpp
   src/peripheral/Magnetic.cpp
-  src/peripheral/Radio.cpp
-#  src/platform/UAV/controllers/Waypoint.cpp
-#  src/platform/UAV/controllers/AnglesHeight.cpp
-#  src/platform/UAV/controllers/Velocity.cpp
-#  src/platform/UAV/controllers/VelocityHeight.cpp
-  src/platform/UAV/UAV.cpp
+  src/peripheral/Orientation.cpp
+  src/peripheral/Position.cpp
+  src/platform/UAV.cpp
   src/HAL.cpp
 )
 ## Declare a cpp executable

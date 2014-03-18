@@ -23,7 +23,7 @@ find_package(Boost REQUIRED COMPONENTS
 ) 
 
 # Find Gazebo
-find_package(gazebo REQUIRED)
+find_package(gazebo REQUIRED COMPONENTS)
 
 # Find Protobuf
 find_package(Protobuf REQUIRED)
@@ -136,12 +136,12 @@ link_directories(
 
 
 ## General plugins
-add_library(simulator  				src/simulator.cpp)
+add_library(simulation  			src/simulation.cpp)
 add_library(experiment 				src/experiment.cpp)
 
 ## World plugins
 add_library(atmosphere  			src/world/atmosphere.cpp)
-add_library(gpsorbits 				src/world/orbits.cpp)
+add_library(gpsorbits 				src/world/gpsorbits.cpp)
 
 ## Model plugins
 add_library(quadrotor 				src/model/quadrotor.cpp)
@@ -150,37 +150,37 @@ add_library(turbulence  			src/model/turbulence.cpp)
 
 ## Sensor plugins
 add_library(altimeter 				src/sensor/altimeter.cpp)
-add_library(inertial 				src/sensor/inertial.cpp)
+add_library(imu 					src/sensor/imu.cpp)
 add_library(compass 				src/sensor/compass.cpp)
-add_library(gpsreceiver 			src/sensor/gpsreceiver.cpp)
-add_library(orientation 			src/sensor/orientation.cpp)
+add_library(gps 					src/sensor/gps.cpp)
+add_library(inclinometer 			src/sensor/inclinometer.cpp)
 
 ## Add cmake target dependencies
-add_dependencies(altimeter			atmosphere_msgs)
-add_dependencies(imu 				atmosphere_msgs)
-add_dependencies(compass 			atmosphere_msgs)
-add_dependencies(atmosphere 		atmosphere_msgs)
-add_dependencies(shear 				atmosphere_msgs)
-add_dependencies(turbulence 		atmosphere_msgs)
-add_dependencies(gpsorbits 			gps_msgs)
-add_dependencies(gpsreceiver 		gps_msgs)
+add_dependencies(altimeter			custom_msgs)
+add_dependencies(imu 				custom_msgs)
+add_dependencies(compass 			custom_msgs)
+add_dependencies(atmosphere 		custom_msgs)
+add_dependencies(shear 				custom_msgs)
+add_dependencies(turbulence 		custom_msgs)
+add_dependencies(gpsorbits 			custom_msgs)
+add_dependencies(gps 	   			custom_msgs)
 
 ## World plugins
-target_link_libraries(simulator 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(experiment 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(atmosphere	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
-target_link_libraries(gpsorbits 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} gps_msgs)
+target_link_libraries(simulation 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(experiment 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(atmosphere	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(gpsorbits 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 ## Model plugins
-target_link_libraries(quadrotor 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(shear 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
-target_link_libraries(turbulence  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
+target_link_libraries(quadrotor 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(shear 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(turbulence  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
-target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
-target_link_libraries(imu 			${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
-target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} atmosphere_msgs)
-target_link_libraries(gpsreceiver 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} gps_msgs)
-target_link_libraries(orientation 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(gps  	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 
 #############

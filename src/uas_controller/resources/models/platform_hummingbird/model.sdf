@@ -29,36 +29,7 @@
           <mesh><uri>model://platform_hummingbird/meshes/hummingbird.dae</uri></mesh>
         </geometry>
       </visual>
-
-      <!-- GPS receiver that uses pseudoranges -->
-      <sensor name='gpsreceiver' type='gpsreceiver' always_on='1' update_rate='50'>
-        <origin pose='0 0 0 0 0 0'/>
-        <plugin name='gpsreceiver' filename='libgpsreceiver.so'/>
-      </sensor>
-      
-      <!-- Inertial measurement unit -->
-      <sensor name='inertial' type='inertial' always_on='1' update_rate='50'>
-        <origin pose='0 0 0 0 0 0'/>
-        <plugin name='inertial' filename='libinertial.so'/>
-      </sensor>
-
-      <!-- Three axis compass -->
-      <sensor name='compass' type='compass' always_on='1' update_rate='50'>
-        <origin pose='0 0 0 0 0 0'/>
-        <plugin name='compass' filename='libcompass.so'/>
-      </sensor>
-
-      <!-- Barometric pressure sensor -->
-      <sensor name='altimeter' type='altimeter' always_on='1' update_rate='50'>
-        <origin pose='0 0 0 0 0 0'/>
-        <plugin name='camera_dump' filename='libaltimeter.so'/>
-      </sensor>
-
-      <!-- Orientation sensor -->
-      <sensor name='orientation' type='orientation' always_on='1' update_rate='50'>
-        <origin pose='0 0 0 0 0 0'/>
-        <plugin name='camera_dump' filename='liborientation.so'/>
-      </sensor>
+    </link>
 
     <!-- West blade and motor -->
     <link name="blade_w">
@@ -184,6 +155,13 @@
       </axis>
     </joint>
     
+    <!-- Sensor... because gazebo doens't support plugins for NEW sensors -->
+    <plugin name='imu' filename='libimu.so'/>
+    <plugin name='gps' filename='libgps.so'/>
+    <plugin name='compass' filename='libcompass.so'/>
+    <plugin name='inclinometer' filename='libinclinometer.so'/>
+    <plugin name='altimeter' filename='libaltimeter.so'/>
+
     <!-- Provides second-order platform dynamics (respects net wind) -->
     <plugin name="quadrotor" filename="libquadrotor.so">
       <low_throttle>300</low_throttle>

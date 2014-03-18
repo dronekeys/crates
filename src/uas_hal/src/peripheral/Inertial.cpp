@@ -3,12 +3,24 @@
 
 using namespace uas_hal;
 
-Inertial::Inertial() : bound(false) {}
-
-void Inertial::bind(ros::NodeHandle& nh)
+// Setup the altitude sensor
+void Inertial::initialize(const char *name)
 {
-	ROS_WARN("This is a dummy function that is not yet implemented");
+	// First, bind the ROS HAL
+	bind(name);
 
-	// Everything is now bound
-	bound = true;
+	// Then, advertise altitude information with a max queue length of 10
+	pub = getNodeHandle().advertise<uas_hal::MsgInertial>("Inertial", 10);
+}
+
+// Send some 
+void Inertial::post()
+{
+	if (!isBound())
+		ROS_WARN("Cannot send Inertial message, because not bound to ROS");
+	else
+	{
+		// Send the message
+		pub.publish(msg);
+	}
 }

@@ -9,11 +9,11 @@
 #include <gazebo/gazebo.hh>
 
 // HAL includes
-#include <uas_hal/peripheral/Magnetic.h>
+#include <uas_hal/peripheral/Position.h>
 
 namespace uas_controller
 {
-	class Compass : public uas_hal::Magnetic,  public gazebo::ModelPlugin
+	class GPS : public uas_hal::Position,  public gazebo::ModelPlugin
 	{
 
 	private:
@@ -36,12 +36,12 @@ namespace uas_controller
 			modPtr = _model;
 
 			// Initialise the HAL
-			initialize("compass");			      
+			initialize("gps");			      
 
 			// Set up callback for updating the model
             timer = node.createTimer(
                 ros::Duration(1.0),  				     		 	// duration
-                boost::bind(&Compass::Update, this, _1),  	// callback
+                boost::bind(&GPS::Update, this, _1),  	// callback
                 false                                       		// oneshot?
             );
 	    }
@@ -55,5 +55,5 @@ namespace uas_controller
 	};
 
 	// Register this plugin with the simulator
-	GZ_REGISTER_MODEL_PLUGIN(Compass)
+	GZ_REGISTER_MODEL_PLUGIN(GPS)
 }

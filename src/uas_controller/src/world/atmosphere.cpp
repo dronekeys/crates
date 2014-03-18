@@ -19,11 +19,6 @@
 // Messages
 #include "atmosphere.pb.h"
 
-// Useful includes
-#define METERS_TO_FEET 3.28083990000
-#define FEET_TO_METERS 0.30479999953
-#define WIND_Z0        0.15000000000
-
 namespace uas_controller
 {
   class Atmosphere : public gazebo::WorldPlugin
@@ -39,10 +34,12 @@ namespace uas_controller
 
     // Presents this as a node in the simulator
     gazebo::transport::Node         node;
-    gazebo::transport::PublisherPtr pubPtrWind;
+
+    // Service that helps publish data
+    gazebo::transport::PublisherPtr pubPtr;
 
     // Message contacining wind information
-    msgs::Wind                      msgWind;
+    msgs::Atmosphere                msg;
 
   public:
     
@@ -58,11 +55,11 @@ namespace uas_controller
       this->node.Init(_world->GetName());
 
       // Create a publisher on the ~/wind topic
-      this->pubPtrWind = this->node.Advertise<msgs::Wind>("~/wind");
+      this->pubPtr = this->node.Advertise<msgs::Atmosphere>("~/atmosphere");
 
       // Set up callback for updating the model
       this->conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&Wind::Update, this, _1));
+        boost::bind(&Atmosphere::Update, this, _1));
 
       // Issue a reset immediately after load to initialise wind
       Reset();
@@ -72,12 +69,14 @@ namespace uas_controller
     void Update(const gazebo::common::UpdateInfo & _info)
     {
       // Package up the message
-      msgWind.set_z0(0.0);
-      msgWind.set_direction(0.0);
-      msgWind.set_speed(0.0);
+      msg.set_starttime(0.0);
+      msg.set_temperature(0.0);
+      msg.set_humidity(0.0);
+      msg.set_wind_direction(0.0);
+      msg.set_wind_speed(0.0);
 
       // Publish wind information to all subscribers
-      pubPtrWind->Publish(msgWind);
+      pubPtr->Publish(msg);
     }
 
     // Called on load() or reset()
