@@ -2,7 +2,7 @@
 <sdf version="1.4">
   <model name="hummingbird">
     
-    <!-- Are there any moving parts -->  
+    <!-- Will the physics engine move this platform -->  
     <static>false</static>
 
     <!-- Initial pose -->
@@ -13,6 +13,14 @@
       <pose>0 0 0  0 0 0</pose>
       <inertial>
         <mass>1.68</mass>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
       </inertial>
       <collision name="collision">
         <pose>0 0 0.035 0 0 0</pose>
@@ -26,7 +34,9 @@
       <visual name="frame">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh><uri>model://platform_hummingbird/meshes/hummingbird.dae</uri></mesh>
+          <mesh>
+            <uri>model://platform_hummingbird/meshes/hummingbird.dae</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -49,7 +59,9 @@
       <visual name="blade_w_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+          <mesh>
+            <uri>model://platform_hummingbird/meshes/blade.dae</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -80,7 +92,9 @@
       <visual name="blade_e_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+          <mesh>
+            <uri>model://platform_hummingbird/meshes/blade.dae</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -111,7 +125,9 @@
       <visual name="blade_n_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+          <mesh>
+            <uri>model://platform_hummingbird/meshes/blade.dae</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -142,7 +158,9 @@
       <visual name="blade_s_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh><uri>model://platform_hummingbird/meshes/blade.dae</uri></mesh>
+          <mesh>
+            <uri>model://platform_hummingbird/meshes/blade.dae</uri>
+          </mesh>
         </geometry>
       </visual>
     </link>
@@ -181,33 +199,32 @@
     </plugin>
 
     <!-- Provides second-order platform dynamics (respects net wind) -->
-    <plugin name="quadrotor" filename="libquadrotor.so">
-      <low_throttle>300</low_throttle>
-      <max_angvel>2.617993877991494</max_angvel>
-      <pq0>-3.25060e-04</pq0>
-      <pq1>1.79797e+02</pq1>
-      <pq2>-24.3536</pq2>
-      <r0>-4.81783e-03</r0>
-      <r1>-5.08944</r1>
-      <Cth0>6.63881e-01</Cth0>
-      <Cth1>7.44649e-04</Cth1>
-      <Cth2>2.39855e-06</Cth2>
-      <Cvb0>-18.0007</Cvb0>
-      <Cvb1>4.23754</Cvb1>
-      <tau0>3.07321</tau0>
-      <tau1>46.8004</tau1>
-      <kuv>-4.97391e-01</kuv>
-      <kw>-1.35341</kw>
-    </plugin>
-
-    <!-- Models wind shear effects (uses global wind speed and direction) -->
-    <plugin name="shear" filename="libshear.so">
-      <z0>0.15</z0>
-    </plugin>
-
-    <!-- Models wind turbulence effects (uses global wind speed and direction) -->
-    <plugin name="turbulence" filename="libturbulence.so">
-      <z0>0.15</z0>
+    <plugin name="aerodynamics" filename="libaerodynamics.so">
+      <limits>
+        <low_throttle>300</low_throttle>
+        <max_angvel>2.617993877991494</max_angvel>
+      </limits>
+      <dynamics>
+        <pq0>-3.25060e-04</pq0>
+        <pq1>1.79797e+02</pq1>
+        <pq2>-24.3536</pq2>
+        <r0>-4.81783e-03</r0>
+        <r1>-5.08944</r1>
+        <Cth0>6.63881e-01</Cth0>
+        <Cth1>7.44649e-04</Cth1>
+        <Cth2>2.39855e-06</Cth2>
+        <Cvb0>-18.0007</Cvb0>
+        <Cvb1>4.23754</Cvb1>
+        <tau0>3.07321</tau0>
+        <tau1>46.8004</tau1>
+        <kuv>-4.97391e-01</kuv>
+        <kw>-1.35341</kw>
+      </dynamics>
+      <wind>
+        <z0>0.15</z0>
+        <turbulence>true</turbulence>
+        <shear>true</shear>
+      </wind>
     </plugin>
 
   </model>

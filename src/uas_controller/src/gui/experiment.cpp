@@ -24,14 +24,14 @@
 
 namespace gazebo
 {
-  class Simulation : public SystemPlugin
+  class Experiment : public SystemPlugin
   {
   public:
 
     void Load(int /*_argc*/, char ** /*_argv*/)
     {
       conPtr = event::Events::ConnectPreRender(
-        boost::bind(&Simulation::Update, this)
+        boost::bind(&Experiment::Update, this)
       );
     }
 
@@ -41,23 +41,11 @@ namespace gazebo
 
     void Update()
     {
-      // Get scene pointer
-      rendering::ScenePtr scene = rendering::get_scene();
 
-      // Wait until the scene is initialized.
-      if (!scene || !scene->GetInitialized())
-        return;
-
-      // Print out the total number of visuals in the scene
-      std::cout << "Visual Count:" << scene->GetVisualCount() << std::endl;
-
-      // Look for a specific visual by name.
-      if (scene->GetVisual("ground_plane"))
-        std::cout << "Has ground plane visual\n";
     }
 
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_SYSTEM_PLUGIN(Simulation)
+  GZ_REGISTER_SYSTEM_PLUGIN(Experiment)
 }

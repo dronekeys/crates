@@ -4,19 +4,42 @@
 
   <world name="experiment">
 
-    <!-- Set the default camera pose -->
-    <gui>
-      <camera name="user_camera">
-        <pose>0 0 0 0 0 0</pose>
-      </camera>
-    </gui>  
-
     <!-- Set the physics properties -->
     <physics type="ode">
       <max_step_size>0.02</max_step_size>
       <real_time_factor>1.0</real_time_factor>
       <real_time_update_rate>50</real_time_update_rate>
     </physics>
+
+    <!-- Set the scene properties -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>51.71190</latitude_deg>
+      <longitude_deg>-0.21052</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- Setup a basic scene -->
+    <scene>
+      <sky>
+        <time>10.00</time>
+        <sunrise>06.23</sunrise>
+        <sunset>17.59</sunset>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>false</shadows>
+    </scene>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://location_rvc</uri>
+    </include>
 
     <!-- Setup a basic scene -->
     <!--

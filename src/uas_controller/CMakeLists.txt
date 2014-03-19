@@ -36,6 +36,15 @@ find_package(GPSTK REQUIRED)
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
+include (FindPkgConfig)
+if (PKG_CONFIG_FOUND)
+  pkg_check_modules(GAZEBO gazebo)
+  pkg_check_modules(OGRE OGRE)
+  pkg_check_modules(OGRE-Terrain OGRE-Terrain)
+  pkg_check_modules(CEGUI CEGUI)
+  pkg_check_modules(CEGUI-OGRE CEGUI-OGRE)
+endif()
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -117,65 +126,83 @@ catkin_package(
 ## Specify additional locations of header files
 include_directories(include
 	${catkin_INCLUDE_DIRS}
-	${SDFormat_INCLUDE_DIRS}
-	${GAZEBO_INCLUDE_DIRS} 
 	${Boost_INCLUDE_DIR} 
 	${GPSTK_INCLUDE_DIR} 
+	${SDFormat_INCLUDE_DIRS}
+	${GAZEBO_INCLUDE_DIRS}
+	${OGRE_INCLUDE_DIRS}
+  	${OGRE-Terrain_INCLUDE_DIRS}
+  	${CEGUI_INCLUDE_DIRS}
+  	${CEGUI-OGRE_INCLUDE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
 ## Specify additional locations of library files
 link_directories(
 	${catkin_LIBRARY_DIRS}
-	${GAZEBO_LIBRARY_DIRS} 
-	${SDFormat_LIBRARY_DIRS} 
 	${Boost_LIBRARY_DIRS} 
-	${GPSTK_LIBRARY_DIRS} 
+	${GPSTK_LIBRARY_DIRS}
+	${SDFormat_LIBRARY_DIRS} 
+	${GAZEBO_LIBRARY_DIRS} 
+	${OGRE_LIBRARY_DIRS}
+  	${OGRE-Terrain_LIBRARY_DIRS}
+  	${CEGUI_LIBRARY_DIRS}
+  	${CEGUI-OGRE_LIBRARY_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
+################################
+# Define libraries to be built #
 
 ## General plugins
-add_library(simulation  			src/simulation.cpp)
-add_library(experiment 				src/experiment.cpp)
+add_library(simulation  			src/gui/simulation.cpp)
+add_library(experiment 				src/gui/experiment.cpp)
 
 ## World plugins
 add_library(atmosphere  			src/world/atmosphere.cpp)
 add_library(gpsorbits 				src/world/gpsorbits.cpp)
+add_library(listener 				src/world/listener.cpp)
 
 ## Model plugins
-add_library(quadrotor 				src/model/quadrotor.cpp)
-add_library(shear 					src/model/shear.cpp)
-add_library(turbulence  			src/model/turbulence.cpp)
+add_library(aerodynamics 			src/model/aerodynamics.cpp)
+add_library(altimeter 				src/model/altimeter.cpp)
+add_library(imu 					src/model/imu.cpp)
+add_library(compass 				src/model/compass.cpp)
+add_library(gps 					src/model/gps.cpp)
+add_library(inclinometer 			src/model/inclinometer.cpp)
 
-## Sensor plugins
-add_library(altimeter 				src/sensor/altimeter.cpp)
-add_library(imu 					src/sensor/imu.cpp)
-add_library(compass 				src/sensor/compass.cpp)
-add_library(gps 					src/sensor/gps.cpp)
-add_library(inclinometer 			src/sensor/inclinometer.cpp)
+##################################
+## Add cmake target dependencies #
 
-## Add cmake target dependencies
+## General plugins
+add_dependencies(aerodynamics		custom_msgs)
 add_dependencies(altimeter			custom_msgs)
-add_dependencies(imu 				custom_msgs)
-add_dependencies(compass 			custom_msgs)
-add_dependencies(atmosphere 		custom_msgs)
-add_dependencies(shear 				custom_msgs)
-add_dependencies(turbulence 		custom_msgs)
-add_dependencies(gpsorbits 			custom_msgs)
-add_dependencies(gps 	   			custom_msgs)
 
 ## World plugins
-target_link_libraries(simulation 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+add_dependencies(imu 				custom_msgs)
+add_dependencies(compass 			custom_msgs)
+add_dependencies(inclinometer 		custom_msgs)
+add_dependencies(gps 	   			custom_msgs)
+
+## Model plugins
+add_dependencies(atmosphere 		custom_msgs)
+add_dependencies(gpsorbits 			custom_msgs)
+add_dependencies(listener 	   		custom_msgs)
+
+###########################
+## Set up dynamic linking #
+
+## GUI plugins
+target_link_libraries(simulation 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES} ${OGRE-Terrain_LIBRARIES} ${CEGUI_LIBRARIES} ${CEGUI-OGRE_LIBRARIES})
 target_link_libraries(experiment 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+
+## World plugins
+target_link_libraries(listener		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(atmosphere	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(gpsorbits 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 ## Model plugins
-target_link_libraries(quadrotor 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(shear 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(turbulence  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-
+target_link_libraries(aerodynamics	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)

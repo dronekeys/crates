@@ -41,19 +41,7 @@ namespace gazebo
 
     void Update()
     {
-      // Get scene pointer
-      rendering::ScenePtr scene = rendering::get_scene();
 
-      // Wait until the scene is initialized.
-      if (!scene || !scene->GetInitialized())
-        return;
-
-      // Print out the total number of visuals in the scene
-      std::cout << "Visual Count:" << scene->GetVisualCount() << std::endl;
-
-      // Look for a specific visual by name.
-      if (scene->GetVisual("ground_plane"))
-        std::cout << "Has ground plane visual\n";
     }
 
   };
