@@ -10,6 +10,8 @@ endforeach()
 # List of custom messages
 set(msgs 
 	atmosphere.proto 
+	turbulence.proto
+	shear.proto
 	gps.proto
 )
 

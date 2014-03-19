@@ -13,6 +13,16 @@
 
 namespace uas_hal
 {
+    // Basic control
+    typedef struct
+    {
+        double p;
+        double r;
+        double t;
+        double y;
+    } 
+    Control;
+
 	/* 	The UAV interface provides an abstract mechanism from which to control a UAV */
     class UAV : public HAL
     {
@@ -29,14 +39,27 @@ namespace uas_hal
 
     public:
 
+        // Derived classes must implement this function
+        virtual void HalReceiveControl(const Control &ctl) = 0;
+
         // Setup the altitude sensor
-        void initialize(const char *name);
+        void HalInit(const char *name);
 
 		// Send the current state 
-		void postState();
+		void HalBroadcastState(
+            const double &px, const double &py, const double &pz,
+            const double &rx, const double &ry, const double &rz,
+            const double &vx, const double &vy, const double &vz,
+            const double &ax, const double &ay, const double &az,
+            const double &thrust, const double &energy
+        );
 
 		// Send some general information
-		void postInformation();
+		void HalBroadcastInformation(
+            const char*     id,
+            const char*     version,
+            const double&   uptime
+            );
 
     };
 }

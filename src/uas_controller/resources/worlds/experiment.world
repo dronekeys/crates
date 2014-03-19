@@ -40,31 +40,8 @@
     <include>
       <uri>model://location_rvc</uri>
     </include>
-
-    <!-- Setup a basic scene -->
-    <!--
-    <scene>
-      <sky>
-        <time>10.00</time>
-        <sunrise>06.23</sunrise>
-        <sunset>17.59</sunset>
-        <clouds>
-          <speed>12</speed>
-        </clouds>
-      </sky>
-      <shadows>false</shadows>
-    </scene>
-    <include>
-      <uri>model://sun</uri>
-    </include>
-
-    <include>
-      <uri>model://location_rvc</uri>
-    </include>
-    
-    
-    <plugin name="experiment" filename="libexperiment.so"/>
-     This -->
+       
+    <plugin name="listener" filename="liblistener.so"/>
 
   </world>
 

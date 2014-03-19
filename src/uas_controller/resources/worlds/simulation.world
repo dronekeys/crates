@@ -45,15 +45,9 @@
       <uri>model://platform_hummingbird</uri>
     </include>
 
-    <!--
-    <plugin name="simulation" filename="libsimulation.so"/>
-    /--->
-    <!--
     <plugin name="gpsorbits" filename="libgpsorbits.so">
       <orbit>file://media/orbits/ngs15992_16to17.sp3</orbit>
-      <model_pseudorange>15 0 0.1 0.1</model_pseudorange>
     </plugin>
-    -->
 
   </world>
 
