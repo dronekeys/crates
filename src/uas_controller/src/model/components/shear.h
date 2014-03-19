@@ -4,6 +4,9 @@
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 
+// Core functionality
+#include "component.h"
+
 // Basic constants 
 #define METERS_TO_FEET 		3.2808399
 #define FEET_TO_METERS 		0.3048000
@@ -17,6 +20,9 @@ namespace uas_controller
 
     private:
 
+        // Current wind vector
+        gazebo::math::Vector3 wind;
+        
     	// Direction of the mean wind field
     	gazebo::math::Vector3 d20;
     	
@@ -24,22 +30,25 @@ namespace uas_controller
     	double s20;
 
     	// Constant parameters
-    	double  _mA;		// Minimum wind altitude
-    	double  _z0;		// Constant (based on flight envelope)    	
+    	double mA;		// Minimum wind altitude
+    	double z0;		// Constant (based on flight envelope)    	
 
     public:
 
     	// Default constructor
     	Shear();
 
-    	// Change the wind parameters 
-    	SetParameters(const double &mA, const double &z0);
+        // Default constructor takes configuration + pointer to link
+        Configure(sdf::ElementPtr _sdf);
 
     	// Set the speed (m) and direction (degrees) of the winf
-    	void SetGlobalField(const double &speed,const double &direction);
+    	void SetWind(const double &speed,const double &direction);
     	
     	// Get the wind vector based on the 
-    	gazebo::math::Vector3 GetGlobalVelocity(const double &alt);
+    	void Update(const double &alt);
+
+        // Get the wind vector based on the 
+        void GetVelocity(const double &alt);
 
     };
 }

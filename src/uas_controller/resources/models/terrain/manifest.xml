@@ -1,0 +1,10 @@
+<model>
+	<name>Example 3D Terrain</name>
+	<version>1.0</version>
+	<sdf version="1.4">model.sdf</sdf>
+	<author>
+		<name>Andrew Symington</name>
+		<email>andrew.c.symington@gmail.com</email>
+	</author>
+	<description>A location showing 3D terrain from a height map.</description>
+</model>

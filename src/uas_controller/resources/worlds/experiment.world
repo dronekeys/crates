@@ -38,11 +38,13 @@
     </include>
 
     <include>
-      <uri>model://location_rvc</uri>
+      <uri>model://rvc</uri>
     </include>
-       
+      
+    <!--
     <plugin name="listener" filename="liblistener.so"/>
-
+    -->
+    
   </world>
 
 </sdf>

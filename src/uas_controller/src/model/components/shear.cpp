@@ -4,17 +4,31 @@
 using namespace uas_controller;
 
 // Default constructor
-Shear::Shear() : _mA(0.05), _z0(0.15) {}
+Shear::Shear() : mA(0.05), z0(0.15), s20(0), d20(0,0,0), wind(0,0,0) {}
 
-// Change the wind parameters 
-Shear::SetParameters(const double &mA, const double &z0)
+// Default constructor takes configuration + pointer to link
+Shear::Configure(sdf::ElementPtr _sdf)
 {
-  _mA = mA;
-  _z0 = z0;
+ /*
+      <shear>
+        <enabled>true</enabled>
+        <
+      </shear>                       */
+
+  // Direct parameters
+  mA = GetSDFDouble(sdf,"shear.floor",mA);
+  z0 = GetSDFDouble(sdf,"shear.z0",z0);
+  
+  // Speed and direction
+  double s = GetSDFDouble(sdf,"shear.speed",0.0);
+  double d = GetSDFDouble(sdf,"shear.direction" ,0.0);
+  
+  // Set from SI -> MIL units
+  SetWind(s,d);
 }
 
 // Set the speed (m) and direction (degrees) of the winf
-void Shear::SetGlobalField(const double &speed,const double &direction)
+void Shear::SetWind(const double &speed, const double &direction)
 {
   // Wind always blows orthogonal to the down direction
   d20.x = -cos(DEGREES_TO_RADIANS * direction);
@@ -26,12 +40,17 @@ void Shear::SetGlobalField(const double &speed,const double &direction)
 }
 
 // Get the wind vector based on the 
-gazebo::math::Vector3 Shear::GetGlobalVelocity(const double &alt)
+void Shear::Update(const double &alt)
 {
   // Calculate the wind vector, taking into account shear
-  if (alt > _mA)
-    return FEET_TO_METERS * s20 * (log(METERS_TO_FEET*alt/_z0)/log(20.0/_z0)) * d20;
-  
-  // If we get here, then we don't have any wind
-  return 0.0 * d20;
+  if (alt > mA)
+    wind = FEET_TO_METERS * s20 * (log(METERS_TO_FEET*alt/z0)/log(20.0/z0)) * d20;
+  else
+    wind.Set(0,0,0);
+}
+
+// Get the wind vector based on the 
+gazebo::math::Vector3 Shear::GetVelocity(const double &alt)
+{
+  return wind;
 }

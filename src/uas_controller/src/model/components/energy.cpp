@@ -1,37 +1,61 @@
 /* This gazebo model plugin implements a second order model for quadrotor dynamics */ 
-#include "shear.h"
+#include "energy.h"
 
 using namespace uas_controller;
 
 // Default constructor
-Shear::Shear() : _mA(0.05), _z0(0.15) {}
+Energy::Energy() : tot(2.2), rem(2.2), cb(0.2), cf(6.6), kill(0.1), warn(0.2), th(0.001) {}
 
-// Change the wind parameters 
-Shear::SetParameters(const double &mA, const double &z0)
+// Configure from plugin sdf
+void Energy::Configure(sdf::ElementPtr sdf)
 {
-  _mA = mA;
-  _z0 = z0;
+  /*
+      <energy>
+        <battery>2.2</battery>
+        <consumption>
+          <base>0.2</base>
+          <flight>6.6</flight>
+        </consumption>
+        <limits>
+          <kill>0.1</kill>
+          <warn>0.2</warn>
+        </limits>
+      </energy>           */
+
+  tot  = GetSDFDouble(sdf,"energy.total",tot);
+  rem  = GetSDFDouble(sdf,"energy.remaining",rem);
+  cb   = GetSDFDouble(sdf,"energy.consumption.base",cb);
+  cf   = GetSDFDouble(sdf,"energy.consumption.flight",cf);
+  kill = GetSDFDouble(sdf,"energy.limits.kill",kill);
+  warn = GetSDFDouble(sdf,"energy.limits.warn",warn);
+  th   = GetSDFDouble(sdf,"energy.throttle",th);
+
 }
 
-// Set the speed (m) and direction (degrees) of the winf
-void Shear::SetGlobalField(const double &speed,const double &direction)
+// Checks whether the energy is too low to continue flying
+bool Energy::IsCriticallyLow()
 {
-  // Wind always blows orthogonal to the down direction
-  d20.x = -cos(DEGREES_TO_RADIANS * direction);
-  d20.y = -sin(DEGREES_TO_RADIANS * direction);
-  d20.z = 0.0;
-
-  // Get the speed at 20ft
-  s20 = METERS_TO_FEET * speed;
+  return (rem < kill);
 }
 
-// Get the wind vector based on the 
-gazebo::math::Vector3 Shear::GetGlobalVelocity(const double &alt)
+// Update the energy 
+void Energy::Update(const double &thrust, const double &dt)
 {
-  // Calculate the wind vector, taking into account shear
-  if (alt > _mA)
-    return FEET_TO_METERS * s20 * (log(METERS_TO_FEET*alt/_z0)/log(20.0/_z0)) * d20;
-  
-  // If we get here, then we don't have any wind
-  return 0.0 * d20;
+  if (thrust > 0)
+    rem -= dt * (cb + cf) / 3600;
+  else
+    rem -= dt * cb / 3600;
 }
+
+// The amount by which to reduce thrust to offer a gentle landing
+double Energy::GetThrustReduction()
+{
+  return th;
+}
+
+// Predict voltage -- this should definitely be improved (not linear in reality)
+double Energy::GetVoltage()
+{
+  return 9 + (rem / tot) * 3.5;
+}
+

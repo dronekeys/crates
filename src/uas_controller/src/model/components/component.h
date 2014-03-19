@@ -1,19 +1,59 @@
 #ifndef UAS_CONTROLLER_COMPONENT_H
 #define UAS_CONTROLLER_COMPONENT_H
 
+// System includes
+#include <string>
+#include <vector>
+
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
+
+// Core functionality
+#include "component.h"
 
 namespace uas_controller
 {
     class Component
     {
-
     protected:
 
-    	// Default constructor takes
-    	virtual Configure(sdf::ElementPtr _sdf) = 0;
+    	// Recurse down the tree  looking for elements
+    	bool FindElement(sdf::ElementPtr &cur, std::string path)
+    	{
+    		// Stores the query path
+    		std::vector<std::string> e;
 
+    		// Aplit the query path string into nice tokens
+    		boost::split(e, (std::string) key, boost::is_any_of("."));
+
+    		// Iterate over tokens, checking that each child exists
+    		for (std::vector<std::string>::iterator i = e.beg(); i != e.end(); i++)
+    		{
+    			if (cur->HasElement(*i))
+    				cur = cur->GetElement(*i);
+    			else
+    				return false;
+    		}
+
+    		// Element found
+    		return true;
+    	}
+
+    	// Get a SDF double parameter
+    	double GetSDFDouble(sdf::ElementPtr root, const char* path, double value)
+    	{
+			if (FindElement(root, (std::string) path))
+    			return cur->GetValueDouble();
+    		return value;
+    	}
+
+    	// Get a SDF double parameter
+    	int GetSDFInteger(sdf::ElementPtr root, const char* path, double value)
+    	{
+			if (FindElement(root, (std::string) path))
+    			return cur->GetValueInt();
+    		return value;
+    	}
     };
 }
 

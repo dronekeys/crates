@@ -4,6 +4,9 @@
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 
+// Core functionality
+#include "component.h"
+
 // Basic constants 
 #define METERS_TO_FEET 		3.2808399
 #define FEET_TO_METERS 		0.3048000
@@ -18,34 +21,40 @@ namespace uas_controller
 
     private:
 
+        // CBoostrapping parameters
+        int     bsiter;
+        double  bstime;
+
     	// Direction of the mean wind field
-    	gazebo::math::Vector3 gust;
+    	gazebo::math::Vector3 wind;
 
-    	// Intermediary sigma and length scale
+    	// Intermediary variables
     	gazebo::math::Vector3 s, l;
-
-    	// Used in the update() call
     	double d, h, k;
     	
-    	// Speed
+    	// Speed and direction 
     	double s20;
-
-    	// Direction
     	gazebo::math::Quaternion d20;    	
 
     public:
 
-    	// Default constructor
-    	Turbulence();
+        // Constructor
+        Turbulence();
 
-    	// Change the wind parameters 
-    	SetParameters(const double &mA, const double &z0);
+        // Default constructor takes configuration + pointer to link
+        void Configure(sdf::ElementPtr _sdf, const double &alt, const double &speed);
 
-    	// Set the speed (m) and direction (degrees) of the winf
-    	void SetGlobalField(const double &speed,const double &direction);
-    	
-    	// Get the wind vector based on the 
-    	gazebo::math::Vector3 GetGlobalVelocity(const double &alt);
+        // Set the speed (m) and direction (degrees) of the winf
+        void SetWind(const double &speed, const double &direction);
+
+        // Set the speed (m) and direction (degrees) of the winf
+        void Reset(const double &alt, const double &speed);
+
+        // Get the wind vector based on the 
+        void Update(const double &alt, const double &speed, const double &dt);
+        
+        // Get the wind vector based on the 
+        void GetVelocity();
 
     };
 }

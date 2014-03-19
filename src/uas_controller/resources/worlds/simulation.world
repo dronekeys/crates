@@ -38,17 +38,19 @@
     </include>
 
     <include>
-      <uri>model://location_rvc</uri>
+      <uri>model://rvc</uri>
     </include>
 
     <include>
-      <uri>model://platform_hummingbird</uri>
+      <uri>model://hummingbird</uri>
     </include>
 
+    <!--
     <plugin name="gpsorbits" filename="libgpsorbits.so">
       <orbit>file://media/orbits/ngs15992_16to17.sp3</orbit>
     </plugin>
-
+    -->
+    
   </world>
 
 </sdf>

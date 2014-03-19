@@ -155,7 +155,7 @@ link_directories(
 # Define libraries to be built #
 
 ## General plugins
-add_library(noise  					src/gui/simulation.cpp)
+add_library(noise  					src/noise.cpp)
 
 ## General plugins
 add_library(simulation  			src/gui/simulation.cpp)
@@ -172,7 +172,7 @@ add_library(imu 					src/model/imu.cpp)
 add_library(compass 				src/model/compass.cpp)
 add_library(gps 					src/model/gps.cpp)
 add_library(inclinometer 			src/model/inclinometer.cpp)
-add_library(quadrotor 				src/quadrotor.cpp
+add_library(quadrotor 				src/model/quadrotor.cpp
 	src/model/components/dynamics.cpp
 	src/model/components/turbulence.cpp
 	src/model/components/shear.cpp
@@ -209,13 +209,12 @@ target_link_libraries(atmosphere	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost
 target_link_libraries(gpsorbits 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 ## Model plugins
-target_link_libraries(quadrotor		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(gps  	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-
+target_link_libraries(quadrotor		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
+target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
+target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
+target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
+target_link_libraries(gps  	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
+target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} noise custom_msgs)
 
 #############
 ## Install ##
