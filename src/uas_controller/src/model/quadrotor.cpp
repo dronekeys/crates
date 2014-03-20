@@ -9,6 +9,10 @@
 // Gazebo includes
 #include <gazebo/physics/Model.hh>
 #include <gazebo/gazebo.hh>
+#include <gazebo/common/CommonTypes.hh>
+#include <gazebo/common/Animation.hh>
+#include <gazebo/common/KeyFrame.hh>
+#include <gazebo/physics/Model.hh>
 
 // HAL includes
 #include <uas_hal/platform/UAV.h>
@@ -39,6 +43,7 @@ namespace uas_controller
 
     // Pointer to the current model
     gazebo::physics::ModelPtr         modPtr;
+    gazebo::physics::LinkPtr          lnkPtr;
 
     // Pointer to the update event connection
     gazebo::event::ConnectionPtr      conPtr;
@@ -78,11 +83,13 @@ namespace uas_controller
     // Receive the global wind speed and direction
     void ReceiveAtmosphere(AtmospherePtr &msg)
     {
+      /*
       // Configure the wind shear accoridngly
       shear.SetWind(
         msg->wind_speed(),      // Spped
         msg->wind_direction()   // Direction
       );
+      */
     }
 
     // Broadcast the current state
@@ -108,9 +115,9 @@ namespace uas_controller
     {
       // Immediately publish the state
       PostInformation(
-        modPtr->GetName().c_str(),              // UAV name
-        "simulated",                            // Decription
-        tim                                     // Uptime (respects siulation)
+        "uav",              // UAV name
+        "simulated",        // Decription
+        tim                 // Uptime (respects siulation)
       );
     }
 
@@ -129,41 +136,27 @@ namespace uas_controller
 
         // Update the energy consumption, and get the current voltage
         control.voltage = energy.Update(control.throttle, dt);
-      
-        /////////////////
-        // WIND UPDATE //
-        /////////////////
 
-        // Reset the wind veector
-        wind.Set(0,0,0);
+        if (tim < 5)
+          control.pitch = 0.05;
+        else
+          control.pitch = 0.0;
+        
+        // Get navigation-frame wind
+        wind = shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt);
 
-        // Add the shear component
-        wind += shear.Update(
-          modPtr->GetWorldPose().pos.z
-        );
-
-        // Add the turbulence component
-        wind += turbulence.Update(
-          modPtr->GetWorldPose().pos.z,                     // Altitude
-          modPtr->GetWorldLinearVel().GetLength(),          // Airspeed
-          dt                                                // Time
-        );
-
-        ////////////////////
-        // DYNAMIC UPDATE //
-        ////////////////////
-
-       // Set the state of the platform directly from the simulation
+        // Set the state of the platform directly from the simulation
         dynamics.Update(
-          modPtr,                                             // Model
+          lnkPtr,                                             // Model
+          wind,                                               // Wind
           control.GetScaledPitch(),                           // Pitch
           control.GetScaledRoll(),                            // Roll
           control.GetScaledThrottle(),                        // Throttle
           control.GetScaledYaw(),                             // Yaw
           control.GetScaledVoltage(),                         // Yaw
-          wind,                                               // Wind
           dt                                                  // Time
         );
+
       }
 
       // Update timer
@@ -172,13 +165,17 @@ namespace uas_controller
 
   public: 
 
-    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0) {}
+    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0)
+    {
+      ROS_INFO("Loaded quadrotor plugin");
+    }
 
     // On initial load
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
     {
       // Save pointer to the model
       modPtr = model;
+      lnkPtr = model->GetLink("body");
 
       ////////////////////////
       // Configure from SDF //
@@ -191,7 +188,7 @@ namespace uas_controller
       shear.Configure(root);
 
       // Configure the turbulence model from SDF
-      turbulence.Configure(root);
+      turbulence.Configure(root, lnkPtr);
       
       // Configure the dynamic model from SDF
       dynamics.Configure(root);
@@ -230,6 +227,18 @@ namespace uas_controller
           boost::bind(&Quadrotor::BroadcastInformation, this, _1),     // callback
           false                                                           // oneshot?
       );
+
+
+      // Animate the motors
+      /*
+      gazebo::common::PoseAnimationPtr anim(new gazebo::common::PoseAnimation("test", 1000.0, true));
+      gazebo::common::PoseKeyFrame *key;
+      key = anim->CreateKeyFrame(0);
+      key->SetRotation(math::Quaternion(0, 0, 0));
+      key->SetRotation(math::Quaternion(0, 0, 1.5707));
+      _parent->SetAnimation(anim);
+      */
+
     }
   };
 

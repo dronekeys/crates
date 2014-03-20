@@ -20,16 +20,26 @@ namespace uas_controller
 
 	    // Pointer to the current model
 	    gazebo::physics::ModelPtr	 modPtr;
-
-	    // Pointer to the update event connection
-	    gazebo::event::ConnectionPtr conPtr;
 	    
 	    // Listen to broadcasts from the atmosphere
 		ros::Timer timer;
 
+		// When called published the data
+		void Update(const ros::TimerEvent& event)
+		{
+			// Immediately post the z position and speed
+			Post(
+				modPtr->GetWorldPose().pos.z, 	// Height (m)
+				modPtr->GetWorldLinearVel().z	// Velocity (m/s)
+			);
+		}
+		
 	public:
 
-		Altimeter() : uas_hal::Altitude("altimeter") {}
+		Altimeter() : uas_hal::Altitude("altimeter") 
+		{
+			ROS_INFO("Loaded altimeter plugin");
+		}
 
 		// On initial load
 	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
@@ -44,16 +54,6 @@ namespace uas_controller
                 false                                       		// oneshot?
             );
 	    }
-
-		// When called published the data
-		void Update(const ros::TimerEvent& event)
-		{
-			// Immediately post the z position and speed
-			Post(
-				modPtr->GetWorldPose().pos.z, 	// Height (m)
-				modPtr->GetWorldLinearVel().z	// Velocity (m/s)
-			);
-		}
 	};
 
 	// Register this plugin with the simulator

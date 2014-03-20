@@ -5,15 +5,15 @@
 #include <ros/ros.h>
 
 // Gazebo includes
-#include <gazebo/physics/Model.hh>
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
 
 // HAL includes
 #include <uas_hal/peripheral/Position.h>
 
 namespace uas_controller
 {
-	class GPS : public uas_hal::Position,  public gazebo::ModelPlugin
+	class GPSReceiver : public uas_hal::Position,  public gazebo::ModelPlugin
 	{
 
 	private:
@@ -21,32 +21,12 @@ namespace uas_controller
 	    // Pointer to the current model
 	    gazebo::physics::ModelPtr	 modPtr;
 
-	    // Pointer to the update event connection
-	    gazebo::event::ConnectionPtr conPtr;
-	    
 	    // Listen to broadcasts from the atmosphere
 		ros::Timer timer;
 
 	    // Prevents needless allocation
 	    gazebo::math::Vector3 pos, vel, err_pos, err_vel;
 
-	public:
-
-		GPS() : uas_hal::Position("gps") {}
-
-		// On initial load
-	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
-	    {
-			// Save the model pointer
-			modPtr = _model;
-
-			// Set up callback for updating the model
-            timer = GetROSNode().createTimer(
-                ros::Duration(1.0),  				     		 	// duration
-                boost::bind(&GPS::Update, this, _1),  	// callback
-                false                                       		// oneshot?
-            );
-	    }
 
 		// When called published the data
 		void Update(const ros::TimerEvent& event)
@@ -81,8 +61,29 @@ namespace uas_controller
                     err_vel.z,
                     0.0);
 		}
+		
+	public:
+
+		GPSReceiver() : uas_hal::Position("gpsreceiver")
+		{
+			ROS_INFO("Loaded gps receiver plugin");
+		}
+
+		// On initial load
+	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
+	    {
+			// Save the model pointer
+			modPtr = _model;
+
+			// Set up callback for updating the model
+            timer = GetROSNode().createTimer(
+                ros::Duration(1.0),  				     		 	// duration
+                boost::bind(&GPSReceiver::Update, this, _1),  		// callback
+                false                                       		// oneshot?
+            );
+	    }
 	};
 
 	// Register this plugin with the simulator
-	GZ_REGISTER_MODEL_PLUGIN(GPS)
+	GZ_REGISTER_MODEL_PLUGIN(GPSReceiver)
 }

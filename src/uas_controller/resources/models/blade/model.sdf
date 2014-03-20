@@ -6,9 +6,11 @@
     <!-- Will the physics engine move this platform -->  
     <static>true</static>
 
-    <link name="link">
+    <link name="blade_link">
+
+      <gravity>false</gravity>
       
-      <collision name="collision">
+      <collision name="blade_collision">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
@@ -18,7 +20,7 @@
         </geometry>
       </collision>
       
-      <visual name="visual">
+      <visual name="blade_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>

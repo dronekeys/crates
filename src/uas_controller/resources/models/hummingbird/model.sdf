@@ -12,6 +12,7 @@
     <!-- Frame -->
     <link name="body">
       <pose>0 0 0  0 0 0</pose>
+      <must_be_base_link>true</must_be_base_link>
       <inertial>
         <mass>1.68</mass>
         <inertia>
@@ -23,7 +24,7 @@
           <izz>1</izz>
         </inertia>
       </inertial>
-      <collision name="collision">
+      <collision name="body_collision">
         <pose>0 0 0.035 0 0 0</pose>
         <geometry>
           <cylinder>
@@ -32,7 +33,7 @@
           </cylinder>
         </geometry>
       </collision>
-      <visual name="frame">
+      <visual name="body_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
@@ -47,26 +48,69 @@
       <name>blade0</name>
       <pose>-0.241 0.0 0.05 0 0 0</pose>
     </include>
+    <joint name="motor0" type="revolute">
+      <parent>body</parent>
+      <child>blade0::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
 
     <include>
       <uri>model://blade</uri>
       <name>blade1</name>
       <pose>0.241 0.0 0.05 0 0 0</pose>
     </include>
+    <joint name="motor1" type="revolute">
+      <parent>body</parent>
+      <child>blade1::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
 
     <include>
       <uri>model://blade</uri>
       <name>blade2</name>
       <pose>0.0 0.241 0.05 0 0 0</pose>
-    </include>
+    </include>`
+    <joint name="motor`2" type="revolute">
+      <parent>body</parent>
+      <child>blade2::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
 
     <include>
       <uri>model://blade</uri>
       <name>blade3</name>
       <pose>0.0 -0.241 0.05 0 0 0</pose>
     </include>
+    <joint name="motor3" type="revolute">
+      <parent>body</parent>
+      <child>blade3::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
 
-    <!-- Inertial sensor -->
     <plugin name='imu' filename='libimu.so'>
       <rate>128</rate>
       <noise>
@@ -83,11 +127,10 @@
       </noise>
     </plugin>
 
-    <!-- Magnetic sensor -->
     <plugin name='compass' filename='libcompass.so'>
       <rate>8</rate>
       <noise>
-        <magne>
+        <magnetic>
           <x><gaussian>0.0 0.0025 0.0</gaussian></x>
           <y><gaussian>0.0 0.0025 0.0</gaussian></y>
           <z><gaussian>0.0 0.0025 0.0</gaussian></z>
@@ -95,7 +138,6 @@
       </noise>
     </plugin>
 
-    <!-- Orientation sensor -->
     <plugin name='inclinometer' filename='libinclinometer.so'>
       <rate>8</rate>
       <noise>
@@ -105,7 +147,6 @@
       </noise>
     </plugin>
 
-    <!-- Altitude sensor -->
     <plugin name='altimeter' filename='libaltimeter.so'>
       <rate>8</rate>
       <noise>
@@ -113,8 +154,7 @@
       </noise>
     </plugin>
 
-    <!-- Position sensor -->
-    <plugin name='gps' filename='libgps.so'>
+    <plugin name='gpsreceiver' filename='libgpsreceiver.so'>
       <rate>8</rate>
       <noise>
         <clock><gaussian>0.0 0.2</gaussian></clock>
@@ -195,16 +235,16 @@
       <turbulence>
         <bsiter>1000</bsiter>
         <bstime>0.02</bstime>
+        <speed>0.0</speed>
         <direction>90.0</direction>
-        <speed>1.0</speed>
       </turbulence>
         
       <!-- Shear -->
       <shear>
         <floor>0.05</floor>
         <z0>0.15</z0>
+        <speed>0.0</speed>
         <direction>90</direction>
-        <speed>1.0</speed>
       </shear>
 
     </plugin>

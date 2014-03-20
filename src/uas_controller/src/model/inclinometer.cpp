@@ -21,32 +21,11 @@ namespace uas_controller
     // Pointer to the current model
     gazebo::physics::ModelPtr  modPtr;
 
-    // Pointer to the update event connection
-    gazebo::event::ConnectionPtr conPtr;
-    
     // Listen to broadcasts from the atmosphere
     ros::Timer timer;
 
     // Rotation
     gazebo::math::Vector3 rot;
-
-  public:
-
-    Inclinometer() : uas_hal::Orientation("inclinometer") {}
-
-    // On initial load
-    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
-    {
-      // Save the model pointer
-      modPtr = _model;
-
-      // Set up callback for updating the model
-      timer = GetROSNode().createTimer(
-          ros::Duration(1.0),                             // duration
-          boost::bind(&Inclinometer::Update, this, _1),   // callback
-          false                                           // oneshot?
-      );
-    }
 
     // When called published the data
     void Update(const ros::TimerEvent& event)
@@ -62,7 +41,27 @@ namespace uas_controller
       );
 
     }
+    
+  public:
 
+    Inclinometer() : uas_hal::Orientation("inclinometer")
+    {
+      ROS_INFO("Loaded inclinometer plugin");
+    }
+
+    // On initial load
+    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
+    {
+      // Save the model pointer
+      modPtr = _model;
+
+      // Set up callback for updating the model
+      timer = GetROSNode().createTimer(
+          ros::Duration(1.0),                             // duration
+          boost::bind(&Inclinometer::Update, this, _1),   // callback
+          false                                           // oneshot?
+      );
+    }
   };
 
   // Register this plugin with the simulator

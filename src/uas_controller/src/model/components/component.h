@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <ros/ros.h>
+
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 
@@ -43,7 +45,7 @@ namespace uas_controller
     	double GetSDFDouble(sdf::ElementPtr cur, const char* path, double value)
     	{
 			if (FindElement(cur, (std::string) path))
-    			return cur->GetValue()->Get(value);
+    			cur->GetValue()->Get(value);
     		return value;
     	}
 
@@ -51,7 +53,7 @@ namespace uas_controller
     	int GetSDFInteger(sdf::ElementPtr cur, const char* path, int value)
     	{
 			if (FindElement(cur, (std::string) path))
-    			return cur->GetValue()->Get(value);
+    			cur->GetValue()->Get(value);
     		return value;
     	}
     };

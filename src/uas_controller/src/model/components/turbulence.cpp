@@ -1,13 +1,20 @@
 /* This gazebo model plugin implements a second order model for quadrotor dynamics */ 
 #include "turbulence.h"
 
+// Basic constants 
+#define METERS_TO_FEET 		3.2808399
+#define FEET_TO_METERS 		0.3048000
+#define DEGREES_TO_RADIANS  0.01745329258399
+#define RADIANS_TO_DEGREES  57.2957795000000
+#define MATH_PI				3.14159265359
+
 using namespace uas_controller;
 
 // Default constructor
 Turbulence::Turbulence() : bsiter(1000), bstime(0.02), s20(0), d20(0,0,0), wind(0,0,0) {}
 
 // Default constructor takes configuration + pointer to link
-void Turbulence::Configure(sdf::ElementPtr root)
+void Turbulence::Configure(sdf::ElementPtr root, const gazebo::physics::LinkPtr &link)
 {
 	/**********************************
 
@@ -21,8 +28,8 @@ void Turbulence::Configure(sdf::ElementPtr root)
       *********************************/
 
 	// Speed and direction
-	bsiter = GetSDFInteger(root, "turbulence.bsiter",  bsiter);
-	bstime = GetSDFDouble(root, "turbulence.bstime",  bstime);
+	bsiter = GetSDFInteger(root,"turbulence.bsiter",bsiter);
+	bstime = GetSDFDouble(root,"turbulence.bstime",bstime);
 
 	// Speed and direction (random if needed)
 	double s = GetSDFDouble(root, "turbulence.speed", 0);
@@ -31,6 +38,9 @@ void Turbulence::Configure(sdf::ElementPtr root)
 	  
 	// Set from SI -> MIL units
 	SetWind(s, d);
+
+	// Boostrap the wind
+	Reset(link);
 }
 
 // Set the speed (m) and direction (degrees) of the winf
@@ -44,22 +54,22 @@ void Turbulence::SetWind(const double &speed, const double &direction)
 }
 
 // Set the speed (m) and direction (degrees) of the winf
-void Turbulence::Reset(const double &alt, const double &speed)
+void Turbulence::Reset(const gazebo::physics::LinkPtr &link)
 {
 	// Boostrap the gust model, so the wind doesn't start at zero
 	wind = gazebo::math::Vector3(0,0,0);
 	for (int i = 0; i < bsiter; i++)
-		Update(alt, speed, bstime);
+		Update(link, bstime);
 }
 
 // Get the wind vector based on the 
-gazebo::math::Vector3 Turbulence::Update(const double &alt, const double &speed, const double &dt)
+gazebo::math::Vector3 Turbulence::Update(const gazebo::physics::LinkPtr &link, const double &dt)
 {
 	// wind displacement in feet over this timestep
-	d = METERS_TO_FEET * speed * dt;
+	d = METERS_TO_FEET * link->GetWorldLinearVel().GetLength() * dt;
 	
 	// current altitude
-	h = METERS_TO_FEET * alt;
+	h = METERS_TO_FEET * link->GetWorldPose().pos.z;
 
 	// optimization
 	k = 0.177 + 0.000823 * h;

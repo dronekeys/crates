@@ -1,8 +1,0 @@
-package uas_controller.msgs;
-
-message Shear
-{
-	required double 	u = 1 [default = 0.00];
-  	required double 	v = 2 [default = 0.00];
-  	required double 	w = 3 [default = 0.00];
-}

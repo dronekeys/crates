@@ -1,6 +1,12 @@
 /* This gazebo model plugin implements a second order model for quadrotor dynamics */ 
 #include "shear.h"
 
+// Basic constants 
+#define METERS_TO_FEET    3.2808399
+#define FEET_TO_METERS    0.3048000
+#define DEGREES_TO_RADIANS  0.01745329258399
+#define RADIANS_TO_DEGREES  57.2957795000000
+
 using namespace uas_controller;
 
 // Default constructor
@@ -24,7 +30,7 @@ void Shear::Configure(sdf::ElementPtr root)
   // Speed and direction
   double s = GetSDFDouble(root,"shear.speed",0.0);
   double d = GetSDFDouble(root,"shear.direction" ,0.0);
-  
+
   // Set from SI -> MIL units
   SetWind(s,d);
 }
@@ -42,8 +48,11 @@ void Shear::SetWind(const double &speed, const double &direction)
 }
 
 // Get the wind vector based on the 
-gazebo::math::Vector3 Shear::Update(const double &alt)
+gazebo::math::Vector3 Shear::Update(const gazebo::physics::LinkPtr &link, const double& dt)
 {
+  // Extract the altitude from the state
+  double alt = link->GetWorldPose().pos.z;
+
   // Calculate the wind vector, taking into account shear
   if (alt > mA)
     wind = FEET_TO_METERS * s20 * (log(METERS_TO_FEET*alt/z0)/log(20.0/z0)) * d20;

@@ -1,6 +1,0 @@
-package uas_controller.msgs;
-
-message GPS
-{
-	required double 	starttime		= 1 [default = 0.00];
-}

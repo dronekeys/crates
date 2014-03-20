@@ -3,16 +3,10 @@
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
 
 // Core functionality
 #include "component.h"
-
-// Basic constants 
-#define METERS_TO_FEET 		3.2808399
-#define FEET_TO_METERS 		0.3048000
-#define DEGREES_TO_RADIANS  0.01745329258399
-#define RADIANS_TO_DEGREES  57.2957795000000
-#define MATH_PI				3.14159265359
 
 namespace uas_controller
 {
@@ -42,16 +36,16 @@ namespace uas_controller
         Turbulence();
 
         // Default constructor takes configuration + pointer to link
-        void Configure(sdf::ElementPtr root);
+        void Configure(sdf::ElementPtr root, const gazebo::physics::LinkPtr &link);
 
         // Set the speed (m) and direction (degrees) of the winf
         void SetWind(const double &speed, const double &direction);
 
         // Set the speed (m) and direction (degrees) of the winf
-        void Reset(const double &alt, const double &speed);
+        void Reset(const gazebo::physics::LinkPtr &link);
 
         // Get the wind vector based on the 
-        gazebo::math::Vector3 Update(const double &alt, const double &speed, const double &dt);
+        gazebo::math::Vector3 Update(const gazebo::physics::LinkPtr &link, const double &dt);
         
         // Get the wind vector based on the 
         gazebo::math::Vector3 GetVelocity();

@@ -5,6 +5,7 @@ using namespace uas_controller;
 
 // Default constructor
 Dynamics::Dynamics() : 
+	thrust(0),							// Current thrust
 	_LOW_THROTT(300.0),
 	_MAX_ANGVEL(2.617993877991494),
 	_pq0(-3.25060e-04),
@@ -79,84 +80,80 @@ void Dynamics::Configure(sdf::ElementPtr root)
 	_tau1       = GetSDFDouble(root, "dynamics.parameters.tau1", _tau1);
 	_kuv        = GetSDFDouble(root, "dynamics.parameters.kuv", _kuv);
 	_kw         = GetSDFDouble(root, "dynamics.parameters.kw", _kw);
-
-	// TODO: add some noise, boys.
-
 };
 
 // Update the system dynamics
 void Dynamics::Update(
-            const gazebo::physics::ModelPtr &model,             // Pointer to physics element                          
+            const gazebo::physics::LinkPtr& link,               // Pointer to physics element                          
+            const gazebo::math::Vector3& wind,					// Wind force
             const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
             const double& throttle,                             // RC throttle
             const double& yaw,                                  // RC yaw
             const double& voltage,                              // RC voltage
-            const gazebo::math::Vector3 &wind,                  // Navigation frame wind
             const double& dt)  	                                // Time
 {
-	/*
-	// Get the b-frame linear velocity
-	b_vel = modPtr->GetWorldPose().rot.GetInverse().RotateVector(
-		model->GetWorldLinearVel()
-	);
+	// Get the world-frame position and orientation
+	n_rot = link->GetWorldPose().rot.GetAsEuler();
+	b_lin_vel = link->GetRelativeLinearVel();
+	b_ang_vel = link->GetRelativeAngularVel();
 
-	// Get the b-frame angular velocity
-	b_ang = modPtr->GetWorldPose().rot.GetInverse().RotateVector(
-	model->GetWorldAngularVel()
-	);
+	/////////////////////////////////////////
+	// Update b-frame angular acceleration //
+	/////////////////////////////////////////
 
-	//////////////////////////
-	// Get the wind values  //
-	//////////////////////////
+	// Pitch
+	torq.x = _pq1*(_pq0*roll - n_rot.x) + _pq2*b_ang_vel.x;    
+	if ((b_ang_vel.x > _MAX_ANGVEL && (torq.x > 0)) || (b_ang_vel.x < -_MAX_ANGVEL && (torq.x < 0)))
+	  torq.x = 0;
 
-	// Wind = shear(altitude) + turbulence(altitude,speed,dt)
-	b_wnd = shear.GetGlobalVelocity(n_pos.z)
-	    + turbulence.GetGlobalVelocity(n_pos.z,b_vel.GetLength(),dt);
+	// Roll
+	torq.y = _pq1*(_pq0*pitch  - n_rot.y) + _pq2*b_ang_vel.y;    
+	if ((b_ang_vel.y > _MAX_ANGVEL && (torq.y > 0)) || (b_ang_vel.y < -_MAX_ANGVEL && (torq.y < 0)))
+	  torq.y = 0;
 
-	// Navigation frame -> Body frame
-	b_wnd = modPtr->GetWorldPose().rot.RotateVector(b_wnd);
+	// Yaw
+	torq.z = _r0*yaw + _r1*b_ang_vel.z;
 
-	////////////////////////////////////////////
-	// Calculate b-frame angular acceleration //
-	////////////////////////////////////////////
+	/////////////////////////
+	// Update thrust force //
+	/////////////////////////
 
-	// X torque
-	b_tor.x = _pq1*(_pq0*ctl.r - n_rot.x) + _pq2*b_ang.x;    
-	if ((b_ang.x > _MAX_ANGVEL && (b_tor.x > 0)) || (b_ang.x < -_MAX_ANGVEL && (b_tor.x < 0)))
-	  b_tor.x = 0;
-
-	// Y torque
-	b_tor.y = _pq1*(_pq0*ctl.p - n_rot.y) + _pq2*b_ang.y;    
-	if ((b_ang.y > _MAX_ANGVEL && (b_tor.y > 0)) || (b_ang.y < -_MAX_ANGVEL && (b_tor.y < 0)))
-	  b_tor.y = 0;
-
-	// Z torque
-	b_tor.z = _r0*ctl.y + _r1*b_ang.z;
-
-	////////////////////////////
-	// Calculate thrust force //
-	////////////////////////////
-
-	dFth = ((_Cth0 + _Cth1*ctl.t + _Cth2*ctl.t*ctl.t) - thrust);
-	if (ctl.t < _LOW_THROTT)
+	dFth = ((_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust);
+	if (throttle < _LOW_THROTT)
 		dFth = _tau0 * dFth;
 	else
 	{
-		tau  = 0;
+		tau  = 0.0;
 		if (abs(dFth) < (_tau1*dt))
 		  tau = dFth / dt;
 		else
 		  tau = (dFth > 0 ? _tau1 : -_tau1);
 
-		if ((thrust + tau*dt) > (_Cvb0 + _Cvb1*ctl.v))
-		  dFth = (_Cvb0 + _Cvb1*ctl.v - thrust) / dt;
+		if ((thrust + tau*dt) > (_Cvb0 + _Cvb1*voltage))
+		  dFth = (_Cvb0 + _Cvb1*voltage - thrust) / dt;
 		else
 		  dFth = tau;
 	}
+	
+	// Update thrust force (link below should idle the quadrotor)
+	thrust = -link->GetInertial()->GetMass() 
+		      * link->GetModel()->GetWorld()->GetPhysicsEngine()->GetGravity().z;
+	//thrust = dFth + thrust;
 
-	// Update the drag force
-	b_for = drag * (b_vel + b_wnd);   // Drag force
-	b_for.z = thrust + dFth;          // Thrust force
-	*/
+	// Force is always orthogonal to rotor plane
+	forc = gazebo::math::Vector3(0.0,0.0,thrust);
+	
+	// Drag is proportional to airspeed and wind
+	drag  = link->GetRelativeLinearVel();
+	drag -= link->GetWorldPose().rot.RotateVector(wind);
+
+	// Convert from a force to a mass
+	drag.x *= link->GetInertial()->GetMass() *_kuv;
+	drag.y *= link->GetInertial()->GetMass() *_kuv;
+	drag.z *= link->GetInertial()->GetMass() *_kw;
+
+	// set force and torque in gazebo
+	link->AddRelativeForce(forc + drag);
+	link->AddRelativeTorque(torq);
 }

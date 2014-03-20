@@ -167,7 +167,7 @@ add_library(listener 				src/world/listener.cpp)
 add_library(altimeter 				src/model/altimeter.cpp)
 add_library(imu 					src/model/imu.cpp)
 add_library(compass 				src/model/compass.cpp)
-add_library(gps 					src/model/gps.cpp)
+add_library(gpsreceiver 			src/model/gpsreceiver.cpp)
 add_library(inclinometer 			src/model/inclinometer.cpp)
 add_library(quadrotor 				src/model/quadrotor.cpp
 	src/model/components/dynamics.cpp
@@ -186,7 +186,7 @@ add_dependencies(altimeter			custom_msgs)
 add_dependencies(imu 				custom_msgs)
 add_dependencies(compass 			custom_msgs)
 add_dependencies(inclinometer 		custom_msgs)
-add_dependencies(gps 	   			custom_msgs)
+add_dependencies(gpsreceiver 		custom_msgs)
 
 ## World plugins
 add_dependencies(atmosphere 		custom_msgs)
@@ -210,7 +210,7 @@ target_link_libraries(quadrotor		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost
 target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(gps  	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(gpsreceiver  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 #############
