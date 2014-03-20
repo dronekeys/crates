@@ -7,12 +7,13 @@
 #include <ros/ros.h>
 
 // Gazebo includes
-#include <gazebo/physics/Model.hh>
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+
+// For animation
 #include <gazebo/common/CommonTypes.hh>
 #include <gazebo/common/Animation.hh>
 #include <gazebo/common/KeyFrame.hh>
-#include <gazebo/physics/Model.hh>
 
 // HAL includes
 #include <uas_hal/platform/UAV.h>
@@ -42,11 +43,11 @@ namespace uas_controller
     double tim;
 
     // Pointer to the current model
-    gazebo::physics::ModelPtr         modPtr;
     gazebo::physics::LinkPtr          lnkPtr;
 
     // Pointer to the update event connection
-    gazebo::event::ConnectionPtr      conPtr;
+    gazebo::event::ConnectionPtr      conBegPtr;
+    gazebo::event::ConnectionPtr      conEndPtr;
 
     // Required for receiving atmospheric updates
     gazebo::transport::NodePtr        nodePtr;
@@ -66,58 +67,26 @@ namespace uas_controller
     Dynamics      dynamics;     // Models UAV dynamics
     Control       control;      // Converts SI control <-> RX values
   
-
     // When new control arrives from the HAL, save it...
     void ReceiveControl(
             const double &pitch,
             const double &roll,
-            const double &throttle,
-            const double &yaw)
+            const double &yaw,
+            const double &throttle)
     {
         control.pitch    = pitch;
         control.roll     = roll;
-        control.throttle = throttle;
         control.yaw      = yaw;
+        control.throttle = throttle;
     }
 
     // Receive the global wind speed and direction
     void ReceiveAtmosphere(AtmospherePtr &msg)
     {
-      /*
       // Configure the wind shear accoridngly
       shear.SetWind(
         msg->wind_speed(),      // Spped
         msg->wind_direction()   // Direction
-      );
-      */
-    }
-
-    // Broadcast the current state
-    void BroadcastState(const ros::TimerEvent& event)
-    {
-      /*
-      pose = lnkPtr->GetWorldPose();
-
-      // Immediately publish the state
-      HalBroadcastState(
-        state.pos.x,  state.pos.y,  state.pos.z,  // Position
-        state.rot.x,  state.rot.y,  state.rot.z,  // Orientation
-        state.vel.x,  state.vel.y,  state.vel.z,  // Velocity
-        state.ang.x,  state.ang.y,  state.ang.z,  // Angular velocity
-        state.thrust, state.battery               // Thrust force
-      );
-
-      */
-    }
-
-    // Broadcast the current state
-    void BroadcastInformation(const ros::TimerEvent& event)
-    {
-      // Immediately publish the state
-      PostInformation(
-        "uav",              // UAV name
-        "simulated",        // Decription
-        tim                 // Uptime (respects siulation)
       );
     }
 
@@ -130,37 +99,45 @@ namespace uas_controller
       // If simulation is paused, dont waste CPU cycles calculating a physics update...
       if (dt > 0) 
       {
-        ///////////////////
-        // ENERGY UPDATE //
-        ///////////////////
-
         // Update the energy consumption, and get the current voltage
         control.voltage = energy.Update(control.throttle, dt);
 
-        if (tim < 5)
-          control.pitch = 0.05;
-        else
-          control.pitch = 0.0;
-        
-        // Get navigation-frame wind
-        wind = shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt);
-
         // Set the state of the platform directly from the simulation
         dynamics.Update(
-          lnkPtr,                                             // Model
-          wind,                                               // Wind
-          control.GetScaledPitch(),                           // Pitch
-          control.GetScaledRoll(),                            // Roll
-          control.GetScaledThrottle(),                        // Throttle
-          control.GetScaledYaw(),                             // Yaw
-          control.GetScaledVoltage(),                         // Yaw
-          dt                                                  // Time
+          lnkPtr,                                                   // Model
+          shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt), // Wind                                              // Wind
+          control.GetScaledPitch(),                                 // Pitch
+          control.GetScaledRoll(),                                  // Roll
+          control.GetScaledYaw(),                                   // Yaw
+          control.GetScaledThrottle(),                              // Throttle
+          control.GetScaledVoltage(),                               // Voltage
+          dt                                                        // Time
         );
 
       }
 
       // Update timer
       tim = _info.simTime.Double();
+    }
+
+    // Send information to the HAL
+    void Broadcast()
+    {
+      // Extract the state
+      gazebo::math::Vector3 pos = lnkPtr->GetWorldPose().pos;
+      gazebo::math::Vector3 rot = lnkPtr->GetWorldPose().rot.GetAsEuler();
+      gazebo::math::Vector3 vel = lnkPtr->GetRelativeLinearVel();
+      gazebo::math::Vector3 ang = lnkPtr->GetRelativeAngularVel();
+      
+      // Push the state
+      UAV::SetState(
+        pos.x,  pos.y,  pos.z,      // Position
+        rot.x,  rot.y,  rot.z,      // Orientation
+        vel.x,  vel.y,  vel.z,      // Velocity
+        ang.x,  ang.y,  ang.z,      // Angular velocity
+        dynamics.GetThrust(),       // Thrust is stored in dynamics
+        control.GetScaledVoltage()  // Battery voltage
+      );
     }
 
   public: 
@@ -174,7 +151,6 @@ namespace uas_controller
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
     {
       // Save pointer to the model
-      modPtr = model;
       lnkPtr = model->GetLink("body");
 
       ////////////////////////
@@ -204,40 +180,40 @@ namespace uas_controller
       nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 
       // Subscribe to messages about atmospheric conditions
-      subPtr = nodePtr->Subscribe("~/atmosphere", &Quadrotor::ReceiveAtmosphere, this);
+      subPtr  = nodePtr->Subscribe("~/atmosphere", &Quadrotor::ReceiveAtmosphere, this);
 
-      // Set up callback for updating the model dynamics (at physics rate)
-      conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
+      // Pre physics - update quadrotor dynamics and wind
+      conBegPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
         boost::bind(&Quadrotor::Update, this, _1));
+
+      // Post physics - broadcast current state to HAL
+      conEndPtr = gazebo::event::Events::ConnectWorldUpdateEnd(
+        boost::bind(&Quadrotor::Broadcast, this));
 
       //////////////////////////////////////////
       // Initialise HAL and ROS communication //
       //////////////////////////////////////////
 
+      /*
+
       // Call method periodically to broadcast state (respects simulation time)
       timState = GetROSNode().createTimer(
-          ros::Duration(1.0),                                             // duration
+          ros::Duration(1.0),                                          // duration
           boost::bind(&Quadrotor::BroadcastState, this, _1),           // callback
-          false                                                           // oneshot?
+          false                                                        // oneshot?
       );
 
       // Call method periodically to broadcast information (respects simulation time)
       timInformation = GetROSNode().createTimer(
-          ros::Duration(1.0),                                             // duration
+          ros::Duration(1.0),                                          // duration
           boost::bind(&Quadrotor::BroadcastInformation, this, _1),     // callback
-          false                                                           // oneshot?
+          false                                                        // oneshot?
       );
 
-
-      // Animate the motors
-      /*
-      gazebo::common::PoseAnimationPtr anim(new gazebo::common::PoseAnimation("test", 1000.0, true));
-      gazebo::common::PoseKeyFrame *key;
-      key = anim->CreateKeyFrame(0);
-      key->SetRotation(math::Quaternion(0, 0, 0));
-      key->SetRotation(math::Quaternion(0, 0, 1.5707));
-      _parent->SetAnimation(anim);
       */
+
+      //model->GetJoint("motor0")->SetForce(0,100.0);
+
 
     }
   };

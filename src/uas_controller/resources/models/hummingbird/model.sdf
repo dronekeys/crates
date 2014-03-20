@@ -7,7 +7,7 @@
     <static>false</static>
 
     <!-- Initial pose -->
-    <pose>0 0 1  0 0 0</pose>
+    <pose>0 0 0  0 0 0</pose>
 
     <!-- Frame -->
     <link name="body">
@@ -110,7 +110,7 @@
         </limit>
       </axis>
     </joint>
-
+    
     <plugin name='imu' filename='libimu.so'>
       <rate>128</rate>
       <noise>

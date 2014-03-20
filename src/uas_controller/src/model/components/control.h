@@ -23,8 +23,8 @@ namespace uas_controller
         // Control, in SI units
         double pitch;
         double roll;
-        double throttle;
         double yaw;
+        double throttle;
         double voltage;
 
         // Default constructor takes configuration + pointer to link
@@ -36,8 +36,8 @@ namespace uas_controller
         // Returns control scaled to RC values
         double GetScaledPitch();
         double GetScaledRoll();
-        double GetScaledThrottle();
         double GetScaledYaw();
+        double GetScaledThrottle();
         double GetScaledVoltage();
     };
 }

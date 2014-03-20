@@ -127,12 +127,19 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GeographicLib_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(hal 
+add_library(hal
   src/peripheral/Altitude.cpp
   src/peripheral/Inertial.cpp
   src/peripheral/Magnetic.cpp
   src/peripheral/Orientation.cpp
   src/peripheral/Position.cpp
+  src/controller/AnglesHeight.cpp
+  src/controller/Velocity.cpp
+  src/controller/VelocityHeight.cpp
+  src/controller/Waypoint.cpp
+  #src/controller/Emergency.cpp
+  #src/controller/Land.cpp
+  #src/controller/Takeoff.cpp
   src/platform/UAV.cpp
   src/HAL.cpp
 )

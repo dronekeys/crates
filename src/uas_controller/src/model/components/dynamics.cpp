@@ -88,8 +88,8 @@ void Dynamics::Update(
             const gazebo::math::Vector3& wind,					// Wind force
             const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
-            const double& throttle,                             // RC throttle
             const double& yaw,                                  // RC yaw
+            const double& throttle,                             // RC throttle
             const double& voltage,                              // RC voltage
             const double& dt)  	                                // Time
 {
@@ -119,7 +119,7 @@ void Dynamics::Update(
 	// Update thrust force //
 	/////////////////////////
 
-	dFth = ((_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust);
+	dFth = (_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust;
 	if (throttle < _LOW_THROTT)
 		dFth = _tau0 * dFth;
 	else
@@ -137,12 +137,13 @@ void Dynamics::Update(
 	}
 	
 	// Update thrust force (link below should idle the quadrotor)
-	thrust = -link->GetInertial()->GetMass() 
-		      * link->GetModel()->GetWorld()->GetPhysicsEngine()->GetGravity().z;
-	//thrust = dFth + thrust;
+	thrust = dFth + thrust;
+	
+	//thrust = -link->GetInertial()->GetMass() 
+	//	      * link->GetModel()->GetWorld()->GetPhysicsEngine()->GetGravity().z;
 
 	// Force is always orthogonal to rotor plane
-	forc = gazebo::math::Vector3(0.0,0.0,thrust);
+	forc = gazebo::math::Vector3(0.0,0.0,throttle);
 	
 	// Drag is proportional to airspeed and wind
 	drag  = link->GetRelativeLinearVel();
@@ -154,6 +155,12 @@ void Dynamics::Update(
 	drag.z *= link->GetInertial()->GetMass() *_kw;
 
 	// set force and torque in gazebo
-	link->AddRelativeForce(forc + drag);
-	link->AddRelativeTorque(torq);
+	//link->AddRelativeForce(forc + drag);
+	//link->AddRelativeTorque(torq);
+}
+
+// Reset the component
+double Dynamics::GetThrust()
+{
+	return thrust;
 }

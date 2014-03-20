@@ -7,8 +7,8 @@ using namespace uas_controller;
 Control::Control() 
 	: sp(-2291.83118052329), 
 		sr(-2291.83118052329), 
-		st( 4097.0),
 		sy(-460.597254433196),
+    st( 4097.0),
 		sv(1.0) {}
 
 // Default constructor takes configuration + pointer to link
@@ -19,8 +19,8 @@ void Control::Configure(sdf::ElementPtr root)
       <control>
         <pitch>-2291.83118052329</pitch>
         <roll>-2291.83118052329</roll>
-        <throttle>4097</throttle>
         <yaw>-460.597254433196</yaw>
+        <throttle>4097.0</throttle>
         <voltage>1.0</voltage>
       </control>                         
 
@@ -29,8 +29,8 @@ void Control::Configure(sdf::ElementPtr root)
   // Direct parameters
   sp = GetSDFDouble(root,"control.pitch",sp);
   sr = GetSDFDouble(root,"control.roll",sr);
-  st = GetSDFDouble(root,"control.throttle",st);
   sy = GetSDFDouble(root,"control.yaw",sy);
+  st = GetSDFDouble(root,"control.throttle",st);
   sv = GetSDFDouble(root,"control.voltage",sv);
 }
 
@@ -45,14 +45,14 @@ double Control::GetScaledRoll()
 	return  sr * roll;
 }
 
-double Control::GetScaledThrottle()
-{
-	return  st * throttle;
-}
-
 double Control::GetScaledYaw()
 {
 	return  sy * yaw;
+}
+
+double Control::GetScaledThrottle()
+{
+  return  st * throttle;
 }
 
 double Control::GetScaledVoltage()

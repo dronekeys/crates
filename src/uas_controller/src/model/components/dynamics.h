@@ -45,10 +45,13 @@ namespace uas_controller
             const gazebo::math::Vector3& wind,                  // Wind force                   
             const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
-            const double& throttle,                             // RC throttle
             const double& yaw,                                  // RC yaw
+            const double& throttle,                             // RC throttle
             const double& voltage,                              // RC voltage
             const double& dt);                                  // Time
+        
+        // Reset the component
+        double GetThrust();
     };
 }
 

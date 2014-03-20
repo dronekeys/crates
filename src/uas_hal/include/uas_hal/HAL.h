@@ -6,6 +6,7 @@
 
 namespace uas_hal
 {
+    /* A basic hardware abstraction layer for classes in ROS */
     class HAL
     {
 
