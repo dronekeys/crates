@@ -186,8 +186,9 @@
       <control>
         <pitch>-2291.83118052329</pitch>
         <roll>-2291.83118052329</roll>
-        <thrust>4097</thrust>
+        <throttle>4097</throttle>
         <yaw>-460.597254433196</yaw>
+        <voltage>1.0</voltage>
       </control>
       
       <!-- Turbulence -->

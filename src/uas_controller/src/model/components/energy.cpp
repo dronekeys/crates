@@ -4,12 +4,12 @@
 using namespace uas_controller;
 
 // Default constructor
-Energy::Energy() : tot(2.2), rem(2.2), cb(0.2), cf(6.6), kill(0.1), warn(0.2), th(0.001) {}
+Energy::Energy() : tot(2.2), rem(2.2), cb(0.2), cf(6.6), kill(0.1), warn(0.2) {}
 
 // Configure from plugin sdf
-void Energy::Configure(sdf::ElementPtr sdf)
+void Energy::Configure(sdf::ElementPtr root)
 {
-  /*
+  /*****************************
       <energy>
         <battery>2.2</battery>
         <consumption>
@@ -20,42 +20,52 @@ void Energy::Configure(sdf::ElementPtr sdf)
           <kill>0.1</kill>
           <warn>0.2</warn>
         </limits>
-      </energy>           */
+      </energy>           
 
-  tot  = GetSDFDouble(sdf,"energy.total",tot);
-  rem  = GetSDFDouble(sdf,"energy.remaining",rem);
-  cb   = GetSDFDouble(sdf,"energy.consumption.base",cb);
-  cf   = GetSDFDouble(sdf,"energy.consumption.flight",cf);
-  kill = GetSDFDouble(sdf,"energy.limits.kill",kill);
-  warn = GetSDFDouble(sdf,"energy.limits.warn",warn);
-  th   = GetSDFDouble(sdf,"energy.throttle",th);
+  *******************************/
 
+  tot  = GetSDFDouble(root,"energy.total",tot);
+  rem  = GetSDFDouble(root,"energy.remaining",rem);
+  cb   = GetSDFDouble(root,"energy.consumption.base",cb);
+  cf   = GetSDFDouble(root,"energy.consumption.flight",cf);
+  kill = GetSDFDouble(root,"energy.limits.kill",kill);
+  warn = GetSDFDouble(root,"energy.limits.warn",warn);
+}
+
+// Reset state
+void Energy::Reset()
+{
+  remaining = rem;
+}
+
+// Checks whether the energy is too low to continue flying
+bool Energy::IsLow()
+{
+  return (remaining < warn);
 }
 
 // Checks whether the energy is too low to continue flying
 bool Energy::IsCriticallyLow()
 {
-  return (rem < kill);
+  return (remaining < kill);
 }
 
 // Update the energy 
-void Energy::Update(const double &thrust, const double &dt)
+double Energy::Update(const double &thrust, const double &dt)
 {
+  // Incur some energy cost
   if (thrust > 0)
-    rem -= dt * (cb + cf) / 3600;
+    remaining -= dt * (cb + cf) / 3600;
   else
-    rem -= dt * cb / 3600;
-}
+    remaining -= dt * cb / 3600;
 
-// The amount by which to reduce thrust to offer a gentle landing
-double Energy::GetThrustReduction()
-{
-  return th;
+  // Return the voltage
+  return GetVoltage(); 
 }
 
 // Predict voltage -- this should definitely be improved (not linear in reality)
 double Energy::GetVoltage()
 {
-  return 9 + (rem / tot) * 3.5;
+  return 9 + (remaining / tot) * 3.5;
 }
 

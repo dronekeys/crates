@@ -24,10 +24,10 @@ namespace uas_hal
     public:
 
         // Setup the altitude sensor
-        void initialize(const char *name);
+        Inertial(const char *name);
 
         // Send altitude immediately with current time stamp
-        void post(
+        void Post(
             const double &lin_acc_x,
             const double &lin_acc_y,
             const double &lin_acc_z,

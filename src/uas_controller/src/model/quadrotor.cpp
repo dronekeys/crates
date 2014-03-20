@@ -13,6 +13,9 @@
 // HAL includes
 #include <uas_hal/platform/UAV.h>
 
+// HAL includes
+#include "atmosphere.pb.h"
+
 // Components used int the model
 #include "components/energy.h"
 #include "components/dynamics.h"
@@ -22,10 +25,17 @@
 
 namespace uas_controller
 {
+
+  // Save some pain
+  typedef const boost::shared_ptr<const uas_controller::msgs::Atmosphere> AtmospherePtr;
+
   class Quadrotor : public uas_hal::UAV, public gazebo::ModelPlugin
   {
 
   private:
+
+    // Current time
+    double tim;
 
     // Pointer to the current model
     gazebo::physics::ModelPtr         modPtr;
@@ -41,37 +51,45 @@ namespace uas_controller
     ros::Timer                        timState;
     ros::Timer                        timInformation;
 
+    // Optimizaiton
+    gazebo::math::Vector3             wind;
+
     // COMPONENTS
-    Shear         shear;      // Models wind shear, based on global field
-    Turbulence    turbulence; // Models wind gusts
-    Energy        energy;     // Models energy consumption
-    Dynamics      dynamics;   // Models UAV dynamics
-    Control       control;    // Converts SI control <-> RX values
+    Shear         shear;        // Models wind shear, based on global field
+    Turbulence    turbulence;   // Models wind gusts
+    Energy        energy;       // Models energy consumption
+    Dynamics      dynamics;     // Models UAV dynamics
+    Control       control;      // Converts SI control <-> RX values
+  
 
     // When new control arrives from the HAL, save it...
-    void HalProcessControl(const uas_hal::Control & _ctl)
+    void ReceiveControl(
+            const double &pitch,
+            const double &roll,
+            const double &throttle,
+            const double &yaw)
     {
-      // If we are not in a critical energy mode, then set control
-      if (!energy.IsCriticallyLow())
-        control.SetControlSI(_ctl.pitch,_ctl.roll,_ctl.thrust,_ctl.yaw);
+        control.pitch    = pitch;
+        control.roll     = roll;
+        control.throttle = throttle;
+        control.yaw      = yaw;
     }
 
     // Receive the global wind speed and direction
     void ReceiveAtmosphere(AtmospherePtr &msg)
     {
       // Configure the wind shear accoridngly
-      shear.SetGlobalField
-      (
-        msg->wind_speed(),
-        msg->wind_direction()
-      )
+      shear.SetWind(
+        msg->wind_speed(),      // Spped
+        msg->wind_direction()   // Direction
+      );
     }
 
     // Broadcast the current state
     void BroadcastState(const ros::TimerEvent& event)
     {
-      // Get the current state of the vehicle
-      state = dynamics.SetState(modPtr);
+      /*
+      pose = lnkPtr->GetWorldPose();
 
       // Immediately publish the state
       HalBroadcastState(
@@ -81,84 +99,71 @@ namespace uas_controller
         state.ang.x,  state.ang.y,  state.ang.z,  // Angular velocity
         state.thrust, state.battery               // Thrust force
       );
+
+      */
     }
 
     // Broadcast the current state
     void BroadcastInformation(const ros::TimerEvent& event)
     {
       // Immediately publish the state
-      HalBroadcastInformation(
-        modPtr->GetName().c_str()   // UAV name
-        "simulated",                // Decription
-        tim                         // Uptime (respects siulation)
+      PostInformation(
+        modPtr->GetName().c_str(),              // UAV name
+        "simulated",                            // Decription
+        tim                                     // Uptime (respects siulation)
       );
     }
 
     // Second-order Runge-Kutta dynamics
-    void Update(const gazebo::common::UpdateInfo & _info)
+    void Update(const gazebo::common::UpdateInfo &_info)
     {
       // Time over which dynamics must be updated (needed for thrust update)
-      dt = _info.simTime.Double() - tim;
+      double dt = _info.simTime.Double() - tim;
 
       // If simulation is paused, dont waste CPU cycles calculating a physics update...
       if (dt > 0) 
       {
-        // Set the state of the platform directly from the simulation
-        dynamics.SetState(linkPtr);
-
         ///////////////////
         // ENERGY UPDATE //
         ///////////////////
 
-        // Update the energy consumption based on the current thrust force
-        energy.Update(control.GetThrust(),dt);
-        
-        // If we have hit a critically low energy value, 
-        if (energy.IsCriticallyLow())
-        {
-          // Update the control to level platform, then gently reduce thrust
-          control.SetControlSI(
-            0.0,
-            0.0,
-            control.GetThrustSI() - energy.GetThrustReduction(),
-            0.0
-          );
-        }
+        // Update the energy consumption, and get the current voltage
+        control.voltage = energy.Update(control.throttle, dt);
       
-        // Update the control to include the remaining voltage 
-        control.SetVoltage(energy.GetVoltage());
-
         /////////////////
         // WIND UPDATE //
         /////////////////
 
-        // Update shear
-        shear.Update(dynamics.GetAltitude());
+        // Reset the wind veector
+        wind.Set(0,0,0);
 
-        // Update turbulence
-        turbulence.Update(dynamics.GetAltitude(),dynamics.GetAirspeed(),dt);
-
-        ///////////////////
-        // DYNAMIC MODEL //
-        ///////////////////
-
-        // First, set the state based on the simulated link
-        dynamics.Update(
-          control.GetControlRC(),                             // control
-          shear->GetVelocity() + turbulence->GetVelocity(),   // wind
-          dt                                                  // discrete time
+        // Add the shear component
+        wind += shear.Update(
+          modPtr->GetWorldPose().pos.z
         );
 
-        ///////////////////////
-        // FORCE APPLICATION //
-        ///////////////////////
+        // Add the turbulence component
+        wind += turbulence.Update(
+          modPtr->GetWorldPose().pos.z,                     // Altitude
+          modPtr->GetWorldLinearVel().GetLength(),          // Airspeed
+          dt                                                // Time
+        );
 
-        // Add a force to the link (noise is added by dynamic model)
-        linkPtr->AddForce(dynamics.GetForce());
-        
-        // Add a torque to the link (noise is added by dynamic model)
-        linkPtr->AddTorque(dynamics.GetTorque());
+        ////////////////////
+        // DYNAMIC UPDATE //
+        ////////////////////
 
+       // Set the state of the platform directly from the simulation
+        dynamics.Update(
+          modPtr,                                             // Model
+          control.GetScaledPitch(),                           // Pitch
+          control.GetScaledRoll(),                            // Roll
+          control.GetScaledThrottle(),                        // Throttle
+          control.GetScaledYaw(),                             // Yaw
+          control.GetScaledVoltage(),                         // Yaw
+          wind,                                               // Wind
+          dt                                                  // Time
+        );
       }
 
       // Update timer
@@ -167,37 +172,39 @@ namespace uas_controller
 
   public: 
 
+    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0) {}
+
     // On initial load
-    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
+    void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
     {
       // Save pointer to the model
-      modPtr = _model;
+      modPtr = model;
 
       ////////////////////////
       // Configure from SDF //
       ////////////////////////
 
       // Configure the energy model from the SDF
-      energy.Configure(_sdf);
+      energy.Configure(root);
 
       // Configure the shear model from SDF
-      shear.Configure(_sdf);
+      shear.Configure(root);
 
       // Configure the turbulence model from SDF
-      turbulence.Configure(_sdf);
+      turbulence.Configure(root);
       
       // Configure the dynamic model from SDF
-      dynamics.Configure(_sdf);
+      dynamics.Configure(root);
 
       // Configure the control model from SDF
-      control.Configure(_sdf);
+      control.Configure(root);
 
       /////////////////////////////////////
       // Initialise gazbeo communication //
       /////////////////////////////////////
 
       // Setup the gazebo node
-      nodePtr = transport::NodePtr(new transport::Node());
+      nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 
       // Subscribe to messages about atmospheric conditions
       subPtr = nodePtr->Subscribe("~/atmosphere", &Quadrotor::ReceiveAtmosphere, this);
@@ -210,18 +217,15 @@ namespace uas_controller
       // Initialise HAL and ROS communication //
       //////////////////////////////////////////
 
-      // Initialise the HAL to the model name
-      HalInit(((std::string)"/hal/"+(std::string)modPtr->GetName()).c_str()); 
-
       // Call method periodically to broadcast state (respects simulation time)
-      timState = node.createTimer(
+      timState = GetROSNode().createTimer(
           ros::Duration(1.0),                                             // duration
           boost::bind(&Quadrotor::BroadcastState, this, _1),           // callback
           false                                                           // oneshot?
       );
 
       // Call method periodically to broadcast information (respects simulation time)
-      timInformation = node.createTimer(
+      timInformation = GetROSNode().createTimer(
           ros::Duration(1.0),                                             // duration
           boost::bind(&Quadrotor::BroadcastInformation, this, _1),     // callback
           false                                                           // oneshot?

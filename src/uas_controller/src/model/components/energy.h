@@ -17,8 +17,8 @@ namespace uas_controller
     	// Parameters
     	double tot, rem, cb, cf, kill, warn, th;
 
-		// Watt-hours remaining
-		double remaining;
+        // How much battery remains (amp hours)
+        double remaining;
 
     public:
 
@@ -26,19 +26,22 @@ namespace uas_controller
     	Energy();
 
     	// Configure from plugin sdf
-    	bool Configure();
+    	void Configure(sdf::ElementPtr root);
+
+        // Reset the energy
+        void Reset();
+
+        // Checks whether the energy is getting low
+        bool IsLow();
 
     	// Checks whether the energy is too low to continue flying
 		bool IsCriticallyLow();
 
+        // Predict voltage 
+        double GetVoltage();
+
 		// Update the energy 
-		void Update(const double &thrust, const double &dt);
-
-		// The amount by which to reduce thrust to offer a genlt landing
-		double GetThrustReduction();
-
-		// Predict voltage 
-		double GetVoltage();
+		double Update(const double &thrust, const double &dt);
 
     };
 }

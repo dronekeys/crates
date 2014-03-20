@@ -12,4 +12,4 @@ float64 ax		  # Pitch (rad/s)
 float64 ay		  # Roll (rad/s)
 float64 az		  # Yaw (rad/s)
 float64 thrust	  # Thrust force
-float64 battery	  # Battery remaining (proportion)
+float64 energy	  # Energy remaining (proportion)

@@ -24,10 +24,10 @@ namespace uas_hal
     public:
 
         // Setup the altitude sensor
-        void initialize(const char *name);
+        Magnetic(const char *name);
         
         // Send altitude immediately with current time stamp
-        void post(
+        void Post(
             const double &x,    // Body-frame magnetic field X (Gauss)
             const double &y,    // Body-frame Magnetic field Y (Gauss)
             const double &z     // Body-frame Magnetic field Z (Gauss)

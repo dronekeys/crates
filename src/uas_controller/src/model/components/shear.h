@@ -39,16 +39,16 @@ namespace uas_controller
     	Shear();
 
         // Default constructor takes configuration + pointer to link
-        Configure(sdf::ElementPtr _sdf);
+        void Configure(sdf::ElementPtr root);
 
     	// Set the speed (m) and direction (degrees) of the winf
     	void SetWind(const double &speed,const double &direction);
     	
     	// Get the wind vector based on the 
-    	void Update(const double &alt);
+    	gazebo::math::Vector3 Update(const double &alt);
 
         // Get the wind vector based on the 
-        void GetVelocity(const double &alt);
+        gazebo::math::Vector3 GetVelocity();
 
     };
 }

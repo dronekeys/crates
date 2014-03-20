@@ -4,33 +4,101 @@
 using namespace uas_controller;
 
 // Default constructor
-Dynamics::Dynamics(sdf::ElementPtr _sdf, gazebo::physics::LinkPtr _lp) 
-	: linkPtr(lp)
+Dynamics::Dynamics() : 
+	_LOW_THROTT(300.0),
+	_MAX_ANGVEL(2.617993877991494),
+	_pq0(-3.25060e-04),
+	_pq1(1.79797e+02),
+	_pq2(-24.3536),
+	_r0(-4.81783e-03),
+	_r1(-5.08944),
+	_Cth0(6.63881e-01),
+	_Cth1(7.44649e-04),
+	_Cth2(2.39855e-06),
+	_Cvb0(-18.0007),
+	_Cvb1(4.23754),
+	_tau0(3.07321),
+	_tau1(46.8004),
+	_kuv(-4.97391e-01),
+	_kw(-1.35341)
+{}
+
+void Dynamics::Configure(sdf::ElementPtr root) 
 {
-  _LOW_THROTT = GetSDFDouble(_sdf, "low_throttle",  300.0);
-  _MAX_ANGVEL = GetSDFDouble(_sdf, "max_angvel",    2.617993877991494);
-  _pq0        = GetSDFDouble(_sdf, "pq0",          -3.25060e-04);
-  _pq1        = GetSDFDouble(_sdf, "pq1",           1.79797e+02);
-  _pq2        = GetSDFDouble(_sdf, "pq2",          -24.3536);
-  _r0         = GetSDFDouble(_sdf, "r0",           -4.81783e-03);
-  _r1         = GetSDFDouble(_sdf, "r1",           -5.08944);
-  _Cth0       = GetSDFDouble(_sdf, "Cth0",          6.63881e-01);
-  _Cth1       = GetSDFDouble(_sdf, "Cth1",          7.44649e-04);
-  _Cth2       = GetSDFDouble(_sdf, "Cth2",          2.39855e-06);
-  _Cvb0       = GetSDFDouble(_sdf, "Cvb0",         -18.0007);
-  _Cvb1       = GetSDFDouble(_sdf, "Cvb1",          4.23754);
-  _tau0       = GetSDFDouble(_sdf, "tau0",          3.07321);
-  _tau1       = GetSDFDouble(_sdf, "tau1",          46.8004);
-  _kuv        = GetSDFDouble(_sdf, "kuv",          -4.97391e-01);
-  _kw         = GetSDFDouble(_sdf, "kw",           -1.35341);
+
+	/*****************************************
+
+    <dynamics>
+        <parameters>
+          <low_throttle>300</low_throttle>
+          <max_angvel>2.617993877991494</max_angvel>
+          <pq0>-3.25060e-04</pq0>
+          <pq1>1.79797e+02</pq1>
+          <pq2>-24.3536</pq2>
+          <r0>-4.81783e-03</r0>
+          <r1>-5.08944</r1>
+          <Cth0>6.63881e-01</Cth0>
+          <Cth1>7.44649e-04</Cth1>
+          <Cth2>2.39855e-06</Cth2>
+          <Cvb0>-18.0007</Cvb0>
+          <Cvb1>4.23754</Cvb1>
+          <tau0>3.07321</tau0>
+          <tau1>46.8004</tau1>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </parameters>
+        <noise>
+          <force>
+            <x><gaussian>0.0 0.2</gaussian></x>
+            <y><gaussian>0.0 0.2</gaussian></y>
+            <z><gaussian>0.0 0.2</gaussian></z>
+          </force>
+          <torque>
+            <x><gaussian>0.0 0.2</gaussian></x>
+            <y><gaussian>0.0 0.2</gaussian></y>
+            <z><gaussian>0.0 0.2</gaussian></z>
+          </torque>
+        </noise>
+      </dynamics>
+
+      *****************************************/
+
+	_LOW_THROTT = GetSDFDouble(root, "dynamics.parameters.low_throttle", _LOW_THROTT);
+	_MAX_ANGVEL = GetSDFDouble(root, "dynamics.parameters.max_angvel", _MAX_ANGVEL);
+	_pq0        = GetSDFDouble(root, "dynamics.parameters.pq0", _pq0);
+	_pq1        = GetSDFDouble(root, "dynamics.parameters.pq1", _pq1);
+	_pq2        = GetSDFDouble(root, "dynamics.parameters.pq2", _pq2);
+	_r0         = GetSDFDouble(root, "dynamics.parameters.r0", _r0);
+	_r1         = GetSDFDouble(root, "dynamics.parameters.r1", _r1);
+	_Cth0       = GetSDFDouble(root, "dynamics.parameters.Cth0", _Cth0);
+	_Cth1       = GetSDFDouble(root, "dynamics.parameters.Cth1", _Cth1);
+	_Cth2       = GetSDFDouble(root, "dynamics.parameters.Cth2", _Cth2);
+	_Cvb0       = GetSDFDouble(root, "dynamics.parameters.Cvb0", _Cvb0);
+	_Cvb1       = GetSDFDouble(root, "dynamics.parameters.Cvb1", _Cvb1);
+	_tau0       = GetSDFDouble(root, "dynamics.parameters.tau0", _tau0);
+	_tau1       = GetSDFDouble(root, "dynamics.parameters.tau1", _tau1);
+	_kuv        = GetSDFDouble(root, "dynamics.parameters.kuv", _kuv);
+	_kw         = GetSDFDouble(root, "dynamics.parameters.kw", _kw);
+
+	// TODO: add some noise, boys.
+
 };
 
 // Update the system dynamics
-Dynamics::Update(const double &dt)
+void Dynamics::Update(
+            const gazebo::physics::ModelPtr &model,             // Pointer to physics element                          
+            const double& pitch,                                // RC pitch
+            const double& roll,                                 // RC roll
+            const double& throttle,                             // RC throttle
+            const double& yaw,                                  // RC yaw
+            const double& voltage,                              // RC voltage
+            const gazebo::math::Vector3 &wind,                  // Navigation frame wind
+            const double& dt)  	                                // Time
 {
+	/*
 	// Get the b-frame linear velocity
 	b_vel = modPtr->GetWorldPose().rot.GetInverse().RotateVector(
-	model->GetWorldLinearVel()
+		model->GetWorldLinearVel()
 	);
 
 	// Get the b-frame angular velocity
@@ -90,5 +158,5 @@ Dynamics::Update(const double &dt)
 	// Update the drag force
 	b_for = drag * (b_vel + b_wnd);   // Drag force
 	b_for.z = thrust + dFth;          // Thrust force
-
+	*/
 }

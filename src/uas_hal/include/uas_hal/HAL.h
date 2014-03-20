@@ -9,30 +9,20 @@ namespace uas_hal
     class HAL
     {
 
+    private:
+
+        // Handle to the ROS node
+        ros::NodeHandle node;
+
     protected: 
 
-        // Is the HAL bound to 
-        bool bound;
-
-    	// Handle to the ROS node
-		ros::NodeHandle node;
-
-        // Constructor
-        HAL();
-
-    	// Perform binding to the HAL
-    	void bind(const char *name);
-
-    	// Is this HAL bounded?
-    	bool isBound();
-
         // Get a handle to the ROS node
-        ros::NodeHandle& getNodeHandle();
+        ros::NodeHandle& GetROSNode();
 
     public:
 
-        // Default initialization (should be overloaded)
-        void initialize(const char *name);
+        // Constructor
+        HAL(const char *name);
 
 	};
 

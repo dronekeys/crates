@@ -29,21 +29,18 @@ namespace uas_controller
 
 	public:
 
+		Altimeter() : uas_hal::Altitude("altimeter") {}
+
 		// On initial load
 	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
 	    {
 			// Save the model pointer
 			modPtr = _model;
 
-			// Initialise the HAL using the model name
-			initialize(((std::string) "/hal/" 
-				+		(std::string) modPtr->GetName() 
-				+ 		(std::string) "/altimeter").c_str());		      
-
 			// Set up callback for updating the model
-            timer = node.createTimer(
+            timer = GetROSNode().createTimer(
                 ros::Duration(1.0),  				     		 	// duration
-                boost::bind(&Altimeter::Update, this, _1),  	// callback
+                boost::bind(&Altimeter::Update, this, _1),  		// callback
                 false                                       		// oneshot?
             );
 	    }
@@ -52,7 +49,7 @@ namespace uas_controller
 		void Update(const ros::TimerEvent& event)
 		{
 			// Immediately post the z position and speed
-			post(
+			Post(
 				modPtr->GetWorldPose().pos.z, 	// Height (m)
 				modPtr->GetWorldLinearVel().z	// Velocity (m/s)
 			);

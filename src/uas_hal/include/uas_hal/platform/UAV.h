@@ -4,12 +4,21 @@
 // ROS includes
 #include <uas_hal/HAL.h>
 
+// For managing actions
+#include <actionlib/server/simple_action_server.h>
+
 // This package's messages
 #include <uas_hal/MsgInformation.h>
 #include <uas_hal/MsgState.h>
 
 // This package's actions
-//#include <uas_hal/ControlWaypointAction.h>
+#include <uas_hal/AnglesHeightAction.h>
+#include <uas_hal/EmergencyAction.h>
+#include <uas_hal/LandAction.h>
+#include <uas_hal/TakeoffAction.h>
+#include <uas_hal/VelocityAction.h>
+#include <uas_hal/VelocityHeightAction.h>
+#include <uas_hal/WaypointAction.h>
 
 namespace uas_hal
 {
@@ -37,16 +46,27 @@ namespace uas_hal
         ros::Publisher  pubState;
         ros::Publisher  pubInformation;
 
+        // Support the following actions
+        actionlib::SimpleActionServer<uas_hal::AnglesHeightAction>      actAnglesHeight;
+        /*
+        actionlib::SimpleActionServer<uas_hal::EmergencyAction>         actAnglesEmergency;
+        actionlib::SimpleActionServer<uas_hal::LandAction>              actLand;
+        actionlib::SimpleActionServer<uas_hal::TakeoffAction>           actTakeoff;
+        actionlib::SimpleActionServer<uas_hal::VelocityAction>          actVelocity;
+        actionlib::SimpleActionServer<uas_hal::VelocityHeightAction>    actVelocityHeight;
+        actionlib::SimpleActionServer<uas_hal::WaypointAction>          actWaypoint;
+        */
+
+        // Callback
+        void cbAnglesHeight(const uas_hal::AnglesHeightGoalConstPtr &goal);
+
     public:
 
-        // Derived classes must implement this function
-        virtual void HalReceiveControl(const Control &ctl) = 0;
-
         // Setup the altitude sensor
-        void HalInit(const char *name);
+        UAV(const char *name);
 
 		// Send the current state 
-		void HalBroadcastState(
+		void PostState(
             const double &px, const double &py, const double &pz,
             const double &rx, const double &ry, const double &rz,
             const double &vx, const double &vy, const double &vz,
@@ -55,11 +75,18 @@ namespace uas_hal
         );
 
 		// Send some general information
-		void HalBroadcastInformation(
+		void PostInformation(
             const char*     id,
             const char*     version,
             const double&   uptime
             );
+
+        // Derived classes must implement this function
+        virtual void ReceiveControl(
+            const double &pitch,
+            const double &roll,
+            const double &throttle,
+            const double &yaw) = 0;
 
     };
 }

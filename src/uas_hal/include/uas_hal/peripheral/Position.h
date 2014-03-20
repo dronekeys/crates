@@ -24,10 +24,10 @@ namespace uas_hal
     public:
 
         // Setup the altitude sensor
-        void initialize(const char *name);
+        Position(const char *name);
         
         // Send altitude immediately with current time stamp
-        void post(  const char *                    source,
+        void Post(  const char *                    source,
                     const char *                    status,
                     const char *                    cframe,
                     const double &                  x,

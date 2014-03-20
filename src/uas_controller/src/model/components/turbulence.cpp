@@ -1,5 +1,5 @@
 /* This gazebo model plugin implements a second order model for quadrotor dynamics */ 
-#include "shear.h"
+#include "turbulence.h"
 
 using namespace uas_controller;
 
@@ -7,37 +7,37 @@ using namespace uas_controller;
 Turbulence::Turbulence() : bsiter(1000), bstime(0.02), s20(0), d20(0,0,0), wind(0,0,0) {}
 
 // Default constructor takes configuration + pointer to link
-void Turbulence::Configure(sdf::ElementPtr _sdf, const double &alt, const double &speed)
+void Turbulence::Configure(sdf::ElementPtr root)
 {
-	/*
+	/**********************************
+
 	    <turbulence>
 	        <bsiter>1000</bsiter>
 	        <bstime>0.02</bstime>
 	        <direction>90.0</direction>
 	        <speed>1.0</speed>
-      	</turbulence>                */
+      	</turbulence>                
+
+      *********************************/
 
 	// Speed and direction
-	bsiter = GetSDFInteger(sdf, "turbulence.bsiter",  bsiter);
-	bstime = GetSDFDouble(sdf, "turbulence.bstime",  bstime);
+	bsiter = GetSDFInteger(root, "turbulence.bsiter",  bsiter);
+	bstime = GetSDFDouble(root, "turbulence.bstime",  bstime);
 
 	// Speed and direction (random if needed)
-	double s = GetSDFDouble(sdf, "turbulence.speed", 0);
-	double d = GetSDFDouble(sdf, "turbulence.direction" , 
+	double s = GetSDFDouble(root, "turbulence.speed", 0);
+	double d = GetSDFDouble(root, "turbulence.direction" , 
 		gazebo::math::Rand::GetDblUniform(-MATH_PI,MATH_PI));
 	  
 	// Set from SI -> MIL units
 	SetWind(s, d);
-
-	// Select a random direction and initlize
-	Reset(alt, speed);	
 }
 
 // Set the speed (m) and direction (degrees) of the winf
 void Turbulence::SetWind(const double &speed, const double &direction)
 {
   // Wind direction expressed as a rotation quaternion
-  d20.setFromEuler(0.0, 0.0, DEGREES_TO_RADIANS * direction);
+  d20.SetFromEuler(0.0, 0.0, DEGREES_TO_RADIANS * direction);
 
   // Get the speed at 20ft
   s20 = METERS_TO_FEET * speed;
@@ -53,7 +53,7 @@ void Turbulence::Reset(const double &alt, const double &speed)
 }
 
 // Get the wind vector based on the 
-void Turbulence::Update(const double &alt, const double &speed, const double &dt)
+gazebo::math::Vector3 Turbulence::Update(const double &alt, const double &speed, const double &dt)
 {
 	// wind displacement in feet over this timestep
 	d = METERS_TO_FEET * speed * dt;
@@ -71,7 +71,7 @@ void Turbulence::Update(const double &alt, const double &speed, const double &dt
 	
 	// length scale
 	l.z = h;
-	l.y = hl.z / pow(k, 1.2);
+	l.y = l.z / pow(k, 1.2);
 	l.x = l.y;
 	
 	// Gust X component
@@ -91,12 +91,15 @@ void Turbulence::Update(const double &alt, const double &speed, const double &dt
 		(1-d/l.z) *  wind.z,	// Mean
 		sqrt(2*d/l.z) * s.z		// Standard deviation
 	);
+
+	// Return the updated velocity
+	return GetVelocity();
 }
 
 // Get the wind vector based on the 
-void Turbulence::GetVelocity()
+gazebo::math::Vector3 Turbulence::GetVelocity()
 {
 	// Turbulence is aligned with the main turbulence direction. So,
 	// we need to align it with the navigation frame
-	return d20.Invert().RotateVector(FEET_TO_METERS * wind);
+	return d20.GetInverse().RotateVector(FEET_TO_METERS * wind);
 }

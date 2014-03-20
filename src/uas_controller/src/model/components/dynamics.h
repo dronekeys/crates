@@ -15,7 +15,7 @@ namespace uas_controller
     private:
     
         // Pointer to the current model
-        gazebo::physics::LinkPtr     linkPtr;
+        gazebo::physics::ModelPtr modPtr;
 
 	    // Constant model parameters
 	    double _LOW_THROTT, _MAX_ANGVEL, _G,  _MASS_KG;         // Platform config
@@ -28,9 +28,25 @@ namespace uas_controller
 
     public:
 
-    	// Default constructor takes configuration + pointer to link
-    	Dynamics(sdf::ElementPtr _sdf, gazebo::physics::LinkPtr _linkPtr);
+        // Default constructor
+        Dynamics();
 
+    	//  Configure
+    	void Configure(sdf::ElementPtr root);
+
+        // Reset the component
+        void Reset();
+
+        // Update the component
+        void Update(
+            const gazebo::physics::ModelPtr &model,             // Pointer to physics element                          
+            const double& pitch,                                // RC pitch
+            const double& roll,                                 // RC roll
+            const double& throttle,                             // RC throttle
+            const double& yaw,                                  // RC yaw
+            const double& voltage,                              // RC voltage
+            const gazebo::math::Vector3 &wind,                  // Navigation frame wind
+            const double& dt);                                  // Time
     };
 }
 

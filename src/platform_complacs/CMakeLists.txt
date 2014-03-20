@@ -81,12 +81,10 @@ find_package(Boost REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
-catkin_package(
-  LIBRARIES
-    FlightControlSystem
-    PointGrey
-    WiFi
-)
+#catkin_package(
+#  LIBRARIES
+#    fcs
+#)
 
 ###########
 ## Build ##
@@ -100,7 +98,7 @@ set(CMAKE_C_FLAGS "-std=c99")
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
 
 ## Declare a cpp library
-add_library(FlightControlSystem
+add_library(fcs
   src/serial/AsyncSerial.cpp
   src/aci/asctecCommIntf.c
   src/FlightControlSystem.cpp
@@ -115,10 +113,10 @@ add_library(FlightControlSystem
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(FlightControlSystem uas_hal)
+add_dependencies(fcs uas_hal)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(FlightControlSystem 
+target_link_libraries(fcs 
 	${catkin_LIBRARIES} 
 	${Boost_LIBRARIES}
 )

@@ -32,19 +32,16 @@ namespace uas_controller
 
 	public:
 
+		GPS() : uas_hal::Position("gps") {}
+
 		// On initial load
 	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
 	    {
 			// Save the model pointer
 			modPtr = _model;
 
-			// Initialise the HAL
-			initialize(((std::string) "/hal/" 
-				+		(std::string) modPtr->GetName() 
-				+ 		(std::string) "/gps").c_str());			      
-
 			// Set up callback for updating the model
-            timer = node.createTimer(
+            timer = GetROSNode().createTimer(
                 ros::Duration(1.0),  				     		 	// duration
                 boost::bind(&GPS::Update, this, _1),  	// callback
                 false                                       		// oneshot?
@@ -67,7 +64,7 @@ namespace uas_controller
 			err_vel = gazebo::math::Vector3(0,0,0);
 
 			// Immediately post the GPS message
-			post(	"Simulated, L1 code-phase GPS",
+			Post(	"Simulated, L1 code-phase GPS",
                     "Fix (6 satellites)",
                    	"WGS84",
                     pos.x,

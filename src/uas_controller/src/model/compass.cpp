@@ -32,19 +32,16 @@ namespace uas_controller
 
 	public:
 
+		Compass() : uas_hal::Magnetic("compass") {}
+
 		// On initial load
 	    void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
 	    {
 			// Save the model pointer
 			modPtr = _model;
-
-			// Initialise the HAL
-			initialize(((std::string) "/hal/" 
-				+		(std::string) modPtr->GetName() 
-				+ 		(std::string) "/compass").c_str());			      
-
+		      
 			// Set up callback for updating the model (respects sim time)
-            timer = node.createTimer(
+            timer = GetROSNode().createTimer(
                 ros::Duration(1.0),  				     	// duration
                 boost::bind(&Compass::Update, this, _1),  	// callback
                 false                                       // oneshot?
@@ -63,7 +60,7 @@ namespace uas_controller
 			mag = modPtr->GetWorldPose().rot.GetInverse().RotateVector(mag);
 
 			// Immediately post the euler angles
-			post(
+			Post(
 				mag.x,  // Magnetic field strength X (Gauss)
 				mag.y,  // Magnetic field strength Y (Gauss)
 				mag.z   // Magnetic field strength Z (Gauss)

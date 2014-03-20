@@ -42,7 +42,7 @@ namespace uas_controller
         Turbulence();
 
         // Default constructor takes configuration + pointer to link
-        void Configure(sdf::ElementPtr _sdf, const double &alt, const double &speed);
+        void Configure(sdf::ElementPtr root);
 
         // Set the speed (m) and direction (degrees) of the winf
         void SetWind(const double &speed, const double &direction);
@@ -51,10 +51,10 @@ namespace uas_controller
         void Reset(const double &alt, const double &speed);
 
         // Get the wind vector based on the 
-        void Update(const double &alt, const double &speed, const double &dt);
+        gazebo::math::Vector3 Update(const double &alt, const double &speed, const double &dt);
         
         // Get the wind vector based on the 
-        void GetVelocity();
+        gazebo::math::Vector3 GetVelocity();
 
     };
 }

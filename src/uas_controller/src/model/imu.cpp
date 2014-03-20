@@ -32,19 +32,16 @@ namespace uas_controller
 
   public:
 
+    IMU() : uas_hal::Inertial("imu") {}
+
     // On initial load
     void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
     {
       // Save the model pointer
       modPtr = _model;
 
-      // Initialise the HAL
-      initialize(((std::string) "/hal/" 
-        +         (std::string) modPtr->GetName() 
-        +         (std::string) "/imu").c_str());          
-
       // Set up callback for updating the model
-      timer = node.createTimer(
+      timer = GetROSNode().createTimer(
         ros::Duration(1.0),                   // duration
         boost::bind(&IMU::Update, this, _1),    // callback
         false                                           // oneshot?
@@ -65,7 +62,7 @@ namespace uas_controller
       );
 
       // Immediately post the inertial information
-      post(
+      Post(
         angvel.x,
         angvel.y,
         angvel.z,

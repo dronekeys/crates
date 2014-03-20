@@ -80,13 +80,13 @@ add_action_files(
   DIRECTORY 
     action
   FILES 
-    UAV/AnglesHeight.action
-    UAV/Velocity.action
-    UAV/VelocityHeight.action
-    UAV/Waypoint.action
-    UAV/Takeoff.action
-    UAV/Land.action
-    UAV/Emergency.action
+    AnglesHeight.action
+    Velocity.action
+    VelocityHeight.action
+    Waypoint.action
+    Takeoff.action
+    Land.action
+    Emergency.action
 )
 
 ## Generate added messages and services with any dependencies listed here

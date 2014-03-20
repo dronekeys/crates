@@ -32,21 +32,18 @@ namespace uas_controller
 
   public:
 
+    Inclinometer() : uas_hal::Orientation("inclinometer") {}
+
     // On initial load
     void Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr _sdf) 
     {
       // Save the model pointer
       modPtr = _model;
 
-      // Initialise the HAL
-      initialize(((std::string) "/hal/" 
-        +         (std::string) modPtr->GetName() 
-        +         (std::string) "/inclinometer").c_str());    
-
       // Set up callback for updating the model
-      timer = node.createTimer(
-          ros::Duration(1.0),                   // duration
-          boost::bind(&Inclinometer::Update, this, _1),    // callback
+      timer = GetROSNode().createTimer(
+          ros::Duration(1.0),                             // duration
+          boost::bind(&Inclinometer::Update, this, _1),   // callback
           false                                           // oneshot?
       );
     }
@@ -58,7 +55,7 @@ namespace uas_controller
       rot = modPtr->GetWorldPose().rot.GetAsEuler();
 
       // Immediately post the euler angles
-      post(
+      Post(
         rot.x,  // Rotation aroudn the X axis in rads
         rot.y,  // Rotation aroudn the Y axis in rads
         rot.z   // Rotation aroudn the Z axis in rads

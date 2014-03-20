@@ -24,10 +24,10 @@ namespace uas_controller
     		std::vector<std::string> e;
 
     		// Aplit the query path string into nice tokens
-    		boost::split(e, (std::string) key, boost::is_any_of("."));
+    		boost::split(e, path, boost::is_any_of("."));
 
     		// Iterate over tokens, checking that each child exists
-    		for (std::vector<std::string>::iterator i = e.beg(); i != e.end(); i++)
+    		for (std::vector<std::string>::iterator i = e.begin(); i != e.end(); i++)
     		{
     			if (cur->HasElement(*i))
     				cur = cur->GetElement(*i);
@@ -40,18 +40,18 @@ namespace uas_controller
     	}
 
     	// Get a SDF double parameter
-    	double GetSDFDouble(sdf::ElementPtr root, const char* path, double value)
+    	double GetSDFDouble(sdf::ElementPtr cur, const char* path, double value)
     	{
-			if (FindElement(root, (std::string) path))
-    			return cur->GetValueDouble();
+			if (FindElement(cur, (std::string) path))
+    			return cur->GetValue()->Get(value);
     		return value;
     	}
 
     	// Get a SDF double parameter
-    	int GetSDFInteger(sdf::ElementPtr root, const char* path, double value)
+    	int GetSDFInteger(sdf::ElementPtr cur, const char* path, int value)
     	{
-			if (FindElement(root, (std::string) path))
-    			return cur->GetValueInt();
+			if (FindElement(cur, (std::string) path))
+    			return cur->GetValue()->Get(value);
     		return value;
     	}
     };
