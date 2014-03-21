@@ -70,15 +70,15 @@ namespace uas_controller
   
     // When new control arrives from the HAL, save it...
     void ReceiveControl(
-            const double &pitch,
             const double &roll,
+            const double &pitch,
             const double &yaw,
             const double &throttle)
     {
-        control.pitch    = pitch;
-        control.roll     = roll;
-        control.yaw      = yaw;
-        control.throttle = throttle;
+      control.roll     = roll;
+      control.pitch    = pitch;
+      control.yaw      = yaw;
+      control.throttle = throttle;
     }
 
     // Receive the global wind speed and direction
@@ -107,8 +107,8 @@ namespace uas_controller
         dynamics.Update(
           modPtr,                                                   // Model
           shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt), // Wind                                              // Wind
-          control.GetScaledPitch(),                                 // Pitch
           control.GetScaledRoll(),                                  // Roll
+          control.GetScaledPitch(),                                 // Pitch
           control.GetScaledYaw(),                                   // Yaw
           control.GetScaledThrottle(),                              // Throttle
           control.GetScaledVoltage(),                               // Voltage

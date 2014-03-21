@@ -47,12 +47,12 @@ void Waypoint::Update(State *state, double dt, Control *ctl)
     double bx = d * cos(a);
     double by = d * sin(a); 
     
-    ////////////////////// P PITCH CONTROLLER ////////////////////////
+    ////////////////////// P ROLL CONTROLLER ////////////////////////
 
     double desu = limit(_Kxy*bx,-_maxv,_maxv);
     double desP = limit( _Kv*(desu - state->u), -_maxtilt, _maxtilt);
     
-    ////////////////////// P ROLL CONTROLLER ////////////////////////
+    ////////////////////// P PITCH CONTROLLER ////////////////////////
 
     double desv = limit(_Kxy*by,-_maxv,_maxv);
     double desR = limit(-_Kv*(desv - state->v), -_maxtilt, _maxtilt);
@@ -83,8 +83,8 @@ void Waypoint::Update(State *state, double dt, Control *ctl)
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
     // This will be returned
-    ctl->pitch    = desP;
     ctl->roll     = desR;
+    ctl->pitch    = desP;
     ctl->yaw      = desY;
     ctl->throttle = th;
 

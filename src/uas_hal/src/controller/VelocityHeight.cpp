@@ -48,8 +48,8 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     ///////////////// ROTATE VELOCITY INTO B-FRAME /////////////////////
 
     // Get the Euler orientation
-    r[0] = state->pitch;
-    r[1] = state->roll;
+    r[0] = state->roll;
+    r[1] = state->pitch;
     r[2] = state->yaw;
 
     // Make a copy of the n-frame velocity
@@ -109,8 +109,8 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
     // This will be returned
-    ctl->pitch    = desP;
     ctl->roll     = desR;
+    ctl->pitch    = desP;
     ctl->yaw      = desY;
     ctl->throttle = th;
 

@@ -27,22 +27,21 @@ void Control::Configure(sdf::ElementPtr root)
     ***********************************/
 
   // Direct parameters
-  sp = GetSDFDouble(root,"control.pitch",sp);
   sr = GetSDFDouble(root,"control.roll",sr);
+  sp = GetSDFDouble(root,"control.pitch",sp);
   sy = GetSDFDouble(root,"control.yaw",sy);
   st = GetSDFDouble(root,"control.throttle",st);
   sv = GetSDFDouble(root,"control.voltage",sv);
 }
 
-// Returns control scaled to RC values
+double Control::GetScaledRoll()
+{
+  return  sr * roll;
+}
+
 double Control::GetScaledPitch()
 {
 	return  sp * pitch;
-}
-
-double Control::GetScaledRoll()
-{
-	return  sr * roll;
 }
 
 double Control::GetScaledYaw()

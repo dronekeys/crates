@@ -16,13 +16,13 @@ namespace uas_controller
     private:
 
         // Scaling parameters
-        double sp, sr, sy, st, sv;
+        double sr, sp, sy, st, sv;
 
     public:
         
         // Control, in SI units
-        double pitch;
         double roll;
+        double pitch;
         double yaw;
         double throttle;
         double voltage;
@@ -34,8 +34,8 @@ namespace uas_controller
     	void Configure(sdf::ElementPtr root);
 		
         // Returns control scaled to RC values
-        double GetScaledPitch();
         double GetScaledRoll();
+        double GetScaledPitch();
         double GetScaledYaw();
         double GetScaledThrottle();
         double GetScaledVoltage();

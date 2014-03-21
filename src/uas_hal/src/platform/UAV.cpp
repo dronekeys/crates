@@ -32,8 +32,8 @@ UAV::UAV(const char *name) :
 	*/
 
 	// Set the new control goal
-	//ctlAnglesHeight.SetGoal(0.0,0.0,3.14/2.0,1.0);
-	ctlWaypoint.SetGoal(1.0,0.0,1.0,0.0);
+	ctlAnglesHeight.SetGoal(0.0,0.1,0.0,1.0);
+	//ctlWaypoint.SetGoal(0.0,1.0,1.0,0.0);
 	//ctlVelocity.SetGoal(0.0,0.1,0.0,0.0);
 	//ctlVelocityHeight.SetGoal(1.0,0.0,0.0,1.0);
 
@@ -48,15 +48,15 @@ UAV::UAV(const char *name) :
 void UAV::cbAnglesHeight_prog(const ros::TimerEvent& event)
 {
 	// Obtain the control
-	//ctlAnglesHeight.Update(&state, 0.02, &control);
-	ctlWaypoint.Update(&state, 0.02, &control);
+	ctlAnglesHeight.Update(&state, 0.02, &control);
+	//	ctlWaypoint.Update(&state, 0.02, &control);
 	//ctlVelocity.Update(&state, 0.02, &control);
 	//ctlVelocityHeight.Update(&state, 0.02, &control);
 
 	// Update the HAL implementation
 	ReceiveControl(
-		control.pitch,
 		control.roll,
+		control.pitch,
 		control.yaw,
 		control.throttle
 	);
@@ -68,8 +68,8 @@ void UAV::cbAnglesHeight_goal(const uas_hal::AnglesHeightGoalConstPtr &goal)
 	// Set the new control goal
 	ctlAnglesHeight.SetGoal
 	(
-		goal->pitch,
 		goal->roll,
+		goal->pitch,
 		goal->yaw,
 		goal->altitude
 	);
@@ -103,7 +103,7 @@ void UAV::cbWaypoint_kill() {}
 // Set the state of the vehicle
 void UAV::SetState(
     const double &x, 		const double &y, 	 	const double &z,
-    const double &pitch, 	const double &roll, 	const double &yaw,
+    const double &roll, 	const double &pitch, 	const double &yaw,
     const double &u, 		const double &v, 	 	const double &w,
     const double &p, 		const double &q, 	 	const double &r,
     const double &thrust, 	const double &energy)
@@ -111,8 +111,8 @@ void UAV::SetState(
 	state.x 	 = x; 
 	state.y 	 = y; 
 	state.z 	 = z;
-	state.roll 	 = pitch; 
-	state.pitch  = roll; 
+	state.roll   = roll; 
+	state.pitch  = pitch; 
 	state.yaw 	 = yaw;
 	state.u 	 = u; 
 	state.v 	 = v; 
@@ -132,8 +132,8 @@ void UAV::PostState()
 	msgState.x 	 	= state.x; 
 	msgState.y 	 	= state.y; 
 	msgState.z 	 	= state.z;
-	msgState.pitch 	= state.pitch; 
 	msgState.roll   = state.roll; 
+	msgState.pitch 	= state.pitch; 
 	msgState.yaw 	= state.yaw;
 	msgState.u 	 	= state.u; 
 	msgState.v 	 	= state.v; 

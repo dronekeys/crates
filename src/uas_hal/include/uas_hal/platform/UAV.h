@@ -108,15 +108,15 @@ namespace uas_hal
         // Set the state of the vehicle
         void SetState(
             const double &x,        const double &y,        const double &z,
-            const double &pitch,    const double &roll,     const double &yaw,
+            const double &roll,     const double &pitch,   const double &yaw,
             const double &u,        const double &v,        const double &w,
             const double &p,        const double &q,        const double &r,
             const double &thrust,   const double &energy);
 
         // Derived classes must implement this function
         virtual void ReceiveControl(
-            const double &pitch,
-            const double &roll, 
+            const double &roll,
+            const double &pitch, 
             const double &yaw, 
             const double &throttle) = 0;
 

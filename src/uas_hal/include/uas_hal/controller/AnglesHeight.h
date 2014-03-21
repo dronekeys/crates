@@ -33,7 +33,7 @@ namespace uas_hal
         AnglesHeight();
 
         // Set the goal
-        void SetGoal(double pitch, double roll, double yaw, double height);
+        void SetGoal(double roll, double pitch, double yaw, double height);
 
         // Pass the state and discrete time step and receive a control back
         void Update(State *state, double dt, Control *ctl);

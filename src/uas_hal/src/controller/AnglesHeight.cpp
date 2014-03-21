@@ -4,8 +4,8 @@
 #include <ros/ros.h>
 
 // Convenience declarations
-#define _PITCH  0
-#define _ROLL   1 
+#define _ROLL   0 
+#define _PITCH  1
 #define _YAW    2
 #define _HEIGHT 3
 
@@ -18,14 +18,14 @@ AnglesHeight::AnglesHeight()
 }
 
 // Constructor ta
-void AnglesHeight::SetGoal(double pitch, double roll, double yaw, double height)
+void AnglesHeight::SetGoal(double roll, double pitch, double yaw, double height)
 {
     // Rest the controller
     Reset();
 
     // Set the new goal
-    sp[_PITCH]  = pitch;
     sp[_ROLL]   = roll;
+    sp[_PITCH]  = pitch;
     sp[_YAW]    = yaw;
     sp[_HEIGHT] = height;
 }
@@ -74,8 +74,8 @@ void AnglesHeight::Update(State *state, double dt, Control *ctl)
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
     // This will be returned
-    ctl->pitch    = sp[_PITCH];
     ctl->roll     = sp[_ROLL];
+    ctl->pitch    = sp[_PITCH];
     ctl->yaw      = ya;
     ctl->throttle = th;
 
@@ -87,8 +87,8 @@ void AnglesHeight::Update(State *state, double dt, Control *ctl)
 void AnglesHeight::Reset()
 {
     // Reset goal
-    sp[_PITCH]  = 0.0;
     sp[_ROLL]   = 0.0;
+    sp[_PITCH]  = 0.0;
     sp[_YAW]    = 0.0;
     sp[_HEIGHT] = 0.0;
 

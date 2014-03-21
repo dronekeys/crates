@@ -107,10 +107,10 @@ void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model)
 
 // Update the system dynamics
 void Dynamics::Update(
-            const gazebo::physics::ModelPtr& model,               // Pointer to physics element                          
+            const gazebo::physics::ModelPtr& model,             // Pointer to physics element                          
             const gazebo::math::Vector3& wind,					// Wind force
-            const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
+            const double& pitch,                                // RC pitch
             const double& yaw,                                  // RC yaw
             const double& throttle,                             // RC throttle
             const double& voltage,                              // RC voltage
@@ -128,12 +128,12 @@ void Dynamics::Update(
 	// Update b-frame angular acceleration //
 	/////////////////////////////////////////
 
-	// Pitch
+	// x = roll
 	torq.x = _pq1*(_pq0*roll - n_rot.x) + _pq2*b_ang_vel.x;    
 	if ((b_ang_vel.x > _MAX_ANGVEL && (torq.x > 0)) || (b_ang_vel.x < -_MAX_ANGVEL && (torq.x < 0)))
 	  torq.x = 0;
 
-	// Roll
+	// y = pitch
 	torq.y = _pq1*(_pq0*pitch  - n_rot.y) + _pq2*b_ang_vel.y;    
 	if ((b_ang_vel.y > _MAX_ANGVEL && (torq.y > 0)) || (b_ang_vel.y < -_MAX_ANGVEL && (torq.y < 0)))
 	  torq.y = 0;
@@ -184,7 +184,7 @@ void Dynamics::Update(
 	//////////////////////
 
 	// Rotate wind from navigation to body frame, and subtract from current velocity
-	drag  = model->GetLink("body")->GetWorldLinearVel() - wind;
+	drag = model->GetLink("body")->GetWorldLinearVel() - wind;
 
 	// Drag coefficients (NNB: negative)
 	drag.x *= _kuv;
@@ -192,7 +192,7 @@ void Dynamics::Update(
 	drag.z *= _kw;
 
 	// Include drag
-	model->GetLink("body")->AddForce(mass*drag);
+	model->GetLink("body")->AddForce(drag);
 
 	//////////////////////
 	// MOTOR AESTHETICS //

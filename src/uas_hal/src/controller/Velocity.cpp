@@ -48,8 +48,8 @@ void Velocity::Update(State *state, double dt, Control *ctl)
     ///////////////// ROTATE VELOCITY INTO B-FRAME /////////////////////
 
     // Get the Euler orientation
-    r[_X] = state->pitch;
-    r[_Y] = state->roll;
+    r[_X] = state->roll;
+    r[_Y] = state->pitch;
     r[_Z] = state->yaw;
 
     // Make a copy of the n-frame velocity
@@ -59,7 +59,7 @@ void Velocity::Update(State *state, double dt, Control *ctl)
     // Get the b-frame velocity
     n2b(r,vt);
 
-    //////////////////// PID CONTROLLER FOR PITCH //////////////////////
+    //////////////////// PID CONTROLLER FOR ROLL //////////////////////
 
     // b-frame X
     e = -(limit(vt[_X],-_maxv,_maxv) - state->u);  
@@ -69,7 +69,7 @@ void Velocity::Update(State *state, double dt, Control *ctl)
 
     double desP = limit(_Kvp * e + _Kvi * ei[_X] + _Kvd * de, -_maxtilt, _maxtilt);
 
-    //////////////////// PID CONTROLLER FOR ROLL //////////////////////
+    //////////////////// PID CONTROLLER FOR PITCH //////////////////////
 
     // b-frame Y
     e = -(limit(vt[_Y],-_maxv,_maxv) - state->v);     
@@ -96,8 +96,8 @@ void Velocity::Update(State *state, double dt, Control *ctl)
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
     // This will be returned
-    ctl->pitch    = desP;
     ctl->roll     = desR;
+    ctl->pitch    = desP;
     ctl->yaw      = desY;
     ctl->throttle = desT;
 

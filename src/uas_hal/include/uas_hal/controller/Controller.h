@@ -11,8 +11,8 @@ namespace uas_hal
         double x;
         double y;
         double z;
-        double pitch;
         double roll;
+        double pitch;
         double yaw;
         double u;
         double v;
@@ -27,8 +27,8 @@ namespace uas_hal
     // UAV control structure
     struct Control
     {
-        double pitch;
         double roll;
+        double pitch;
         double throttle;
         double yaw;
     };
