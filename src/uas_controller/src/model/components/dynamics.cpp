@@ -84,7 +84,7 @@ void Dynamics::Configure(sdf::ElementPtr root)
 
 // Update the system dynamics
 void Dynamics::Update(
-            const gazebo::physics::LinkPtr& link,               // Pointer to physics element                          
+            const gazebo::physics::ModelPtr& model,               // Pointer to physics element                          
             const gazebo::math::Vector3& wind,					// Wind force
             const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
@@ -93,10 +93,13 @@ void Dynamics::Update(
             const double& voltage,                              // RC voltage
             const double& dt)  	                                // Time
 {
-	// Get the world-frame position and orientation
-	n_rot = link->GetWorldPose().rot.GetAsEuler();
-	b_lin_vel = link->GetRelativeLinearVel();
-	b_ang_vel = link->GetRelativeAngularVel();
+	///////////////////////////////////////////
+	// Get the current state of the platform //
+	///////////////////////////////////////////
+
+	n_rot     = model->GetLink("body")->GetWorldPose().rot.GetAsEuler();
+	b_lin_vel = model->GetLink("body")->GetRelativeLinearVel();
+	b_ang_vel = model->GetLink("body")->GetRelativeAngularVel();
 
 	/////////////////////////////////////////
 	// Update b-frame angular acceleration //
@@ -136,27 +139,33 @@ void Dynamics::Update(
 		  dFth = tau;
 	}
 	
+	// Add the change in thrust
+	model->GetJoint("motor0")->SetForce(0, dFth/4);
+	model->GetJoint("motor1")->SetForce(0, dFth/4);
+	model->GetJoint("motor2")->SetForce(0,-dFth/4);
+	model->GetJoint("motor3")->SetForce(0,-dFth/4);
+
 	// Update thrust force (link below should idle the quadrotor)
-	thrust = dFth + thrust;
+	// thrust = dFth + thrust;
 	
-	//thrust = -link->GetInertial()->GetMass() 
-	//	      * link->GetModel()->GetWorld()->GetPhysicsEngine()->GetGravity().z;
+	thrust = -model->GetLink("body")->GetInertial()->GetMass()
+   	       *  model->GetWorld()->GetPhysicsEngine()->GetGravity().z;
 
 	// Force is always orthogonal to rotor plane
-	forc = gazebo::math::Vector3(0.0,0.0,throttle);
+	forc = gazebo::math::Vector3(0.0,0.0,thrust);
 	
 	// Drag is proportional to airspeed and wind
-	drag  = link->GetRelativeLinearVel();
-	drag -= link->GetWorldPose().rot.RotateVector(wind);
+	drag  = model->GetLink("body")->GetRelativeLinearVel();
+	drag -= model->GetLink("body")->GetWorldPose().rot.RotateVector(wind);
 
 	// Convert from a force to a mass
-	drag.x *= link->GetInertial()->GetMass() *_kuv;
-	drag.y *= link->GetInertial()->GetMass() *_kuv;
-	drag.z *= link->GetInertial()->GetMass() *_kw;
+	drag.x *= model->GetLink("body")->GetInertial()->GetMass() *_kuv;
+	drag.y *= model->GetLink("body")->GetInertial()->GetMass() *_kuv;
+	drag.z *= model->GetLink("body")->GetInertial()->GetMass() *_kw;
 
 	// set force and torque in gazebo
-	//link->AddRelativeForce(forc + drag);
-	//link->AddRelativeTorque(torq);
+	model->GetLink("body")->AddRelativeForce(forc + drag);
+	model->GetLink("body")->AddRelativeTorque(torq);
 }
 
 // Reset the component

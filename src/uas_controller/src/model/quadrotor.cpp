@@ -43,6 +43,7 @@ namespace uas_controller
     double tim;
 
     // Pointer to the current model
+    gazebo::physics::ModelPtr         modPtr;
     gazebo::physics::LinkPtr          lnkPtr;
 
     // Pointer to the update event connection
@@ -104,7 +105,7 @@ namespace uas_controller
 
         // Set the state of the platform directly from the simulation
         dynamics.Update(
-          lnkPtr,                                                   // Model
+          modPtr,                                                   // Model
           shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt), // Wind                                              // Wind
           control.GetScaledPitch(),                                 // Pitch
           control.GetScaledRoll(),                                  // Roll
@@ -113,7 +114,6 @@ namespace uas_controller
           control.GetScaledVoltage(),                               // Voltage
           dt                                                        // Time
         );
-
       }
 
       // Update timer
@@ -151,6 +151,7 @@ namespace uas_controller
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
     {
       // Save pointer to the model
+      modPtr = model;
       lnkPtr = model->GetLink("body");
 
       ////////////////////////
@@ -211,9 +212,6 @@ namespace uas_controller
       );
 
       */
-
-      //model->GetJoint("motor0")->SetForce(0,100.0);
-
 
     }
   };

@@ -7,22 +7,13 @@
     <static>false</static>
 
     <!-- Initial pose -->
-    <pose>0 0 0  0 0 0</pose>
+    <pose>0 0 1  0 0 0</pose>
 
     <!-- Frame -->
     <link name="body">
       <pose>0 0 0  0 0 0</pose>
-      <must_be_base_link>true</must_be_base_link>
       <inertial>
-        <mass>1.68</mass>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
+        <mass>1.670</mass>
       </inertial>
       <collision name="body_collision">
         <pose>0 0 0.035 0 0 0</pose>
@@ -43,74 +34,94 @@
       </visual>
     </link>
 
-    <include>
-      <uri>model://blade</uri>
-      <name>blade0</name>
-      <pose>-0.241 0.0 0.05 0 0 0</pose>
-    </include>
+    <!-- BLADE0 (ACI) = FRONT -->
+    <link name="blade0">
+      <pose>0.241 0.0 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.0025</mass>
+      </inertial>
+      <visual name="blade0_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hummingbird/meshes/blade.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
     <joint name="motor0" type="revolute">
       <parent>body</parent>
-      <child>blade0::blade_link</child>
+      <child>blade0</child>
       <axis>
         <xyz>0 0 1</xyz>
-        <limit>
-          <upper>0</upper>
-          <lower>0</lower>
-        </limit>
       </axis>
     </joint>
 
-    <include>
-      <uri>model://blade</uri>
-      <name>blade1</name>
-      <pose>0.241 0.0 0.05 0 0 0</pose>
-    </include>
+    <!-- BLADE1 (ACI) = REAR -->
+    <link name="blade1">
+      <pose>-0.241 0.0 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.0025</mass>
+      </inertial>
+      <visual name="blade1_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hummingbird/meshes/blade.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
     <joint name="motor1" type="revolute">
       <parent>body</parent>
-      <child>blade1::blade_link</child>
+      <child>blade1</child>
       <axis>
         <xyz>0 0 1</xyz>
-        <limit>
-          <upper>0</upper>
-          <lower>0</lower>
-        </limit>
       </axis>
     </joint>
 
-    <include>
-      <uri>model://blade</uri>
-      <name>blade2</name>
-      <pose>0.0 0.241 0.05 0 0 0</pose>
-    </include>`
-    <joint name="motor`2" type="revolute">
-      <parent>body</parent>
-      <child>blade2::blade_link</child>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <upper>0</upper>
-          <lower>0</lower>
-        </limit>
-      </axis>
-    </joint>
-
-    <include>
-      <uri>model://blade</uri>
-      <name>blade3</name>
+   <!-- BLADE0 (ACI) = LEFT -->
+    <link name="blade2">
       <pose>0.0 -0.241 0.05 0 0 0</pose>
-    </include>
+      <inertial>
+        <mass>0.0025</mass>
+      </inertial>
+      <visual name="blade2_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hummingbird/meshes/blade.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name="motor2" type="revolute">
+      <parent>body</parent>
+      <child>blade2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <!-- BLADE1 (ACI) = REAR -->
+    <link name="blade3">
+      <pose>0.0 0.241 0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.0025</mass>
+      </inertial>
+      <visual name="blade3_visual">
+        <geometry>
+          <mesh>
+            <uri>model://hummingbird/meshes/blade.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
     <joint name="motor3" type="revolute">
       <parent>body</parent>
-      <child>blade3::blade_link</child>
+      <child>blade3</child>
       <axis>
         <xyz>0 0 1</xyz>
-        <limit>
-          <upper>0</upper>
-          <lower>0</lower>
-        </limit>
       </axis>
     </joint>
-    
+
     <plugin name='imu' filename='libimu.so'>
       <rate>128</rate>
       <noise>

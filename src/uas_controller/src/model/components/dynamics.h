@@ -41,7 +41,7 @@ namespace uas_controller
 
         // Update the component
         void Update(
-            const gazebo::physics::LinkPtr& link,               // Pointer to physics element       
+            const gazebo::physics::ModelPtr& model,             // Pointer to physics element       
             const gazebo::math::Vector3& wind,                  // Wind force                   
             const double& pitch,                                // RC pitch
             const double& roll,                                 // RC roll
