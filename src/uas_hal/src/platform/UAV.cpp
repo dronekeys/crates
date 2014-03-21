@@ -31,7 +31,7 @@ UAV::UAV(const char *name) :
 	*/
 
 	// Set the new control goal
-	ctlAnglesHeight.SetGoal(0.0,0.0,1.0,1.0);
+	ctlAnglesHeight.SetGoal(0.0,0.0,1.0,5.0);
 
 	// Set the control timer (always happens at 50Hz, and respects simulated time)
 	timCtl = GetROSNode().createTimer(

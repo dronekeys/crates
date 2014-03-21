@@ -168,7 +168,7 @@ namespace uas_controller
       turbulence.Configure(root, lnkPtr);
       
       // Configure the dynamic model from SDF
-      dynamics.Configure(root);
+      dynamics.Configure(root, modPtr);
 
       // Configure the control model from SDF
       control.Configure(root);

@@ -50,8 +50,8 @@ void AnglesHeight::Update(State *state, double dt, Control *ctl)
 
     //////////////////////// THROTTLE CONTROLLER ////////////////////////
 
-    // Get the (P)roportional component
-    double ez_ = -(sp[_HEIGHT] - state->z);
+    // Get the (P)roportional component (sign change by Andrew)
+    double ez_ = sp[_HEIGHT] - state->z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;

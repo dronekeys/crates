@@ -28,13 +28,16 @@ namespace uas_controller
         gazebo::math::Vector3 n_rot, b_lin_vel, b_ang_vel;
         gazebo::math::Vector3 torq, forc, drag;
 
+        // A scaling factor for converting thrust -> motor torque
+        double mscale;
+
     public:
 
         // Default constructor
         Dynamics();
 
-    	//  Configure
-    	void Configure(sdf::ElementPtr root);
+    	//  Configure (needs gazebo model to set initial thrust and motor speed)
+    	void Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model);
 
         // Reset the component
         void Reset();

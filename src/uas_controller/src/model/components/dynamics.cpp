@@ -5,7 +5,8 @@ using namespace uas_controller;
 
 // Default constructor
 Dynamics::Dynamics() : 
-	thrust(0),							// Current thrust
+	mscale(1000.0),						// Motor speed scaling
+	thrust(16.464000),					// Default for hovering!
 	_LOW_THROTT(300.0),
 	_MAX_ANGVEL(2.617993877991494),
 	_pq0(-3.25060e-04),
@@ -24,7 +25,7 @@ Dynamics::Dynamics() :
 	_kw(-1.35341)
 {}
 
-void Dynamics::Configure(sdf::ElementPtr root) 
+void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model) 
 {
 
 	/*****************************************
@@ -80,6 +81,21 @@ void Dynamics::Configure(sdf::ElementPtr root)
 	_tau1       = GetSDFDouble(root, "dynamics.parameters.tau1", _tau1);
 	_kuv        = GetSDFDouble(root, "dynamics.parameters.kuv", _kuv);
 	_kw         = GetSDFDouble(root, "dynamics.parameters.kw", _kw);
+
+	// If the platform has taken off
+	thrust = 0;
+	if (model->GetLink("body")->GetWorldPose().pos.z > 0)
+	{
+		// Give it enough thrust to hover
+		thrust = 16.464000;
+		
+		// Aesthetics
+		model->GetJoint("motor0")->SetForce(0, thrust*mscale);
+		model->GetJoint("motor1")->SetForce(0, thrust*mscale);
+		model->GetJoint("motor2")->SetForce(0,-thrust*mscale);
+		model->GetJoint("motor3")->SetForce(0,-thrust*mscale);
+	}	
+
 };
 
 // Update the system dynamics
@@ -138,34 +154,49 @@ void Dynamics::Update(
 		else
 		  dFth = tau;
 	}
-	
-	// Add the change in thrust
-	model->GetJoint("motor0")->SetForce(0, dFth/4);
-	model->GetJoint("motor1")->SetForce(0, dFth/4);
-	model->GetJoint("motor2")->SetForce(0,-dFth/4);
-	model->GetJoint("motor3")->SetForce(0,-dFth/4);
 
-	// Update thrust force (link below should idle the quadrotor)
-	// thrust = dFth + thrust;
-	
-	thrust = -model->GetLink("body")->GetInertial()->GetMass()
-   	       *  model->GetWorld()->GetPhysicsEngine()->GetGravity().z;
+	// Update thrust
+	thrust += dFth*dt;
 
-	// Force is always orthogonal to rotor plane
-	forc = gazebo::math::Vector3(0.0,0.0,thrust);
-	
-	// Drag is proportional to airspeed and wind
-	drag  = model->GetLink("body")->GetRelativeLinearVel();
-	drag -= model->GetLink("body")->GetWorldPose().rot.RotateVector(wind);
+	/////////////////////////////
+	// TORQUE INDUCED BY ROTORS //
+	/////////////////////////////
 
-	// Convert from a force to a mass
-	drag.x *= model->GetLink("body")->GetInertial()->GetMass() *_kuv;
-	drag.y *= model->GetLink("body")->GetInertial()->GetMass() *_kuv;
-	drag.z *= model->GetLink("body")->GetInertial()->GetMass() *_kw;
-
-	// set force and torque in gazebo
-	model->GetLink("body")->AddRelativeForce(forc + drag);
+	// Dynamic model takes into account inertia 
 	model->GetLink("body")->AddRelativeTorque(torq);
+
+	/////////////////////////////
+	// FORCE INDUCED BY ROTORS // 
+	/////////////////////////////
+
+	// Thrust is always orthogonal to rotor plane
+	model->GetLink("body")->AddRelativeForce(gazebo::math::Vector3(0.0,0.0,thrust));
+
+	//////////////////////
+	// AERODYNAMIC DRAG //
+	//////////////////////
+
+	// Rotate wind from navigation to body frame, and subtract from current velocity
+	drag  = model->GetLink("body")->GetWorldLinearVel() - wind;
+
+	// Drag coefficients
+	drag.x *= _kuv;
+	drag.y *= _kuv;
+	drag.z *= _kw;
+
+	// Include drag
+	model->GetLink("body")->AddForce(-drag);
+
+	//////////////////////
+	// MOTOR AESTHETICS //
+	//////////////////////
+
+	// Add the change in thrust
+	model->GetJoint("motor0")->SetForce(0, dFth*dt*mscale);
+	model->GetJoint("motor1")->SetForce(0, dFth*dt*mscale);
+	model->GetJoint("motor2")->SetForce(0,-dFth*dt*mscale);
+	model->GetJoint("motor3")->SetForce(0,-dFth*dt*mscale);
+
 }
 
 // Reset the component

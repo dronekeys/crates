@@ -30,6 +30,9 @@ void Energy::Configure(sdf::ElementPtr root)
   cf   = GetSDFDouble(root,"energy.consumption.flight",cf);
   kill = GetSDFDouble(root,"energy.limits.kill",kill);
   warn = GetSDFDouble(root,"energy.limits.warn",warn);
+
+  // Reset the energy
+  Reset();
 }
 
 // Reset state
