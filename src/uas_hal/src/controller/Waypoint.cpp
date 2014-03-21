@@ -50,14 +50,12 @@ void Waypoint::Update(State *state, double dt, Control *ctl)
     ////////////////////// P PITCH CONTROLLER ////////////////////////
 
     double desu = limit(_Kxy*bx,-_maxv,_maxv);
-    
-    double desP = limit(_Kv*(-(desu - state->u)),-_maxtilt,_maxtilt);
+    double desP = limit( _Kv*(desu - state->u), -_maxtilt, _maxtilt);
     
     ////////////////////// P ROLL CONTROLLER ////////////////////////
 
     double desv = limit(_Kxy*by,-_maxv,_maxv);
-    
-    double desR = limit(_Kv*(desv - state->v),-_maxtilt,_maxtilt);
+    double desR = limit(-_Kv*(desv - state->v), -_maxtilt, _maxtilt);
     
     //////////////////////// P YAW CONTROLLER ////////////////////////
 
@@ -65,8 +63,8 @@ void Waypoint::Update(State *state, double dt, Control *ctl)
     
     /////////////////// PID THROTTLE CONTROLLER //////////////////////
 
-    // Get the (P)roportional component
-    double ez_ = -(sp[_Z] - state->z);
+    // Get the (P)roportional component (Changed by Andrew)
+    double ez_ = sp[_Z] - state->z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;

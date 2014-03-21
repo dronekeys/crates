@@ -62,7 +62,7 @@ void Velocity::Update(State *state, double dt, Control *ctl)
     //////////////////// PID CONTROLLER FOR PITCH //////////////////////
 
     // b-frame X
-    e = -(limit(vt[_X],_maxv,_maxv) - state->u);  
+    e = -(limit(vt[_X],-_maxv,_maxv) - state->u);  
     de = (first ? 0 : (e - ep[_X]) / dt);
     ei[_X] += e; 
     ep[_X]  = e;
@@ -72,12 +72,12 @@ void Velocity::Update(State *state, double dt, Control *ctl)
     //////////////////// PID CONTROLLER FOR ROLL //////////////////////
 
     // b-frame Y
-    e = -(limit(vt[_Y],_maxv,_maxv) - state->v);     
+    e = -(limit(vt[_Y],-_maxv,_maxv) - state->v);     
     de = (first ? 0 : (e - ep[_Y]) / dt);
     ei[_Y] += e; 
     ep[_Y]  = e;
 
-    double desR = limit(_Kvp * e + _Kvi * ei[_X] + _Kvd * de, -_maxtilt, _maxtilt);
+    double desR = limit(_Kvp * e + _Kvi * ei[_Y] + _Kvd * de, -_maxtilt, _maxtilt);
 
     //////////////////// PID CONTROLLER FOR THRUST //////////////////////
 

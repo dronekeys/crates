@@ -55,7 +55,7 @@ namespace uas_hal
             //     [          cy*cz,          cy*sz,            -sy]
             //     [ sy*sx*cz-sz*cx, sy*sx*sz+cz*cx,          cy*sx] 
             //     [ sy*cx*cz+sz*sx, sy*cx*sz-cz*sx,          cy*cx]
-            vec[0] =                (c[0]*c[2])*t[0] +                (c[1]*s[2])*t[1] -      s[1]*t[2];
+            vec[0] =                (c[1]*c[2])*t[0] +                (c[1]*s[2])*t[1] -      s[1]*t[2];
             vec[1] = (s[1]*s[0]*c[2]-s[2]*c[0])*t[0] + (s[1]*s[0]*s[2]+c[2]*c[0])*t[1] + c[1]*s[0]*t[2];
             vec[2] = (s[1]*c[0]*c[2]-s[2]*s[0])*t[0] + (s[1]*c[0]*s[2]+c[2]*s[0])*t[1] + c[1]*c[0]*t[2];
         }

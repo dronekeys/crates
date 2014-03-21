@@ -28,8 +28,7 @@ namespace uas_controller
         gazebo::math::Vector3 n_rot, b_lin_vel, b_ang_vel;
         gazebo::math::Vector3 torq, forc, drag;
 
-        // A scaling factor for converting thrust -> motor torque
-        double mscale;
+        double mscale, mass;
 
     public:
 

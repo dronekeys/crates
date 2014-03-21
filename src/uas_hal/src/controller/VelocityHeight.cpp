@@ -58,7 +58,7 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     vt[2] = 0.0;
 
     // Get the n-frame (x,y) velocity in the b-frame
-    n2b(r,vt);
+    //n2b(r,vt);
 
     // Used for calculations below
     double e, de;
@@ -66,7 +66,7 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     //////////////////////// PID CONTROLLER FOR PITCH ///////////////////////////
 
     // b-frame X controller is a full PID
-    e = -(limit(vt[0],_maxv,_maxv) - state->u);  
+    e =  (limit(vt[0],-_maxv,_maxv) - state->u);  
     de = (first ? 0 : (e - ep[_U]) / dt);
     ei[_U] += e; 
     ep[_U]  = e;
@@ -76,7 +76,7 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     ///////////////////////// PID CONTROLLER FOR ROLL ///////////////////////////
 
     // b-frame Y controller is a full PID
-    e = -(limit(vt[1],_maxv,_maxv) - state->v);     
+    e = -(limit(vt[1],-_maxv,_maxv) - state->v);     
     de = (first ? 0 : (e - ep[_V]) / dt);
     ei[_V] += e; 
     ep[_V]  = e;
@@ -86,7 +86,7 @@ void VelocityHeight::Update(State *state, double dt, Control *ctl)
     ////////////////////////// PID THROTTLE CONTROLLER //////////////////////////
 
     // Get the (P)roportional component
-    double ez_ = -(sp[_HEIGHT] - state->z);
+    double ez_ = sp[_HEIGHT] - state->z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;

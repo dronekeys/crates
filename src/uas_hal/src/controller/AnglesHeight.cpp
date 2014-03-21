@@ -1,6 +1,8 @@
 // Local library incldues
 #include <uas_hal/controller/AnglesHeight.h>
 
+#include <ros/ros.h>
+
 // Convenience declarations
 #define _PITCH  0
 #define _ROLL   1 
@@ -45,6 +47,8 @@ void AnglesHeight::Update(State *state, double dt, Control *ctl)
     // _HEIGHT      : uses a PID-controller
 
     ////////////////////////// YAW CONTROLLER /////////////////////////
+
+    ROS_INFO("%f %f",sp[_YAW],state->yaw);
 
     double ya = limit(_Kya*(sp[_YAW] - state->yaw),-_maxyawrate,_maxyawrate);
 

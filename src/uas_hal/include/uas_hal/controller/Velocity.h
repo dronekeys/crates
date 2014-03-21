@@ -22,9 +22,9 @@ namespace uas_hal
         static const double _Kwd        = -0.0;     // z velocity derivative constant
         static const double _th_hover   = 0.59;     // throttle hover offset
         static const double _maxtilt    = 0.34;     // max pitch/roll angle
-        static const double _Kya        = 6;        // yaw proportional constant
+        static const double _Kya        = 6.0;      // yaw proportional constant
         static const double _maxyawrate = 4.4;      // max allowed yaw rate
-        static const double _maxv       = 3;        // max allowed xy velocity
+        static const double _maxv       = 3.0;      // max allowed xy velocity
 
         // PID parameters
         double ei[3], ep[3], sp[4];

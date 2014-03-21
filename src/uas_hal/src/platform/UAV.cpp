@@ -6,12 +6,13 @@ using namespace uas_hal;
 UAV::UAV(const char *name) : 
 	HAL(name),
 	actAnglesHeight		(HAL::GetROSNode(), "AnglesHeight",   boost::bind(&UAV::cbAnglesHeight_goal, 	this, _1), false),
-	actEmergency		(HAL::GetROSNode(), "Emergency", 	  boost::bind(&UAV::cbEmergency_goal, 		this, _1), false),
-	actLand				(HAL::GetROSNode(), "Land", 		  boost::bind(&UAV::cbLand_goal, 			this, _1), false),
-	actTakeoff			(HAL::GetROSNode(), "Takeoff", 		  boost::bind(&UAV::cbTakeoff_goal, 		this, _1), false),
 	actVelocity			(HAL::GetROSNode(), "Velocity", 	  boost::bind(&UAV::cbVelocity_goal, 		this, _1), false),
 	actVelocityHeight	(HAL::GetROSNode(), "VelocityHeight", boost::bind(&UAV::cbVelocityHeight_goal, 	this, _1), false),
-	actWaypoint			(HAL::GetROSNode(), "Waypoint", 	  boost::bind(&UAV::cbWaypoint_goal, 		this, _1), false)
+	actWaypoint			(HAL::GetROSNode(), "Waypoint", 	  boost::bind(&UAV::cbWaypoint_goal, 		this, _1), false),
+	actEmergency		(HAL::GetROSNode(), "Emergency", 	  boost::bind(&UAV::cbEmergency_goal, 		this, _1), false),
+	actLand				(HAL::GetROSNode(), "Land", 		  boost::bind(&UAV::cbLand_goal, 			this, _1), false),
+	actTakeoff			(HAL::GetROSNode(), "Takeoff", 		  boost::bind(&UAV::cbTakeoff_goal, 		this, _1), false)
+
 {
 	// Periodically, a UAV may wish to broadcast its state
 	pubState = GetROSNode().advertise<uas_hal::MsgState>("State", 10);
@@ -31,7 +32,10 @@ UAV::UAV(const char *name) :
 	*/
 
 	// Set the new control goal
-	ctlAnglesHeight.SetGoal(0.0,0.0,1.0,5.0);
+	//ctlAnglesHeight.SetGoal(0.0,0.0,3.14/2.0,1.0);
+	ctlWaypoint.SetGoal(1.0,0.0,1.0,0.0);
+	//ctlVelocity.SetGoal(0.0,0.1,0.0,0.0);
+	//ctlVelocityHeight.SetGoal(1.0,0.0,0.0,1.0);
 
 	// Set the control timer (always happens at 50Hz, and respects simulated time)
 	timCtl = GetROSNode().createTimer(
@@ -44,7 +48,10 @@ UAV::UAV(const char *name) :
 void UAV::cbAnglesHeight_prog(const ros::TimerEvent& event)
 {
 	// Obtain the control
-	ctlAnglesHeight.Update(&state, 0.02, &control);
+	//ctlAnglesHeight.Update(&state, 0.02, &control);
+	ctlWaypoint.Update(&state, 0.02, &control);
+	//ctlVelocity.Update(&state, 0.02, &control);
+	//ctlVelocityHeight.Update(&state, 0.02, &control);
 
 	// Update the HAL implementation
 	ReceiveControl(
@@ -95,11 +102,11 @@ void UAV::cbWaypoint_kill() {}
 
 // Set the state of the vehicle
 void UAV::SetState(
-    const double &x, 	const double &y, 	 const double &z,
-    const double &roll, const double &pitch, const double &yaw,
-    const double &u, 	const double &v, 	 const double &w,
-    const double &p, 	const double &q, 	 const double &r,
-    const double &thrust, const double &energy)
+    const double &x, 		const double &y, 	 	const double &z,
+    const double &pitch, 	const double &roll, 	const double &yaw,
+    const double &u, 		const double &v, 	 	const double &w,
+    const double &p, 		const double &q, 	 	const double &r,
+    const double &thrust, 	const double &energy)
 {
 	state.x 	 = x; 
 	state.y 	 = y; 
@@ -109,7 +116,7 @@ void UAV::SetState(
 	state.yaw 	 = yaw;
 	state.u 	 = u; 
 	state.v 	 = v; 
-	state.w 	 = v;
+	state.w 	 = w;
 	state.p 	 = p; 
 	state.q 	 = q; 
 	state.r 	 = r;
@@ -125,12 +132,12 @@ void UAV::PostState()
 	msgState.x 	 	= state.x; 
 	msgState.y 	 	= state.y; 
 	msgState.z 	 	= state.z;
-	msgState.roll 	= state.pitch; 
-	msgState.pitch  = state.roll; 
+	msgState.pitch 	= state.pitch; 
+	msgState.roll   = state.roll; 
 	msgState.yaw 	= state.yaw;
 	msgState.u 	 	= state.u; 
 	msgState.v 	 	= state.v; 
-	msgState.w 	 	= state.v;
+	msgState.w 	 	= state.w;
 	msgState.p 	 	= state.p; 
 	msgState.q 	 	= state.q; 
 	msgState.r 	 	= state.r;

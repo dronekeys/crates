@@ -25,6 +25,9 @@
 
 // Include the UAV PID controllers
 #include <uas_hal/controller/AnglesHeight.h>
+#include <uas_hal/controller/Velocity.h>
+#include <uas_hal/controller/VelocityHeight.h>
+#include <uas_hal/controller/Waypoint.h>
 
 namespace uas_hal
 {
@@ -58,8 +61,11 @@ namespace uas_hal
         State           state;
         Control         control;
 
-        // A controller
+        // Contrllers that can be used
         AnglesHeight    ctlAnglesHeight;
+        Velocity        ctlVelocity;
+        Waypoint        ctlWaypoint;
+        VelocityHeight  ctlVelocityHeight;
 
         // Goal implementations
         void cbAnglesHeight_goal(const uas_hal::AnglesHeightGoalConstPtr &goal);
@@ -101,11 +107,11 @@ namespace uas_hal
 
         // Set the state of the vehicle
         void SetState(
-            const double &x,      const double &y,     const double &z,
-            const double &roll,   const double &pitch, const double &yaw,
-            const double &u,      const double &v,     const double &w,
-            const double &p,      const double &q,     const double &r,
-            const double &thrust, const double &energy);
+            const double &x,        const double &y,        const double &z,
+            const double &pitch,    const double &roll,     const double &yaw,
+            const double &u,        const double &v,        const double &w,
+            const double &p,        const double &q,        const double &r,
+            const double &thrust,   const double &energy);
 
         // Derived classes must implement this function
         virtual void ReceiveControl(

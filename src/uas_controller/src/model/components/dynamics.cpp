@@ -82,6 +82,13 @@ void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model)
 	_kuv        = GetSDFDouble(root, "dynamics.parameters.kuv", _kuv);
 	_kw         = GetSDFDouble(root, "dynamics.parameters.kw", _kw);
 
+	// Work out the mass of the platform
+	mass = model->GetLink("body")  ->GetInertial()->GetMass()
+		 + model->GetLink("blade0")->GetInertial()->GetMass()
+		 + model->GetLink("blade1")->GetInertial()->GetMass()
+		 + model->GetLink("blade2")->GetInertial()->GetMass()
+		 + model->GetLink("blade3")->GetInertial()->GetMass();
+
 	// If the platform has taken off
 	thrust = 0;
 	if (model->GetLink("body")->GetWorldPose().pos.z > 0)
@@ -179,13 +186,13 @@ void Dynamics::Update(
 	// Rotate wind from navigation to body frame, and subtract from current velocity
 	drag  = model->GetLink("body")->GetWorldLinearVel() - wind;
 
-	// Drag coefficients
+	// Drag coefficients (NNB: negative)
 	drag.x *= _kuv;
 	drag.y *= _kuv;
 	drag.z *= _kw;
 
 	// Include drag
-	model->GetLink("body")->AddForce(-drag);
+	model->GetLink("body")->AddForce(mass*drag);
 
 	//////////////////////
 	// MOTOR AESTHETICS //
