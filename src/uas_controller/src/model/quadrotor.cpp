@@ -120,7 +120,7 @@ namespace uas_controller
       tim = _info.simTime.Double();
     }
 
-    // Send information to the HAL
+    // Send state information back to the HAL, so that it can be
     void Broadcast()
     {
       // Extract the state

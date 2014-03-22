@@ -32,8 +32,8 @@ UAV::UAV(const char *name) :
 	*/
 
 	// Set the new control goal
-	ctlAnglesHeight.SetGoal(0.0,0.1,0.0,1.0);
-	//ctlWaypoint.SetGoal(0.0,1.0,1.0,0.0);
+	//ctlAnglesHeight.SetGoal(0.0,0.1,0.0,1.0);
+	ctlWaypoint.SetGoal(0.0,1.0,1.0,0.0);
 	//ctlVelocity.SetGoal(0.0,0.1,0.0,0.0);
 	//ctlVelocityHeight.SetGoal(1.0,0.0,0.0,1.0);
 
@@ -48,8 +48,8 @@ UAV::UAV(const char *name) :
 void UAV::cbAnglesHeight_prog(const ros::TimerEvent& event)
 {
 	// Obtain the control
-	ctlAnglesHeight.Update(&state, 0.02, &control);
-	//	ctlWaypoint.Update(&state, 0.02, &control);
+	//ctlAnglesHeight.Update(&state, 0.02, &control);
+	ctlWaypoint.Update(&state, 0.02, &control);
 	//ctlVelocity.Update(&state, 0.02, &control);
 	//ctlVelocityHeight.Update(&state, 0.02, &control);
 

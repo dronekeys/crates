@@ -19,6 +19,14 @@ namespace uas_controller
     {
     protected:
 
+        // Clamp a value to exist between two intervals
+        static double limit(double val, double minval, double maxval)
+        {
+            if (val < minval) return minval;
+            if (val > maxval) return maxval;
+            return val;
+        }
+        
     	// Recurse down the tree  looking for elements
     	bool FindElement(sdf::ElementPtr &cur, std::string path)
     	{

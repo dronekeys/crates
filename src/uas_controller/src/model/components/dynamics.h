@@ -24,11 +24,19 @@ namespace uas_controller
         // Updating in each loop iteration
         double thrust, dFth, tau;
 
-        // Intermediary elements
-        gazebo::math::Vector3 n_rot, b_lin_vel, b_ang_vel;
-        gazebo::math::Vector3 torq, forc, drag;
+        // State
+        gazebo::math::Quaternion q;
+        gazebo::math::Vector3 b_lin_vel, b_ang_vel;
 
+        // Actions
+        gazebo::math::Vector3 torque, force, drag;
+
+        // Constants
         double mscale, mass;
+
+        // Animate the motor joints
+        void AnimateMotor(gazebo::physics::ModelPtr& model, 
+            const char *name, const char* motor, double rpm);
 
     public:
 

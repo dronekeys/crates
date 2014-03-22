@@ -25,6 +25,22 @@ Dynamics::Dynamics() :
 	_kw(-1.35341)
 {}
 
+// Animate a motor
+void Dynamics::AnimateMotor(gazebo::physics::ModelPtr& model, 
+	const char *name, const char* motor, double rpm)
+{
+	std::map<std::string,gazebo::common::NumericAnimationPtr> anim;
+	anim[motor].reset(new gazebo::common::NumericAnimation(name, 60.0/rpm, true));
+	gazebo::common::NumericKeyFrame *key;
+	for (int i = 0; i <= 4; i++)
+	{ 
+		key = anim[motor]->CreateKeyFrame((double)i*15.0/rpm);
+		key->SetValue((double)i*1.57079632679);
+	}
+	model->SetJointAnimation(anim);
+}
+
+
 void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model) 
 {
 
@@ -82,27 +98,22 @@ void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model)
 	_kuv        = GetSDFDouble(root, "dynamics.parameters.kuv", _kuv);
 	_kw         = GetSDFDouble(root, "dynamics.parameters.kw", _kw);
 
+	// Set the drag
+	drag.Set(_kuv, _kuv, _kw);
+
 	// Work out the mass of the platform
-	mass = model->GetLink("body")  ->GetInertial()->GetMass()
-		 + model->GetLink("blade0")->GetInertial()->GetMass()
-		 + model->GetLink("blade1")->GetInertial()->GetMass()
-		 + model->GetLink("blade2")->GetInertial()->GetMass()
-		 + model->GetLink("blade3")->GetInertial()->GetMass();
+	mass = model->GetLink("body")  ->GetInertial()->GetMass();
 
 	// If the platform has taken off
 	thrust = 0;
 	if (model->GetLink("body")->GetWorldPose().pos.z > 0)
-	{
-		// Give it enough thrust to hover
-		thrust = 16.464000;
-		
-		// Aesthetics
-		model->GetJoint("motor0")->SetForce(0, thrust*mscale);
-		model->GetJoint("motor1")->SetForce(0, thrust*mscale);
-		model->GetJoint("motor2")->SetForce(0,-thrust*mscale);
-		model->GetJoint("motor3")->SetForce(0,-thrust*mscale);
-	}	
+		thrust = 16.464000; 
 
+	// Animate the motors
+	AnimateMotor(model, "rpm0", "motor0", 60);
+	AnimateMotor(model, "rpm1", "motor1", 60);
+	AnimateMotor(model, "rpm2", "motor2", 60);
+	AnimateMotor(model, "rpm3", "motor3", 60);
 };
 
 // Update the system dynamics
@@ -120,26 +131,9 @@ void Dynamics::Update(
 	// Get the current state of the platform //
 	///////////////////////////////////////////
 
-	n_rot     = model->GetLink("body")->GetWorldPose().rot.GetAsEuler();
+	q    	  = model->GetLink("body")->GetWorldPose().rot;
 	b_lin_vel = model->GetLink("body")->GetRelativeLinearVel();
 	b_ang_vel = model->GetLink("body")->GetRelativeAngularVel();
-
-	/////////////////////////////////////////
-	// Update b-frame angular acceleration //
-	/////////////////////////////////////////
-
-	// x = roll
-	torq.x = _pq1*(_pq0*roll - n_rot.x) + _pq2*b_ang_vel.x;    
-	if ((b_ang_vel.x > _MAX_ANGVEL && (torq.x > 0)) || (b_ang_vel.x < -_MAX_ANGVEL && (torq.x < 0)))
-	  torq.x = 0;
-
-	// y = pitch
-	torq.y = _pq1*(_pq0*pitch  - n_rot.y) + _pq2*b_ang_vel.y;    
-	if ((b_ang_vel.y > _MAX_ANGVEL && (torq.y > 0)) || (b_ang_vel.y < -_MAX_ANGVEL && (torq.y < 0)))
-	  torq.y = 0;
-
-	// Yaw
-	torq.z = _r0*yaw + _r1*b_ang_vel.z;
 
 	/////////////////////////
 	// Update thrust force //
@@ -165,45 +159,34 @@ void Dynamics::Update(
 	// Update thrust
 	thrust += dFth*dt;
 
-	/////////////////////////////
-	// TORQUE INDUCED BY ROTORS //
-	/////////////////////////////
+	///////////////////////////////////////////////
+	// OBTAIN FORCE AND TORQUE INDUCED BY ROTORS //
+	///////////////////////////////////////////////
 
-	// Dynamic model takes into account inertia 
-	model->GetLink("body")->AddRelativeTorque(torq);
+	// Calculate force
+	force = gazebo::math::Vector3(0.0,0.0,thrust) 
+	      + mass*drag*(b_lin_vel-q.RotateVector(wind));
 
-	/////////////////////////////
-	// FORCE INDUCED BY ROTORS // 
-	/////////////////////////////
+	// x = roll
+	torque.x = _pq1*(_pq0*roll  - q.GetAsEuler().x) + _pq2*b_ang_vel.x;    
+	if ((b_ang_vel.x > _MAX_ANGVEL && (torque.x > 0)) || (b_ang_vel.x < -_MAX_ANGVEL && (torque.x < 0)))
+	  torque.x = 0;
 
-	// Thrust is always orthogonal to rotor plane
-	model->GetLink("body")->AddRelativeForce(gazebo::math::Vector3(0.0,0.0,thrust));
+	// y = pitch
+	torque.y = _pq1*(_pq0*pitch - q.GetAsEuler().y) + _pq2*b_ang_vel.y;    
+	if ((b_ang_vel.y > _MAX_ANGVEL && (torque.y > 0)) || (b_ang_vel.y < -_MAX_ANGVEL && (torque.y < 0)))
+	  torque.y = 0;
 
-	//////////////////////
-	// AERODYNAMIC DRAG //
-	//////////////////////
+	// Yaw
+	torque.z = _r0*yaw + _r1*b_ang_vel.z;
 
-	// Rotate wind from navigation to body frame, and subtract from current velocity
-	drag = model->GetLink("body")->GetWorldLinearVel() - wind;
+	////////////////////
+	// UPDATE PHYSICS //
+	////////////////////
 
-	// Drag coefficients (NNB: negative)
-	drag.x *= _kuv;
-	drag.y *= _kuv;
-	drag.z *= _kw;
-
-	// Include drag
-	model->GetLink("body")->AddForce(drag);
-
-	//////////////////////
-	// MOTOR AESTHETICS //
-	//////////////////////
-
-	// Add the change in thrust
-	model->GetJoint("motor0")->SetForce(0, dFth*dt*mscale);
-	model->GetJoint("motor1")->SetForce(0, dFth*dt*mscale);
-	model->GetJoint("motor2")->SetForce(0,-dFth*dt*mscale);
-	model->GetJoint("motor3")->SetForce(0,-dFth*dt*mscale);
-
+  	// set force and torque in gazebo
+  	model->GetLink("body")->AddRelativeForce(force);
+  	model->GetLink("body")->AddRelativeTorque(torque);
 }
 
 // Reset the component

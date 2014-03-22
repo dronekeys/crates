@@ -15,8 +15,10 @@ namespace uas_controller
 
     private:
 
-        // Scaling parameters
-        double sr, sp, sy, st, sv;
+        // Scales, upper and lower limits
+        double srs, sps, sys, sts, svs;
+        double srl, spl, syl, stl, svl;
+        double sru, spu, syu, stu, svu;
 
     public:
         
