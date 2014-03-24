@@ -16,8 +16,8 @@ message Ephemeris
 // A GPStk time epoch (generated on simultation tick event)
 message Epoch 
 {
-	required int64  days              = 2;
-	required double secondsofdays     = 3;
+	required int64  days              = 1;
+	required double secondsofdays     = 2;
 }
 
 // A GPStk time epoch (generated on simultation tick event)
@@ -35,9 +35,7 @@ message Environment
 	required double 	humidity		= 3;
 	required double 	pressure		= 4;
 	required Wind     	wind            = 5;
-	required double     ionosphere      = 6;
-	required double     tropo_wet       = 7;
-	required double     tropo_dry       = 8;
-	repeated Ephemeris  gps             = 9;
-	repeated Ephemeris  glonass         = 10;
+	required double     tec             = 6;
+	repeated Ephemeris  gps             = 7;
+	repeated Ephemeris  glonass         = 8;
 }

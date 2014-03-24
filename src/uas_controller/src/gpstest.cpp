@@ -2,6 +2,8 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <map>
+#include <list>
 #include <vector>
 
 // Used throughout GPStk to represent time
@@ -47,7 +49,6 @@
    // Class defining GPS system constants
 #include <gpstk/GNSSconstants.hpp>
 
-
 using namespace std;
 using namespace gpstk;
 
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 
       // Position
       WGS84Ellipsoid em;
-      Position       pt(-0.21052, 51.71190,  0, Position::Geocentric, &em, ReferenceFrame::Unknown);
+      Position       pt(-0.21052, 51.71190,  0, Position::Geodetic, &em, ReferenceFrame::Unknown);
       
       // Object for GG-type tropospheric model (Goad and Goodman, 1974)
       // Default constructor => default values for model
@@ -151,6 +152,39 @@ int main(int argc, char *argv[])
       list<IonexData> il;
       while (is >> id)
          il.push_back(id);
+
+
+      ///////////////////////////////////////////////////////////////
+
+      // Set the minimum elevation angle for a satellite to be visible
+      double minElevationAngle = 15.0;
+      int    minStationCount   = 2;
+
+      // Iterate over salellites
+      ct.setTimeSystem(TimeSystem::GPS);
+      for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
+      {
+         // Storage for the literal co
+         try
+         {
+            // Elevation of the current satellite
+            double elv = pt.elvAngle(gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),ct).getPos());
+
+            // print
+            if (elv > minElevationAngle)
+               cout << "GPS PRN " << prn << " VISIBLE " << elv << endl;            
+            else
+               cout << "GPS PRN " << prn << "  " << elv << endl;            
+         }
+         catch(InvalidRequest& e)
+         { 
+            cout << "GPS PRN " << prn << " NOT FOUND "  << endl; 
+         }
+      }
+            
+
+
+      /*
 
       //////////////////////////////////////////////////////////////////
       // GOAL -> Produce the following messages                       //
@@ -233,13 +267,14 @@ int main(int argc, char *argv[])
       // IONOSPHERIC DATA //////////////////////////////////////////////
 
 
-      ct.setTimeSystem(TimeSystem::UTC);
+      ct.setTimeSystem(TimeSystem::All);
       list<IonexData>::iterator ii = il.begin();
-      cout << (*ii).time.getTimeSystem().getTimeSystem() << endl;
       while ((!il.empty())  && (ii!= il.end() && (*ii).time < ct)) 
          ii++;
 
       cout << "/scene/ionosphere\t\t\t"        << (*ii).getValue(pt) << endl;
+
+      */
 
    }
    catch(Exception& e)
@@ -253,100 +288,4 @@ int main(int argc, char *argv[])
 
    exit(0);
 
-}  // End of 'main()'
-
-
-/*
-
-// GNSS constants
-#include <gpstk/GNSSconstants.hpp>
-
-// Class to store satellite precise navigation data
-#include <gpstk/SP3EphemerisStore.hpp>
-#include <gpstk/SP3Header.hpp>
-#include <gpstk/SP3Data.hpp>
-#include <gpstk/SP3Stream.hpp>
-#include <gpstk/SP3SatID.hpp>
-
-// Class for handling tropospheric models
-#include <gpstk/TropModel.hpp>
-
-// Class providing RAIM solver
-#include <gpstk/PRSolution2.hpp>
-
-using namespace std;
-using namespace gpstk;
-
-int main(void)
-{
-   //////////////////////////
-   // HAPPENS IN GPSORBITS //
-   //////////////////////////
-
-   // Basic tropospheric model
-   ZeroTropModel noTropModel;
-   TropModel*    tropModelPtr = &noTropModel;
-
-   // Position solver
-   //RAIMSolution raimSolver;
-
-   // Declare a "SP3EphemerisStore" object to handle precise ephemeris
-   SP3EphemerisStore SP3EphList;
-
-   // Load all the SP3 ephemerides files
-   SP3EphList.loadFile("/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/src/uas_controller/resources/orbits/ngs15992_16to17.sp3");
-
-   // Reject satellites with bad or absent positional values / clocks
-   SP3EphList.rejectBadPositions(true);
-   SP3EphList.rejectBadClocks(true);
-
-
-   // Read nav file and store unique list of ephemerides
-   SP3Stream         stream("/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/src/uas_controller/resources/orbits/ngs15992_16to17.sp3");    // Open ephemerides data file
-   Rinex3NavData     data;
-   Rinex3NavHeader   header;
-
-   // Let's read the header (may be skipped)
-   stream >> hdr;
-
-   // Let's process all lines of observation data, one by one
-   while( roffs >> rod )
-   {
-
-      vector<SatID>  prnVec;     // Visibility 
-      vector<double> rangeVec;   // Ranges
-
-      // The default constructor for PRSolution2 objects (like
-      // "raimSolver") is to set a RMSLimit of 6.5. We change that
-      // here. With this value of 3e6 the solution will have a lot
-      // more dispersion.
-      raimSolver.RMSLimit = 3e6;
-
-      // In order to compute positions we need the current time, the
-      // vector of visible satellites, the vector of corresponding
-      // ranges, the object containing satellite ephemerides, and a
-      // pointer to the tropospheric model to be applied
-      raimSolver.RAIMCompute( rod.time,         // Current receiver clock time
-                              prnVec,           // Visible satellites
-                              rangeVec,         // Pseudoranges
-                              bcestore,         // Satellite ephemerides
-                              tropModelPtr);    // Tropospheric model   
-
-      if (raimSolver.isValid())
-      {
-         // Vector "Solution" holds the coordinates, expressed in
-         // meters in an Earth Centered, Earth Fixed (ECEF) reference
-         // frame. The order is x, y, z  (as all ECEF objects)
-         cout << setprecision(12);
-         cout << raimSolver.Solution[0] << " " ;
-         cout << raimSolver.Solution[1] << " " ;
-         cout << raimSolver.Solution[2];
-         cout << endl ;
-
-      } 
-
-   }
-
-   exit(0);       // End of program
 }
-*/

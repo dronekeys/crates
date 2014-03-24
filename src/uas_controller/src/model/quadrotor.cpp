@@ -21,12 +21,18 @@
 // HAL includes
 #include "environment.pb.h"
 
-// Components used int the model
-#include "components/energy.h"
-#include "components/dynamics.h"
-#include "components/control.h"
-#include "components/shear.h"
-#include "components/turbulence.h"
+// Components used to update the model dynamics
+#include "dynamics/propulsion.h"
+#include "dynamics/shear.h"
+#include "dynamics/turbulence.h"
+#include "dynamics/energy.h"
+
+// Sensors provided by a stock quadrotor
+#include "sensors/altimeter.h"
+#include "sensors/compass.h"
+#include "sensors/gnss.h"
+#include "sensors/imu.h"
+#include "sensors/ahrs.h"
 
 namespace uas_controller
 {
@@ -39,12 +45,10 @@ namespace uas_controller
 
   private:
 
-    // Current time
-    double tim;
+    // BASIC SIMULATION VARIABLES ////////////////////////////////////////////////////////////
 
-    // Pointer to the current model
+    // Pointer to the model object
     gazebo::physics::ModelPtr         modPtr;
-    gazebo::physics::LinkPtr          lnkPtr;
 
     // Pointer to the update event connection
     gazebo::event::ConnectionPtr      conBegPtr;
@@ -54,47 +58,92 @@ namespace uas_controller
     gazebo::transport::NodePtr        nodePtr;
     gazebo::transport::SubscriberPtr  subPtr;
 
-    // Timers for state and information broadcasting
-    ros::Timer                        timState;
-    ros::Timer                        timInformation;
+    // Stores the current simulation time (seconds since start)
+    double                            tim;
 
-    // Optimizaiton
-    gazebo::math::Vector3             wind;
+    // DYNAMICS CLASSES TO HELP WITH PLATFORM DYNAMICS ////////////////////////////////////////
 
-    // COMPONENTS
-    Shear         shear;        // Models wind shear, based on global field
-    Turbulence    turbulence;   // Models wind gusts
-    Energy        energy;       // Models energy consumption
-    Dynamics      dynamics;     // Models UAV dynamics
-    Control       control;      // Converts SI control <-> RX values
-  
-    // When new control arrives from the HAL, save it...
+    Shear         shear;        // Calculates wind shear and applies force to platform
+    Turbulence    turbulence;   // Calculates wind turbulence and applies force to platform
+    Propulsion    propulsion;   // Uses control to select motor speeds, applying force to platform 
+    Energy        energy;       // Simulates a battery
+
+    // CLASSES TO HELP WITH SENSOR DATA PRODUCTION /////////////////////////////////////////////
+
+    Altimeter     altimeter;    // Simulates barometric altitude sensing
+    Compass       compass;      // Simulates a magnetic field strength sensor
+    GNSS          gnss;         // Simulates a GNSS receiver using GPStk
+    IMU           imu;          // Simulates an inertial measurement unit
+    AHRS          ahrs;         // Simulates an AHRS system (orientation)
+
+    // CALLBACKS ///////////////////////////////////////////////////////////////////////////////
+
+    // When new control arrives from the HAL, immedaitely save it to the control class, so that
+    // it can be used by Dynamics::Update() to change the platform propulsion.
     void ReceiveControl(
             const double &roll,
             const double &pitch,
             const double &yaw,
             const double &throttle)
     {
-      control.roll     = roll;
-      control.pitch    = pitch;
-      control.yaw      = yaw;
-      control.throttle = throttle;
+      // The energy module needs to know how much juice we are sending to the rotors
+      energy.SetThrottle(throttle);
+
+      // Pass the control to the propulsion engine
+      propulsion.SetControl(
+        roll, pitch, yaw, throttle,   // From the HAL
+        energy.GetVoltage()           // From the energy model
+      );
+
     }
 
-    // Receive the global wind speed and direction
-    void ReceiveAtmosphere(EnvironmentPtr &msg)
+    // Periodically the simulation produces a environment message, which contains a global UTC time
+    // as well as meteorological information and GPS ephemerides. This information is used to 
+    // update all of the simulated sensors, so that they can produce a meaningful measurement.
+    void ReceiveEnvironment(EnvironmentPtr &msg)
     {
-      /*
-      // Configure the wind shear accoridngly
+      // Configure the wind shear
       shear.SetWind(
-        msg->wind_speed(),      // Spped
-        msg->wind_direction()   // Direction
+        msg->wind().speed(),      // Speed (meter per second at 6m)
+        msg->wind().direction()   // Direction (degrees at 6m)
+      );
+
+      // Set the ground temperature and pressure
+      altimeter.SetMeteorological(
+        msg->temperature(),       // Environment dry temp (kelvin)
+        msg->pressure(),          // Environment pressure (hPa)
+        msg->humidity()           // Environment rel humidity (%)
+      );
+
+      // Set the temperature of the IMU
+      imu.SetMeteorological(
+        msg->temperature()        // Environment dry temp (kelvin)
+      );
+
+      // Set the temperature of the compass
+      compass.SetMeteorological(
+        msg->temperature()        // Environment dry temp (kelvin)
+      );
+
+      // Set the GNSS satellites
+      /*
+      gnss.SetEphemerides(
+        msg->epoch(),             // UTC time
+        msg->temperature(),       // Environment dry temp (kelvin)
+        msg->pressure(),          // Environment pressure (hPa)
+        msg->humidity(),          // Environment humidity (percent) 
+        msg->gps(),               // GPS ephemerides
+        msg->glonass()            // Glonass ephemerides
       );
       */
+      
     }
 
-    // Second-order Runge-Kutta dynamics
-    void Update(const gazebo::common::UpdateInfo &_info)
+    // This is the grand simulation abritrator. In a nutshell, it is called on every physics time
+    // tick, which should be 20ms (50Hz). The Update() method is called on each of the dynamics 
+    // classes, which apply a force and torque to the platform. The actual physics is then handled
+    // by the gazebo physics engine, in order to be interoperable with other robots.
+    void PrePhysics(const gazebo::common::UpdateInfo &_info)
     {
       // Time over which dynamics must be updated (needed for thrust update)
       double dt = _info.simTime.Double() - tim;
@@ -102,34 +151,33 @@ namespace uas_controller
       // If simulation is paused, dont waste CPU cycles calculating a physics update...
       if (dt > 0) 
       {
-        // Update the energy consumption, and get the current voltage
-        control.voltage = energy.Update(control.throttle, dt);
-
         // Set the state of the platform directly from the simulation
-        dynamics.Update(
-          modPtr,                                                   // Model
-          shear.Update(lnkPtr, dt) + turbulence.Update(lnkPtr, dt), // Wind                                              // Wind
-          control.GetScaledRoll(),                                  // Roll
-          control.GetScaledPitch(),                                 // Pitch
-          control.GetScaledYaw(),                                   // Yaw
-          control.GetScaledThrottle(),                              // Throttle
-          control.GetScaledVoltage(),                               // Voltage
-          dt                                                        // Time
-        );
+        propulsion.Update(dt);
+
+        // Add any shear forces
+        shear.Update(dt);
+
+        // Add any turbulent forces
+        turbulence.Update(dt);
+
+        // Update energy
+        energy.Update(dt);
       }
 
       // Update timer
       tim = _info.simTime.Double();
     }
 
-    // Send state information back to the HAL, so that it can be
-    void Broadcast()
+    // Once the simulated world has been updated, we're going to want to update our noisy perception
+    // of it. We will post the result up to the UAV hardware abstraction layer, as it will be needed
+    // to decide the next control action to send back to the simulated device.
+    void PostPhysics()
     {
       // Extract the state
-      gazebo::math::Vector3 pos = lnkPtr->GetWorldPose().pos;
-      gazebo::math::Vector3 rot = lnkPtr->GetWorldPose().rot.GetAsEuler();
-      gazebo::math::Vector3 vel = lnkPtr->GetRelativeLinearVel();
-      gazebo::math::Vector3 ang = lnkPtr->GetRelativeAngularVel();
+      gazebo::math::Vector3 pos = modPtr->GetLink("body")->GetWorldPose().pos;
+      gazebo::math::Vector3 rot = modPtr->GetLink("body")->GetWorldPose().rot.GetAsEuler();
+      gazebo::math::Vector3 vel = modPtr->GetLink("body")->GetRelativeLinearVel();
+      gazebo::math::Vector3 ang = modPtr->GetLink("body")->GetRelativeAngularVel();
       
       // Push the state
       UAV::SetState(
@@ -137,85 +185,77 @@ namespace uas_controller
         rot.x,  rot.y,  rot.z,      // Orientation
         vel.x,  vel.y,  vel.z,      // Velocity
         ang.x,  ang.y,  ang.z,      // Angular velocity
-        dynamics.GetThrust(),       // Thrust is stored in dynamics
-        control.GetScaledVoltage()  // Battery voltage
+        propulsion.GetThrust(),     // Current thrust force
+        energy.GetVoltage()         // Battery voltage
       );
     }
 
   public: 
 
-    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0)
-    {
-      ROS_INFO("Loaded quadrotor plugin");
-    }
+    // Constructor
+    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0) {}
 
     // On initial load
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
     {
-      // Save pointer to the model
+      // Save the model
       modPtr = model;
-      lnkPtr = model->GetLink("body");
 
-      ////////////////////////
-      // Configure from SDF //
-      ////////////////////////
+      // CONFIGURE THE HELPER CLASSES ////////////////////////////////
 
-      // Configure the energy model from the SDF
-      energy.Configure(root);
-
-      // Configure the shear model from SDF
-      shear.Configure(root);
-
-      // Configure the turbulence model from SDF
-      turbulence.Configure(root, lnkPtr);
+      // Dynamics and control
+      turbulence.Configure(root->GetElement("turbulence"),model);
+      propulsion.Configure(root->GetElement("propulsion"),model);
+      shear.Configure(root->GetElement("shear"),model);
       
-      // Configure the dynamic model from SDF
-      dynamics.Configure(root, modPtr);
+      // Sensors
+      ahrs.Configure(root->GetElement("ahrs"),model);
+      altimeter.Configure(root->GetElement("altimeter"),model);
+      compass.Configure(root->GetElement("compass"),model);
+      energy.Configure(root->GetElement("energy"),model);
+      gnss.Configure(root->GetElement("gnss"),model);
+      imu.Configure(root->GetElement("imu"),model);
 
-      // Configure the control model from SDF
-      control.Configure(root);
-
-      /////////////////////////////////////
-      // Initialise gazbeo communication //
-      /////////////////////////////////////
+      // LISTEN FOR MESSAGES CONTAINING METEOROLOGICAL INFO //////////
 
       // Setup the gazebo node
       nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 
       // Subscribe to messages about atmospheric conditions
-      subPtr  = nodePtr->Subscribe("~/environment", &Quadrotor::ReceiveAtmosphere, this);
+      subPtr  = nodePtr->Subscribe("~/environment", &Quadrotor::ReceiveEnvironment, this);
+
+      // LISTEN FOR PRE AND POST PHYSICS SIM UPDATES /////////////////
 
       // Pre physics - update quadrotor dynamics and wind
       conBegPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&Quadrotor::Update, this, _1));
+        boost::bind(&Quadrotor::PrePhysics, this, _1));
 
       // Post physics - broadcast current state to HAL
       conEndPtr = gazebo::event::Events::ConnectWorldUpdateEnd(
-        boost::bind(&Quadrotor::Broadcast, this));
+        boost::bind(&Quadrotor::PostPhysics, this));
 
-      //////////////////////////////////////////
-      // Initialise HAL and ROS communication //
-      //////////////////////////////////////////
-
-      /*
-
-      // Call method periodically to broadcast state (respects simulation time)
-      timState = GetROSNode().createTimer(
-          ros::Duration(1.0),                                          // duration
-          boost::bind(&Quadrotor::BroadcastState, this, _1),           // callback
-          false                                                        // oneshot?
-      );
-
-      // Call method periodically to broadcast information (respects simulation time)
-      timInformation = GetROSNode().createTimer(
-          ros::Duration(1.0),                                          // duration
-          boost::bind(&Quadrotor::BroadcastInformation, this, _1),     // callback
-          false                                                        // oneshot?
-      );
-
-      */
-
+      /////////////////////////////////////////////////////////////////
     }
+
+    // Return to the initial configuration
+    void Reset()
+    {
+      // Set time back to zero
+      tim = 0.0;
+
+      // Reset all dynamics and control
+      turbulence.Reset();
+      propulsion.Reset();
+      shear.Reset();
+      
+      // Reset all sensors
+      ahrs.Reset();
+      altimeter.Reset();
+      compass.Reset();
+      energy.Reset();
+      gnss.Reset();
+      imu.Reset();
+    } 
   };
 
   // Register this plugin with the simulator

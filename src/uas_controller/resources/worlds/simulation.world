@@ -42,26 +42,50 @@
     </include>
 
     <include>
-      <name>UAV0</name>
+      <name>UAV1</name>
       <pose>1.0 0.0 0.05 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 
     <include>
-      <name>UAV1</name>
+      <name>UAV2</name>
       <pose>0.0 1.0 0.05 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 
     <include>
-      <name>UAV2</name>
+      <name>UAV3</name>
       <pose>-1.0 0.0 0.05 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 
     <include>
-      <name>UAV3</name>
+      <name>UAV4</name>
       <pose>0.0 -1.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV5</name>
+      <pose>2.0 0.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV6</name>
+      <pose>0.0 2.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV7</name>
+      <pose>-2.0 0.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV8</name>
+      <pose>0.0 -2.0 0.05 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 

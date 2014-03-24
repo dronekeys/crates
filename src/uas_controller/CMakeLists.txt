@@ -155,24 +155,30 @@ link_directories(
 # Define libraries to be built #
 
 ## GUI / system plugins
-add_library(gui  		  			src/gui/gui.cpp)
+add_library(gui  		  			
+	src/gui/gui.cpp
+)
 
 ## World plugins
-add_library(simulation  			src/world/simulation.cpp)
-add_library(experiment 				src/world/experiment.cpp)
+add_library(simulation  			
+	src/world/simulation.cpp
+)
+add_library(experiment 				
+	src/world/experiment.cpp
+)
 
 ## Model plugins
-add_library(altimeter 				src/model/altimeter.cpp)
-add_library(imu 					src/model/imu.cpp)
-add_library(compass 				src/model/compass.cpp)
-add_library(gpsreceiver 			src/model/gpsreceiver.cpp)
-add_library(inclinometer 			src/model/inclinometer.cpp)
-add_library(quadrotor 				src/model/quadrotor.cpp
-	src/model/components/dynamics.cpp
-	src/model/components/turbulence.cpp
-	src/model/components/shear.cpp
-	src/model/components/energy.cpp
-	src/model/components/control.cpp
+add_library(quadrotor 				
+	src/model/dynamics/propulsion.cpp
+	src/model/dynamics/turbulence.cpp
+	src/model/dynamics/shear.cpp
+	src/model/dynamics/energy.cpp
+	src/model/sensors/altimeter.cpp
+	src/model/sensors/compass.cpp
+	src/model/sensors/gnss.cpp
+	src/model/sensors/imu.cpp
+	src/model/sensors/ahrs.cpp
+	src/model/quadrotor.cpp
 )
 
 ##################################
@@ -180,11 +186,6 @@ add_library(quadrotor 				src/model/quadrotor.cpp
 
 ## Model plugins
 add_dependencies(quadrotor			custom_msgs)
-add_dependencies(altimeter			custom_msgs)
-add_dependencies(imu 				custom_msgs)
-add_dependencies(compass 			custom_msgs)
-add_dependencies(inclinometer 		custom_msgs)
-add_dependencies(gpsreceiver 		custom_msgs)
 
 ## World plugins
 add_dependencies(simulation 		custom_msgs)
@@ -202,14 +203,8 @@ target_link_libraries(experiment	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost
 
 ## Model plugins
 target_link_libraries(quadrotor		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(altimeter 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(gpsreceiver  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
-
-## Declare a cpp executable
+## TODO: remove this once GNSS testing is complete
 add_executable(gpstest
 	src/gpstest.cpp
 )

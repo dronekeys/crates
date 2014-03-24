@@ -7,6 +7,9 @@
 // Required to bind to non-static methods
 #include <boost/bind.hpp>
 
+// For access to messages
+#include <ros/ros.h>
+
 ///////// GPSTK INCLUDES ///////////////
 
 // A common time system for comparing erht with satellites
@@ -129,7 +132,7 @@ namespace uas_controller
       root->GetElement("utc")->GetElement("second")->GetValue()->Get(s);
 
       // Create a common time variable from the UTC info in the SDF data
-      CivilTime   civ(2010,1,6,3,0,0,TimeSystem::UTC);
+      CivilTime   civ(y,m,d,h,i,s,TimeSystem::UTC);
       CommonTime  startTime = civ.convertToCommonTime();
       
       // Get the origin position
@@ -281,7 +284,7 @@ namespace uas_controller
       currentTime = startTime + _info.simTime.Double();
 
       // Switch time model to UTC
-      currentTime.setTimeSystem(TimeSystem::UTC);
+      currentTime.setTimeSystem(TimeSystem::Any);
     
       // Assemble the epoch message
       msg.mutable_epoch()->set_days(currentTime.getDays());
@@ -293,31 +296,43 @@ namespace uas_controller
 
       // TROPOSHPERIC DELAYS ///////////////////////////////////////////////////////////////
 
-      // Seek for the data
-      while ((!ml.empty())  && (mi!= ml.end() && (*mi).time < currentTime)) 
-         mi++; 
+      try
+      {
+        // Seek for the data
+        while ((!ml.empty())  && (mi!= ml.end() && (*mi).time < currentTime)) 
+           mi++; 
 
-      // Set the weather for the troposphere model
-      ggTropModel.setWeather(
-         (*mi).data[RinexMetHeader::TD],
-         (*mi).data[RinexMetHeader::PR],
-         (*mi).data[RinexMetHeader::HR]);
+        // Set the weather for the troposphere model
+        ggTropModel.setWeather(
+           (*mi).data[RinexMetHeader::TD],
+           (*mi).data[RinexMetHeader::PR],
+           (*mi).data[RinexMetHeader::HR]);
 
-      // Package up the message
-      msg.set_temperature((*mi).data[RinexMetHeader::TD]);
-      msg.set_humidity((*mi).data[RinexMetHeader::HR]);
-      msg.set_pressure((*mi).data[RinexMetHeader::PR]);
-      msg.set_tropo_wet(ggTropModel.wet_zenith_delay());
-      msg.set_tropo_dry(ggTropModel.dry_zenith_delay());
+        // Package up the message
+        msg.set_temperature((*mi).data[RinexMetHeader::TD]);
+        msg.set_humidity((*mi).data[RinexMetHeader::HR]);
+        msg.set_pressure((*mi).data[RinexMetHeader::PR]);
+      }
+      catch(InvalidRequest& e)
+      {
+        ROS_WARN("Problem querying weather data");
+      }
 
       // IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
 
-      // Seek for the data
-      while ((!il.empty())  && (ii!= il.end() && (*ii).time < currentTime)) 
-         ii++;
+      try
+      {
+        // Seek for the data
+        while ((!il.empty())  && (ii!= il.end() && (*ii).time < currentTime)) 
+           ii++;
 
-      // Package up the message
-      msg.set_ionosphere((*ii).getValue(currentPos));
+        // Package up the message
+        msg.set_tec((*ii).getValue(currentPos));
+      }
+      catch(InvalidRequest& e)
+      {
+        ROS_WARN("Problem querying ionospheric data");
+      }
 
       // GPS EPHEMERIDES /////////////////////////////////////////////////////////////////
 

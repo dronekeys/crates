@@ -89,14 +89,11 @@
     <!-- Provides a model for a quadrotor -->
     <plugin name="quadrotor" filename="libquadrotor.so">
 
-      <!-- State estimate -->
-      <state>
-        <rate>50</rate>
-      </state>
+      <!-- Propulsion model -->
+      <propulsion>
 
-      <!-- Dynamics -->
-      <dynamics>
-        <parameters>
+        <!-- Dynamics -->
+        <dynamics>
           <low_throttle>300</low_throttle>
           <max_angvel>2.617993877991494</max_angvel>
           <pq0>-3.25060e-04</pq0>
@@ -113,23 +110,93 @@
           <tau1>46.8004</tau1>
           <kuv>-4.97391e-01</kuv>
           <kw>-1.35341</kw>
-        </parameters>
-        <noise>
-          <force>
-            <x><gaussian>0.0 0.2</gaussian></x>
-            <y><gaussian>0.0 0.2</gaussian></y>
-            <z><gaussian>0.0 0.2</gaussian></z>
-          </force>
-          <torque>
-            <x><gaussian>0.0 0.2</gaussian></x>
-            <y><gaussian>0.0 0.2</gaussian></y>
-            <z><gaussian>0.0 0.2</gaussian></z>
-          </torque>
-        </noise>
-      </dynamics>
+        </dynamics>
+
+        <!-- Control -->
+        <control>
+          <pitch>
+            <scale>-2291.83118052329</scale>
+            <min>-0.9</min>
+            <max> 0.9</max>
+          </pitch>
+          <roll>
+            <scale>-2291.83118052329</scale>
+            <min>-0.9</min>
+            <max> 0.9</max>
+          </roll>
+          <throttle>
+            <scale>4097</scale>
+            <min>0.0</min>
+            <max>1.0</max>
+          </throttle>
+          <yaw>
+            <scale>-460.597254433196</scale>
+            <min>-4.5</min>
+            <max> 4.5</max>
+          </yaw>
+          <voltage>
+            <scale>1.0</scale>
+            <min> 9.0</min>
+            <max>12.0</max>
+          </voltage>
+        </control>
+
+      </propulsion>
+
+      <!-- Shear  -->
+      <shear>
+        <speed>0.0</speed>
+        <direction>90</direction>
+        <drag>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </drag>
+        <floor>0.05</floor>
+        <const>0.15</const>
+      </shear>
+      
+      <!-- Turbulence  -->
+      <turbulence>
+        <speed>5.0</speed>
+        <direction>90.0</direction>
+        <drag>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </drag>
+        <bsiter>1000</bsiter>
+        <bstime>0.02</bstime>
+      </turbulence>
+
+      <!-- AHRS (orientation)  -->
+      <ahrs>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/ahrs, 0 = off -->
+        <rate>8</rate>
+
+      </ahrs>
+
+      <!-- Altimeter -->
+      <altimeter>
+
+        <!-- Data devlicery rate to ROS topic /hal/UAV/XXX/sensor/altimeter, 0 = off -->
+        <rate>8</rate>
+      
+      </altimeter>
+
+      <!-- Compass -->
+      <compass>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/compass, 0 = off -->
+        <rate>8</rate>
+
+      </compass>
 
       <!-- Energy -->
       <energy>
+
+        <!-- Data delivery rate to ROS topic /hal/UAV/XXX/sensor/battery, 0 = off -->
+        <rate>8</rate>
+
         <total>2.2</total>
         <remaining>2.2</remaining>
         <consumption>
@@ -143,115 +210,54 @@
         <throttle>0.001</throttle>
       </energy>
 
-      <!-- Control -->
-      <control>
-        <pitch>
-          <scale>-2291.83118052329</scale>
-          <min>-0.9</min>
-          <max> 0.9</max>
-        </pitch>
-        <roll>
-          <scale>-2291.83118052329</scale>
-          <min>-0.9</min>
-          <max> 0.9</max>
-        </roll>
-        <throttle>
-          <scale>4097</scale>
-          <min>0.0</min>
-          <max>1.0</max>
-        </throttle>
-        <yaw>
-          <scale>-460.597254433196</scale>
-          <min>-4.5</min>
-          <max> 4.5</max>
-        </yaw>
-        <voltage>
-          <scale>1.0</scale>
-          <min> 9.0</min>
-          <max>12.0</max>
-        </voltage>
-      </control>
-      
-      <!-- Turbulence  -->
-      <turbulence>
-        <bsiter>1000</bsiter>
-        <bstime>0.02</bstime>
-        <speed>5.0</speed>
-        <direction>90.0</direction>
-      </turbulence>
+      <!-- RAIM-based GNSS receiver -->
+      <gnss>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/gnss, 0 = off -->    
+        <rate>8</rate>
         
-      <!-- Shear  -->
-      <shear>
-        <floor>0.05</floor>
-        <z0>0.15</z0>
-        <speed>0.0</speed>
-        <direction>90</direction>
-      </shear>
+        <!-- Minimum SV elevation from position to obtain fix -->        
+        <minelevation>15</minelevation>
 
-      <!-- Altimeter -->
-      <altimeter>
-        <rate>8</rate>
-        <topic>sensor/altitude</topic>
-        <noise>
-          <sensor><ou>0.0 300 0.003</ou></sensor>
-        </noise>
-      </altimeter>
+        <!-- Clock error (in pseudorange meters) -->        
+        <noise>0.01</noise>
 
-      <!-- GNSS receiver -->
-      <gnssreceiver>
-        <rate>8</rate>
-        <topic>sensor/position</topic>
-        <noise>
-          <clock><gaussian>0.0 0.2</gaussian></clock>
-        </noise>
-      </gnssreceiver>
+        <!-- GPS support -->
+        <gps>
+          <frequencies>
+            <L1>true</L1>
+            <L2>false</L2>
+          </frequencies>
+          <corrections>
+            <troposphere>true</troposphere>
+            <ionosphere>true</ionosphere>
+          </corrections>
+        </gps> 
 
-      <!-- ///////////////////////////////////////////////////////// -->
-      <!-- /// THESE ARE EXTRA SENSORS THAT DONT AFFECT THE STATE // -->
-      <!-- ///    (set rate to zero to disable data production)   // -->
-      <!-- ///////////////////////////////////////////////////////// -->
+        <!-- Glonass support -->
+        <glonass>
+          <frequencies>
+            <L1OF>true</L1OF>
+            <L2OF>true</L2OF>
+            <L1SF>false</L1SF>
+            <L2SF>false</L2SF>
+          </frequencies>
+          <corrections>
+            <troposphere>true</troposphere>
+            <ionosphere>true</ionosphere>
+          </corrections>
+        </glonass> 
+
+      </gnss>
 
       <!-- Inertial measurement unit -->
       <imu>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/imu, 0 = off -->
         <rate>128</rate>
-        <topic>sensor/inertial</topic>
-        <noise>
-          <accel>
-            <x><gaussian>0.0 0.0025 0.0</gaussian></x>
-            <y><gaussian>0.0 0.0025 0.0</gaussian></y>
-            <z><gaussian>0.0 0.0025 0.0</gaussian></z>
-          </accel>
-          <angvel>
-            <x><gaussian>0.0 0.0002 0.0</gaussian></x>
-            <y><gaussian>0.0 0.0002 0.0</gaussian></y>
-            <z><gaussian>0.0 0.0002 0.0</gaussian></z>
-          </angvel>
-        </noise>
+        
       </imu>
 
-      <!-- Compass -->
-      <compass>
-        <rate>8</rate>
-        <topic>sensor/compass</topic>
-        <noise>
-          <magnetic>
-            <x><gaussian>0.0 0.0025 0.0</gaussian></x>
-            <y><gaussian>0.0 0.0025 0.0</gaussian></y>
-            <z><gaussian>0.0 0.0025 0.0</gaussian></z>
-          </magnetic>
-        </noise>
-      </compass>
-
-      <!-- Attitude Heading and Reference System -->
-      <ahars>
-        <rate>8</rate>
-        <topic>sensor/ahrs</topic>
-        <noise>
-          <pitch><ou>0.0 100 0.0005</ou></pitch>
-          <roll><ou>0.0 100 0.0005</ou></roll>
-          <yaw><ou>0.0 100 0.0005</ou></yaw>
-        </noise>
-      </ahars>
 
     </plugin>
 

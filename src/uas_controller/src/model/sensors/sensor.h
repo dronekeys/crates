@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_COMPONENT_H
-#define UAS_CONTROLLER_COMPONENT_H
+#ifndef UAS_CONTROLLER_SENSOR_H
+#define UAS_CONTROLLER_SENSOR_H
 
 // System includes
 #include <string>
@@ -10,12 +10,9 @@
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 
-// Core functionality
-#include "component.h"
-
 namespace uas_controller
 {
-    class Component
+    class Sensor
     {
     protected:
 
@@ -28,7 +25,7 @@ namespace uas_controller
         }
         
     	// Recurse down the tree  looking for elements
-    	bool FindElement(sdf::ElementPtr &cur, std::string path)
+    	static bool FindElement(sdf::ElementPtr &cur, std::string path)
     	{
     		// Stores the query path
     		std::vector<std::string> e;
@@ -50,7 +47,7 @@ namespace uas_controller
     	}
 
     	// Get a SDF double parameter
-    	double GetSDFDouble(sdf::ElementPtr cur, const char* path, double value)
+    	static double GetSDFDouble(sdf::ElementPtr cur, const char* path, double value)
     	{
 			if (FindElement(cur, (std::string) path))
     			cur->GetValue()->Get(value);
@@ -58,12 +55,21 @@ namespace uas_controller
     	}
 
     	// Get a SDF double parameter
-    	int GetSDFInteger(sdf::ElementPtr cur, const char* path, int value)
+    	static int GetSDFInteger(sdf::ElementPtr cur, const char* path, int value)
     	{
 			if (FindElement(cur, (std::string) path))
     			cur->GetValue()->Get(value);
     		return value;
     	}
+
+    public:
+
+        // All sensors must be configured using the current model information and the SDF
+        virtual void Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr model) = 0;
+
+        // All sensors must be resettable
+        virtual void Reset() = 0;
+
     };
 }
 
