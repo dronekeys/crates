@@ -10,6 +10,11 @@
 // For access to messages
 #include <ros/ros.h>
 
+///////// GEOGRAPHIC INCLUDES //////////
+
+#include <GeographicLib/MagneticModel.hpp>
+#include <GeographicLib/GravityModel.hpp>
+
 ///////// GPSTK INCLUDES ///////////////
 
 // A common time system for comparing erht with satellites
@@ -66,7 +71,9 @@ namespace uas_controller
 
   private:
 
-    // GPSTK PRIVATE VARIABLES
+    // Magnetic and gravitational field vectors
+    gazebo::math::Vector3           vec_mag;
+    gazebo::math::Vector3           vec_grav;
 
     // For storing GPS and Glonass ephemerides
     GPSEphemerisStore               gps_ephemerides;
@@ -138,6 +145,37 @@ namespace uas_controller
       // Get the origin position
       currentPos.setEllipsoidModel(&wgs84);
       currentPos.setGeocentric(-0.21052, 51.71190,  0);
+
+      // GET THE MAGNETIC AND GRAVITATIONAL VECTORS //////////////////////
+
+      try
+      {
+        GeographicLib::MagneticModel mag("wmm2010");
+        double lat = 27.99, lon = 86.93, h = 8820, t = 2012; // Mt Everest
+        double Bx, By, Bz;
+        mag(t,lat,lon,h,Bx,By,Bz);
+        vec_mag.Set(Bx, By, Bz);
+      }
+      catch (const exception& e)
+      {
+        ROS_WARN("Could not determine magnetic field strength: %s",e.what());
+      }
+
+      try
+      {
+        GeographicLib::GravityModel grav("egm96");
+        double lat = 27.99, lon = 86.93, h = 8820, t = 2012; // Mt Everest
+        double Gx, Gy, Gz;
+        grav.Gravity(lat, lon, h, Gx, Gy, Gz);
+        vec_grav.Set(Gx, Gy, Gz);
+      }
+      catch (const exception& e)
+      {
+        ROS_WARN("Could not determine gravitational field strength: %s",e.what());
+      }
+
+      // Immediately, modify the gravity
+      _world->GetPhysicsEngine()->SetGravity(vec_grav);
 
       // OPEN AND STORE GPS EPHEMERIDES //////////////////////////////////
 
@@ -294,6 +332,14 @@ namespace uas_controller
       msg.mutable_wind()->set_speed(0);
       msg.mutable_wind()->set_direction(90);
 
+      // Assemble the gravity and magnetic message
+      msg.mutable_gravity()->set_x(vec_grav.x);
+      msg.mutable_gravity()->set_y(vec_grav.y);
+      msg.mutable_gravity()->set_z(vec_grav.z);
+      msg.mutable_magnetic()->set_x(vec_mag.x);
+      msg.mutable_magnetic()->set_y(vec_mag.y);
+      msg.mutable_magnetic()->set_z(vec_mag.z);
+
       // TROPOSHPERIC DELAYS ///////////////////////////////////////////////////////////////
 
       try
@@ -354,9 +400,9 @@ namespace uas_controller
             // Save to the message
             msgs::Ephemeris* gps = msg.add_gps();
             gps->set_prn(prn);
-            gps->set_x(pos[0]);
-            gps->set_y(pos[1]);
-            gps->set_z(pos[2]);
+            gps->mutable_pos()->set_x(pos[0]);
+            gps->mutable_pos()->set_y(pos[1]);
+            gps->mutable_pos()->set_z(pos[2]);
             gps->set_clkbias(xvt.getClockBias());
             gps->set_clkdrift(xvt.getClockDrift());
             gps->set_relcorr(xvt.getRelativityCorr());
@@ -388,9 +434,9 @@ namespace uas_controller
             // Save to the message
             msgs::Ephemeris* glonass = msg.add_glonass();
             glonass->set_prn(prn);
-            glonass->set_x(pos[0]);
-            glonass->set_y(pos[1]);
-            glonass->set_z(pos[2]);
+            glonass->mutable_pos()->set_x(pos[0]);
+            glonass->mutable_pos()->set_y(pos[1]);
+            glonass->mutable_pos()->set_z(pos[2]);
             glonass->set_clkbias(xvt.getClockBias());
             glonass->set_clkdrift(xvt.getClockDrift());
             glonass->set_relcorr(xvt.getRelativityCorr());

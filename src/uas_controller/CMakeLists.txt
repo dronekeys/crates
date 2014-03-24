@@ -31,6 +31,9 @@ find_package(Protobuf REQUIRED)
 # Find GPS toolkit
 find_package(GPSTK REQUIRED)
 
+# Find GPS toolkit
+find_package(GeographicLib REQUIRED)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -128,6 +131,7 @@ include_directories(include
 	${catkin_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR} 
 	${GPSTK_INCLUDE_DIR} 
+	${GEOGRAPHICLIB_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
 	${GAZEBO_INCLUDE_DIRS}
 	${OGRE_INCLUDE_DIRS}
@@ -142,6 +146,7 @@ link_directories(
 	${catkin_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS} 
 	${GPSTK_LIBRARY_DIRS}
+	${GEOGRAPHICLIB_LIBRARY_DIRS} 
 	${SDFormat_LIBRARY_DIRS} 
 	${GAZEBO_LIBRARY_DIRS} 
 	${OGRE_LIBRARY_DIRS}
@@ -160,7 +165,7 @@ add_library(gui
 )
 
 ## World plugins
-add_library(simulation  			
+add_library(simulation	
 	src/world/simulation.cpp
 )
 add_library(experiment 				
@@ -198,7 +203,7 @@ add_dependencies(experiment			custom_msgs)
 target_link_libraries(gui       	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES} ${OGRE-Terrain_LIBRARIES} ${CEGUI_LIBRARIES} ${CEGUI-OGRE_LIBRARIES})
 
 ## World plugins
-target_link_libraries(simulation	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(simulation	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
 target_link_libraries(experiment	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 ## Model plugins
