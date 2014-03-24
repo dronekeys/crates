@@ -23,12 +23,15 @@ void Compass::Reset()
 // EXTRA METHODS
 
 // Set the pressure and height at ground level
-void Compass::SetMeteorological(const double &temperature)
+void Compass::SetMeteorological( const double &temperature,
+    const double &Bx, const double &By, const double &Bz)
 {
-	// Set the ground variables
-	t = temperature;
-}
+  // Set the ground variables
+  t = temperature;
 
+  // Magnetic field
+  mag.Set(Bx,By,Bz);
+}
 
 // Set the pressure and height at ground level
 gazebo::math::Vector3 Compass::GetMagneticField()

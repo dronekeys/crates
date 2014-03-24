@@ -42,7 +42,8 @@ namespace uas_controller
         // EXTRA METHODS
 
         // Set the pressure and height at ground level
-        void SetMeteorological(const double &temperature);
+        void SetMeteorological( const double &temperature,
+    		const double &Bx, const double &By, const double &Bz);
 
         // Set the pressure and height at ground level
         gazebo::math::Vector3 GetMagneticField();

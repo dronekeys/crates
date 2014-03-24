@@ -23,10 +23,14 @@ void IMU::Reset()
 // EXTRA METHODS
 
 // Set the pressure and height at ground level
-void IMU::SetMeteorological(const double &temperature)
+void IMU::SetMeteorological( const double &temperature,
+    const double &Gx, const double &Gy, const double &Gz)
 {
   // Set the ground variables
   t = temperature;
+
+  // Magnetic and gravitational fields
+  grav.Set(Gx,Gy,Gz);
 }
 
 // Set the pressure and height at ground level
@@ -43,6 +47,6 @@ gazebo::math::Vector3 IMU::GetLinearAcceleration()
 {
   // Rotate linear acceleration (specific force + gravity) into body frame
   return modPtr->GetWorldPose().rot.GetInverse().RotateVector(
-      modPtr->GetWorldLinearAccel() + modPtr->GetWorld()->GetPhysicsEngine()->GetGravity()
+    modPtr->GetWorldLinearAccel() + grav
   );
 }

@@ -117,12 +117,18 @@ namespace uas_controller
 
       // Set the temperature of the IMU
       imu.SetMeteorological(
-        msg->temperature()        // Environment dry temp (kelvin)
+        msg->temperature(),       // Environment dry temp (kelvin)
+        msg->gravity().x(),         // Grav field strength X
+        msg->gravity().y(),         // Grav field strength Y
+        msg->gravity().z()          // Grav field strength Z
       );
 
       // Set the temperature of the compass
       compass.SetMeteorological(
-        msg->temperature()        // Environment dry temp (kelvin)
+        msg->temperature(),       // Environment dry temp (kelvin)
+        msg->magnetic().x(),        // Mag field strength X
+        msg->magnetic().y(),        // Mag field strength Y
+        msg->magnetic().z()         // Mag field strength Z
       );
 
       // Set the GNSS satellites

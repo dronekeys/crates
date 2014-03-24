@@ -22,7 +22,7 @@ namespace uas_controller
 	    gazebo::physics::ModelPtr	 modPtr;
 
 	  	// Store temp, humidity and pressure
-	  	double t, p, h;
+	  	double t0, p0, h0;
 
 
 	public:
@@ -43,7 +43,7 @@ namespace uas_controller
         void SetMeteorological(const double &temperature, const double &pressure, const double &humidity);
 
         // Get the atmospheric pressure at the current altitude
-        double GetAltitude();
+        double GetPressure();
 	};
 }
 

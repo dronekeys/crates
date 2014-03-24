@@ -13,21 +13,24 @@
 
 namespace uas_controller
 {
-	class IMU : public uas_hal::Inertial, public Sensor
-	{
+    class IMU : public uas_hal::Inertial, public Sensor
+    {
 
-	private:
+    private:
 
-	    // Pointer to the current model
-	    gazebo::physics::ModelPtr	 modPtr;
+        // Pointer to the current model
+        gazebo::physics::ModelPtr    modPtr;
 
-	    // Current temperature
-	    double t;
+        // Gravity and magnetic fields
+        gazebo::math::Vector3        grav;
 
-	public:
+        // Current temperature
+        double t;
 
-		// Default constructor
-		IMU();
+    public:
+
+        // Default constructor
+        IMU();
 
         // REQUIRED METHODS
 
@@ -39,8 +42,9 @@ namespace uas_controller
 
         // EXTRA METHODS
 
-        // Set the pressure and height at ground level
-        void SetMeteorological(const double &temperature);
+        // Set the temperature, as well as the gravitational and magnetic fields
+        void SetMeteorological(const double &temperature,
+            const double &Gx, const double &Gy, const double &Gz);
 
         // Set the pressure and height at ground level
         gazebo::math::Vector3 GetAngularVelocity();
@@ -48,7 +52,7 @@ namespace uas_controller
         // Set the pressure and height at ground level
         gazebo::math::Vector3 GetLinearAcceleration();
 
-	};
+    };
 }
 
 #endif
