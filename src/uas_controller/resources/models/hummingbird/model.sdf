@@ -34,7 +34,6 @@
       </visual>
     </link>
 
-
     <include>
       <uri>model://blade</uri>
       <name>blade0</name>
@@ -87,67 +86,13 @@
       </axis>
     </joint>
 
-    <plugin name='imu' filename='libimu.so'>
-      <rate>128</rate>
-      <noise>
-        <accel>
-          <x><gaussian>0.0 0.0025 0.0</gaussian></x>
-          <y><gaussian>0.0 0.0025 0.0</gaussian></y>
-          <z><gaussian>0.0 0.0025 0.0</gaussian></z>
-        </accel>
-        <angvel>
-          <x><gaussian>0.0 0.0002 0.0</gaussian></x>
-          <y><gaussian>0.0 0.0002 0.0</gaussian></y>
-          <z><gaussian>0.0 0.0002 0.0</gaussian></z>
-        </angvel>
-      </noise>
-    </plugin>
-
-    <plugin name='compass' filename='libcompass.so'>
-      <rate>8</rate>
-      <noise>
-        <magnetic>
-          <x><gaussian>0.0 0.0025 0.0</gaussian></x>
-          <y><gaussian>0.0 0.0025 0.0</gaussian></y>
-          <z><gaussian>0.0 0.0025 0.0</gaussian></z>
-        </magnetic>
-      </noise>
-    </plugin>
-
-    <plugin name='inclinometer' filename='libinclinometer.so'>
-      <rate>8</rate>
-      <noise>
-        <pitch><ou>0.0 100 0.0005</ou></pitch>
-        <roll><ou>0.0 100 0.0005</ou></roll>
-        <yaw><ou>0.0 100 0.0005</ou></yaw>
-      </noise>
-    </plugin>
-
-    <plugin name='altimeter' filename='libaltimeter.so'>
-      <rate>8</rate>
-      <noise>
-        <sensor><ou>0.0 300 0.003</ou></sensor>
-      </noise>
-    </plugin>
-
-    <plugin name='gpsreceiver' filename='libgpsreceiver.so'>
-      <rate>8</rate>
-      <noise>
-        <clock><gaussian>0.0 0.2</gaussian></clock>
-      </noise>
-    </plugin>
-
     <!-- Provides a model for a quadrotor -->
     <plugin name="quadrotor" filename="libquadrotor.so">
 
-      <!-- The link against which everything will be modelled -->     
-      <link>body</link>
-
-      <!-- Broadcast rate -->
-      <rate>
-        <information>1</information>
-        <state>50</state>
-      </rate>
+      <!-- State estimate -->
+      <state>
+        <rate>50</rate>
+      </state>
 
       <!-- Dynamics -->
       <dynamics>
@@ -227,21 +172,86 @@
         </voltage>
       </control>
       
-      <!-- Turbulence -->
+      <!-- Turbulence  -->
       <turbulence>
         <bsiter>1000</bsiter>
         <bstime>0.02</bstime>
-        <speed>0.0</speed>
+        <speed>5.0</speed>
         <direction>90.0</direction>
       </turbulence>
         
-      <!-- Shear -->
+      <!-- Shear  -->
       <shear>
         <floor>0.05</floor>
         <z0>0.15</z0>
         <speed>0.0</speed>
         <direction>90</direction>
       </shear>
+
+      <!-- Altimeter -->
+      <altimeter>
+        <rate>8</rate>
+        <topic>sensor/altitude</topic>
+        <noise>
+          <sensor><ou>0.0 300 0.003</ou></sensor>
+        </noise>
+      </altimeter>
+
+      <!-- GNSS receiver -->
+      <gnssreceiver>
+        <rate>8</rate>
+        <topic>sensor/position</topic>
+        <noise>
+          <clock><gaussian>0.0 0.2</gaussian></clock>
+        </noise>
+      </gnssreceiver>
+
+      <!-- ///////////////////////////////////////////////////////// -->
+      <!-- /// THESE ARE EXTRA SENSORS THAT DONT AFFECT THE STATE // -->
+      <!-- ///    (set rate to zero to disable data production)   // -->
+      <!-- ///////////////////////////////////////////////////////// -->
+
+      <!-- Inertial measurement unit -->
+      <imu>
+        <rate>128</rate>
+        <topic>sensor/inertial</topic>
+        <noise>
+          <accel>
+            <x><gaussian>0.0 0.0025 0.0</gaussian></x>
+            <y><gaussian>0.0 0.0025 0.0</gaussian></y>
+            <z><gaussian>0.0 0.0025 0.0</gaussian></z>
+          </accel>
+          <angvel>
+            <x><gaussian>0.0 0.0002 0.0</gaussian></x>
+            <y><gaussian>0.0 0.0002 0.0</gaussian></y>
+            <z><gaussian>0.0 0.0002 0.0</gaussian></z>
+          </angvel>
+        </noise>
+      </imu>
+
+      <!-- Compass -->
+      <compass>
+        <rate>8</rate>
+        <topic>sensor/compass</topic>
+        <noise>
+          <magnetic>
+            <x><gaussian>0.0 0.0025 0.0</gaussian></x>
+            <y><gaussian>0.0 0.0025 0.0</gaussian></y>
+            <z><gaussian>0.0 0.0025 0.0</gaussian></z>
+          </magnetic>
+        </noise>
+      </compass>
+
+      <!-- Attitude Heading and Reference System -->
+      <ahars>
+        <rate>8</rate>
+        <topic>sensor/ahrs</topic>
+        <noise>
+          <pitch><ou>0.0 100 0.0005</ou></pitch>
+          <roll><ou>0.0 100 0.0005</ou></roll>
+          <yaw><ou>0.0 100 0.0005</ou></yaw>
+        </noise>
+      </ahars>
 
     </plugin>
 

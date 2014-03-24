@@ -1,6 +1,17 @@
 #include <gazebo/common/Plugin.hh>
 #include <ros/ros.h>
 
+// Classes for handling RINEX satellite navigation parameters (ephemerides)
+#include <gpstk/Rinex3NavHeader.hpp>
+#include <gpstk/Rinex3NavData.hpp>
+#include <gpstk/Rinex3NavStream.hpp>
+
+// Classes for handling RINEX files with meteorological parameters
+#include <gpstk/RinexMetBase.hpp>
+#include <gpstk/RinexMetData.hpp>
+#include <gpstk/RinexMetHeader.hpp>
+#include <gpstk/RinexMetStream.hpp>
+
 namespace gazebo
 {
   class Orbits : public WorldPlugin

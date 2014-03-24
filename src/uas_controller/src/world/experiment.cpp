@@ -3,11 +3,11 @@
 
 namespace gazebo
 {
-  class Listener : public WorldPlugin
+  class Experiment : public WorldPlugin
   {
   public:
 
-    Listener() : WorldPlugin() {}
+    Experiment() : WorldPlugin() {}
 
     void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     {
@@ -16,5 +16,5 @@ namespace gazebo
 
   };
   
-  GZ_REGISTER_WORLD_PLUGIN(Listener)
+  GZ_REGISTER_WORLD_PLUGIN(Experiment)
 } 

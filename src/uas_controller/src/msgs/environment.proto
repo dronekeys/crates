@@ -1,0 +1,43 @@
+package uas_controller.msgs;
+
+// GNSS Satellite ephemeris
+message Ephemeris
+{
+	required int32  prn				= 1;
+	required double x         		= 2;
+	required double y     			= 3;
+	required double z   			= 4;
+	required double clkbias   		= 5;
+	required double clkdrift        = 6;
+	required double relcorr       	= 7;
+	required bool   health       	= 8;
+}
+
+// A GPStk time epoch (generated on simultation tick event)
+message Epoch 
+{
+	required int64  days              = 2;
+	required double secondsofdays     = 3;
+}
+
+// A GPStk time epoch (generated on simultation tick event)
+message Wind 
+{
+	required int32  speed              = 1;
+	required int32  direction          = 2;
+}
+
+// Information broadcast about the environment
+message Environment
+{
+	required Epoch      epoch           = 1;
+	required double 	temperature		= 2;
+	required double 	humidity		= 3;
+	required double 	pressure		= 4;
+	required Wind     	wind            = 5;
+	required double     ionosphere      = 6;
+	required double     tropo_wet       = 7;
+	required double     tropo_dry       = 8;
+	repeated Ephemeris  gps             = 9;
+	repeated Ephemeris  glonass         = 10;
+}

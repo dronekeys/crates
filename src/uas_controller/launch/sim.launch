@@ -26,9 +26,9 @@
     <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
   </node>
 
-  <!-- start gazebo client -->
+  <!-- start gazebo client   args="-g libgui.so" -->
   <group if="$(arg gui)">
-    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" args="-g libsimulation.so" output="screen">
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
       <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
       <env name="GAZEBO_MODEL_PATH" value="$(find uas_controller)/resources/models"/>
       <env name="GAZEBO_RESOURCE_PATH" value="/usr/share/gazebo-2.2:$(find uas_controller)/resources"/>

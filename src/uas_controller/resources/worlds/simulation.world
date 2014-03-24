@@ -2,7 +2,7 @@
 
 <sdf version="1.4">
 
-  <world name="simulation">
+  <world name="uas">
 
     <!-- Set the physics properties -->
     <physics type="ode">
@@ -11,7 +11,7 @@
       <real_time_update_rate>50</real_time_update_rate>
     </physics>
 
-    <!-- Set the scene properties -->
+    <!-- Set the geodetic system  -->
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
       <latitude_deg>51.71190</latitude_deg>
@@ -23,7 +23,7 @@
     <!-- Setup a basic scene -->
     <scene>
       <sky>
-        <time>10.00</time>
+        <time>12.00</time>
         <sunrise>06.23</sunrise>
         <sunset>17.59</sunset>
         <clouds>
@@ -34,22 +34,82 @@
     </scene>
 
     <include>
-      <uri>model://sun</uri>
-    </include>
-
-    <include>
       <uri>model://rvc</uri>
     </include>
 
     <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <name>UAV0</name>
+      <pose>1.0 0.0 0.05 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 
-    <!--
-    <plugin name="gpsorbits" filename="libgpsorbits.so">
-      <orbit>file://media/orbits/ngs15992_16to17.sp3</orbit>
+    <include>
+      <name>UAV1</name>
+      <pose>0.0 1.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV2</name>
+      <pose>-1.0 0.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <include>
+      <name>UAV3</name>
+      <pose>0.0 -1.0 0.05 0 0 0</pose>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <!-- Code to run the entire simulation -->
+    <plugin name="simulation" filename="libsimulation.so">
+
+      <!-- The precise start time of the experiment -->
+      <utc>
+        <year>2010</year>
+        <month>1</month>
+        <day>6</day>
+        <hour>10</hour>
+        <minute>0</minute>
+        <second>0</second>
+      </utc>
+
+      <!-- Constant wind speed and direction -->
+      <wind>
+        <speed>5</speed>
+        <direction>90</direction>
+      </wind>
+
+      <!-- Global navigation satellite system -->
+      <gnss>
+
+        <!-- Meterological conditions -->
+        <meteorological>
+          <uri>file://gnss/hers0060.10m</uri>
+        </meteorological>
+
+        <!-- Ionospheric conditions  -->
+        <ionosphere>
+          <uri>file://gnss/igsg0060.10i</uri>
+        </ionosphere>
+
+        <!-- Noise perturbed GPS ephemerides -->
+        <gps>
+          <uri>file://gnss/brdc0060.10n</uri>
+        </gps>
+
+        <!-- Noise perturbed Glonass ephemerides -->
+        <glonass>
+          <uri>file://gnss/brdc0060.10g</uri>
+        </glonass>
+
+      </gnss>
+
     </plugin>
-    -->
     
   </world>
 

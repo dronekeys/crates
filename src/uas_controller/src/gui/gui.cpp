@@ -5,14 +5,14 @@
 
 namespace gazebo
 {
-  class Simulation : public SystemPlugin
+  class GUI : public SystemPlugin
   {
   public:
 
     void Load(int /*_argc*/, char ** /*_argv*/)
     {
       conPtr = event::Events::ConnectPreRender(
-        boost::bind(&Simulation::Update, this)
+        boost::bind(&GUI::Update, this)
       );
     }
 
@@ -28,5 +28,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_SYSTEM_PLUGIN(Simulation)
+  GZ_REGISTER_SYSTEM_PLUGIN(GUI)
 }

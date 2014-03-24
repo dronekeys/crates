@@ -19,7 +19,7 @@
 #include <uas_hal/platform/UAV.h>
 
 // HAL includes
-#include "atmosphere.pb.h"
+#include "environment.pb.h"
 
 // Components used int the model
 #include "components/energy.h"
@@ -32,7 +32,7 @@ namespace uas_controller
 {
 
   // Save some pain
-  typedef const boost::shared_ptr<const uas_controller::msgs::Atmosphere> AtmospherePtr;
+  typedef const boost::shared_ptr<const uas_controller::msgs::Environment> EnvironmentPtr;
 
   class Quadrotor : public uas_hal::UAV, public gazebo::ModelPlugin
   {
@@ -82,13 +82,15 @@ namespace uas_controller
     }
 
     // Receive the global wind speed and direction
-    void ReceiveAtmosphere(AtmospherePtr &msg)
+    void ReceiveAtmosphere(EnvironmentPtr &msg)
     {
+      /*
       // Configure the wind shear accoridngly
       shear.SetWind(
         msg->wind_speed(),      // Spped
         msg->wind_direction()   // Direction
       );
+      */
     }
 
     // Second-order Runge-Kutta dynamics
@@ -181,7 +183,7 @@ namespace uas_controller
       nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 
       // Subscribe to messages about atmospheric conditions
-      subPtr  = nodePtr->Subscribe("~/atmosphere", &Quadrotor::ReceiveAtmosphere, this);
+      subPtr  = nodePtr->Subscribe("~/environment", &Quadrotor::ReceiveAtmosphere, this);
 
       // Pre physics - update quadrotor dynamics and wind
       conBegPtr = gazebo::event::Events::ConnectWorldUpdateBegin(

@@ -154,14 +154,12 @@ link_directories(
 ################################
 # Define libraries to be built #
 
-## General plugins
-add_library(simulation  			src/gui/simulation.cpp)
-add_library(experiment 				src/gui/experiment.cpp)
+## GUI / system plugins
+add_library(gui  		  			src/gui/gui.cpp)
 
 ## World plugins
-add_library(atmosphere  			src/world/atmosphere.cpp)
-add_library(gpsorbits 				src/world/gpsorbits.cpp)
-add_library(listener 				src/world/listener.cpp)
+add_library(simulation  			src/world/simulation.cpp)
+add_library(experiment 				src/world/experiment.cpp)
 
 ## Model plugins
 add_library(altimeter 				src/model/altimeter.cpp)
@@ -189,21 +187,18 @@ add_dependencies(inclinometer 		custom_msgs)
 add_dependencies(gpsreceiver 		custom_msgs)
 
 ## World plugins
-add_dependencies(atmosphere 		custom_msgs)
-add_dependencies(gpsorbits 			custom_msgs)
-add_dependencies(listener 	   		custom_msgs)
+add_dependencies(simulation 		custom_msgs)
+add_dependencies(experiment			custom_msgs)
 
 ###########################
 ## Set up dynamic linking #
 
 ## GUI plugins
-target_link_libraries(simulation 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES} ${OGRE-Terrain_LIBRARIES} ${CEGUI_LIBRARIES} ${CEGUI-OGRE_LIBRARIES})
-target_link_libraries(experiment 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(gui       	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES} ${OGRE-Terrain_LIBRARIES} ${CEGUI_LIBRARIES} ${CEGUI-OGRE_LIBRARIES})
 
 ## World plugins
-target_link_libraries(listener		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(atmosphere	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
-target_link_libraries(gpsorbits 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(simulation	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+target_link_libraries(experiment	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 
 ## Model plugins
 target_link_libraries(quadrotor		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
@@ -212,6 +207,13 @@ target_link_libraries(imu 	 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LI
 target_link_libraries(compass 		${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(gpsreceiver  	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
 target_link_libraries(inclinometer 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES} custom_msgs)
+
+
+## Declare a cpp executable
+add_executable(gpstest
+	src/gpstest.cpp
+)
+target_link_libraries(gpstest	 	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${GPSTK_LIBRARIES})
 
 #############
 ## Install ##

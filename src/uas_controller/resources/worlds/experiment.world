@@ -2,7 +2,7 @@
 
 <sdf version="1.4">
 
-  <world name="experiment">
+  <world name="uas">
 
     <!-- Set the physics properties -->
     <physics type="ode">

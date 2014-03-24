@@ -8,7 +8,7 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
 endforeach()
 
 # List of custom messages
-set(msgs atmosphere.proto)
+set(msgs environment.proto)
 
 # Generate the message source and header files
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})

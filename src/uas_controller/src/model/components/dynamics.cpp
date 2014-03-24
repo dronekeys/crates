@@ -110,10 +110,10 @@ void Dynamics::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr& model)
 		thrust = 16.464000; 
 
 	// Animate the motors
-	AnimateMotor(model, "rpm0", "motor0", 60);
-	AnimateMotor(model, "rpm1", "motor1", 60);
-	AnimateMotor(model, "rpm2", "motor2", 60);
-	AnimateMotor(model, "rpm3", "motor3", 60);
+	AnimateMotor(model, "rpm0", "motor0", 300);
+	AnimateMotor(model, "rpm1", "motor1", 300);
+	AnimateMotor(model, "rpm2", "motor2", 300);
+	AnimateMotor(model, "rpm3", "motor3", 300);
 };
 
 // Update the system dynamics
