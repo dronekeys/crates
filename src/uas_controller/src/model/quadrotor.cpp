@@ -130,14 +130,10 @@ namespace uas_controller
         msg->magnetic().y(),        // Mag field strength Y
         msg->magnetic().z()         // Mag field strength Z
       );
-
-      // Set the GNSS satellites
+      
       /*
+      // Set the GNSS satellites
       gnss.SetEphemerides(
-        msg->epoch(),             // UTC time
-        msg->temperature(),       // Environment dry temp (kelvin)
-        msg->pressure(),          // Environment pressure (hPa)
-        msg->humidity(),          // Environment humidity (percent) 
         msg->gps(),               // GPS ephemerides
         msg->glonass()            // Glonass ephemerides
       );

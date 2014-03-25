@@ -13,10 +13,11 @@ message Ephemeris
 {
 	required int32  prn				= 1;
 	required Vec3D  pos         	= 2;
-	required double clkbias   		= 3;
-	required double clkdrift        = 4;
-	required double relcorr       	= 5;
-	required bool   health       	= 6;
+	required Vec3D  vel         	= 3;
+	required double delay_iono_f1   = 4;
+	required double delay_iono_f2   = 5;
+	required double delay_trop      = 6;
+	required int32  health       	= 7;
 }
 
 // A GPStk time epoch (generated on simultation tick event)
@@ -43,7 +44,6 @@ message Environment
 	required Vec3D      gravity         = 5;
 	required Vec3D      magnetic        = 6;
 	required Wind     	wind            = 7;
-	required double     tec             = 8;
-	repeated Ephemeris  gps             = 9;
-	repeated Ephemeris  glonass         = 10;
+	repeated Ephemeris  gps             = 8;
+	repeated Ephemeris  glonass         = 9;
 }

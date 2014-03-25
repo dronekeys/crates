@@ -42,9 +42,11 @@
 // Class for storing "broadcast-type" ephemerides
 #include <gpstk/GPSEphemerisStore.hpp>
 #include <gpstk/GloEphemerisStore.hpp>
+#include <gpstk/IonexStore.hpp>
 
-// Class for handling tropospheric models
+// Class for handling tropospheric and ionospheric delay models
 #include <gpstk/TropModel.hpp>
+#include <gpstk/IonoModel.hpp>
 
 ///////// GAZEBO INCLUDES ///////////////
 
@@ -60,6 +62,14 @@
 
 // Messages
 #include "environment.pb.h"
+
+// Frequencies used for ION correction
+#define GPS_L1               1575.42e6
+#define GPS_L2               1227.60e6
+#define GLONASS_L1OF_OFFSET  1602.0e6
+#define GLONASS_L1OF_SCALE   0.5625e6
+#define GLONASS_L2OF_OFFSET  1246.0e6
+#define GLONASS_L2OF_SCALE   0.4375e6
 
 using namespace std;
 using namespace gpstk;
@@ -78,15 +88,15 @@ namespace uas_controller
     // For storing GPS and Glonass ephemerides
     GPSEphemerisStore               gps_ephemerides;
     GloEphemerisStore               glo_ephemerides;
+    IonexStore                      tec_store;
 
     // For storing and iterating trhough tropo and ionosphere adata
     list<RinexMetData>              ml;
     list<RinexMetData>::iterator    mi;
-    list<IonexData>                 il;
-    list<IonexData>::iterator       ii;
 
-    // Object for Goad and Goodman (1974) model
-    GGTropModel                     ggTropModel;
+    // Path delay models
+    GGTropModel                     tropModel;  // Goad and Goodman (1974) model
+    IonoModel                       ionoModel;  // ICD-GPS-200, section 20.3.3.5.2.5
 
     // Earth ellipsoid
     WGS84Ellipsoid                  wgs84;
@@ -144,7 +154,7 @@ namespace uas_controller
       
       // Get the origin position
       currentPos.setEllipsoidModel(&wgs84);
-      currentPos.setGeocentric(-0.21052, 51.71190,  0);
+      currentPos.setGeocentric(-0.21052, 51.71190,  1);
 
       // GET THE MAGNETIC AND GRAVITATIONAL VECTORS //////////////////////
 
@@ -273,15 +283,12 @@ namespace uas_controller
         // Let's read the header (may be skipped)
         is >> ih;
 
-        // Read data into linked list
-        while (is >> id)
-           il.push_back(id);
+        // Storing the ephemeris in "bcstore"
+        while (is >> id) 
+           tec_store.addMap(id);
 
       }
       while(el = el->GetNextElement());
-
-      // Set the iterator to the beginning of the linked list
-      ii = il.begin();
 
       // START PUBLISHING DATA //////////////////////////////////////////
 
@@ -306,13 +313,8 @@ namespace uas_controller
     // When the simulation is reset
     void Reset() 
     {
-
       // Set the iterator to the beginning of the linked list
       mi = ml.begin();
-      
-      // Set the iterator to the beginning of the linked list
-      ii = il.begin();
-
     }
 
     // Broadcast the wind parameters
@@ -349,10 +351,10 @@ namespace uas_controller
            mi++; 
 
         // Set the weather for the troposphere model
-        ggTropModel.setWeather(
-           (*mi).data[RinexMetHeader::TD],
-           (*mi).data[RinexMetHeader::PR],
-           (*mi).data[RinexMetHeader::HR]);
+        tropModel.setWeather(
+          (*mi).data[RinexMetHeader::TD],
+          (*mi).data[RinexMetHeader::PR],
+          (*mi).data[RinexMetHeader::HR]);
 
         // Package up the message
         msg.set_temperature((*mi).data[RinexMetHeader::TD]);
@@ -364,23 +366,24 @@ namespace uas_controller
         ROS_WARN("Problem querying weather data");
       }
 
-      // IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
+      // IONOSPHERIC CONDITIONS //////////////////////////////////////////////////////////
 
+      Triple tec;
       try
       {
-        // Seek for the data
-        while ((!il.empty())  && (ii!= il.end() && (*ii).time < currentTime)) 
-           ii++;
-
-        // Package up the message
-        msg.set_tec((*ii).getValue(currentPos));
+        // Get the TEC count for the current receiver position and time
+        tec = tec_store.getIonexValue(currentTime, currentPos.asECEF()); 
       }
       catch(InvalidRequest& e)
       {
-        ROS_WARN("Problem querying ionospheric data");
+        ROS_WARN("Problem querying ionosphere data");
       }
 
       // GPS EPHEMERIDES /////////////////////////////////////////////////////////////////
+
+
+      CivilTime   civ(2010,1,6,3,0,0,TimeSystem::UTC);
+      currentTime = civ.convertToCommonTime();
 
       // Clear any existing glonass
       msg.clear_gps();
@@ -393,23 +396,60 @@ namespace uas_controller
       {
          try
          {
-            // Get the ephemeride information
-            Xvt xvt = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTime);
-            Vector<double> pos = xvt.getPos().toVector();
+            // Don't look for invalid satellites
+            if (!gps_ephemerides.isPresent(SatID(prn,SatID::systemGPS)))
+              continue;
 
+            // Get the ephemeris
+            Triple satellitePos = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTime).getPos();
+            
+            // Get the health
+            int health = gps_ephemerides.getSatHealth(SatID(prn,SatID::systemGPS),currentTime);
+            
             // Save to the message
             msgs::Ephemeris* gps = msg.add_gps();
             gps->set_prn(prn);
-            gps->mutable_pos()->set_x(pos[0]);
-            gps->mutable_pos()->set_y(pos[1]);
-            gps->mutable_pos()->set_z(pos[2]);
-            gps->set_clkbias(xvt.getClockBias());
-            gps->set_clkdrift(xvt.getClockDrift());
-            gps->set_relcorr(xvt.getRelativityCorr());
-            gps->set_health(true);
+            gps->mutable_pos()->set_x(satellitePos[0]);
+            gps->mutable_pos()->set_y(satellitePos[1]);
+            gps->mutable_pos()->set_z(satellitePos[2]);
+            gps->set_health(health);
+
+            /*
+            // Set the tropospheic delay, based on the simulation location
+            gps->set_delay_trop(
+              tropModel.correction(
+                currentPos,                               // Current receiver position
+                satellitePos,                             // Current satellite position
+                currentTime                               // Time of observation
+              )
+            );
+
+            // Type of ionosphere mapping function (string) 
+            // (0) NONE no mapping function is applied 
+            // (1) SLM Single Layer Model (IGS) 
+            // (2) MSLM Modified Single Layer Model (CODE) 
+            // (3) ESM Extended Slab Model (JLP)
+            gps->set_delay_iono_f1(
+              tec_store.getIono(
+                currentPos.elvAngle(satellitePos),  // Elevation of the satellite
+                tec[0],                             // Total electron count
+                GPS_L1,                             // L1 GPS frequency
+                "MLSM"                              // Mapping function
+              ) 
+            );
+            gps->set_delay_iono_f2(
+              tec_store.getIono(
+                currentPos.elvAngle(satellitePos),  // Elevation of the satellite
+                tec[0],                             // Total electron count
+                GPS_L2,                             // L1 GPS frequency
+                "MLSM"                              // Mapping function
+              ) 
+            );
+            */
          }
          catch(InvalidRequest& e)
          { 
+            ROS_WARN("Problem with GPS satellite %d",prn);
             continue;
          }
       }
@@ -427,26 +467,63 @@ namespace uas_controller
       {
          try
          {
-            // Get the ephemeris information
-            Xvt xvt = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTime);
-            Vector<double> pos = xvt.getPos().toVector();
+            // Don't look for invalid satellites
+            if (!glo_ephemerides.isPresent(SatID(prn,SatID::systemGlonass)))
+              continue;
+
+            // Get the ephemeris
+            Triple satellitePos = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTime).getPos();
             
             // Save to the message
             msgs::Ephemeris* glonass = msg.add_glonass();
             glonass->set_prn(prn);
-            glonass->mutable_pos()->set_x(pos[0]);
-            glonass->mutable_pos()->set_y(pos[1]);
-            glonass->mutable_pos()->set_z(pos[2]);
-            glonass->set_clkbias(xvt.getClockBias());
-            glonass->set_clkdrift(xvt.getClockDrift());
-            glonass->set_relcorr(xvt.getRelativityCorr());
-            glonass->set_health(true);
+            glonass->mutable_pos()->set_x(satellitePos[0]);
+            glonass->mutable_pos()->set_y(satellitePos[1]);
+            glonass->mutable_pos()->set_z(satellitePos[2]);
+            glonass->set_health(1);
+           
+            /*
+
+            // Set the tropospheic delay, based on the simulation location
+            glonass->set_delay_trop(
+              tropModel.correction(
+                currentPos,                               // Current receiver position
+                satellitePos,                             // Current satellite position
+                currentTime                               // Time of observation
+              )
+            );
+
+            // Type of ionosphere mapping function (string) 
+            // (0) NONE no mapping function is applied 
+            // (1) SLM Single Layer Model (IGS) 
+            // (2) MSLM Modified Single Layer Model (CODE) 
+            // (3) ESM Extended Slab Model (JLP)
+            glonass->set_delay_iono_f1(
+              tec_store.getIono(
+                currentPos.elvAngle(satellitePos),                        // Elevation of the satellite
+                tec[0],                                                   // Total electron count of the area
+                GLONASS_L1OF_OFFSET+eph.getfreqNum()*GLONASS_L1OF_SCALE,  // L1OF GPS frequency
+                "MLSM"                                                    // Mapping function
+              ) 
+            );
+            glonass->set_delay_iono_f2(
+              tec_store.getIono(
+                currentPos.elvAngle(satellitePos),                        // Elevation of the satellite
+                tec[0],                                                   // Total electron count of the area
+                GLONASS_L2OF_OFFSET+eph.getfreqNum()*GLONASS_L2OF_SCALE,  // L2OF GPS frequency
+                "MLSM"                                                    // Mapping function
+              ) 
+            );
+            */
+
          }
          catch(InvalidRequest& e)
          { 
+            ROS_WARN("Problem with Glonass satellite %d",prn);
             continue;
          }
       }
+    
 
       // Publish wind information to all subscribers
       pubPtr->Publish(msg);

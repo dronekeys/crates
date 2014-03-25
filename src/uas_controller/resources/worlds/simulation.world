@@ -112,7 +112,7 @@
       <!-- Global navigation satellite system -->
       <gnss>
 
-        <!-- Meterological conditions -->
+        <!-- Meterological conditions (for troposphere) -->
         <meteorological>
           <uri>file://gnss/hers0060.10m</uri>
         </meteorological>
