@@ -20,8 +20,8 @@ using namespace uas_controller;
 // Default constructor - basically gives a standard GPS L1 (code) L2 (carrier), and Glonass L1 (CODE)
 // L2 (code) receiver. Possible other options are "NONE", "CODE", "CARRIER" and "MILITARY"
 GNSS::GNSS() : uas_hal::Position("gnss"),
-	gps_L1(true), gps_L2(true), gps_rel(false), gps_clk(false), gps_eph(true), gps_tro(true), gps_ion(true),
-	glo_L1(true), glo_L2(true), glo_rel(false), glo_clk(false), glo_eph(true), glo_tro(true), glo_ion(true)
+	gps_L1(true), gps_L2(true), gps_rel(true), gps_clk(true), gps_eph(true), gps_tro(true), gps_ion(true),
+	glo_L1(true), glo_L2(true), glo_rel(true), glo_clk(true), glo_eph(true), glo_tro(true), glo_ion(true)
 {}
 
 // REQUIRED METHODS
@@ -113,19 +113,20 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 			);
 
 			// Get the error
-			Triple ephError = Triple(
-				env->gnss(i).err().x(),
-				env->gnss(i).err().y(),
-				env->gnss(i).err().z()
+			gpstk::Position erPosECEF = gpstk::Position(
+				env->gnss(i).pos().x()+env->gnss(i).err().x(),
+				env->gnss(i).pos().y()+env->gnss(i).err().y(),
+				env->gnss(i).pos().z()+env->gnss(i).err().z()
 			);
 
 			// PSEUDORANGE ESTIMATION //////////////////////////////////////////
 
 			// Get the true range
-			double truerange = range(msPosECEF, svPosECEF);
+			double trurange = range(msPosECEF, svPosECEF);
+			double errEphem = range(msPosECEF, erPosECEF) - trurange;
 
 			// Now calculate the pseudorange
-			double pseudorange = truerange;
+			double pseudorange = trurange;
 
 			// PSEUDORANGE PERTURBATION BASED ON SYSTEM AND FREQUENCY ///////////
 
@@ -143,7 +144,7 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 				if (!gps_clk) pseudorange += (C_MPS * env->gnss(i).clkbias());
 				if (!gps_rel) pseudorange += (C_MPS * env->gnss(i).relcorr());
 				if (!gps_tro) pseudorange += env->gnss(i).delay_trop();
-				if (!gps_eph) pseudorange += ephError.mag();
+				if (!gps_eph) pseudorange += errEphem;
 				break;
 				
 			case SatID::systemGlonass:
@@ -157,12 +158,12 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 				if (!glo_clk) pseudorange += (C_MPS * env->gnss(i).clkbias());
 				if (!glo_rel) pseudorange += (C_MPS * env->gnss(i).relcorr());
 				if (!glo_tro) pseudorange += env->gnss(i).delay_trop();
-				if (!glo_eph) pseudorange += ephError.mag();
+				if (!glo_eph) pseudorange += errEphem;
 				break;
 			}
 
 			// Summary
-			ROS_INFO("-- Satellite %d range error : %f", i, (pseudorange-truerange));
+			ROS_INFO("-- Satellite %d error : %f", i, errEphem);
 
 			// DATA PREPARATION ////////////////////////////////////////////////
          	
