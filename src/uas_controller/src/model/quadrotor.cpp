@@ -102,6 +102,8 @@ namespace uas_controller
     // update all of the simulated sensors, so that they can produce a meaningful measurement.
     void ReceiveEnvironment(EnvironmentPtr &msg)
     {
+      ROS_INFO("RECEIVED ENVIRONMENT");
+
       // Configure the wind shear
       shear.SetWind(
         msg->wind().speed(),      // Speed (meter per second at 6m)
@@ -131,14 +133,8 @@ namespace uas_controller
         msg->magnetic().z()         // Mag field strength Z
       );
       
-      /*
-      // Set the GNSS satellites
-      gnss.SetEphemerides(
-        msg->gps(),               // GPS ephemerides
-        msg->glonass()            // Glonass ephemerides
-      );
-      */
-      
+      // Gte a navigation solution from the message
+      gnss.SetNavigationSolution(msg);
     }
 
     // This is the grand simulation abritrator. In a nutshell, it is called on every physics time
@@ -223,8 +219,13 @@ namespace uas_controller
       // Setup the gazebo node
       nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 
+      // Initialize the node with the world name
+      nodePtr->Init(modPtr->GetWorld()->GetName());
+
       // Subscribe to messages about atmospheric conditions
       subPtr  = nodePtr->Subscribe("~/environment", &Quadrotor::ReceiveEnvironment, this);
+
+      ROS_INFO("Subscribed to environment");
 
       // LISTEN FOR PRE AND POST PHYSICS SIM UPDATES /////////////////
 

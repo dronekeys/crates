@@ -8,12 +8,6 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-// GPS includes
-#include <gpstk/WGS84Ellipsoid.hpp> // GPS ellipsoid
-#include <gpstk/TropModel.hpp>      // Tropospheric model
-#include <gpstk/PRSolution2.hpp>    // Provides a RAIM solver
-#include <gpstk/XvtStore.hpp>       // For storing satellite ephemerides
-
 // HAL includes
 #include <uas_hal/peripheral/Position.h>
 
@@ -22,9 +16,6 @@
 
 // Core functionality
 #include "sensor.h"
-
-using namespace std;
-using namespace gpstk;
 
 namespace uas_controller
 {
@@ -41,23 +32,12 @@ namespace uas_controller
         gazebo::physics::ModelPtr    modPtr;
 
         // GPS parameters
-        std::string gps_L1, gps_L2;
-        bool gps_eph, gps_clk, gps_rel, gps_rot, gps_tro, gps_ion; 
+        bool gps_L1, gps_L2, gps_eph, gps_clk, gps_rel, gps_tro, gps_ion; 
 
         // Glonass parameters
-        std::string glo_L1, glo_L2;
-        bool glo_eph, glo_clk, glo_rel, glo_rot, glo_tro, glo_ion; 
+        bool glo_L1, glo_L2, glo_eph, glo_clk, glo_rel, glo_tro, glo_ion; 
         
-        // Tropospheric correction model (NULL)
-        ZeroTropModel   tropModelZero;
-        TropModel*      tropModel;
-
-        // Earth ellipsoid (for coordinate conversions)
-        WGS84Ellipsoid  wgs84;
-
-        // Pseudorange-based GNSS solver
-        PRSolution2     solver;
-
+  
     public:
 
         // Default constructor

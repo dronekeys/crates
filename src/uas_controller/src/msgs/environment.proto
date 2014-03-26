@@ -11,13 +11,17 @@ message Vec3D
 // GNSS Satellite ephemeris
 message Ephemeris
 {
-	required int32  prn				= 1;
-	required double elevation		= 2;
-	required Vec3D  pos         	= 3;
-	required Vec3D  err         	= 4;
-	required double delay_iono_f1   = 5;
-	required double delay_iono_f2   = 6;
-	required double delay_trop      = 7;
+	required int32  system			= 1;
+	required int32  prn				= 2;
+	required double elevation		= 3;
+	required Vec3D  pos         	= 4;
+	required Vec3D  err         	= 5;
+	required double clkbias         = 6;
+	required double clkdrift        = 7;
+	required double relcorr  		= 8;
+	required double delay_iono_f1   = 9;
+	required double delay_iono_f2   = 10;
+	required double delay_trop      = 11;
 }
 
 // A GPStk time epoch (generated on simultation tick event)
@@ -44,6 +48,5 @@ message Environment
 	required Vec3D      gravity         = 5;
 	required Vec3D      magnetic        = 6;
 	required Wind     	wind            = 7;
-	repeated Ephemeris  gps             = 8;
-	repeated Ephemeris  glonass         = 9;
+	repeated Ephemeris  gnss            = 8;
 }

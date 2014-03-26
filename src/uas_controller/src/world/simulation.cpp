@@ -79,9 +79,8 @@
 #define GLONASS_L1OF_SCALE   0.5625e6
 #define GLONASS_L2OF_OFFSET  1246.0e6
 #define GLONASS_L2OF_SCALE   0.4375e6
-#define SPEED_OF_LIGHT       299.792458
 
-#define DEBUG false
+#define DEBUG                false
 
 using namespace std;
 using namespace gpstk;
@@ -139,8 +138,6 @@ namespace uas_controller
     // Service that helps publish data
     gazebo::transport::PublisherPtr pubPtr;
 
-    // Message contacining wind information
-    msgs::Environment               msg;
 
   public:
     
@@ -223,8 +220,9 @@ namespace uas_controller
 
       // OPEN AND STORE FINAL GLONASS EPHEMERIDES ////////////////////////////
 
-      //sp3_ephemerides.rejectBadPositions(true);
-      //sp3_ephemerides.rejectBadClocks(true);
+      // So that we don't get nonsense
+      sp3_ephemerides.rejectBadPositions(true);
+      sp3_ephemerides.rejectBadClocks(true);
 
       el = root->GetElement("gnss")->GetElement("glonass")->GetElement("final")->GetFirstElement();
       do
@@ -363,13 +361,15 @@ namespace uas_controller
 
       // Initialize the node with the world name
       this->nodePtr->Init(_world->GetName());
-
+      
       // Create a publisher on the ~/wind topic
       this->pubPtr = this->nodePtr->Advertise<msgs::Environment>("~/environment");
 
       // Set up callback for updating the model
       this->conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
         boost::bind(&Simulation::Update, this, _1));
+
+      ROS_INFO("Advertised to environment");
 
     }
 
@@ -383,6 +383,9 @@ namespace uas_controller
     // Broadcast the wind parameters
     void Update(const gazebo::common::UpdateInfo& _info)
     {
+      // Message containing information
+      msgs::Environment msg;
+
       // TIME AND POSITION MANAGEMENT /////////////////////////////////////////////////////////
 
       // Get the current time tick, which is the start of the experimetn plus simulated time
@@ -433,10 +436,7 @@ namespace uas_controller
         ROS_INFO("POS: %f %f %f", originPosECEF.X(), originPosECEF.Y(), originPosECEF.Z());
       }
 
-      // TROPOSHPERIC DELAYS ///////////////////////////////////////////////////////////////
-
-      // Switch time model to UTC
-      // currentTime.setTimeSystem(TimeSystem::UTC);
+      // TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
       try
       {
@@ -491,7 +491,7 @@ namespace uas_controller
       // GPS EPHEMERIDES /////////////////////////////////////////////////////////////////
 
       // Clear any existing glonass
-      msg.clear_gps();
+      msg.clear_gnss();
 
       // Iterate over possible satellite identifiers
       for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
@@ -501,8 +501,11 @@ namespace uas_controller
           // Don't look for invalid satellites
           if (sp3_ephemerides.isPresent(SatID(prn,SatID::systemGPS)))
           {
+            // Get the ephemeris
+            Xvt eph = sp3_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS);
+
             // Elevation of the current satellite with respect to HOME position
-            Triple satellitePos = sp3_ephemerides.getPosition(SatID(prn,SatID::systemGPS),currentTimeGPS);
+            Triple satellitePos = eph.getPos();
 
             // Get the elevation
             double elv = originPosECEF.elvAngle(satellitePos);
@@ -511,9 +514,15 @@ namespace uas_controller
             if (elv > minElevation)
             {          
               // Save to the message
-              msgs::Ephemeris* gps = msg.add_gps();
+              msgs::Ephemeris* gps = msg.add_gnss();
+              gps->set_system(SatID::systemGlonass);
               gps->set_prn(prn);
               gps->set_elevation(elv);
+
+              // Write the clock bias and relativity correction
+              gps->set_clkbias(eph.getClockBias());
+              gps->set_clkdrift(eph.getClockDrift());
+              gps->set_relcorr(eph.getRelativityCorr());
 
               // Write the position
               gps->mutable_pos()->set_x(satellitePos[0]);
@@ -523,11 +532,9 @@ namespace uas_controller
               // Try and get the broadcast ephemeride
               try
               {
-                // Elevation of the current satellite with respect to HOME position
-                Triple brodcastPos = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS).getPos();
-
                 // Work out the ephemeris error
-                Triple err = brodcastPos - satellitePos;
+                Triple err = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS).getPos() 
+                           - satellitePos;
 
                 // Set the ephemeris error
                 gps->mutable_err()->set_x(err[0]);
@@ -579,6 +586,7 @@ namespace uas_controller
                 ROS_INFO(" -- POS TRU: %f %f %f",  gps->pos().x(), gps->pos().y(), gps->pos().z());
                 ROS_INFO(" -- POS ERR: %f %f %f", gps->err().x(), gps->err().y(), gps->err().z());
                 ROS_INFO(" -- ATM DEL: F1: %f | F2: %f | TROP: %f", gps->delay_iono_f1(), gps->delay_iono_f2(), gps->delay_trop());
+                ROS_INFO(" -- TIM ADJ: BIAS: %f | DRIFT: %f | RELCORR: %f", gps->clkbias(), gps->clkdrift(), gps->relcorr());
               }
             }
           }
@@ -589,10 +597,7 @@ namespace uas_controller
         }
       }
 
-      // GPS EPHEMERIDES /////////////////////////////////////////////////////////////////
-
-      // Clear any existing glonass
-      msg.clear_glonass();
+      // GLONASS EPHEMERIDES ////////////////////////////////////////////////////////////////
 
       // Iterate over possible satellite identifiers
       for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
@@ -602,8 +607,11 @@ namespace uas_controller
           // Don't look for invalid satellites
           if (sp3_ephemerides.isPresent(SatID(prn,SatID::systemGlonass)))
           {
+            // Get the ephemeris (not that SP3 are in GPST)
+            Xvt eph = sp3_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGPS);
+
             // Elevation of the current satellite with respect to HOME position
-            Triple satellitePos = sp3_ephemerides.getPosition(SatID(prn,SatID::systemGlonass),currentTimeGPS);
+            Triple satellitePos = eph.getPos();
 
             // Get the elevation
             double elv = originPosECEF.elvAngle(satellitePos);
@@ -612,9 +620,15 @@ namespace uas_controller
             if (elv > minElevation)
             {          
               // Save to the message
-              msgs::Ephemeris* glonass = msg.add_gps();
+              msgs::Ephemeris* glonass = msg.add_gnss();
+              glonass->set_system(SatID::systemGlonass);
               glonass->set_prn(prn);
               glonass->set_elevation(elv);
+
+              // Write the clock bias and relativity correction
+              glonass->set_clkbias(eph.getClockBias());
+              glonass->set_clkdrift(eph.getClockDrift());
+              glonass->set_relcorr(eph.getRelativityCorr());
 
               // Write the position
               glonass->mutable_pos()->set_x(satellitePos[0]);
@@ -627,11 +641,9 @@ namespace uas_controller
               // Try and get the broadcast ephemeride
               try
               {
-                // Elevation of the current satellite with respect to HOME position
-                Triple brodcastPos = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGLO).getPos();
-
-                // Work out the ephemeris error
-                Triple err = brodcastPos - satellitePos;
+                // Work out the ephemeris error (note that Rinex are in UTC)
+                Triple err = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGLO).getPos()
+                           - satellitePos;
 
                 // Set the ephemeris error
                 glonass->mutable_err()->set_x(err[0]);
@@ -688,6 +700,7 @@ namespace uas_controller
                 ROS_INFO(" -- POS TRU: %f %f %f",  glonass->pos().x(), glonass->pos().y(), glonass->pos().z());
                 ROS_INFO(" -- POS ERR: %f %f %f", glonass->err().x(), glonass->err().y(), glonass->err().z());
                 ROS_INFO(" -- ATM DEL: F1: %f | F2: %f | TROP: %f", glonass->delay_iono_f1(), glonass->delay_iono_f2(), glonass->delay_trop());
+                ROS_INFO(" -- TIM ADJ: BIAS: %f | DRIFT: %f | RELCORR: %f", glonass->clkbias(), glonass->clkdrift(), glonass->relcorr());
               }
             }
           }
@@ -700,7 +713,6 @@ namespace uas_controller
 
       // Publish wind information to all subscribers
       pubPtr->Publish(msg);
-
     }
   };
 

@@ -226,32 +226,30 @@
         <!-- GPS support (freq: NON, CODE, CARRIER) -->
         <gps>
           <frequencies>
-            <L1>CODE</L1>
-            <L2>CARRIER</L2>
+            <L1>true</L1>
+            <L2>true</L2>
           </frequencies>
           <corrections>
-            <clk>true</clk>
-            <rel>true</rel>
-            <eph>true</eph>
-            <tro>true</tro>
-            <ion>true</ion>
+            <clk>false</clk>
+            <rel>false</rel>
+            <eph>false</eph>
+            <tro>false</tro>
+            <ion>false</ion>
           </corrections>
         </gps> 
 
         <!-- Glonass support (freq: NON, CODE, CARRIER) -->
         <glonass>
           <frequencies>
-            <L1OF>CODE</L1OF>
-            <L2OF>CARRIER</L2OF>
-            <L1SF>CODE</L1SF>
-            <L2SF>cARRIER</L2SF>
+            <L1>true</L1>
+            <L2>true</L2>
           </frequencies>
           <corrections>
-            <clk>true</clk>
-            <rel>true</rel>
-            <eph>true</eph>
-            <tro>true</tro>
-            <ion>true</ion>
+            <clk>false</clk>
+            <rel>false</rel>
+            <eph>false</eph>
+            <tro>false</tro>
+            <ion>false</ion>
           </corrections>
         </glonass> 
 

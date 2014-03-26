@@ -33,7 +33,7 @@ UAV::UAV(const char *name) :
 
 	// Set the new control goal
 	//ctlAnglesHeight.SetGoal(0.0,0.1,0.0,1.0);
-	ctlWaypoint.SetGoal(0.0,1.0,1.0,0.0);
+	//ctlWaypoint.SetGoal(0.0,1.0,1.0,0.0);
 	//ctlVelocity.SetGoal(0.0,0.1,0.0,0.0);
 	//ctlVelocityHeight.SetGoal(1.0,0.0,0.0,1.0);
 
@@ -49,17 +49,17 @@ void UAV::cbAnglesHeight_prog(const ros::TimerEvent& event)
 {
 	// Obtain the control
 	//ctlAnglesHeight.Update(&state, 0.02, &control);
-	ctlWaypoint.Update(&state, 0.02, &control);
+	//ctlWaypoint.Update(&state, 0.02, &control);
 	//ctlVelocity.Update(&state, 0.02, &control);
 	//ctlVelocityHeight.Update(&state, 0.02, &control);
 
 	// Update the HAL implementation
-	ReceiveControl(
-		control.roll,
-		control.pitch,
-		control.yaw,
-		control.throttle
-	);
+	//ReceiveControl(
+	//	control.roll,
+	//	control.pitch,
+	//	control.yaw,
+	//	control.throttle
+	//);
 }
 
 // Goal implementations
