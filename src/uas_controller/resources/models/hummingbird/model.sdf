@@ -210,7 +210,8 @@
         <throttle>0.001</throttle>
       </energy>
 
-      <!-- RAIM-based GNSS receiver -->
+      <!-- GNSS receiver (imporatantly, it will be assumed that there is a very short -->
+      <!-- baseline between the platforms, to correct ionosphere and troposphere del) -->
       <gnss>
 
         <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/gnss, 0 = off -->    
@@ -219,32 +220,38 @@
         <!-- Minimum SV elevation from position to obtain fix -->        
         <minelevation>15</minelevation>
 
-        <!-- Clock error (in pseudorange meters) -->        
-        <noise>0.01</noise>
+        <!-- Solver type (RAIM,) -->
+        <solver>RAIM</solver>
 
-        <!-- GPS support -->
+        <!-- GPS support (freq: NON, CODE, CARRIER) -->
         <gps>
           <frequencies>
-            <L1>true</L1>
-            <L2>false</L2>
+            <L1>CODE</L1>
+            <L2>CARRIER</L2>
           </frequencies>
           <corrections>
-            <troposphere>true</troposphere>
-            <ionosphere>true</ionosphere>
+            <clk>true</clk>
+            <rel>true</rel>
+            <eph>true</eph>
+            <tro>true</tro>
+            <ion>true</ion>
           </corrections>
         </gps> 
 
-        <!-- Glonass support -->
+        <!-- Glonass support (freq: NON, CODE, CARRIER) -->
         <glonass>
           <frequencies>
-            <L1OF>true</L1OF>
-            <L2OF>true</L2OF>
-            <L1SF>false</L1SF>
-            <L2SF>false</L2SF>
+            <L1OF>CODE</L1OF>
+            <L2OF>CARRIER</L2OF>
+            <L1SF>CODE</L1SF>
+            <L2SF>cARRIER</L2SF>
           </frequencies>
           <corrections>
-            <troposphere>true</troposphere>
-            <ionosphere>true</ionosphere>
+            <clk>true</clk>
+            <rel>true</rel>
+            <eph>true</eph>
+            <tro>true</tro>
+            <ion>true</ion>
           </corrections>
         </glonass> 
 

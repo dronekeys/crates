@@ -11,7 +11,6 @@
 #include <gpstk/CommonTime.hpp>
 #include <gpstk/UTCTime.hpp>
 
-
 #include <gpstk/GPSEllipsoid.hpp>
 
 ///////// ENVIRONMENT ///////////////

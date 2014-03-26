@@ -12,12 +12,12 @@ message Vec3D
 message Ephemeris
 {
 	required int32  prn				= 1;
-	required Vec3D  pos         	= 2;
-	required Vec3D  vel         	= 3;
-	required double delay_iono_f1   = 4;
-	required double delay_iono_f2   = 5;
-	required double delay_trop      = 6;
-	required int32  health       	= 7;
+	required double elevation		= 2;
+	required Vec3D  pos         	= 3;
+	required Vec3D  err         	= 4;
+	required double delay_iono_f1   = 5;
+	required double delay_iono_f2   = 6;
+	required double delay_trop      = 7;
 }
 
 // A GPStk time epoch (generated on simultation tick event)

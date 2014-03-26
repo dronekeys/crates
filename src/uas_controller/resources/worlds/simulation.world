@@ -112,24 +112,49 @@
       <!-- Global navigation satellite system -->
       <gnss>
 
-        <!-- Meterological conditions (for troposphere) -->
+        <!-- Minimum elevation for a satellite to be visible (degrees) -->
+        <minelevation>15</minelevation>
+
+        <!-- Troposhperic conditions -->
         <meteorological>
           <uri>file://gnss/hers0060.10m</uri>
+          <uri>file://gnss/hers0070.10m</uri>
+          <uri>file://gnss/hers0080.10m</uri>
         </meteorological>
 
         <!-- Ionospheric conditions  -->
         <ionosphere>
           <uri>file://gnss/igsg0060.10i</uri>
+          <uri>file://gnss/igsg0070.10i</uri>
+          <uri>file://gnss/igsg0080.10i</uri>
         </ionosphere>
 
-        <!-- Noise perturbed GPS ephemerides -->
+        <!-- GPS broadcast ephemerides -->
         <gps>
-          <uri>file://gnss/brdc0060.10n</uri>
+          <broadcast>
+            <uri>file://gnss/brdc0060.10n</uri>
+            <uri>file://gnss/brdc0070.10n</uri>
+            <uri>file://gnss/brdc0080.10n</uri>
+          </broadcast>
+          <final>
+            <uri>file://gnss/igs15652.sp3</uri>
+            <uri>file://gnss/igs15653.sp3</uri>
+            <uri>file://gnss/igs15654.sp3</uri>
+          </final>
         </gps>
 
-        <!-- Noise perturbed Glonass ephemerides -->
+        <!-- Glonass broadcast ephemerides -->
         <glonass>
-          <uri>file://gnss/brdc0060.10g</uri>
+          <broadcast>
+            <uri>file://gnss/brdc0060.10g</uri>
+            <uri>file://gnss/brdc0070.10g</uri>
+            <uri>file://gnss/brdc0080.10g</uri>
+          </broadcast>
+          <final>
+            <uri>file://gnss/igl15652.sp3</uri>
+            <uri>file://gnss/igl15653.sp3</uri>
+            <uri>file://gnss/igl15654.sp3</uri>
+          </final>
         </glonass>
 
       </gnss>

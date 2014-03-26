@@ -62,6 +62,22 @@ namespace uas_controller
     		return value;
     	}
 
+        // Get a SDF double parameter
+        static std::string GetSDFString(sdf::ElementPtr cur, const char* path, std::string value)
+        {
+            if (FindElement(cur, (std::string) path))
+                cur->GetValue()->Get(value);
+            return value;
+        }
+
+        // Get a SDF double parameter
+        static bool GetSDFBool(sdf::ElementPtr cur, const char* path, bool value)
+        {
+            if (FindElement(cur, (std::string) path))
+                cur->GetValue()->Get(value);
+            return value;
+        }
+
     public:
 
         // All sensors must be configured using the current model information and the SDF
