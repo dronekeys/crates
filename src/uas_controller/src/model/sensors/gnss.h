@@ -32,11 +32,10 @@ namespace uas_controller
         gazebo::physics::ModelPtr    modPtr;
 
         // GPS parameters
-        bool gps_L1, gps_L2, gps_eph, gps_clk, gps_rel, gps_tro, gps_ion; 
+        bool gps_L1, gps_L2, gps_eph, gps_tro, gps_ion; 
 
         // Glonass parameters
-        bool glo_L1, glo_L2, glo_eph, glo_clk, glo_rel, glo_tro, glo_ion; 
-        
+        bool glo_L1, glo_L2, glo_eph, glo_tro, glo_ion;    
   
     public:
 

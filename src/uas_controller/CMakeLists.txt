@@ -180,6 +180,7 @@ add_library(quadrotor
 	src/model/dynamics/energy.cpp
 	src/model/sensors/altimeter.cpp
 	src/model/sensors/compass.cpp
+	src/model/sensors/PRSolutionNoRotation.cpp
 	src/model/sensors/gnss.cpp
 	src/model/sensors/imu.cpp
 	src/model/sensors/ahrs.cpp

@@ -8,10 +8,11 @@
 #include <ros/ros.h>
 
 // This does the GPS heavy lifting (pseudorange solver)
-#include <gpstk/PRSolution.hpp>		// For solving 
+#include "PRSolutionNoRotation.hpp"		// For solving 
 #include <gpstk/GNSSconstants.hpp>  // For the speed of light
 #include <gpstk/WGS84Ellipsoid.hpp> // GPS ellipsoid
 #include <gpstk/TropModel.hpp>      // Tropospheric model
+#include <gpstk/GPSEllipsoid.hpp>	// Ellipsoid model
 
 using namespace std;
 using namespace gpstk;
@@ -20,8 +21,8 @@ using namespace uas_controller;
 // Default constructor - basically gives a standard GPS L1 (code) L2 (carrier), and Glonass L1 (CODE)
 // L2 (code) receiver. Possible other options are "NONE", "CODE", "CARRIER" and "MILITARY"
 GNSS::GNSS() : uas_hal::Position("gnss"),
-	gps_L1(true), gps_L2(true), gps_rel(true), gps_clk(true), gps_eph(true), gps_tro(true), gps_ion(true),
-	glo_L1(true), glo_L2(true), glo_rel(true), glo_clk(true), glo_eph(true), glo_tro(true), glo_ion(true)
+	gps_L1(true), gps_L2(true), gps_eph(false), gps_tro(false), gps_ion(false),
+	glo_L1(true), glo_L2(true), glo_eph(false), glo_tro(false), glo_ion(false)
 {}
 
 // REQUIRED METHODS
@@ -33,23 +34,18 @@ void GNSS::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr model)
 	modPtr = model;
 
 	// GPS Parameters
-	/*
-	gps_L1  = GetSDFBool(root,"gps.frequencies.L1",gps_L1);			// Use the GPS L1 frequency
-	gps_L2  = GetSDFBool(root,"gps.frequencies.L2",gps_L2);			// Use the GPS L2 frequency
-	gps_clk = GetSDFBool(root,"gps.correction.clk",gps_clk);		// Correct for clock error
-	gps_rel = GetSDFBool(root,"gps.correction.rel",gps_rel);		// Correct for relativistic effects
+	gps_L1  = GetSDFBool(root,"gps.frequencies.civ",gps_L1);		// Use the GPS L1 frequency
+	gps_L2  = GetSDFBool(root,"gps.frequencies.mil",gps_L2);		// Use the GPS L2 frequency
 	gps_eph = GetSDFBool(root,"gps.correction.eph",gps_eph);		// Correct for eph error
 	gps_tro = GetSDFBool(root,"gps.correction.tro",gps_tro);		// Correct for tro error
 	gps_ion = GetSDFBool(root,"gps.correction.ion",gps_ion);		// Correct for ion error
 
 	// GLONASS Parameters
-	glo_L1  = GetSDFBool(root,"glonass.frequencies.L1",glo_L1);		// Use the GPS L1 frequency
-	glo_L2  = GetSDFBool(root,"glonass.frequencies.L2",glo_L2);		// Use the GPS L2 frequency
-	glo_clk = GetSDFBool(root,"glonass.correction.clk",glo_clk);	// Correct for clock error
-	glo_rel = GetSDFBool(root,"glonass.correction.rel",glo_rel);	// Correct for relativistic effects
+	glo_L1  = GetSDFBool(root,"glonass.frequencies.civ",glo_L1);	// Use the GPS L1 frequency
+	glo_L2  = GetSDFBool(root,"glonass.frequencies.mil",glo_L2);	// Use the GPS L2 frequency
+	glo_eph = GetSDFBool(root,"glonass.correction.eph",gps_eph);	// Correct for eph error
 	glo_tro = GetSDFBool(root,"glonass.correction.tro",glo_tro);	// Correct for tro error
 	glo_ion = GetSDFBool(root,"glonass.correction.ion",glo_ion);	// Correct for ion error
-	*/
 }
 
 // All sensors must be resettable
@@ -104,7 +100,7 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 
 			// POSITION AND ERROR ESTIMATION /////////////////////////////////
 
-			// Get the position
+			// Get the true position
 			gpstk::Position svPosECEF = gpstk::Position(
 				env->gnss(i).pos().x(),
 				env->gnss(i).pos().y(),
@@ -112,20 +108,20 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 				gpstk::Position::Cartesian
 			);
 
-			// Get the error
+			// Get the boradcast position
 			gpstk::Position erPosECEF = gpstk::Position(
-				env->gnss(i).pos().x()+env->gnss(i).err().x(),
-				env->gnss(i).pos().y()+env->gnss(i).err().y(),
-				env->gnss(i).pos().z()+env->gnss(i).err().z()
+				env->gnss(i).pos().x() + env->gnss(i).err().x(),
+				env->gnss(i).pos().y() + env->gnss(i).err().y(),
+				env->gnss(i).pos().z() + env->gnss(i).err().z()
 			);
 
-			// PSEUDORANGE ESTIMATION //////////////////////////////////////////
+			// GET THE RANGE AND ERROR ESTIMATION ////////////////////////////////
 
 			// Get the true range
 			double trurange = range(msPosECEF, svPosECEF);
 			double errEphem = range(msPosECEF, erPosECEF) - trurange;
 
-			// Now calculate the pseudorange
+			// Now calculate the new pseudorange
 			double pseudorange = trurange;
 
 			// PSEUDORANGE PERTURBATION BASED ON SYSTEM AND FREQUENCY ///////////
@@ -141,8 +137,6 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 					if (!gps_L1 && gps_L2)
 						pseudorange += env->gnss(i).delay_iono_f2();
 				}
-				if (!gps_clk) pseudorange += (C_MPS * env->gnss(i).clkbias());
-				if (!gps_rel) pseudorange += (C_MPS * env->gnss(i).relcorr());
 				if (!gps_tro) pseudorange += env->gnss(i).delay_trop();
 				if (!gps_eph) pseudorange += errEphem;
 				break;
@@ -155,15 +149,14 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 					if (!glo_L1 && glo_L2)
 						pseudorange += env->gnss(i).delay_iono_f2();
 				}
-				if (!glo_clk) pseudorange += (C_MPS * env->gnss(i).clkbias());
-				if (!glo_rel) pseudorange += (C_MPS * env->gnss(i).relcorr());
 				if (!glo_tro) pseudorange += env->gnss(i).delay_trop();
 				if (!glo_eph) pseudorange += errEphem;
 				break;
 			}
-
+			
 			// Summary
-			ROS_INFO("-- Satellite %d error : %f", i, errEphem);
+			ROS_INFO("-- Satellite %d (range %f) with eph err %f, clock err %f, and rel err %f", i, trurange, errEphem,
+				C_MPS*env->gnss(i).clkbias(), C_MPS*env->gnss(i).relcorr());
 
 			// DATA PREPARATION ////////////////////////////////////////////////
          	
@@ -187,10 +180,11 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
   	try
   	{
 		// Create a new RAIM solver
-		PRSolution 		solver;
+		PRSolutionNoRotation solver;
 
 		// We want a once-off solution (segfaults if on)
 		solver.hasMemory = false;
+		solver.RMSLimit  = 3e6;
 
 		// These wills tore the resifuals and slopes after convergence
 	  	Vector<double> 	resids(env->gnss_size());
@@ -225,7 +219,7 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 		gpstk::Position errPosECEF = solPosECEF - msPosECEF;
 
 		// Finished!
-		ROS_WARN("Solver finished with SOL status %d and DOP status %d", statusPOS, statusDOP);
+		ROS_WARN("Solver finished in %d iterations with SOL status %d and DOP status %d", solver.NIterations, statusPOS, statusDOP);
 		ROS_WARN("-- POS: X:%f Y:%f Z:%f", solPosECEF.X(), solPosECEF.Y(), solPosECEF.Z());
 		ROS_WARN("-- ERR: X:%f Y:%f Z:%f", errPosECEF.X(), errPosECEF.Y(), errPosECEF.Z());
 		ROS_WARN("-- DOP: T:%f P:%f G:%f", solver.TDOP, solver.PDOP, solver.GDOP);
