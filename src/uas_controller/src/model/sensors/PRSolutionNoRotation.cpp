@@ -196,7 +196,6 @@ namespace gpstk
       int iret(0),k,n;
       size_t i, j;
       double rho,wt,svxyz[3];
-      GPSEllipsoid ellip;
 
       Valid = Mixed = false;
 
@@ -271,20 +270,11 @@ namespace gpstk
 
          // start with solution = apriori
          Vector<double> APSolution;
-         if(hasMemory) {
-            APSolution = Solution = memory.getAprioriSolution(mySyss);
-            LOG(DEBUG) << " apriori solution (" << Solution.size() << ") is [ "
-               << fixed << setprecision(3) << Solution << " ]";
-         }
-         else {
-            Solution = Vector<double>(dim,0.0);
-            LOG(DEBUG) << " no memory - no apriori solution";
-         }
-
+         Solution = Vector<double>(dim,0.0);
+      
          // -----------------------------------------------------------
          // iteration loop
          do {
-            TropFlag = false;       // true means the trop corr was NOT applied
 
             // current estimate of position solution
             RX.x = Triple(Solution(0),Solution(1),Solution(2));
@@ -299,14 +289,9 @@ namespace gpstk
                rho = 0.0;
 
                // correct for earth rotation
-               wt = ellip.angVelocity()*rho;             // radians
-               svxyz[0] =  ::cos(wt)*SVP(i,0) + ::sin(wt)*SVP(i,1);
-               svxyz[1] = -::sin(wt)*SVP(i,0) + ::cos(wt)*SVP(i,1);
+               svxyz[0] = SVP(i,0);
+               svxyz[1] = SVP(i,1);
                svxyz[2] = SVP(i,2);
-
-               std::cout << svxyz[0] << endl;
-               std::cout << svxyz[1] << endl;
-               std::cout << svxyz[2] << endl;
 
                // rho is now geometric range
                rho = RSS(svxyz[0]-Solution(0),
@@ -322,36 +307,11 @@ namespace gpstk
                // corrected pseudorange (m) minus geometric range
                CRange(n) = SVP(i,3) - rho;
 
-               // correct for troposphere and PCOs (but not on the first iteration)
-               if(n_iterate > 0)
-               {
-                  SV.x = Triple(svxyz[0],svxyz[1],svxyz[2]);
-                  Position R,S;
-                  R.setECEF(RX.x[0],RX.x[1],RX.x[2]);
-                  S.setECEF(SV.x[0],SV.x[1],SV.x[2]);
-
-                  // trop
-                  double tc(R.getHeight());  // tc is a dummy here
-                  // must test R for reasonableness to avoid corrupting TropModel
-                  if(R.elevation(S) < 0.0 || tc > 100000.0 || tc < -1000.0) {
-                     tc = 0.0;
-                     TropFlag = true;        // true means failed to apply trop corr
-                  }
-                  else
-                     tc = pTropModel->correction(R,S,T);    // pTropModel not const
-
-                  CRange(n) -= tc;
-                  LOG(DEBUG) << "Trop " << i << " " << Sats[i] << " "
-                     << fixed << setprecision(3) << tc;
-
-               }  // end if n_iterate > 0
-
                // get the index, for this clock, in the solution vector
                j = 3 + vectorindex(mySyss, Sats[i].system); // Solution ~ X,Y,Z,clks
 
                // find the clock for the sat's system
                const double clk(Solution(j));
-               LOG(DEBUG) << "Clock is (" << j << ") " << clk;
 
                // data vector: corrected range residual
                Resids(n) = CRange(n) - clk;
@@ -426,9 +386,6 @@ namespace gpstk
 
          } while(1);    // end iteration loop
          LOG(DEBUG) << "Out of iteration loop";
-
-         if(TropFlag) LOG(DEBUG) << "Trop correction not applied at time "
-                                 << printTime(T,timfmt);
 
          // compute slopes and find max member
          MaxSlope = 0.0;

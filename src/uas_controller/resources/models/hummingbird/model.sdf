@@ -216,36 +216,32 @@
 
         <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/gnss, 0 = off -->    
         <rate>8</rate>
-        
-        <!-- Minimum SV elevation from position to obtain fix -->        
-        <minelevation>15</minelevation>
-
-        <!-- Solver type (RAIM,) -->
-        <solver>RAIM</solver>
-
-        <!-- GPS support (freq: NON, CODE, CARRIER) -->
+      
+        <!-- GPS support (negative errors = from REAL data, 0 = no error) -->
         <gps>
-          <frequencies>
-            <civ>1</civ>
-            <mil>1</mil>
-          </frequencies>
-          <corrections>
-            <eph>0</eph>
-            <tro>0</tro>
-            <ion>0</ion>
+          <signal>L1</signal>   <!-- L1, L2, DUAL, DISABLED -->
+          <corrections>         <!--ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>      <!--Signal tracking error -->
+            <clk>0.0</clk>      <!--Satellite clock error -->
+            <rel>0.0</rel>      <!--Relativity error -->
+            <rot>0.0</rot>      <!--Earth rotation error -->
+            <eph>0.0</eph>      <!--Satellite ephemeris error -->
+            <tro>0.0</tro>      <!--Troposphere error error -->
+            <ion>0.0</ion>      <!--Ionosphere error -->
           </corrections>
         </gps> 
 
-        <!-- Glonass support (freq: NON, CODE, CARRIER) -->
+        <!-- Glonass support (negative errors = from REAL data, 0 = no error) -->
         <glonass>
-          <frequencies>
-            <civ>1</civ>
-            <mil>1</mil>
-          </frequencies>
-          <corrections>
-            <eph>0</eph>
-            <tro>0</tro>
-            <ion>0</ion>
+          <signal>DISABLED</signal> <!--L1O, L2O, DUAL, DISABLED -->
+          <corrections>         <!--ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>      <!--Signal tracking error -->
+            <clk>0.0</clk>      <!--Satellite clock error -->
+            <rel>0.0</rel>      <!--Relativity error -->
+            <rot>0.0</rot>      <!--Earth rotation error -->
+            <eph>0.0</eph>      <!--Satellite ephemeris error -->
+            <tro>0.0</tro>      <!--Troposphere error error -->
+            <ion>0.0</ion>      <!--Ionosphere error -->
           </corrections>
         </glonass> 
 

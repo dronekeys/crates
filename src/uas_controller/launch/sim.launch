@@ -19,7 +19,7 @@
   <arg if="$(arg debug)" name="script_type" value="debug"/>
 
   <!-- start gazebo server-->
-  <node name="gazebo" pkg="gazebo_ros" type="$(arg script_type)" respawn="false" output="screen" args="--seed $(arg seed) -u -r worlds/simulation.world">
+  <node name="gazebo" pkg="gazebo_ros" type="$(arg script_type)" respawn="false" output="screen" args=" -u -r worlds/simulation.world">
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="$(find uas_controller)/resources/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/share/gazebo-2.2:$(find uas_controller)/resources"/>

@@ -102,8 +102,6 @@ namespace uas_controller
     // update all of the simulated sensors, so that they can produce a meaningful measurement.
     void ReceiveEnvironment(EnvironmentPtr &msg)
     {
-      ROS_INFO("RECEIVED ENVIRONMENT");
-
       // Configure the wind shear
       shear.SetWind(
         msg->wind().speed(),      // Speed (meter per second at 6m)

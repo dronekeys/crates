@@ -7,22 +7,12 @@
 // For logging
 #include <ros/ros.h>
 
-// This does the GPS heavy lifting (pseudorange solver)
-#include "PRSolutionNoRotation.hpp"		// For solving 
-#include <gpstk/GNSSconstants.hpp>  // For the speed of light
-#include <gpstk/WGS84Ellipsoid.hpp> // GPS ellipsoid
-#include <gpstk/TropModel.hpp>      // Tropospheric model
-#include <gpstk/GPSEllipsoid.hpp>	// Ellipsoid model
+#define DEBUG TRUE
 
-using namespace std;
-using namespace gpstk;
-using namespace uas_controller;
-
-// Default constructor - basically gives a standard GPS L1 (code) L2 (carrier), and Glonass L1 (CODE)
-// L2 (code) receiver. Possible other options are "NONE", "CODE", "CARRIER" and "MILITARY"
-GNSS::GNSS() : uas_hal::Position("gnss"),
-	gps_L1(true), gps_L2(true), gps_eph(false), gps_tro(false), gps_ion(false),
-	glo_L1(true), glo_L2(true), glo_eph(false), glo_tro(false), glo_ion(false)
+// Default constructor
+GNSS::GNSS() : uas_hal::Position("gnss"), tropModel(&tropModelZero),
+	gps_typ("L1"), gps_sig(0.0), gps_clk(0.0), gps_rel(0.0), gps_rot(0.0), gps_eph(0.0), gps_tro(0.0), gps_ion(0.0),
+	glo_typ("DUAL"), glo_sig(0.0), glo_clk(0.0), glo_rel(0.0), glo_rot(0.0), glo_eph(0.0), glo_tro(0.0), glo_ion(0.0)
 {}
 
 // REQUIRED METHODS
@@ -34,25 +24,35 @@ void GNSS::Configure(sdf::ElementPtr root, gazebo::physics::ModelPtr model)
 	modPtr = model;
 
 	// GPS Parameters
-	gps_L1  = GetSDFBool(root,"gps.frequencies.civ",gps_L1);		// Use the GPS L1 frequency
-	gps_L2  = GetSDFBool(root,"gps.frequencies.mil",gps_L2);		// Use the GPS L2 frequency
-	gps_eph = GetSDFBool(root,"gps.correction.eph",gps_eph);		// Correct for eph error
-	gps_tro = GetSDFBool(root,"gps.correction.tro",gps_tro);		// Correct for tro error
-	gps_ion = GetSDFBool(root,"gps.correction.ion",gps_ion);		// Correct for ion error
+	gps_typ = GetSDFString(root,"gps.signal",gps_typ);
+	gps_sig = GetSDFDouble(root,"gps.corrections.sig",gps_sig);
+	gps_clk = GetSDFDouble(root,"gps.corrections.clk",gps_clk);
+	gps_rel = GetSDFDouble(root,"gps.corrections.rel",gps_rel);
+	gps_rot = GetSDFDouble(root,"gps.corrections.rot",gps_rot);
+	gps_eph = GetSDFDouble(root,"gps.corrections.eph",gps_eph);
+	gps_tro = GetSDFDouble(root,"gps.corrections.tro",gps_tro);
+	gps_ion = GetSDFDouble(root,"gps.corrections.ion",gps_ion);
 
 	// GLONASS Parameters
-	glo_L1  = GetSDFBool(root,"glonass.frequencies.civ",glo_L1);	// Use the GPS L1 frequency
-	glo_L2  = GetSDFBool(root,"glonass.frequencies.mil",glo_L2);	// Use the GPS L2 frequency
-	glo_eph = GetSDFBool(root,"glonass.correction.eph",gps_eph);	// Correct for eph error
-	glo_tro = GetSDFBool(root,"glonass.correction.tro",glo_tro);	// Correct for tro error
-	glo_ion = GetSDFBool(root,"glonass.correction.ion",glo_ion);	// Correct for ion error
+	glo_typ = GetSDFString(root,"glonass.signal",glo_typ);
+	glo_sig = GetSDFDouble(root,"glonass.corrections.sig",glo_sig);
+	glo_clk = GetSDFDouble(root,"glonass.corrections.clk",glo_clk);
+	glo_rel = GetSDFDouble(root,"glonass.corrections.rel",glo_rel);
+	glo_rot = GetSDFDouble(root,"glonass.corrections.rot",glo_rot);
+	glo_eph = GetSDFDouble(root,"glonass.corrections.eph",glo_eph);
+	glo_tro = GetSDFDouble(root,"glonass.corrections.tro",glo_tro);
+	glo_ion = GetSDFDouble(root,"glonass.corrections.ion",glo_ion);
+
+	// We will be using two GNSS systems in total
+	systems.push_back(SatID::systemGPS);
+	systems.push_back(SatID::systemGlonass);
+
+	// Issue a reset on load
+	Reset();
 }
 
 // All sensors must be resettable
-void GNSS::Reset()
-{
-
-}
+void GNSS::Reset() {}
 
 // EXTRA METHODS
 
@@ -62,32 +62,43 @@ void GNSS::Reset()
 // ionospherid delay, based on the satellite elevation and short experiment baseline.
 void GNSS::SetNavigationSolution(EnvironmentPtr env)
 {
-	// Create a timestamp from the epoch encoded in the environment message
-	CommonTime currentTime;
+	// BACKUP THE LAST POSITION AND TIME FOR VELOCITY CALCULATION /////////////////////
+
+	oldTime = currentTime;
+	oldSolution = gpstk::Position(
+		solver.Solution[0],
+		solver.Solution[1],
+		solver.Solution[2]
+	);
+
+	// DETERMINE THE CURRENT TIME ////////////////////////////////////////////////////
+
 	currentTime.set((long)env->epoch().days(),(double)env->epoch().secondsofdays(),(TimeSystem)TimeSystem::UTC);
 
-	// Determine the ECEF position of the receiver
-    gazebo::math::Vector3 msPositionGlobal = modPtr->GetWorld()->GetSphericalCoordinates()
+	// DETERMINE THE CURRENT POSITION ////////////////////////////////////////////////
+
+    msPositionGlobal = modPtr->GetWorld()->GetSphericalCoordinates()
     	->SphericalFromLocal(modPtr->GetLink("body")->GetWorldPose().pos);
       
     // Convert the position from geotetic spherical to geocentric cartesian
-    WGS84Ellipsoid wgs84;
-  	gpstk::Position msPosGeodetic    = gpstk::Position(
-  		msPositionGlobal.x, msPositionGlobal.y, msPositionGlobal.z, gpstk::Position::Geodetic, &wgs84);
-	gpstk::Position msPosGeocentric  = msPosGeodetic.transformTo(gpstk::Position::Geocentric);
-    gpstk::Position msPosECEF        = msPosGeocentric.asECEF();
+  	msPosGeodetic    = gpstk::Position(
+  		msPositionGlobal.x, 
+  		msPositionGlobal.y, 
+  		msPositionGlobal.z, 
+  		gpstk::Position::Geodetic, 
+  		&wgs84
+	);
+	msPosGeocentric  = msPosGeodetic.transformTo(gpstk::Position::Geocentric);
+    msPosECEF        = msPosGeocentric.asECEF();
 
-    // Obtain the satellites, pseudoranges and ephemerides
-	vector<SatID::SatelliteSystem>  systems;
-	vector<SatID> 					satellites;
-	Matrix<double>					covariance(0,0);	
-	Matrix<double>					ephemerides(env->gnss_size(),4,0.0);
+    // Clear the satellite list
+	satellites.clear();
+	
+	// Make the ephemerides container big enough to store all SV information
+	ephemerides.resize(env->gnss_size(),4,0.0);
 
-	// We will be using two GNSS systems in total
-	systems.push_back(SatID::systemGPS);
-	systems.push_back(SatID::systemGlonass);
-
-	ROS_INFO("Number of satellites in view is %d ",env->gnss_size());
+    // Count the useful satellites
+    int counter = 0;
 
     // Create a store f the
 	for (int i = 0; i < env->gnss_size(); i++)
@@ -97,6 +108,31 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 		{
 			// Satellite ID and system
 			SatID sid(env->gnss(i).prn(),(SatID::SatelliteSystem)env->gnss(i).system());
+
+			// Param mapping		
+			bool rot, eph, tro, rel, ion, clk, sig;
+			std::string F1, F2, typ;
+			switch (env->gnss(i).system())
+			{
+			case ((int)SatID::systemGPS) :
+				rot = gps_rot; eph = gps_eph; tro = gps_tro;
+				rel = gps_rel; ion = gps_ion; clk = gps_clk;
+				sig = gps_sig; typ = gps_typ;
+				F1  = "L1"; F2  = "L2";
+				break;
+
+			case ((int)SatID::systemGlonass) :
+				rot = glo_rot; eph = glo_eph; tro = glo_tro;
+				rel = glo_rel; ion = glo_ion; clk = glo_clk;
+				sig = glo_sig; typ = glo_typ;
+				F1  = "L1O"; F2  = "L2O"; 
+				break;
+			}
+
+			// DONT ADD A RECORD IF THE SYSTEM IS DISABLED ////////////////////
+
+			if (typ.compare("DISABLED")==0)
+				continue;
 
 			// POSITION AND ERROR ESTIMATION /////////////////////////////////
 
@@ -108,66 +144,104 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 				gpstk::Position::Cartesian
 			);
 
-			// Get the boradcast position
-			gpstk::Position erPosECEF = gpstk::Position(
-				env->gnss(i).pos().x() + env->gnss(i).err().x(),
-				env->gnss(i).pos().y() + env->gnss(i).err().y(),
-				env->gnss(i).pos().z() + env->gnss(i).err().z()
-			);
-
-			// GET THE RANGE AND ERROR ESTIMATION ////////////////////////////////
-
 			// Get the true range
-			double trurange = range(msPosECEF, svPosECEF);
-			double errEphem = range(msPosECEF, erPosECEF) - trurange;
+			double trurange = range(msPosECEF,svPosECEF);
 
-			// Now calculate the new pseudorange
+			// Initialise the pseudorange
 			double pseudorange = trurange;
 
-			// PSEUDORANGE PERTURBATION BASED ON SYSTEM AND FREQUENCY ///////////
+			// DEAL WITH ROTATIONAL ERROR ////////////////////////////////////////
 
-			// Based on the frequency, decide how much ionospheric error
-			switch (env->gnss(i).system())
+			if (rot < 0)
 			{
-			case SatID::systemGPS:
-				if (!gps_ion)
-				{
-					if (gps_L1 && !gps_L2)
-						pseudorange += env->gnss(i).delay_iono_f1();
-					if (!gps_L1 && gps_L2)
-						pseudorange += env->gnss(i).delay_iono_f2();
-				}
-				if (!gps_tro) pseudorange += env->gnss(i).delay_trop();
-				if (!gps_eph) pseudorange += errEphem;
-				break;
-				
-			case SatID::systemGlonass:
-				if (!glo_ion)
-				{
-					if (glo_L1 && !glo_L2)
-						pseudorange += env->gnss(i).delay_iono_f1();
-					if (!glo_L1 && glo_L2)
-						pseudorange += env->gnss(i).delay_iono_f2();
-				}
-				if (!glo_tro) pseudorange += env->gnss(i).delay_trop();
-				if (!glo_eph) pseudorange += errEphem;
-				break;
-			}
-			
-			// Summary
-			ROS_INFO("-- Satellite %d (range %f) with eph err %f, clock err %f, and rel err %f", i, trurange, errEphem,
-				C_MPS*env->gnss(i).clkbias(), C_MPS*env->gnss(i).relcorr());
+               // True time of flight
+               double rho = trurange / C_MPS;
 
-			// DATA PREPARATION ////////////////////////////////////////////////
+               // cAngle change in radians
+               double wt = ellip.angVelocity()*rho;
+               
+               // Update the satellite position to reflect error
+               svPosECEF = gpstk::Position( 
+                	::cos(wt)*svPosECEF[0] + ::sin(wt)*svPosECEF[1],
+               	   -::sin(wt)*svPosECEF[0] + ::cos(wt)*svPosECEF[1],
+               		svPosECEF[2]);
+			}
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,rot);
+
+			// DEAL WITH EPHEMERIS ERROR /////////////////////////////////////////
+
+			if (eph < 0)
+			{
+				// Get the broadcast position
+				svPosECEF += gpstk::Position(
+					env->gnss(i).err().x(),
+					env->gnss(i).err().y(),
+					env->gnss(i).err().z()
+				);
+			}
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,eph);
+
+
+			// TROPOSPHERIC DELAY ///////////////////////////////////////////////
+
+			if (tro < 0)
+				pseudorange += env->gnss(i).delay_trop();
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,tro);
+
+			// IONOSPHERIC DELAY ////////////////////////////////////////////////
+						
+			if (ion < 0)
+			{
+				if (typ.compare(F1)==0)
+					pseudorange += env->gnss(i).delay_iono_f1();
+				if (typ.compare(F2)==0)
+					pseudorange += env->gnss(i).delay_iono_f2();
+			}
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,ion);
+
+			// RELATIVITY DELAY /////////////////////////////////////////////////
+
+			if (rel < 0)
+				pseudorange += env->gnss(i).relcorr() * C_MPS;
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,rel);
+
+			// CLOCK DELAY //////////////////////////////////////////////////////
+
+			if (clk < 0)
+				pseudorange += env->gnss(i).clkbias() * C_MPS;
+			else
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,clk);
+
+			// CLOCK DELAY //////////////////////////////////////////////////////
+
+			if (sig > 0)
+				pseudorange += gazebo::math::Rand::GetDblNormal(0,sig);
+
+			// SUMMARY //////////////////////////////////////////////////////////
+
+			if (DEBUG)
+			{
+				ROS_INFO("-- Satellite %d : true range %f with pseudorange error %f",
+					i, trurange, pseudorange - trurange);
+			}
+
+			// DATA PREPARATION //////////////////////////////////////////////////
          	
 			// Add satellite
 			satellites.push_back(sid);
 
          	// Add ephemeride
-         	ephemerides(i,0) = env->gnss(i).pos().x();
-         	ephemerides(i,1) = env->gnss(i).pos().y();
-         	ephemerides(i,2) = env->gnss(i).pos().z();
-         	ephemerides(i,3) = pseudorange;
+         	ephemerides(counter,0) = svPosECEF[0];	// Erronous satellite X
+         	ephemerides(counter,1) = svPosECEF[1];
+         	ephemerides(counter,2) = svPosECEF[2];
+         	ephemerides(counter,3) = pseudorange;	// Erroneous pseudorange
+         	counter++;
+
 		}
 		catch (Exception &e)
 		{
@@ -175,54 +249,67 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 		}
 	}
 
-	ROS_INFO("Obtaining position solution");
 
+	if (DEBUG)
+	{
+		ROS_INFO("Number of satellites in view is %d ",counter);
+	}
+
+	// Resize the matrix
+	SVD.resize(counter,4,0.0);
+	for (int i = 0; i < counter; i++)
+		for (int j = 0; j < 4; j++)
+			SVD(i,j) = ephemerides(i,j);
+
+	// Get a solution!
   	try
   	{
-		// Create a new RAIM solver
-		PRSolutionNoRotation solver;
 
 		// We want a once-off solution (segfaults if on)
 		solver.hasMemory = false;
 		solver.RMSLimit  = 3e6;
 
 		// These wills tore the resifuals and slopes after convergence
-	  	Vector<double> 	resids(env->gnss_size());
-	  	Vector<double> 	slopes(env->gnss_size());
+	  	resids.resize(counter);
+	  	slopes.resize(counter);
 	 
-	    // Tropospheric correction model (NULL)
-        ZeroTropModel   tropModelZero;
-        TropModel*      tropModel = &tropModelZero;
-
-	  	// Perform solving
-		int statusPOS =  solver.SimplePRSolution(
+	  	// Position solution
+		statusFix =  solver.SimplePRSolution(
 			currentTime,
 			satellites,
-			ephemerides,
+			SVD,
 			covariance,
 			tropModel,
-			100,
+			6,
 			3.e-7,
 			systems,
 			resids,
 			slopes);
-		int statusDOP = solver.DOPCompute();
+		
+		// Dilution of precision
+		statusDOP = solver.DOPCompute();
 
-		// Get the position
-		gpstk::Position solPosECEF = gpstk::Position(
-			solver.Solution[0],
-			solver.Solution[1],
-			solver.Solution[2]
-		);
-
-		// Get the error
-		gpstk::Position errPosECEF = solPosECEF - msPosECEF;
 
 		// Finished!
-		ROS_WARN("Solver finished in %d iterations with SOL status %d and DOP status %d", solver.NIterations, statusPOS, statusDOP);
-		ROS_WARN("-- POS: X:%f Y:%f Z:%f", solPosECEF.X(), solPosECEF.Y(), solPosECEF.Z());
-		ROS_WARN("-- ERR: X:%f Y:%f Z:%f", errPosECEF.X(), errPosECEF.Y(), errPosECEF.Z());
-		ROS_WARN("-- DOP: T:%f P:%f G:%f", solver.TDOP, solver.PDOP, solver.GDOP);
+		if (DEBUG)
+		{
+
+			// Get the position
+			gpstk::Position solPosECEF = gpstk::Position(
+				solver.Solution[0],
+				solver.Solution[1],
+				solver.Solution[2]
+			);
+
+			// Get the error
+			gpstk::Position errPosECEF = solPosECEF - msPosECEF;
+
+			// DEBUG!
+			ROS_INFO("Solver finished in %d iterations with SOL status %d and DOP status %d", solver.NIterations, statusFix, statusDOP);
+			ROS_INFO("-- POS: X:%f Y:%f Z:%f", solPosECEF.X(), solPosECEF.Y(), solPosECEF.Z());
+			ROS_INFO("-- ERR: X:%f Y:%f Z:%f", errPosECEF.X(), errPosECEF.Y(), errPosECEF.Z());
+			ROS_INFO("-- DOP: T:%f P:%f G:%f", solver.TDOP, solver.PDOP, solver.GDOP);
+		}
 	}
 	catch (Exception &e)
 	{
@@ -230,15 +317,48 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 	}
 }
 
-
-// Set the pressure and height at ground level
-gazebo::math::Vector3 GNSS::GetPosition()
+bool GNSS::GetStatusFix()
 {
-	return modPtr->GetLink("body")->GetWorldPose().pos;
+	return statusFix;
 }
 
-// Set the pressure and height at ground level
+bool GNSS::GetStatusDOP()
+{
+	return statusDOP;
+}
+
+// Number of satellites
+int GNSS::GetNumSats()
+{
+	return solver.Nsvs;
+}
+
+// Position
+gazebo::math::Vector3 GNSS::GetPosition()
+{
+	return gazebo::math::Vector3(
+		solver.Solution[0],
+		solver.Solution[1],
+		solver.Solution[2]
+	);
+}
+
+// Velocity
 gazebo::math::Vector3 GNSS::GetVelocity()
 {
-	return modPtr->GetLink("body")->GetWorldLinearVel();
+	return gazebo::math::Vector3(
+		solver.Solution[0] - oldSolution[0],
+		solver.Solution[1] - oldSolution[1],
+		solver.Solution[2] - oldSolution[2]
+	) / (currentTime - oldTime);
+}
+
+// Dilution of precision
+gazebo::math::Vector3 GNSS::GetDOP()
+{
+	return gazebo::math::Vector3(
+		solver.TDOP,
+		solver.PDOP,
+		solver.GDOP
+	);
 }

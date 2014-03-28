@@ -138,10 +138,15 @@ namespace uas_controller
     // Service that helps publish data
     gazebo::transport::PublisherPtr pubPtr;
 
+    // ROS timer to call world updates
+    ros::Timer                      updateTimer;
+
+    // Handle to the ROS node
+    ros::NodeHandle                 rosNode;
 
   public:
     
-    Simulation() : WorldPlugin() {}
+    Simulation() : WorldPlugin(), rosNode(ros::NodeHandle("simulator")) {}
 
     // Called on plugin loaded
     void Load(gazebo::physics::WorldPtr _world, sdf::ElementPtr root)
@@ -365,10 +370,18 @@ namespace uas_controller
       // Create a publisher on the ~/wind topic
       this->pubPtr = this->nodePtr->Advertise<msgs::Environment>("~/environment");
 
+      /*
       // Set up callback for updating the model
       this->conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
         boost::bind(&Simulation::Update, this, _1));
+      */
+      // Set the control timer (always happens at 50Hz, and respects simulated time)
+      updateTimer = rosNode.createTimer(
+        ros::Duration(0.10),    // Duration
+        &Simulation::Update,    // Callback
+      this);                    // Handle
 
+      // Info
       ROS_INFO("Advertised to environment");
 
     }
@@ -381,8 +394,12 @@ namespace uas_controller
     }
 
     // Broadcast the wind parameters
-    void Update(const gazebo::common::UpdateInfo& _info)
+    //void Update(const gazebo::common::UpdateInfo& _info)
+    void Update(const ros::TimerEvent& event)
     {
+      // Get the simulated time
+      gazebo::common::Time simTime = worldPtr->GetSimTime();
+
       // Message containing information
       msgs::Environment msg;
 
@@ -390,19 +407,19 @@ namespace uas_controller
 
       // Get the current time tick, which is the start of the experimetn plus simulated time
       CommonTime currentTimeUTC(startTime.convertToCommonTime());
-      currentTimeUTC.addSeconds(_info.simTime.Double());
+      currentTimeUTC.addSeconds(simTime.Double());
       currentTimeUTC.setTimeSystem(TimeSystem::UTC);
 
       // GPS time is slightly different to UTC, so account for this when searching ephemerides
       CommonTime currentTimeGPS(startTime.convertToCommonTime());
-      currentTimeGPS.addSeconds(_info.simTime.Double() +
+      currentTimeGPS.addSeconds(simTime.Double() +
         TimeSystem::Correction(TimeSystem::UTC,TimeSystem::GPS,startTime.year,startTime.month,startTime.day)
       );
       currentTimeGPS.setTimeSystem(TimeSystem::GPS);
 
       // As far as I can tell, glonass time is the same as UTC
       CommonTime currentTimeGLO(startTime.convertToCommonTime());
-      currentTimeGLO.addSeconds(_info.simTime.Double());
+      currentTimeGLO.addSeconds(simTime.Double());
       currentTimeGLO.setTimeSystem(TimeSystem::GLO);
 
       // Extract two numbers that completely describe the UTC time
@@ -515,14 +532,8 @@ namespace uas_controller
             {          
               // Save to the message
               msgs::Ephemeris* gps = msg.add_gnss();
-              gps->set_system(SatID::systemGlonass);
+              gps->set_system(SatID::systemGPS);
               gps->set_prn(prn);
-              gps->set_elevation(elv);
-
-              // Write the clock bias and relativity correction
-              gps->set_clkbias(eph.getClockBias());
-              gps->set_clkdrift(eph.getClockDrift());
-              gps->set_relcorr(eph.getRelativityCorr());
 
               // Write the position
               gps->mutable_pos()->set_x(satellitePos[0]);
@@ -532,14 +543,20 @@ namespace uas_controller
               // Try and get the broadcast ephemeride
               try
               {
-                // Work out the ephemeris error
-                Triple err = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS).getPos() 
-                           - satellitePos;
+                // Get the broadcast ephemeris
+                Xvt ephb = gps_ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS);
+
+                // Elevation of the current satellite with respect to HOME position
+                Triple err = ephb.getPos() - satellitePos;
 
                 // Set the ephemeris error
                 gps->mutable_err()->set_x(err[0]);
                 gps->mutable_err()->set_y(err[1]);
                 gps->mutable_err()->set_z(err[2]);
+
+                // Write the clock bias and relativity correction
+                gps->set_clkbias(ephb.getClockBias()-eph.getClockBias());
+                gps->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
 
               }
               catch(InvalidRequest& e)
@@ -582,11 +599,11 @@ namespace uas_controller
               // Print infor about satellite
               if (DEBUG)
               {
-                ROS_INFO("GPS satellite %d with elevation %f considered in view", gps->prn(), gps->elevation());
+                ROS_INFO("GPS satellite %d with elevation %f considered in view", gps->prn(), elv);
                 ROS_INFO(" -- POS TRU: %f %f %f",  gps->pos().x(), gps->pos().y(), gps->pos().z());
                 ROS_INFO(" -- POS ERR: %f %f %f", gps->err().x(), gps->err().y(), gps->err().z());
                 ROS_INFO(" -- ATM DEL: F1: %f | F2: %f | TROP: %f", gps->delay_iono_f1(), gps->delay_iono_f2(), gps->delay_trop());
-                ROS_INFO(" -- TIM ADJ: BIAS: %f | DRIFT: %f | RELCORR: %f", gps->clkbias(), gps->clkdrift(), gps->relcorr());
+                ROS_INFO(" -- TIM ADJ: BIAS: %f | RELCORR: %f", gps->clkbias(), gps->relcorr());
               }
             }
           }
@@ -623,12 +640,6 @@ namespace uas_controller
               msgs::Ephemeris* glonass = msg.add_gnss();
               glonass->set_system(SatID::systemGlonass);
               glonass->set_prn(prn);
-              glonass->set_elevation(elv);
-
-              // Write the clock bias and relativity correction
-              glonass->set_clkbias(eph.getClockBias());
-              glonass->set_clkdrift(eph.getClockDrift());
-              glonass->set_relcorr(eph.getRelativityCorr());
 
               // Write the position
               glonass->mutable_pos()->set_x(satellitePos[0]);
@@ -641,18 +652,23 @@ namespace uas_controller
               // Try and get the broadcast ephemeride
               try
               {
-                // Work out the ephemeris error (note that Rinex are in UTC)
-                Triple err = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGLO).getPos()
-                           - satellitePos;
+                // Get the broadcast ephemeris
+                Xvt ephb = glo_ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGLO);
+
+               // Elevation of the current satellite with respect to HOME position
+                Triple err = ephb.getPos() - satellitePos;
 
                 // Set the ephemeris error
                 glonass->mutable_err()->set_x(err[0]);
                 glonass->mutable_err()->set_y(err[1]);
                 glonass->mutable_err()->set_z(err[2]);
 
+                // Write the clock bias and relativity correction
+                glonass->set_clkbias(ephb.getClockBias()-eph.getClockBias());
+                glonass->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
+
                 // Set the frequency
                 f = (double) glo_ephemerides.findEphemeris(SatID(prn,SatID::systemGlonass),currentTimeGLO).getfreqNum();
-
               }
               catch(InvalidRequest& e)
               { 
@@ -696,11 +712,11 @@ namespace uas_controller
               // Print infor about satellite
               if (DEBUG)
               {
-                ROS_INFO("GLONASS satellite %d with elevation %f considered in view", glonass->prn(), glonass->elevation());
+                ROS_INFO("GLONASS satellite %d with elevation %f considered in view", glonass->prn(), elv);
                 ROS_INFO(" -- POS TRU: %f %f %f",  glonass->pos().x(), glonass->pos().y(), glonass->pos().z());
                 ROS_INFO(" -- POS ERR: %f %f %f", glonass->err().x(), glonass->err().y(), glonass->err().z());
                 ROS_INFO(" -- ATM DEL: F1: %f | F2: %f | TROP: %f", glonass->delay_iono_f1(), glonass->delay_iono_f2(), glonass->delay_trop());
-                ROS_INFO(" -- TIM ADJ: BIAS: %f | DRIFT: %f | RELCORR: %f", glonass->clkbias(), glonass->clkdrift(), glonass->relcorr());
+                ROS_INFO(" -- TIM ADJ: BIAS: %f | RELCORR: %f", glonass->clkbias(),  glonass->relcorr());
               }
             }
           }
