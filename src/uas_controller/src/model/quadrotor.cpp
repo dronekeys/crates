@@ -131,8 +131,8 @@ namespace uas_controller
         msg->magnetic().z()         // Mag field strength Z
       );
       
-      // Gte a navigation solution from the message
-      gnss.SetNavigationSolution(msg);
+      // Get a navigation solution from the message
+      //gnss.SetNavigationSolution(msg);
     }
 
     // This is the grand simulation abritrator. In a nutshell, it is called on every physics time

@@ -6,7 +6,7 @@
 <launch>
 
   <!-- these are the arguments you can pass this launch file, for example debug:=true gui:=true -->
-  <arg name="debug" default="false"/>
+  <arg name="debug" default="true"/>
   <arg name="gui" default="true"/>
   <arg name="seed" default="0"/>
  

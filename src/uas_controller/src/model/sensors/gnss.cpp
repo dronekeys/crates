@@ -77,19 +77,26 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 
 	// DETERMINE THE CURRENT POSITION ////////////////////////////////////////////////
 
-    msPositionGlobal = modPtr->GetWorld()->GetSphericalCoordinates()
-    	->SphericalFromLocal(modPtr->GetLink("body")->GetWorldPose().pos);
-      
-    // Convert the position from geotetic spherical to geocentric cartesian
-  	msPosGeodetic    = gpstk::Position(
-  		msPositionGlobal.x, 
-  		msPositionGlobal.y, 
-  		msPositionGlobal.z, 
-  		gpstk::Position::Geodetic, 
-  		&wgs84
-	);
-	msPosGeocentric  = msPosGeodetic.transformTo(gpstk::Position::Geocentric);
-    msPosECEF        = msPosGeocentric.asECEF();
+	try
+	{
+	    msPositionGlobal = modPtr->GetWorld()->GetSphericalCoordinates()
+	    	->SphericalFromLocal(modPtr->GetLink("body")->GetWorldPose().pos);
+	      
+	    // Convert the position from geotetic spherical to geocentric cartesian
+	  	msPosGeodetic    = gpstk::Position(
+	  		msPositionGlobal.x, 
+	  		msPositionGlobal.y, 
+	  		msPositionGlobal.z, 
+	  		gpstk::Position::Geodetic, 
+	  		&wgs84
+		);
+		msPosGeocentric  = msPosGeodetic.transformTo(gpstk::Position::Geocentric);
+	    msPosECEF        = msPosGeocentric.asECEF();
+	}
+	catch (Exception &e)
+	{
+		ROS_WARN("Geometry exception : %s", e.what().c_str());
+	}
 
     // Clear the satellite list
 	satellites.clear();
@@ -137,11 +144,10 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 			// POSITION AND ERROR ESTIMATION /////////////////////////////////
 
 			// Get the true position
-			gpstk::Position svPosECEF = gpstk::Position(
+			gpstk::Position svPosECEF(
 				env->gnss(i).pos().x(),
 				env->gnss(i).pos().y(),
-				env->gnss(i).pos().z(), 
-				gpstk::Position::Cartesian
+				env->gnss(i).pos().z()
 			);
 
 			// Get the true range
