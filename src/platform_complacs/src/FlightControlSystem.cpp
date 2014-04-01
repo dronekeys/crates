@@ -14,12 +14,8 @@
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 
-// Project libraries
-#include <uas_hal/platform/UAV.h>
-#include <uas_hal/peripheral/Position.h>
-#include <uas_hal/peripheral/Magnetic.h>
-#include <uas_hal/peripheral/Inertial.h>
-#include <uas_hal/peripheral/Altitude.h>
+// Hardware abstraction layer for a UAV
+#include <uas_hal/UAV/UAV.h>
 
 // Required serial engine
 #include "serial/AsyncSerial.h"
@@ -312,17 +308,19 @@ void cb_config(void)
 namespace platform_complacs
 {
     // Class derives from Nodelet and all HALs
-    class FlightControlSystem : public nodelet::Nodelet, 
-        public uas_hal::UAV,                
-        public uas_hal::Altitude,
-        public uas_hal::Magnetic,
-        public uas_hal::Inertial,
-        public uas_hal::Position
+    class FlightControlSystem : public nodelet::Nodelet, public uas_hal::UAV      
     {
 
     private:
 
-        // Callback timers
+        // Messages
+        uas_hal::MsgInertial msgInertial;
+        uas_hal::MsgPosition msgPosition;
+        uas_hal::MsgMagnetic msgMagnetic;
+        uas_hal::MsgAltitude msgAltitude;
+        uas_hal::MsgAttitude msgAttitude;
+
+        // Callback timers for probing data
         ros::Timer timerHeartbeat;
         ros::Timer timerEstimate;
         ros::Timer timerInertial;
@@ -339,6 +337,9 @@ namespace platform_complacs
             {
                 // Copy the data from the ACI to raw packet 
                 aciSynchronizeVars();
+
+                // Send up to the HAL
+                Peripheral<uas_hal::MsgAttitude>::Set(msgAttitude);
             }
         }
 
@@ -350,6 +351,9 @@ namespace platform_complacs
             {
                 // Copy the data from the ACI to raw packet 
                 aciSynchronizeVars();
+
+                // Send up to the HAL
+                Peripheral<uas_hal::MsgInertial>::Set(msgInertial);
             }
         }
 
@@ -361,6 +365,9 @@ namespace platform_complacs
             {
                 // Copy the data from the ACI to raw packet 
                 aciSynchronizeVars();
+
+                // Send up to the HAL
+                Peripheral<uas_hal::MsgPosition>::Set(msgPosition);
             }
         }
 
@@ -372,6 +379,9 @@ namespace platform_complacs
             {
                 // Copy the data from the ACI to raw packet 
                 aciSynchronizeVars();
+
+                // Send up to the HAL
+                Peripheral<uas_hal::MsgMagnetic>::Set(msgMagnetic);
             }
         }
 
@@ -383,6 +393,9 @@ namespace platform_complacs
             {
                 // Copy the data from the ACI to raw packet 
                 aciSynchronizeVars();
+
+                // Send up to the HAL
+                Peripheral<uas_hal::MsgAltitude>::Set(msgAltitude);
             }
         }
 
@@ -398,24 +411,15 @@ namespace platform_complacs
         }
 
         // Derived classes of HAL must implement a control reception mechanism
-        void ReceiveControl(
-            const double &pitch,
-            const double &roll,
-            const double &throttle,
-            const double &yaw)
+        void AcceptControl(const uas_hal::MsgControl &msg)
         {
-
+            // Do something with the control
         }
 
     public:
 
         // Constructor
-        FlightControlSystem() : 
-            Altitude("altimeter"),
-            Inertial("imu"),
-            Magnetic("compass"),
-            Position("gps"),
-            UAV("uav")    {}
+        FlightControlSystem() : UAV("uav",this->getPrivateNodeHandle()) {}
 
         // Called when nodelet is initialised
         void onInit()

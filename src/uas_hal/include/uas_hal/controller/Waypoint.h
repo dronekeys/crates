@@ -4,6 +4,9 @@
 // Basic HAL : provides Controller class
 #include <uas_hal/controller/Controller.h>
 
+// Messages used and produced by this controller
+#include <uas_hal/WaypointAction.h>
+
 namespace uas_hal
 {
     class Waypoint : public Controller

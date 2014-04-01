@@ -68,7 +68,6 @@ namespace uas_hal
             return val;
         }
 
-
     public:
 
         // Pass the state and discrete time step and receive a control back

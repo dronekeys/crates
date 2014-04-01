@@ -2,7 +2,7 @@
 #define UAS_HAL_CONTROLLER_ANGLESHEIGHT_H
 
 // Basic HAL : provides Controller class
-#include <uas_hal/controller/Controller.h>
+#include <uas_hal/controller/ControllerType.h>
 
 namespace uas_hal
 {

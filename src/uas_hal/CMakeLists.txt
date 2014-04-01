@@ -62,10 +62,11 @@ add_message_files(
   FILES  
     MsgAltitude.msg
     MsgInertial.msg
-    MsgInformation.msg
     MsgMagnetic.msg
-    MsgOrientation.msg
+    MsgAttitude.msg
     MsgPosition.msg
+    MsgInformation.msg
+    MsgControl.msg
     MsgState.msg
 )
 
@@ -81,13 +82,15 @@ add_action_files(
   DIRECTORY 
     action
   FILES 
+    Idle.action
+    Takeoff.action
+    Hover.action
+    Land.action
+    Emergency.action
     AnglesHeight.action
     Velocity.action
     VelocityHeight.action
     Waypoint.action
-    Takeoff.action
-    Land.action
-    Emergency.action
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -127,21 +130,20 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GeographicLib_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(hal
-  src/peripheral/Altitude.cpp
-  src/peripheral/Inertial.cpp
-  src/peripheral/Magnetic.cpp
-  src/peripheral/Orientation.cpp
-  src/peripheral/Position.cpp
+add_library(uav
+#  src/controller/Idle.cpp
+#  src/controller/Takeoff.cpp
+#  src/controller/Hover.cpp
+#  src/controller/Land.cpp
+#  src/controller/Emergency.cpp
   src/controller/AnglesHeight.cpp
-  src/controller/Velocity.cpp
-  src/controller/VelocityHeight.cpp
-  src/controller/Waypoint.cpp
-  #src/controller/Emergency.cpp
-  #src/controller/Land.cpp
-  #src/controller/Takeoff.cpp
-  src/platform/UAV.cpp
-  src/HAL.cpp
+#  src/controller/Velocity.cpp
+#  src/controller/VelocityHeight.cpp
+#  src/controller/Waypoint.cpp
+  src/Controller.cpp
+  src/Navigation.cpp
+  src/Peripheral.cpp
+  src/UAV.cpp
 )
 ## Declare a cpp executable
 # add_executable(uav_driver 
@@ -150,10 +152,10 @@ add_library(hal
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal uas_hal_generate_messages_cpp)
+add_dependencies(uav uas_hal_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal
+target_link_libraries(uav
 	${catkin_LIBRARIES} 
 	${Boost_LIBRARIES}
   ${GeographicLib_LIBRARIES}

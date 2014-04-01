@@ -1,9 +1,9 @@
-time    tick      # Time
+float64 epoch     # Time
 float64 x		  # Navigation-frame Position X (m)
 float64 y		  # Navigation-frame Position Y (m)
 float64 z		  # Navigation-frame Position Z (m)
-float64 pitch	  # Roll (rad)
-float64 roll	  # Pitch (rad)
+float64 roll	  # Roll (rad)
+float64 pitch	  # Pitch (rad)
 float64 yaw		  # Bearing (rad)
 float64 u		  # Navigation-frame Position X (m/s)
 float64 v		  # Navigation-frame Position Y (m/s)
@@ -12,4 +12,4 @@ float64 p		  # Pitch (rad/s)
 float64 q		  # Roll (rad/s)
 float64 r		  # Yaw (rad/s)
 float64 thrust	  # Thrust force
-float64 energy	  # Energy remaining (proportion)
+float64 voltage	  # Energy remaining (proportion)
