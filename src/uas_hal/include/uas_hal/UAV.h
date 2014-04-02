@@ -1,10 +1,13 @@
 #ifndef UAS_HAL_UAV_H
 #define UAS_HAL_UAV_H
 
+// Basic ROS stuff
+#include <ros/ros.h>
+
 // This package's messages
-#include <uas_hal/UAV/Peripheral.h>
-#include <uas_hal/UAV/Controller.h>
-#include <uas_hal/UAV/Navigation.h>
+#include <uas_hal/Peripheral.h>
+#include <uas_hal/Navigation.h>
+#include <uas_hal/Control.h>
 
 // Messages broadcast by this class
 #include <uas_hal/MsgInformation.h>
@@ -21,7 +24,15 @@ namespace uas_hal
         public Peripheral<MsgPosition>,
         public Peripheral<MsgAttitude>,
 
-        public Controller<AnglesHeight>
+        public Control<Idle>,
+        public Control<Takeoff>,
+        public Control<Hover>,
+        public Control<Land>,
+        public Control<Emergency>,
+        public Control<AnglesHeight>,
+        public Control<Velocity>,
+        public Control<Waypoint>,
+        public Control<VelocityHeight>
     {       
 
     private:

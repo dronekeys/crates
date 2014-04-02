@@ -10,13 +10,22 @@ UAV::UAV(const char *name, ros::NodeHandle& node) :
     tick(0.0),
 
     // Initialise the peripherals
-    Peripheral<MsgAltitude>(node,"Altitude"),
-    Peripheral<MsgInertial>(node,"Inertial"),
-    Peripheral<MsgMagnetic>(node,"Magnetic"),
-    Peripheral<MsgPosition>(node,"Position"),
-    Peripheral<MsgAttitude>(node,"Attitude")
+    Peripheral<MsgAltitude> (node,"Altitude"),
+    Peripheral<MsgInertial> (node,"Inertial"),
+    Peripheral<MsgMagnetic> (node,"Magnetic"),
+    Peripheral<MsgPosition> (node,"Position"),
+    Peripheral<MsgAttitude> (node,"Attitude"),
 
     // Initialise the controllers
+    Control<Idle>           (node,"Idle"),
+    Control<Takeoff>        (node,"Takeoff"),
+    Control<Hover>          (node,"Hover"),
+    Control<Land>           (node,"Land"),
+    Control<Emergency>      (node,"Emergency"),
+    Control<AnglesHeight>   (node,"AnglesHeight"),
+    Control<Velocity>       (node,"Velocity"),
+    Control<VelocityHeight> (node,"VelocityHeight"),
+    Control<Waypoint>       (node,"Waypoint")
 
 {
     // Maske sure that ROS actually started, or there will be some issues...
@@ -52,11 +61,11 @@ void UAV::BroadcastState(const ros::TimerEvent& event)
 // Propagate the system forward in time
 void UAV::Update(const ros::TimerEvent& event)
 {
-    // Get the current UAV state
+    // Get the current state from the navigation engine
     msgS = nav.GetState();
 
     // Determine the control to apply, given the current state and time tick
-    //msgI = Controller::Update(msgS, event.current_real.toSec() - tick);
+    msgC = Control::Update(msgS, event.current_real.toSec() - tick);
 
     // Forward the control to the FCS or Simulation
     AcceptControl(msgC);

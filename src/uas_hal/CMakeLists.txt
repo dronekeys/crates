@@ -140,7 +140,7 @@ add_library(uav
 #  src/controller/Velocity.cpp
 #  src/controller/VelocityHeight.cpp
 #  src/controller/Waypoint.cpp
-  src/Controller.cpp
+  src/Control.cpp
   src/Navigation.cpp
   src/Peripheral.cpp
   src/UAV.cpp

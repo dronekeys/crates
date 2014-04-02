@@ -15,7 +15,7 @@
 #include <pluginlib/class_list_macros.h>
 
 // Hardware abstraction layer for a UAV
-#include <uas_hal/UAV/UAV.h>
+#include <uas_hal/UAV.h>
 
 // Required serial engine
 #include "serial/AsyncSerial.h"

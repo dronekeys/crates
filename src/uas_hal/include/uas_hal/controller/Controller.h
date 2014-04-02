@@ -5,35 +5,9 @@
 
 namespace uas_hal
 {
-    // UAV state structure
-    struct State
-    {
-        double x;
-        double y;
-        double z;
-        double roll;
-        double pitch;
-        double yaw;
-        double u;
-        double v;
-        double w;
-        double p;
-        double q;
-        double r;
-        double thrust;
-        double energy;
-    };
-
-    // UAV control structure
-    struct Control
-    {
-        double roll;
-        double pitch;
-        double throttle;
-        double yaw;
-    };
-
-    /* A pure virtual class that provides basic controler */
+    template<class G>
+    template<class A>
+    template<class R>
     class Controller
     {
 
@@ -75,6 +49,10 @@ namespace uas_hal
 
         // Reset the controller
         virtual void Reset() = 0;
+
+        virtual void Preempt() = 0;
+
+        virtual void SetGoal(const &G) = 0;
 
     };
 }
