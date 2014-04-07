@@ -94,6 +94,9 @@ namespace hal_quadrotor
         // Pass state measurement to navigation subsystem
         void Receive(const State &msg);
 
+        // Receive a rate configuration updates
+        bool ConfigRate(const std::string& string, const double& rate);
+
         // This must be overriden by the child class in order to accept control 
         virtual void Control(const Control &ctl) = 0;
 

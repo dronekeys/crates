@@ -67,10 +67,10 @@ void Quadrotor::Receive(const State &msg)
     nav.Measurement(msg);
 }
 
-// Pass the conf
-void Quadrotor::ConfigRate(const std::string &name, const double* rate)
+// Receive a rate configuration updates
+bool Quadrotor::ConfigRate(const std::string& string, const double& rate);
 {
-    Topic::Config(name, rate);
+    return Topic::Config(name, rate);
 }
 
 // CONSTRUCTOR ////////////////////////////////////////////////////////////////////

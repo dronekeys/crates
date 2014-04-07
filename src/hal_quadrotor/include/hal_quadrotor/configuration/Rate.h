@@ -18,12 +18,17 @@ namespace hal_quadrotor
         ros::ServiceServer service;
 
         // Configure data broadcast at a given rate (<= 0.0 means disable)
-        void Receive(ConfigRate::Request &req, ConfigRate::Response &res);
+        bool Receive(ConfigRate::Request &req, ConfigRate::Response &res);
+
+    protected:
+
+        // HAL needs to ovveride this
+        virtual bool ConfigRate(const std::string& string, const double& rate) = 0;
 
     public:
 
         // Constructor
-        Rate();
+        Rate(ros::NodeHandle &node, std::string name);
 
     };
 }
