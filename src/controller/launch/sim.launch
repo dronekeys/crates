@@ -1,0 +1,39 @@
+<!-- This launch file spawns a gazebo server for a simulated experiment. The plugin
+	 libsimulator.cpp provides a node for controlling the experiment. Through it,
+	 platform instances can be created, configured, controlled and destroyed. Gazebo
+	 is used to both simulate and visualise. Starts headless and paused.    -->
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="debug" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="seed" default="0"/>
+ 
+  <!-- set use_sim_time flag -->
+  <group>
+    <param name="/use_sim_time" value="true" />
+  </group>
+
+  <!-- set arguments to the gazebo server -->
+  <arg unless="$(arg debug)" name="script_type" value="gzserver"/>
+  <arg if="$(arg debug)" name="script_type" value="debug"/>
+
+  <!-- start gazebo server-->
+  <node name="gazebo" pkg="gazebo_ros" type="$(arg script_type)" respawn="false" output="screen" args=" -u -r worlds/simulation.world">
+    <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+    <env name="GAZEBO_MODEL_PATH" value="$(find uas_controller)/resources/models"/>
+    <env name="GAZEBO_RESOURCE_PATH" value="/usr/share/gazebo-2.2:$(find uas_controller)/resources"/>
+    <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+  </node>
+
+  <!-- start gazebo client   args="-g libgui.so" -->
+  <group if="$(arg gui)">
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+      <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+      <env name="GAZEBO_MODEL_PATH" value="$(find uas_controller)/resources/models"/>
+      <env name="GAZEBO_RESOURCE_PATH" value="/usr/share/gazebo-2.2:$(find uas_controller)/resources"/>
+      <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+    </node>
+  </group>
+
+</launch>

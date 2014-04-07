@@ -1,0 +1,15 @@
+<launch>
+	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" output="screen"/>
+	<node pkg="nodelet" type="nodelet" name="fcs" args="load platform_complacs/fcs nodelet_manager" output="screen">
+		<param name="serial_port" type="string" value="/dev/ttyUSB0"/>
+		<param name="serial_baud" type="int" value="57600"/>
+		<param name="rate_max" type="int" value="100"/>		
+		<param name="rate_aci" type="int" value="10"/>
+		<param name="rate_est" type="int" value="50"/>
+		<param name="rate_imu" type="int" value="100"/>
+		<param name="rate_mag" type="int" value="50"/>
+		<param name="rate_pos" type="int" value="5"/>
+		<param name="rate_alt" type="int" value="5"/>
+		<param name="rate_inf" type="int" value="1"/>
+	</node>
+</launch>
