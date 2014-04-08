@@ -34,7 +34,7 @@ namespace hal_quadrotor
     public:
 
         // Constructor creates publisher handle and sets default rate
-        TopicBase(ros::NodeHandle &node, std::string name);
+        TopicBase(ros::NodeHandle& node, std::string name);
 
         // Configure data broadcast at a given rate (<= 0.0 means disable)
         void Reset(const double &rate);
@@ -69,10 +69,10 @@ namespace hal_quadrotor
     public:
 
         // Constructor
-        Topic(ros::NodeHandle &node, std::string name);
+        Topic(ros::NodeHandle& node, std::string name);
 
         // Manually set the data in this message (usually called by FCS / simulation)
-        void Set(const T &msg);
+        void Set(const T& msg);
 
         // Get a copy of the message
         T Get();

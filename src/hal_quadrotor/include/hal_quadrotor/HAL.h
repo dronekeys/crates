@@ -18,6 +18,7 @@
 #include <hal_quadrotor/Inertial.h>
 #include <hal_quadrotor/Magnetic.h>
 #include <hal_quadrotor/Position.h>
+#include <hal_quadrotor/Energy.h>
 #include <hal_quadrotor/Orientation.h>
 #include <hal_quadrotor/Information.h>
 #include <hal_quadrotor/State.h>
@@ -39,17 +40,16 @@
 
 namespace hal_quadrotor
 {
-    class Quadrotor : 
-        
+    class HAL : 
         public Topic<Information>,
         public Topic<Control>,
         public Topic<State>,
         public Topic<Altitude>,       
         public Topic<Inertial>,
         public Topic<Magnetic>,
+        public Topic<Energy>,
         public Topic<Position>,
         public Topic<Orientation>,
-        
         public Idle,
         public Takeoff,
         public Hover,
@@ -60,7 +60,6 @@ namespace hal_quadrotor
         public Waypoint,
         public VelocityHeight,
         public Rate
-
     {       
 
     private:
@@ -79,6 +78,9 @@ namespace hal_quadrotor
         
     protected:
 
+        // Handle to the ROS node
+        ros::NodeHandle rosNode;
+
         // Pass altiude measurement to navigation subsystem
         void Receive(const Altitude &msg);
 
@@ -91,6 +93,9 @@ namespace hal_quadrotor
         // Pass magnetic measurement to navigation subsystem
         void Receive(const Magnetic &msg);
 
+        // Pass magnetic measurement to navigation subsystem
+        void Receive(const Energy &msg);
+
         // Pass orientation measurement to navigation subsystem
         void Receive(const Orientation &msg);
 
@@ -98,7 +103,7 @@ namespace hal_quadrotor
         void Receive(const State &msg);
 
         // Receive a rate configuration updates
-        bool ConfigRate(std::string name, double rate);
+        bool ConfigRate(const std::string& name, const double& rate);
 
         // This must be overriden by the child class in order to accept control 
         virtual void Receive(const Control &ctl) = 0;
@@ -107,7 +112,7 @@ namespace hal_quadrotor
 
         // CONSTRUCTOR ////////////////////////////////////////////////////////////////////
     
-        Quadrotor(ros::NodeHandle& node, const std::string &name);
+        HAL(const char *name);
 
     };
 }

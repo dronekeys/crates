@@ -3,12 +3,13 @@
 #include <GeographicLib/GravityModel.hpp>
 
 //  Boost includes
-#include "World.h"
+#include "Environment.h"
 
 using namespace controller;
 
 // Default constructor
-Environment::Environment() : rate(1.0) {}
+Environment::Environment() : World("environment"),
+	rate(1.0) {}
 
 // REQUIRED METHODS
 
@@ -23,27 +24,22 @@ void Environment::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr worl
 
 	// GET THE GAZEBO COORDINATES ///////////////////////////////////////////////////////////
 
-	// The local position X-Y-Z
-	gazebo::math::Vector3 msPositionLocal(0.0,0.0,0.0);
-	
 	// The global WGS84 position
 	gazebo::math::Vector3 msPositionGlobal = 
-		worldPtr->GetSphericalCoordinates()->SphericalFromLocal(msPositionLocal);
+		worldPtr->GetSphericalCoordinates()->SphericalFromLocal(
+			gazebo::math::Vector3(0.0,0.0,0.0));
 
 	// SET THE HOME POSITION ////////////////////////////////////////////////////////////////
 
 	// Convert to a GPStk position
 	gpstk::Position originPosGeodetic(
-		msPositionGlobal.x, msPositionGlobal.y, msPositionGlobal.z, Position::Geodetic, &wgs84);
+		msPositionGlobal.x, msPositionGlobal.y, msPositionGlobal.z, gpstk::Position::Geodetic, &wgs84);
 
 	// Convert to a geocentric position
-	gpstk::Position originPosGeocentric = originPosGeodetic.transformTo(Position::Geocentric);
+	gpstk::Position originPosGeocentric = originPosGeodetic.transformTo(gpstk::Position::Geocentric);
 	
 	// Get the cartesian ECEF position
 	gpstk::Position originPosECEF = originPosGeodetic.asECEF();
-  
-  	// Save the home position
-	home = gazebo::math::Vector3(originPosECEF[0],originPosECEF[1],originPosECEF[2]);
 
 	// GET THE MAGNETIC VECTOR //////////////////////////////////////////////////////////////
 	
@@ -56,7 +52,7 @@ void Environment::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr worl
 			magnetic.x, magnetic.y, magnetic.z								// Target field
 		);
 	}
-	catch (const exception& e)
+	catch (const std::exception& e)
 	{
 		ROS_WARN("Could not determine magnetic field strength: %s",e.what());
 	}
@@ -71,7 +67,7 @@ void Environment::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr worl
 			gravity.x, gravity.y, gravity.z									// Target field
 		);
 	}
-	catch (const exception& e)
+	catch (const std::exception& e)
 	{
 		ROS_WARN("Could not determine gravitational field strength: %s",e.what());
 	}
@@ -108,9 +104,6 @@ void Environment::Reset()
 void Environment::Update(const ros::TimerEvent& event)
 {
 	// Assemble the epoch message
-	msg.mutable_home()->set_x(home.x);
-	msg.mutable_home()->set_y(home.y);
-	msg.mutable_home()->set_z(home.z);
 	msg.mutable_gravity()->set_x(gravity.x);
 	msg.mutable_gravity()->set_y(gravity.y);
 	msg.mutable_gravity()->set_z(gravity.z);

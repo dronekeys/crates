@@ -23,12 +23,11 @@
 
 using namespace std;
 using namespace gpstk;
-using namespace uas_controller;
 
 namespace controller
 {
     // Reference to a GPS ephemeride
-    typedef const boost::shared_ptr<const uas_controller::msgs::Environment> EnvironmentPtr;
+    typedef const boost::shared_ptr<const msgs::Satellites> SatellitesPtr;
 
     // Basic GNSS receiver class
     class GNSS : public Model
@@ -98,7 +97,7 @@ namespace controller
         // EXTRA METHODS
 
         // Set the navigaiton solution from the ephemerides
-        void SetNavigationSolution(EnvironmentPtr env);
+        void SetNavigationSolution(SatellitesPtr env);
 
         // Set the pressure and height at ground level
         bool GetStatusFix();

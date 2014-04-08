@@ -33,7 +33,8 @@
 using namespace controller;
 
 // Default constructor
-Satellites::Satellites() : te(273), pr(1000.0), hu(95.0), mine(15.0), rate(1.0) {}
+Satellites::Satellites() : World("satellites"),
+	temperature(273), pressure(1000.0), humidity(95.0), minElevation(15.0), rate(1.0) {}
 
 // REQUIRED METHODS
 
@@ -45,7 +46,7 @@ void Satellites::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world
 
 	// Basic parameters
 	rate = GetSDFDouble(root,"rate",rate);
-	mine = GetSDFDouble(root,"minelevation",mine);
+	minElevation = GetSDFDouble(root,"minelevation",minElevation);
 
 	// GET THE FINAL GPOS AND GLONASS EPHEMERIDES ////////////////////////////////////////////////
 
@@ -72,7 +73,7 @@ void Satellites::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world
 		}
 		while(el = el->GetNextElement());
 	}
-	catch (const exception& e)
+	catch (const std::exception& e)
 	{
 		ROS_DEBUG("Could not obtain GPS final ephemerides: %s",e.what());
 	}
@@ -187,7 +188,7 @@ void Satellites::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world
 				tecStore.addMap(id);
 			}
 		}
-		while(el = el->GetNextElement());
+		while (el = el->GetNextElement());
 	}
 	catch (const std::exception& e)
 	{
@@ -203,7 +204,6 @@ void Satellites::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world
 // All sensors must be resettable
 void Satellites::Reset()
 {
-
 	// Create and initialize a new Gazebo transport node
 	nodePtr = gazebo::transport::NodePtr(new gazebo::transport::Node());
 	nodePtr->Init(worldPtr->GetName());
@@ -212,18 +212,8 @@ void Satellites::Reset()
 	pubPtr = nodePtr->Advertise<msgs::Satellites>("~/global/satellites");
 
 	// Subscribe to meteorological updates
-	subMetPtr = nodePtr->Subscribe("~/global/meteorological", &Satellites::ReceiveMeteorological, this);
-	subWorPtr = nodePtr->Subscribe("~/global/world", &Satellites::ReceiveWorld, this);
-}
-
-// This will be called whenever a new environment topic is posted
-void Satellites::ReceiveEnvironment(EnvironmentPtr& environment)
-{
-	originECEF.set(
-		environment->home().x(),
-		environment->home().y(),
-		environment->home().z()
-	);
+	subPtr = nodePtr->Subscribe("~/global/meteorological", 
+		&Satellites::ReceiveMeteorological, this);
 }
 
 // This will be called whenever a new meteorlogical topic is posted
@@ -238,14 +228,13 @@ void Satellites::ReceiveMeteorological(MeteorologicalPtr& meteorological)
 void Satellites::Update(const ros::TimerEvent& event)
 {
 	// TIME CACHING /////////////////////////////////////////////////////////////////////
-y
-	CommonTime currentTimeUTC = GetTime(gpstk::TimeSystem::UTC);
-	CommonTime currentTimeGPS = GetTime(gpstk::TimeSystem::GPS);
-	CommonTime currentTimeGLO = GetTime(gpstk::TimeSystem::GLO);
+	gpstk::CommonTime currentTimeUTC = GetTime(gpstk::TimeSystem::UTC);
+	gpstk::CommonTime currentTimeGPS = GetTime(gpstk::TimeSystem::GPS);
+	gpstk::CommonTime currentTimeGLO = GetTime(gpstk::TimeSystem::GLO);
 
 	// TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
-	tropModel.setWeather(temperature - 273.15, pressure, humdity);
+	tropModel.setWeather(temperature - 273.15, pressure, humidity);
 
 	// IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
 
@@ -254,9 +243,9 @@ y
 	{
 		tec = tecStore.getIonexValue(currentTimeGPS, originECEF, 1); 
 	}
-	catch(std::exception& e)
+	catch (const std::exception& e)
 	{
-		ROS_DEBUG("Problem setting ionospheric data: %s", e.what().c_str());
+		ROS_DEBUG("Problem setting ionospheric data: %s", e.what());
 	}
 
 	// TIME EPOCH //////////////////////////////////////////////////////////////////////
@@ -279,23 +268,23 @@ y
 		try
 		{
 			// Don't look for invalid satellites
-			if (sp3Ephemerides.isPresent(SatID(prn,SatID::systemGPS)))
+			if (sp3Ephemerides.isPresent(gpstk::SatID(prn,gpstk::SatID::systemGPS)))
 			{
 				// Get the ephemeris
-				Xvt eph = sp3Ephemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS);
+				gpstk::Xvt eph = sp3Ephemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGPS),currentTimeGPS);
 
 				// Elevation of the current satellite with respect to HOME position
-				Triple satellitePos = eph.getPos();
+				gpstk::Triple satellitePos = eph.getPos();
 
 				// Get the elevation
-				double elv = originPosECEF.elvAngle(satellitePos);
+				double elv = originECEF.elvAngle(satellitePos);
 
 				// Only count satellites above a minnimum elevation
 				if (elv > minElevation)
 				{          
 				  // Save to the message
 				  msgs::Ephemeris* gps = msg.add_gnss();
-				  gps->set_system(SatID::systemGPS);
+				  gps->set_system(gpstk::SatID::systemGPS);
 				  gps->set_prn(prn);
 
 				  // Write the position
@@ -307,10 +296,10 @@ y
 				  try
 				  {
 				    // Get the broadcast ephemeris
-				    Xvt ephb = gpEphemerides.getXvt(SatID(prn,SatID::systemGPS),currentTimeGPS);
+				    gpstk::Xvt ephb = gpsEphemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGPS),currentTimeGPS);
 
 				    // Elevation of the current satellite with respect to HOME position
-				    Triple err = ephb.getPos() - satellitePos;
+				    gpstk::Triple err = ephb.getPos() - satellitePos;
 
 				    // Set the ephemeris error
 				    gps->mutable_err()->set_x(err[0]);
@@ -322,7 +311,7 @@ y
 				    gps->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
 
 				  }
-				  catch(InvalidRequest& e)
+				  catch (const std::exception& e)
 				  { 
 				    // Set the ephemeris error (zero = problem)
 				    gps->mutable_err()->set_x(0);
@@ -333,7 +322,7 @@ y
 				  // Set the tropospheic delay, based on the simulation location
 				  gps->set_delay_trop(
 				    tropModel.correction(
-				      originPosECEF,                       // Current receiver position
+				      originECEF,                       // Current receiver position
 				      satellitePos,                        // Current satellite position
 				      currentTimeGPS                       // Time of observation
 				    )
@@ -361,9 +350,9 @@ y
 				}
 			}
 		}
-		catch(std::exception& e)
+		catch (const std::exception& e)
 		{ 
-		  ROS_DEBUG("Problem with GPS satellite: %s", e.what().c_str());
+		  ROS_DEBUG("Problem with GPS satellite: %s", e.what());
 		}
 	}
 
@@ -375,23 +364,23 @@ y
 		try
 		{
 		  // Don't look for invalid satellites
-		  if (sp3Ephemerides.isPresent(SatID(prn,SatID::systemGlonass)))
+		  if (sp3Ephemerides.isPresent(gpstk::SatID(prn,gpstk::SatID::systemGlonass)))
 		  {
 		    // Get the ephemeris (not that SP3 are in GPST)
-		    Xvt eph = sp3Ephemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGPS);
+		    gpstk::Xvt eph = sp3Ephemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGPS);
 
 		    // Elevation of the current satellite with respect to HOME position
-		    Triple satellitePos = eph.getPos();
+		    gpstk::Triple satellitePos = eph.getPos();
 
 		    // Get the elevation
-		    double elv = originPosECEF.elvAngle(satellitePos);
+		    double elv = originECEF.elvAngle(satellitePos);
 
 		    // Only count satellites above a minnimum elevation
 		    if (elv > minElevation)
 		    {          
 		      // Save to the message
 		      msgs::Ephemeris* glonass = msg.add_gnss();
-		      glonass->set_system(SatID::systemGlonass);
+		      glonass->set_system(gpstk::SatID::systemGlonass);
 		      glonass->set_prn(prn);
 
 		      // Write the position
@@ -406,10 +395,10 @@ y
 		      try
 		      {
 		        // Get the broadcast ephemeris
-		        Xvt ephb = gloEphemerides.getXvt(SatID(prn,SatID::systemGlonass),currentTimeGLO);
+		        gpstk::Xvt ephb = gloEphemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGLO);
 
-		       // Elevation of the current satellite with respect to HOME position
-		        Triple err = ephb.getPos() - satellitePos;
+		       	// Elevation of the current satellite with respect to HOME position
+		        gpstk::Triple err = ephb.getPos() - satellitePos;
 
 		        // Set the ephemeris error
 		        glonass->mutable_err()->set_x(err[0]);
@@ -421,11 +410,11 @@ y
 		        glonass->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
 
 		        // Set the frequency
-		        f = (double) glo_ephemerides.findEphemeris(SatID(prn,SatID::systemGlonass),currentTimeGLO).getfreqNum();
+		        f = (double) gloEphemerides.findEphemeris(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGLO).getfreqNum();
 		      }
-		      catch(InvalidRequest& e)
+		      catch (const std::exception& e)
 		      { 
-		        ROS_WARN("Problem with satellite: %s", e.what().c_str());
+		        ROS_WARN("Problem with satellite: %s", e.what());
 
 		        // Set the ephemeris error (zero = problem)
 		        glonass->mutable_err()->set_x(0);
@@ -456,7 +445,7 @@ y
 		      // Set the tropospheic delay, based on the simulation location
 		      glonass->set_delay_trop(
 		        tropModel.correction(
-		          originPosECEF,                       // Current receiver position
+		          originECEF,                       // Current receiver position
 		          satellitePos,                        // Current satellite position
 		          currentTimeGPS                       // Time of observation
 		        )
@@ -464,9 +453,9 @@ y
 		    }
 		  }
 		}
-		catch(std::exception& e)
+		catch(const std::exception& e)
 		{ 
-		  ROS_DEBUG("Problem with Glonass satellite: %s", e.what().c_str());
+		  ROS_DEBUG("Problem with Glonass satellite: %s", e.what());
 		}
 	}
 

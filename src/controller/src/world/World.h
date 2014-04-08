@@ -19,8 +19,8 @@
 #include <ros/ros.h>
 
 // All the different gazebo message types
-#include "environment.pb.h"
 #include "meteorological.pb.h"
+#include "environment.pb.h"
 #include "satellites.pb.h"
 
 namespace controller
@@ -43,9 +43,10 @@ namespace controller
 
     protected:
 
+        ros::NodeHandle rosNode;
+
         // SDF PARSING METHODS ///////////////////////////////////////////////////////
 
-        
     	// Recurse down the tree  looking for elements
     	static bool FindElement(sdf::ElementPtr &cur, std::string path)
     	{
@@ -100,25 +101,7 @@ namespace controller
             return value;
         }
 
-        // METHOD FOR CHILDREN TO GET THE CURENT TIME ////////////////////////////////////
-
-        // Get the current pressure in millibar
-        static double GetPressure()
-        {
-            return pressure;
-        }        
-
-        // Get the current temperature in Kelvin
-        static double GetTemperature()
-        {
-            return pressure;
-        }        
-
-        // Get the current relative humidity in percent
-        static double GetHumidity()
-        {
-            return pressure;
-        }        
+        // METHOD FOR CHILDREN TO GET THE CURENT TIME ////////////////////////////////////   
 
         // Get the current time in a specific format
         static gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
@@ -130,7 +113,7 @@ namespace controller
             if (ts == gpstk::TimeSystem::GPS)
             {
                 ret.addSeconds(
-                    TimeSystem::Correction(
+                    gpstk::TimeSystem::Correction(
                         gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,        // Source & Dest
                         startTime.year, startTime.month, startTime.day         // Rough period
                     )
@@ -147,6 +130,13 @@ namespace controller
 
     public:
 
+        // Constructor
+        World(const char *name) : rosNode(ros::NodeHandle(name))
+        {
+            if (!ros::isInitialized())
+                ROS_FATAL("A ROS node has not been initialized");
+        }
+
         // ALL CHILD CLASSES HAVE ACCESS TO THE WORLD TIME //////////////////////////////
 
         // Initilialise  the
@@ -155,15 +145,15 @@ namespace controller
             //  Extract time from the sdf
             try
             {       
-                int yr = GetSDFInt(root,"year",2010);           // Year
-                int mo = GetSDFInt(root,"month",1);             // Month
-                int da = GetSDFInt(root,"day",6);               // Day
-                int ho = GetSDFInt(root,"hour",10);             // Hour
-                int mi = GetSDFInt(root,"minute",0);            // Minute
-                double se = GetSDFDouble(root,"second",0.0);    // Second
+                int ye = GetSDFInteger(root,"year",2010);           // Year
+                int mo = GetSDFInteger(root,"month",1);             // Month
+                int da = GetSDFInteger(root,"day",6);               // Day
+                int ho = GetSDFInteger(root,"hour",10);             // Hour
+                int mi = GetSDFInteger(root,"minute",0);            // Minute
+                double se = GetSDFDouble(root,"second",0.0);        // Second
 
                 // Create a common time variable from the UTC info in the SDF data
-                startTime = gpstk::CivilTime(ye,mo,da,ho,mi,se,TimeSystem::UTC);
+                startTime = gpstk::CivilTime(ye,mo,da,ho,mi,se,gpstk::TimeSystem::UTC);
             }
             catch (const std::exception& e)
             {
@@ -177,7 +167,7 @@ namespace controller
         {
             try
             {
-                currentTime.set(startTime.convertToCommonTime());
+                currentTime = startTime.convertToCommonTime();
                 currentTime.addSeconds(offset);
                 currentTime.setTimeSystem(gpstk::TimeSystem::UTC);
             }

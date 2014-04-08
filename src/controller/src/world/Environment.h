@@ -5,6 +5,7 @@
 #include <gpstk/CommonTime.hpp>
 #include <gpstk/CivilTime.hpp>
 #include <gpstk/Position.hpp>
+#include <gpstk/WGS84Ellipsoid.hpp>
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
@@ -29,10 +30,12 @@ namespace controller
 		gazebo::transport::PublisherPtr pubPtr;
 		ros::Timer 						timer;
 
-	    // Stores the current magnetic and gravitational field
-	    gazebo::math::Vector3 magnetic;
-	    gazebo::math::Vector3 gravity;
-		gazebo::math::Vector3 home;
+        // Used to convert from gazebo local to spherical
+        gpstk::WGS84Ellipsoid           wgs84;
+    
+	    // Stores the current magnetic ang gravity field
+	    gazebo::math::Vector3 			magnetic;
+	    gazebo::math::Vector3 			gravity;
 
       	// Message containing information
       	msgs::Environment msg;
@@ -46,7 +49,7 @@ namespace controller
 		Environment();
 
         // All sensors must be configured using the current model information and the SDF
-        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr model);
+        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world);
 
         // All sensors must be resettable
         void Reset();

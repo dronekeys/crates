@@ -23,7 +23,7 @@ namespace hal_quadrotor
     protected:
 
         // HAL needs to ovveride this
-        virtual bool ConfigRate(const std::string& string, const double& rate) = 0;
+        virtual bool ConfigRate(const std::string& name, const double& rate) = 0;
 
     public:
 

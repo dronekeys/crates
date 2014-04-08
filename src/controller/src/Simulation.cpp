@@ -9,8 +9,8 @@
 namespace controller
 {
   // Forward declaration of the static module variables
-  gpstk::CivilTime  Feature::startTime;
-  gpstk::CommonTime Feature::currentTime;
+  gpstk::CivilTime  	startTime;
+  gpstk::CommonTime 	currentTime;
 
   // This class is responsible for managing the entire simulation. Most importantly,
   // it maintains the latest global time, and broadcasts meteorological information,
@@ -34,7 +34,7 @@ namespace controller
   public:
 	
 	// Constructor
-	Simulation() : WorldPlugin(), rosNode(ros::NodeHandle("controller")) {}
+	Simulation() : WorldPlugin() {}
 
 	// When the plugin is loaded ...
 	void Load(gazebo::physics::WorldPtr _world, sdf::ElementPtr root)
@@ -42,43 +42,28 @@ namespace controller
 	  // Save the world pointer
 	  worldPtr = _world;
 
-	  // First, configure the feature class so that all children have access to time
-	  Feature::Init(root->GetElement("time"));
-
 	  // Configure the gravitational fiel, magnetic field and ECEF home position
-	  environment.Configure(root->GetElement("world"),model);
+	  environment.Configure(root->GetElement("world"),worldPtr);
 
 	  // Configure the temperature, pressure, humidty and wind broadcasting
-	  meteorological.Configure(root->GetElement("meteorological"),model);
+	  meteorological.Configure(root->GetElement("meteorological"),worldPtr);
 
 	  // Configure the GNSS satellites
-	  satellites.Configure(root->GetElement("satellites"),model);
-
-	  // Set up callback for updating the timer
-	  conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
-		boost::bind(&Simulation::Update, this, _1));
+	  satellites.Configure(root->GetElement("satellites"),worldPtr);
 	}
 
 	// When the simulation is reset...
 	void Reset() 
 	{
 	  // Reset the environment
-	  environment.reset();
+	  environment.Reset();
 
 	  // Reset all meteorological effects
-	  meteorological.reset();
+	  meteorological.Reset();
 
 	  // Reset all satellites
-	  satellites.reset();
+	  satellites.Reset();
 	}
-
-	// Called at the resolution of physics updates
-	void Update(const gazebo::common::UpdateInfo& _info)
-	{
-		// Update the internat prepresentation of time
-	 	Feature::Update(_info.simTime.Double()); 
-	}
-
   };
 
   GZ_REGISTER_WORLD_PLUGIN(Simulation)

@@ -6,6 +6,7 @@
 #include <hal_quadrotor/Inertial.h>
 #include <hal_quadrotor/Position.h>
 #include <hal_quadrotor/Magnetic.h>
+#include <hal_quadrotor/Energy.h>
 #include <hal_quadrotor/Orientation.h>
 #include <hal_quadrotor/State.h>
 
@@ -31,6 +32,7 @@ namespace hal_quadrotor
         void Measurement(const Inertial &msg);
         void Measurement(const Position &msg);
         void Measurement(const Magnetic &msg);
+        void Measurement(const Energy &msg);
         void Measurement(const Orientation &msg);
         void Measurement(const State &msg);
 

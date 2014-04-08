@@ -61,6 +61,7 @@ add_message_files(
     Altitude.msg
     Inertial.msg
     Magnetic.msg
+    Energy.msg
     Orientation.msg
     Position.msg
     Information.msg
@@ -140,7 +141,7 @@ add_library(hal_quadrotor
   src/configuration/Rate.cpp
   src/Topic.cpp
   src/Navigation.cpp
-  src/Quadrotor.cpp
+  src/HAL.cpp
 )
 ## Declare a cpp executable
 # add_executable(uav_driver 

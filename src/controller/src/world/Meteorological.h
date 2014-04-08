@@ -49,7 +49,7 @@ namespace controller
 		Meteorological();
 
         // All sensors must be configured using the current model information and the SDF
-        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr model);
+        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world);
 
         // All sensors must be resettable
         void Reset();

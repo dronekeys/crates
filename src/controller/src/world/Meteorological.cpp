@@ -12,7 +12,8 @@
 using namespace controller;
 
 // Default constructor
-Meteorological::Meteorological() : te(273), pr(1000.0), hu(95.0), rate(1.0), ws(0.0), wd(0.0) {}
+Meteorological::Meteorological() : World("meteorological"),
+	te(273), pr(1000.0), hu(95.0), rate(1.0), ws(0.0), wd(0.0) {}
 
 // REQUIRED METHODS
 
@@ -60,7 +61,7 @@ void Meteorological::Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr w
 		while (rms >> rmd)
 		{
 		  // We need to specify that this file is in UTC
-		  rmd.time.setTimeSystem(TimeSystem::GPS);
+		  rmd.time.setTimeSystem(gpstk::TimeSystem::GPS);
 		  ml.push_back(rmd);
 		}
 
@@ -127,9 +128,9 @@ void Meteorological::Update(const ros::TimerEvent& event)
 		h = (*mi).data[gpstk::RinexMetHeader::HR];
 		p = (*mi).data[gpstk::RinexMetHeader::PR];
 	}
-	catch(InvalidRequest& e)
+	catch(const std::exception& e)
 	{
-		ROS_WARN("Problem querying weather data: %s", e.what().c_str());
+		ROS_WARN("Problem querying weather data: %s", e.what());
 	}
 
 	// Assemble the epoch message, with or without RINEX data

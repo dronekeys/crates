@@ -66,7 +66,7 @@ void GNSS::Reset()
 // Set the  GNSS navigation solution from gps and glonass ephemerides. These actually
 // also contain the ephemeride error, tropospheric dry and wet delays, clock error and
 // ionospherid delay, based on the satellite elevation and short experiment baseline.
-void GNSS::SetNavigationSolution(EnvironmentPtr env)
+void GNSS::SetNavigationSolution(SatellitesPtr env)
 {
 	// BACKUP THE LAST POSITION AND TIME FOR VELOCITY CALCULATION /////////////////////
 
@@ -79,7 +79,7 @@ void GNSS::SetNavigationSolution(EnvironmentPtr env)
 
 	// DETERMINE THE CURRENT TIME ////////////////////////////////////////////////////
 
-	currentTime.set((long)env->epoch().days(),(double)env->epoch().secondsofdays(),(TimeSystem)TimeSystem::UTC);
+	currentTime.set(env->epoch(),(TimeSystem)TimeSystem::UTC);
 
 	// DETERMINE THE CURRENT POSITION ////////////////////////////////////////////////
 

@@ -16,7 +16,7 @@
 #include <gazebo/common/KeyFrame.hh>
 
 // Include the quadrotor HAL
-#include <hal_quadrotor/Quadrotor.h>
+#include <hal_quadrotor/HAL.h>
 
 // Components used to update the model dynamics
 #include "model/Propulsion.h"
@@ -27,12 +27,11 @@
 #include "model/Compass.h"
 #include "model/GNSS.h"
 #include "model/IMU.h"
-#include "model/AHRS.h"
 
 namespace controller
 {
 
-  class Quadrotor : public hal_quadrotor::Quadrotor, public gazebo::ModelPlugin
+  class Quadrotor : public hal_quadrotor::HAL, public gazebo::ModelPlugin
   {
 
   private:
@@ -48,7 +47,7 @@ namespace controller
 
     // Required for receiving atmospheric updates
     gazebo::transport::NodePtr        nodePtr;
-    gazebo::transport::SubscriberPtr  subPtr;
+    gazebo::transport::SubscriberPtr  subPtrEnv, subPtrMet, subPtrSat;
 
     // Stores the current simulation time (seconds since start)
     double                            tim;
@@ -66,61 +65,21 @@ namespace controller
     Compass       compass;      // Simulates a magnetic field strength sensor
     GNSS          gnss;         // Simulates a GNSS receiver using GPStk
     IMU           imu;          // Simulates an inertial measurement unit
-    AHRS          ahrs;         // Simulates an AHRS system (orientation)
 
     // CALLBACKS ///////////////////////////////////////////////////////////////////////////////
 
     // When new control arrives from the HAL, immedaitely save it to the control class, so that
     // it can be used by Propulsion::Update() to update the platform dynamics.
-    void Receive(const Control &control)
+    void Receive(const hal_quadrotor::Control &ctl)
     {
       // The energy module needs to know how much juice we are sending to the rotors
-      energy.SetThrottle(throttle);
+      energy.SetThrottle(ctl.throttle);
 
       // Pass the control to the propulsion engine
       propulsion.SetControl(
-        control.roll, control.pitch, control.yaw, control.throttle,   // From the HAL
-        energy.GetVoltage()                                           // From the energy model
+        ctl.roll, ctl.pitch, ctl.yaw, ctl.throttle,   // From the HAL
+        energy.GetVoltage()                           // From the energy model
       );
-
-    }
-
-    // Periodically the simulation produces a environment message, which contains a global UTC time
-    // as well as meteorological information and GPS ephemerides. This information is used to 
-    // update all of the simulated sensors, so that they can produce a meaningful measurement.
-    void ReceiveEnvironment(EnvironmentPtr &msg)
-    {
-      // Configure the wind shear
-      shear.SetWind(
-        msg->wind().speed(),      // Speed (meter per second at 6m)
-        msg->wind().direction()   // Direction (degrees at 6m)
-      );
-
-      // Set the ground temperature and pressure
-      altimeter.SetMeteorological(
-        msg->temperature(),       // Environment dry temp (kelvin)
-        msg->pressure(),          // Environment pressure (hPa)
-        msg->humidity()           // Environment rel humidity (%)
-      );
-
-      // Set the temperature of the IMU
-      imu.SetMeteorological(
-        msg->temperature(),       // Environment dry temp (kelvin)
-        msg->gravity().x(),         // Grav field strength X
-        msg->gravity().y(),         // Grav field strength Y
-        msg->gravity().z()          // Grav field strength Z
-      );
-
-      // Set the temperature of the compass
-      compass.SetMeteorological(
-        msg->temperature(),       // Environment dry temp (kelvin)
-        msg->magnetic().x(),        // Mag field strength X
-        msg->magnetic().y(),        // Mag field strength Y
-        msg->magnetic().z()         // Mag field strength Z
-      );
-      
-      // Gte a navigation solution from the message
-      gnss.SetNavigationSolution(msg);
     }
 
     // This is the grand simulation abritrator. In a nutshell, it is called on every physics time
@@ -157,6 +116,10 @@ namespace controller
     // to decide the next control action to send back to the simulated device.
     void PostPhysics()
     {
+      /*
+      // Update the HAL state
+      hal_quadrotor::Topic<hal_quadrotor::State>::Set();
+
       // Position and velocity from GNSS (in gazebo local reference frame)
       gazebo::math::Vector3 pos = gnss.GetPosition();
       gazebo::math::Vector3 vel = gnss.GetVelocity();
@@ -190,12 +153,13 @@ namespace controller
         thrust,                     // Current thrust force (dynamics)
         voltage                     // Battery voltage (energy)
       );
+      */
     }
 
   public: 
 
     // Constructor
-    Quadrotor() : hal_quadrotor::Quadrotor("quadrotor"), tim(0.0) {}
+    Quadrotor() : hal_quadrotor::HAL("quadrotor"), tim(0.0) {}
 
     // On initial load
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 
@@ -211,7 +175,6 @@ namespace controller
       shear.Configure(root->GetElement("shear"),model);
       
       // Sensors
-      ahrs.Configure(root->GetElement("ahrs"),model);
       altimeter.Configure(root->GetElement("altimeter"),model);
       compass.Configure(root->GetElement("compass"),model);
       energy.Configure(root->GetElement("energy"),model);
@@ -225,11 +188,6 @@ namespace controller
 
       // Initialize the node with the world name
       nodePtr->Init(modPtr->GetWorld()->GetName());
-
-      // Subscribe to messages about atmospheric conditions
-      subPtr  = nodePtr->Subscribe("~/environment", &Quadrotor::ReceiveEnvironment, this);
-
-      ROS_INFO("Subscribed to environment");
 
       // LISTEN FOR PRE AND POST PHYSICS SIM UPDATES /////////////////
 
@@ -256,7 +214,6 @@ namespace controller
       shear.Reset();
       
       // Reset all sensors
-      ahrs.Reset();
       altimeter.Reset();
       compass.Reset();
       energy.Reset();

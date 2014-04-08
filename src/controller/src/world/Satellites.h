@@ -39,7 +39,7 @@ namespace controller
 
 		// BASIC PARAMETERS ////////////////////////////////////////////////////
 
-		double                              rate, mine;
+		double                              rate, minElevation;
 
 		// MDATA STORAGE MECHANISMS ////////////////////////////////////////////
 
@@ -65,7 +65,7 @@ namespace controller
 	    gazebo::physics::WorldPtr 			worldPtr;
 		gazebo::transport::NodePtr 			nodePtr;
 		gazebo::transport::PublisherPtr 	pubPtr;
-		gazebo::transport::SubscriberPtr 	subMetPtr, subWorPtr;
+		gazebo::transport::SubscriberPtr 	subPtr;
 		ros::Timer 							timer;
 
       	// Message containing information
@@ -76,13 +76,16 @@ namespace controller
 	    //  Called to update the world information
 	    void Update(const ros::TimerEvent& event);
 
+		// This will be called whenever a new meteorlogical topic is posted
+		void ReceiveMeteorological(MeteorologicalPtr& meteorological);
+
 	public:
 
 		// Constructor
 		Satellites();
 
         // All sensors must be configured using the current world information
-        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr model);
+        void Configure(sdf::ElementPtr root, gazebo::physics::WorldPtr world);
 
         // All sensors must be resettable
         void Reset();
