@@ -39,9 +39,10 @@ namespace hal_quadrotor
 
         // USED TO KEEP TRACK OF THE CURRENT CONTROLLER /////////////////////////////
         
+        // The current controller
         static Controller* current;
 
-        // The important controller types to which one can switch
+        // A map of references from types to controllers
         static std::map<ControllerType,Controller*> types;
 
         // Flight logic
@@ -109,7 +110,7 @@ namespace hal_quadrotor
         }
 
         // Get the control for the current type
-        Control Get(const State &state, const double &dt)
+        static Control Get(const State &state, const double &dt)
         {
             return current->Update(state, dt);  
         }

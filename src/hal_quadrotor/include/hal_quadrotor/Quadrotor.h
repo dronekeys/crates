@@ -1,6 +1,9 @@
 #ifndef HAL_QUADROTOR_H
 #define HAL_QUADROTOR_H
 
+// System libraries
+#include <string>
+
 // Basic ROS stuff
 #include <ros/ros.h>
 
@@ -95,10 +98,10 @@ namespace hal_quadrotor
         void Receive(const State &msg);
 
         // Receive a rate configuration updates
-        bool ConfigRate(const std::string& string, const double& rate);
+        bool ConfigRate(std::string name, double rate);
 
         // This must be overriden by the child class in order to accept control 
-        virtual void Control(const Control &ctl) = 0;
+        virtual void Receive(const Control &ctl) = 0;
 
     public:
 
