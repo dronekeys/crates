@@ -3,7 +3,7 @@
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gazebo.hh>
 
-namespace uas_controller
+namespace controller
 {
   class Interface : public gazebo::SystemPlugin
   {

@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_METEOROLOGICAL_H
-#define UAS_CONTROLLER_METEOROLOGICAL_H
+#ifndef CONTROLLER_METEOROLOGICAL_H
+#define CONTROLLER_METEOROLOGICAL_H
 
 // Standard data containers
 #include <list>
@@ -14,7 +14,7 @@
 // Core functionality
 #include "World.h"
 
-namespace uas_controller
+namespace controller
 {
 	class Meteorological : public World
 	{

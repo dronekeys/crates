@@ -5,7 +5,7 @@
 //  Boost includes
 #include "World.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Environment::Environment() : rate(1.0) {}

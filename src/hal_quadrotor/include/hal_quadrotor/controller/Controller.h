@@ -48,7 +48,20 @@ namespace hal_quadrotor
         // Flight logic
         static bool Logic(ControllerType next)
         {
-            return true;
+            // Always permit a transition to emergency
+            if (next==EmergencyType)
+                return true;
+
+            // Permissable state transitions
+            switch (current->type)
+            {
+            case EmergencyType: return false;
+            case IdleType:      return (next==TakeoffType);
+            case TakeoffType:   return false;   
+            case HoverType:     return (next==LandType || next==ActionType);
+            case LandType:      return false;
+            case ActionType:    return (next==LandType || next==HoverType);
+            }
         }
 
         // Convert navigation frame to body frame

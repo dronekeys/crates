@@ -9,7 +9,7 @@
 // This library
 #include "Meteorological.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Meteorological::Meteorological() : te(273), pr(1000.0), hu(95.0), rate(1.0), ws(0.0), wd(0.0) {}

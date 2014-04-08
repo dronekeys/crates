@@ -30,7 +30,7 @@
 #define GLONASS_L2OF_OFFSET  1246.0e6
 #define GLONASS_L2OF_SCALE   0.4375e6
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Satellites::Satellites() : te(273), pr(1000.0), hu(95.0), mine(15.0), rate(1.0) {}

@@ -1,7 +1,7 @@
 //  Boost includes
 #include "Compass.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Compass::Compass() : t(273.0) {}

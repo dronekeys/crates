@@ -1,4 +1,4 @@
-package uas_controller.msgs;
+package controller.msgs;
 
 // 3D position
 message Pos3D

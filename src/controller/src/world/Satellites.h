@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_SATELLITES_H
-#define UAS_CONTROLLER_SATELLITES_H
+#ifndef CONTROLLER_SATELLITES_H
+#define CONTROLLER_SATELLITES_H
 
 // Boost includes
 #include <boost/bind.hpp>
@@ -25,7 +25,7 @@
 // Core functionality
 #include "World.h"
 
-namespace uas_controller
+namespace controller
 {
 	/* This class opens broadcast and final GPS and Glonass emphemerides files
 	   and publishes the satellite positions to /global/satellites based on the

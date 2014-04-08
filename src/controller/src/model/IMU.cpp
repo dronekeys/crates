@@ -1,7 +1,7 @@
 //  Boost includes
 #include "IMU.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 IMU::IMU() :  t(273.0) {}

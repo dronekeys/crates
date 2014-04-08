@@ -23,12 +23,12 @@
 #include "meteorological.pb.h"
 #include "satellites.pb.h"
 
-namespace uas_controller
+namespace controller
 {
     // The GNSS subsystem needs to know the meterological and world info for pseudoranges
-    typedef const boost::shared_ptr<const uas_controller::msgs::Meteorological> MeteorologicalPtr;
-    typedef const boost::shared_ptr<const uas_controller::msgs::Environment>    EnvironmentPtr;
-    typedef const boost::shared_ptr<const uas_controller::msgs::Satellites>     SatellitesPtr;
+    typedef const boost::shared_ptr<const msgs::Meteorological> MeteorologicalPtr;
+    typedef const boost::shared_ptr<const msgs::Environment>    EnvironmentPtr;
+    typedef const boost::shared_ptr<const msgs::Satellites>     SatellitesPtr;
     
     /*  All modules inherit from this base class. The base class provides reusable methods
         for parsing SDF files. It also provides a GetTime(-) method, which returns time  */ 
@@ -121,7 +121,7 @@ namespace uas_controller
         }        
 
         // Get the current time in a specific format
-        static gpstk::CurrentTime GetTime(const gpstk::TimeSystem &ts)
+        static gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
         {
             // Get the current time tick, which is the start of the experimetn plus simulated time
             gpstk::CommonTime ret = currentTime;

@@ -1,7 +1,7 @@
 #include <gazebo/common/Plugin.hh>
 #include <ros/ros.h>
 
-namespace uas_controller
+namespace controller
 {
   class Experiment : public gazebo::WorldPlugin
   {

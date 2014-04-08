@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_ENERGY_H
-#define UAS_CONTROLLER_ENERGY_H
+#ifndef CONTROLLER_ENERGY_H
+#define CONTROLLER_ENERGY_H
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
@@ -7,7 +7,7 @@
 // Core functionality
 #include "Model.h"
 
-namespace uas_controller
+namespace controller
 {
     class Energy : public Model
     {

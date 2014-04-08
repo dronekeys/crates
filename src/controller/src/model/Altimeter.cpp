@@ -1,7 +1,7 @@
 //  Boost includes
 #include "Altimeter.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Constructor
 Altimeter::Altimeter() : t0(300.0), p0(1000), h0(90.0) {}

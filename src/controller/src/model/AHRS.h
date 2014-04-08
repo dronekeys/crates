@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_AHRS_H
-#define UAS_CONTROLLER_AHRS_H
+#ifndef CONTROLLER_AHRS_H
+#define CONTROLLER_AHRS_H
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
@@ -8,7 +8,7 @@
 // Core functionality
 #include "Model.h"
 
-namespace uas_controller
+namespace controller
 {
     class AHRS : public uas_hal::Orientation, public Model
     {

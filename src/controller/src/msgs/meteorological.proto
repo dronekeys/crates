@@ -1,4 +1,4 @@
-package uas_controller.msgs;
+package controller.msgs;
 
 // Information broadcast about the environment
 message Wind

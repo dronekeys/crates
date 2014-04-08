@@ -7,7 +7,7 @@
 #define DEGREES_TO_RADIANS  0.01745329258399
 #define RADIANS_TO_DEGREES  57.2957795000000
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Turbulence::Turbulence() : bsiter(1000), bstime(0.02), speed(0), dir(0), kuv(-4.97391e-01), kw(-1.35341) {}

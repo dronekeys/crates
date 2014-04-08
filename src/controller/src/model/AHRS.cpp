@@ -1,7 +1,7 @@
 //  Boost includes
 #include "AHRS.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 AHRS::AHRS() :  {}

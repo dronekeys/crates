@@ -8,7 +8,7 @@
 #define MOTOR_ANIMATION_THRESHOLD 0.001
 #define MOTOR_ANIMATION_ON_RPM    200.0
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Propulsion::Propulsion() : 

@@ -6,7 +6,7 @@
 #include "world/Meteorological.h"
 #include "world/Satellites.h"
 
-namespace uas_controller
+namespace controller
 {
   // Forward declaration of the static module variables
   gpstk::CivilTime  Feature::startTime;

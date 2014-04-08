@@ -15,8 +15,8 @@
 #include <gazebo/common/Animation.hh>
 #include <gazebo/common/KeyFrame.hh>
 
-// HAL includes
-#include <uas_hal/UAV.h>
+// Include the quadrotor HAL
+#include <hal_quadrotor/Quadrotor.h>
 
 // Components used to update the model dynamics
 #include "model/Propulsion.h"
@@ -29,10 +29,10 @@
 #include "model/IMU.h"
 #include "model/AHRS.h"
 
-namespace uas_controller
+namespace controller
 {
 
-  class Quadrotor : public uas_hal::UAV, public gazebo::ModelPlugin
+  class Quadrotor : public hal_quadrotor::Quadrotor, public gazebo::ModelPlugin
   {
 
   private:
@@ -72,19 +72,15 @@ namespace uas_controller
 
     // When new control arrives from the HAL, immedaitely save it to the control class, so that
     // it can be used by Propulsion::Update() to update the platform dynamics.
-    void ReceiveControl(
-            const double &roll,
-            const double &pitch,
-            const double &yaw,
-            const double &throttle)
+    void Receive(const Control &control)
     {
       // The energy module needs to know how much juice we are sending to the rotors
       energy.SetThrottle(throttle);
 
       // Pass the control to the propulsion engine
       propulsion.SetControl(
-        roll, pitch, yaw, throttle,   // From the HAL
-        energy.GetVoltage()           // From the energy model
+        control.roll, control.pitch, control.yaw, control.throttle,   // From the HAL
+        energy.GetVoltage()                                           // From the energy model
       );
 
     }
@@ -186,7 +182,7 @@ namespace uas_controller
       // alt = pos.z;
 
       // Push the state
-      UAV::SetState(
+      Quadrotor::SetState(
         pos.x,  pos.y,  alt,        // Position (GNSS, GNSS, altimeter)
         rot.x,  rot.y,  rot.z,      // Orientation (AHRS, AHRS, AHRS)
         vel.x,  vel.y,  vel.z,      // Velocity (GNSS, GNSS, GNSS)
@@ -199,7 +195,7 @@ namespace uas_controller
   public: 
 
     // Constructor
-    Quadrotor() : uas_hal::UAV("quadrotor"), tim(0.0) {}
+    Quadrotor() : hal_quadrotor::Quadrotor("quadrotor"), tim(0.0) {}
 
     // On initial load
     void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr root) 

@@ -1,7 +1,7 @@
 /* This gazebo model plugin implements a second order model for quadrotor dynamics */ 
 #include "Energy.h"
 
-using namespace uas_controller;
+using namespace controller;
 
 // Default constructor
 Energy::Energy() : tot(2.2), rem(2.2), cb(0.2), cf(6.6), kill(0.1), warn(0.2) {}

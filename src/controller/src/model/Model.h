@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_MODEL_H
-#define UAS_CONTROLLER_MODEL_H
+#ifndef CONTROLLER_MODEL_H
+#define CONTROLLER_MODEL_H
 
 // System includes
 #include <string>
@@ -19,10 +19,10 @@
 // Used in a couple of places
 #define MATH_PI 3.14159265359
 
-namespace uas_controller
+namespace controller
 {
     // Save some pain
-    typedef const boost::shared_ptr<const uas_controller::msgs::Environment> EnvironmentPtr;
+    typedef const boost::shared_ptr<const msgs::Environment> EnvironmentPtr;
 
     class Model
     {

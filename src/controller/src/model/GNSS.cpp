@@ -9,6 +9,8 @@
 
 #define DEBUG TRUE
 
+using namespace controller;
+
 // Default constructor
 GNSS::GNSS() : tropModel(&tropModelZero),
 	gps_typ("L1"), gps_sig(0.0), gps_clk(0.0), gps_rel(0.0), gps_rot(0.0), gps_eph(0.0), gps_tro(0.0), gps_ion(0.0),

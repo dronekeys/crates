@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_GNSS_H
-#define UAS_CONTROLLER_GNSS_H
+#ifndef CONTROLLER_GNSS_H
+#define CONTROLLER_GNSS_H
 
 // Standar dincludes
 #include <string>
@@ -25,7 +25,7 @@ using namespace std;
 using namespace gpstk;
 using namespace uas_controller;
 
-namespace uas_controller
+namespace controller
 {
     // Reference to a GPS ephemeride
     typedef const boost::shared_ptr<const uas_controller::msgs::Environment> EnvironmentPtr;

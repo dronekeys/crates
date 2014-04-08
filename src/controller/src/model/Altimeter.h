@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_ALTIMETER_H
-#define UAS_CONTROLLER_ALTIMETER_H
+#ifndef CONTROLLER_ALTIMETER_H
+#define CONTROLLER_ALTIMETER_H
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
@@ -8,7 +8,7 @@
 // Core functionality
 #include "Model.h"
 
-namespace uas_controller
+namespace controller
 {
 	class Altimeter : public Model
 	{

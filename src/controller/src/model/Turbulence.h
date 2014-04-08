@@ -1,5 +1,5 @@
-#ifndef UAS_CONTROLLER_TURBULENCE_H
-#define UAS_CONTROLLER_TURBULENCE_H
+#ifndef CONTROLLER_TURBULENCE_H
+#define CONTROLLER_TURBULENCE_H
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
@@ -8,7 +8,7 @@
 // Core functionality
 #include "Model.h"
 
-namespace uas_controller
+namespace controller
 {
     class Turbulence : public Model
     {
