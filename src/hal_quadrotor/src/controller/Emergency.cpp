@@ -6,7 +6,8 @@ using namespace hal_quadrotor;
 // Configure data broadcast at a given rate (<= 0.0 means disable)
 bool Emergency::Receive(ControlEmergency::Request &req, ControlEmergency::Response &res)
 {
-
+    // Eveything OK
+    return true;
 }
 
 // Constructor

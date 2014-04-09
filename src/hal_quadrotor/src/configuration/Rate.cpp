@@ -1,6 +1,3 @@
-// Provides the ability to control rates
-#include <hal_quadrotor/Topic.h>
-
 // This component
 #include <hal_quadrotor/configuration/Rate.h>
 
@@ -11,14 +8,14 @@
 using namespace hal_quadrotor;
 
 // Configure data broadcast at a given rate (<= 0.0 means disable)
-void Rate::Receive(ConfigRate::Request &req, ConfigRate::Response &res)
+bool Rate::Receive(ConfigRate::Request &req, ConfigRate::Response &res)
 {
 	if (req.rate < RATE_MIN || req.rate > RATE_MAX)
 	{
 		res.success = false;
 		res.status  = "Rate must be between RATE_MIN and RATE_MAX";
 	}
-	else if (Topic::Config(req.name,req.rate))
+	else if (ConfigRate(req.name,req.rate))
 	{
 		res.success = true;
 		res.status  = "Successfully updated topic broadcast rate";
@@ -34,5 +31,5 @@ void Rate::Receive(ConfigRate::Request &req, ConfigRate::Response &res)
 Rate::Rate(ros::NodeHandle &node, std::string name)
 {
  	// Advertise this message on the ROS backbone
-    service = node.advertiseService(name.c_str(), Rate::Receive, this);
+    service = node.advertiseService(name.c_str(), &Rate::Receive, this);
 }

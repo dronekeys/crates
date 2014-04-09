@@ -40,6 +40,33 @@
 
 namespace hal_quadrotor
 {
+    /**
+    * The 
+    * - hal
+    *  - uav
+    *   - identifier
+    *    - information............ General information about this platform
+    *    - state.................. The current platform state
+    *    - control................ The last control sent to the device
+    *    - config
+    *      - rate................. Set the rate of a given message
+    *    - sensors
+    *     - inertial.............. Body frame angular velocity, linear acceleration
+    *     - magnetic.............. Body frame magnetic field strength
+    *     - altitude.............. Altitude relative to ground plane
+    *     - position.............. GNSS solution in WGS84, velocity, DOP
+    *     - orientation........... Euler, quaternion, DCM orientation from fusion
+    *    - actions
+    *     - emergency............. Turn the rotors off
+    *     - idle.................. On the ground, rotors off
+    *     - hover................. Hover in place 
+    *     - takeoff............... Move from the ground to given altitude
+    *     - land.................. Move from the current position to the ground
+    *     - anglesheight.......... Change the angles and height of the UAV
+    *     - velocity.............. Maintain 3D velocity and heading
+    *     - velocityheight........ Maintain 2D velocity, altitude and heading
+    *     - waypoint.............. Move to a waypoint and hover
+    */
     class HAL : 
         public Topic<Information>,
         public Topic<Control>,

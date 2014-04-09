@@ -6,7 +6,8 @@ using namespace hal_quadrotor;
 // Configure data broadcast at a given rate (<= 0.0 means disable)
 bool Idle::Receive(ControlIdle::Request &req, ControlIdle::Response &res)
 {
-
+    // Eveything OK
+    return true;
 }
 
 // Constructor

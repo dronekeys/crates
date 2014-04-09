@@ -14,6 +14,9 @@ bool AnglesHeight::Receive(ControlAnglesHeight::Request &req, ControlAnglesHeigh
     sp[_PITCH]  = req.pitch;
     sp[_YAW]    = req.yaw;
     sp[_HEIGHT] = req.z;
+
+    // Eveything OK
+    return true;
 }
 
 // Constructor

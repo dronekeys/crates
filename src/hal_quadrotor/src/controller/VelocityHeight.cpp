@@ -20,6 +20,9 @@ bool VelocityHeight::Receive(ControlVelocityHeight::Request &req, ControlVelocit
     sp[_V]      = req.v;
     sp[_YAW]    = req.yaw;
     sp[_HEIGHT] = req.z;
+
+    // Eveything OK
+    return true;
 }
 
 

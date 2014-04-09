@@ -20,6 +20,9 @@ bool Waypoint::Receive(ControlWaypoint::Request &req, ControlWaypoint::Response 
     sp[_Y]   = req.y;
     sp[_Z]   = req.z;
     sp[_YAW] = req.yaw;
+    
+    // Eveything OK
+    return true;
 }
 
 // Constructor

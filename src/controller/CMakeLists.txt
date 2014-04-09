@@ -1,6 +1,6 @@
 # Minimum cmake version
 cmake_minimum_required(VERSION 2.8.3)
-project(uas_controller)
+project(controller)
 
 # Add custom cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -13,7 +13,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 find_package(catkin REQUIRED COMPONENTS 
 	roscpp
 	gazebo_ros 
-	uas_hal
+	hal_quadrotor
 ) 
 
 # Find Boost
@@ -119,7 +119,7 @@ catkin_package(
   DEPENDS 
     roscpp
     gazebo_ros
-    uas_hal
+    hal_quadrotor
 )
 
 ###########
@@ -186,7 +186,6 @@ add_library(quadrotor
 	src/model/PRSolutionNoRotation.cpp
 	src/model/GNSS.cpp
 	src/model/IMU.cpp
-	src/model/AHRS.cpp
 	src/Quadrotor.cpp
 )
 

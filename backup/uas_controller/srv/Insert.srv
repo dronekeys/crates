@@ -1,5 +1,0 @@
-string  id
-string  type
----
-bool    success
-string  status_message

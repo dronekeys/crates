@@ -67,8 +67,11 @@
 \begin_body
 
 \begin_layout Title
-CRANES: Cognitive Robotics Architecture for Nesting Experimentation and
- Simulation
+
+\series bold
+RATES
+\series default
+: Robotics Architecture for Tightly-coupled Experiments and Simulation
 \end_layout
 
 \begin_layout Author
@@ -298,10 +301,7 @@ General cognitiva ar
 The key things to note is that, while the platform and hardware level control
  needs to be tightly coupled, the application and platform level control
  need not be.
- With this in mind
-,
-\lang english
- 
+ With this in mind, 
 \begin_inset ERT
 status open
 

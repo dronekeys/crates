@@ -20,6 +20,9 @@ bool Velocity::Receive(ControlVelocity::Request &req, ControlVelocity::Response 
     sp[_Y]   = req.v;
     sp[_Z]   = req.w;
     sp[_YAW] = req.yaw;
+
+    // Eveything OK
+    return true;
 }
 
 // Constructor
