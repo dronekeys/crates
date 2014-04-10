@@ -72,7 +72,7 @@ Checkout uav_framework into a new workspace
 	cd /some/path/to/a/new/workspace
 	git clone https://bitbucket.org/asymingt/uav_framework.git
 
-Build the UAV framework
+Build the UAV framework.
 
 	cd uav_framework
 	catkin_make

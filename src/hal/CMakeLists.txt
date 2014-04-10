@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_quadrotor)
+project(hal)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -113,7 +113,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    hal_quadrotor
+    quadrotor
   DEPENDS 
     roscpp
     message_runtime
@@ -128,7 +128,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GeographicLib_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(hal_quadrotor
+add_library(quadrotor
   src/controller/Idle.cpp
   src/controller/Takeoff.cpp
   src/controller/Hover.cpp

@@ -5,7 +5,13 @@ using namespace hal_quadrotor;
 
 // TOPICBASE ///////////////////////////////////////////////////////////
 
-// Constructor creates publisher handle and sets default rate
+//! A normal member taking two arguments and returning an integer value.
+/*!
+  \param node an integer argument.
+  \param name a constant character pointer.
+  \return New TopicBase object
+  \sa Test(), ~Test(), testMeToo() and publicVar()
+*/
 TopicBase::TopicBase(ros::NodeHandle &node, std::string name)
 {
     // Create a timer to broadcast the data

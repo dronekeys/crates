@@ -1,0 +1,70 @@
+/**
+\mainpage Overview
+
+The overarching objective of the CRATES project is to develop a framework for rapidly developing high-level cognitive controllers for multi-platform robot experiments. The toolchain itself spawned from the European Research Council funded <a href='http://www.complacs.org'>CompLACS project</a>, motivated by a need for an easy-to-use mechanism for applying machine learning control algorithms to coordinating swarms of unmanned aerial vehicles.
+
+One of the key advantages of the CRATES architecture is that it seeks to shorten the step between simulations and experiments. It does this through the introduction of a Hardware Abstraction Layer (HAL) that sits between the platform itself and the high-level controller. The HAL exposes topics and services for a class of robot, such as a quadrotor. This architecture has the following key benefits.
+1. Since the HAL masks the complexity of the underlying platform, it allows for platform-agnostic high-level controllers. This make moving from simulation to experimentation much easier.
+2. Time-critical functionality, such as collision avoidance, navigation and low-level control (moving to waypoint, adjusting velocity) is implemented in the HAL and reused by all platforms.
+3. By masking the complexity of the underlying platform, it allows the user to focus on the development of the high-level controller.
+
+CRATES is built upon the <a href="http://www.ros.org">Robotic Operating System (ROS)</a> and <a href="http://www.gazebosim.org">Gazebo simulator</a>.
+
+A simple diagram illustrating the basic system architecture is included below. Irrespective of whether it be a simulated or hardware instance, every platform exposes its presence through a HAL. The entire system is orchestrated by the <b>crates</b> application, which can be launched in one of two modes. In <em>Empirical mode</em> the visualisation application simply listens for new HALs to appear on the messaging backbone. One a HAL is found the visualisation subscribes to its state, and stores this internally. In <em>Simulation mode</em> the application actually simulates the behaviour of the platform itself internally. The simulated entity inherits from the HAL and therefore exposes itself to the messaging backbone in exactly the same way as a hardware instance would. In this mode the messging backbone's clock is bound to the simulated clock, allowing this simulation to be universally sped up and slowed down.
+
+\image html arch.png "Hardware Abstraction Layer" width=10cm
+
+\section filestructure File structure
+
+CRATES uses catkin workspace, which adopts the following folder structure:
+
+- <b>docs</b>: Doxygen generated project documentation.
+- <b>examples</b>: Example high-level application controllers
+- <b>src</b>: Source code
+ - <b>crates</b>: Utility for orchestrating experiments and simulations
+ - <b>hal</b>: A set of HALs for various robot classes
+ - <b>platform_IDENTIFIER</b>: A type of platform (eg. Ascending Technologies quadrotor)
+ - <b>sensor_IDENTIFIER</b>: A type of sensor (eg. GNSS) 
+ - <b>scenario_IDENTIFIER</b>: An application scenario (eg. Search and Rescue)
+- <b>thirdparty</b>: Any third party libraries
+
+CRATES is distributed with drivers for the Ascending Technologies Hummingbird / Pelican quadrotors (platform_asctec). The drivers include a flight control system and a dynamic model, which can be used to simulate the behaviour of the platform. Appropriate sensor drivers (sensor_gnss, sensor_imu, sensor_altimeter, sensor_compass) are also included. CRATES is also bundled with three example scenarios, which can be used to benchmark high-level controllers.
+
+\section conventions Conventions
+
+It is impossible to discuss the system without first specifying the units and coordinate frame conventions that are used. Importantly, some of these conventions are different from those that are typically used in aviation.We have adopted the conventions used in the Gazebo simulator, which are extensions to those typically used in 3D modelling. 
+
+\subsection units Units
+
+For consistency, The entire framework adopts SI conventions in order to be as. Distance is measured in meters and angles are measured in radians. Temperature, pressure and relative humidity are measured in degrees Kelvin, millibars and percentages respectively. 
+
+\image html axes.png "Coordinate Frames in CRATES" width=10cm
+
+\subsection coordinateframes Coordinate frames
+
+For modelling convenience we have chosen to represent the quadrotor as a rigid body with six degrees of freedom in three dimensional space. Describing its motion requires a minimum of two coordinate frames -- a body frame and navigation frame. The underlying reason for this is that rotation can only be described as the orientation of one frame with respect to another. Where integration with a GNSS system is required, a third navigation frame is used. 
+
+\subsubsection bodyframe Body frame
+
+This is a right-hand, cartesian coordinate frame that is fixed with respect to the rigid body of the quadrotor. The origin of this coordinate frame is illustrated by red, green and blue arrows, which correspond to X, Y and Z. Since they are obtained from a strapdown navigation system, inertial and magnetic measurements are obtained in this coordinate frame.
+
+\subsubsection navigationframe Navigation frame
+
+Similar to the body frame, the navigation frame is described by a right-hand cartesian coordinate system. The key difference is that the origin is described by a fixed point on the earth's surface, with +X corresponding to East, +Y to North and +Z upwards toward the sky.
+
+\subsubsection resolvingframe Resolving frame
+
+In order for a quadrotor to close the loop of its position controller, it requires absolute measurements of its position. Indoor quadrotor experiments typically use motion capture systems to achieve position updates with millimeter accuracy within the navigation frame. However, outdoors one must rely on navigation solutions from a Global navigation satellite system (GNSS) such as GPS. Since these systems operate on a global scale, a spherical coordinate is needed.
+
+Inside a GNSS receiver a position solution is first obtained in a geocentric, cartesian coordinate frame. The origin of this coordinate system is the centre of the earth, with its axes defined by the equator, Greenwich meridian and north-south polar line. Importantly, this coordinate frame is fixed with respect to the earth. Since the satellite vehicles are not geosynchronous (orbital peiod of 12 hours) they have a position that changes with time. 
+
+The GNSS receiver ultimately projects its internal geocentric solution into a geodetic, spherical coordinate frame, where position is described by a latitude, longitude and altitude. Importantly, altitude is described relative to sea-level and not the centre of the earth. The WGS84 model provides a standard definition of the centre of the earth and its sea level, allowing GNSS receivers to obtain consistent projections between geocentric and geodetic coordinate frames.
+
+\subsection rotations Rotations
+
+Quadrotors are rotationally symmetric, and hence there is ambiguity as to which is the forward direction of motion. In our system an orange band is used to represent the “forward” direction of motion. With this information one can easily see that Fig X graphically depicts a rotational alignment of the body and navigation frames. We define “roll”, “pitch” and “yaw” as Euler rotations about the X, Y and Z body-frame axes respectively.
+
+One of the drawbacks of describing rotations by Euler angles is that it introduces rotational ambiguity: the order in which the angles are applied matters. Although superior representation exist, they are less intuitive to work with. Rather than project a representation on users of the system, we have chosen to adopt a X-Y-Z angle application ordering. In o
+
+
+*/
