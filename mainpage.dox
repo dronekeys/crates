@@ -8,7 +8,7 @@ One of the key advantages of the CRATES architecture is that it seeks to shorten
 2. Time-critical functionality, such as collision avoidance, navigation and low-level control (moving to waypoint, adjusting velocity) is implemented in the HAL and reused by all platforms.
 3. By masking the complexity of the underlying platform, it allows the user to focus on the development of the high-level controller.
 
-CRATES is built upon the <a href="http://www.ros.org">Robotic Operating System (ROS)</a> and <a href="http://www.gazebosim.org">Gazebo simulator</a>.
+CRATES is built upon the <a href="http://www.ros.org">Robotic Operating System (ROS)</a> and <a href="http://www.gazebosim.org">Gazebo simulator</a>. It also makes use of the GPS tool
 
 A simple diagram illustrating the basic system architecture is included below. Irrespective of whether it be a simulated or hardware instance, every platform exposes its presence through a HAL. The entire system is orchestrated by the <b>crates</b> application, which can be launched in one of two modes. In <em>Empirical mode</em> the visualisation application simply listens for new HALs to appear on the messaging backbone. One a HAL is found the visualisation subscribes to its state, and stores this internally. In <em>Simulation mode</em> the application actually simulates the behaviour of the platform itself internally. The simulated entity inherits from the HAL and therefore exposes itself to the messaging backbone in exactly the same way as a hardware instance would. In this mode the messging backbone's clock is bound to the simulated clock, allowing this simulation to be universally sped up and slowed down.
 

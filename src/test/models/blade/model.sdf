@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+
+  <model name="blade">
+    
+    <static>true</static>
+
+    <link name="blade_link">
+
+      <gravity>false</gravity>
+
+      <visual name="blade_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://blade/meshes/blade.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+    </link>
+
+  </model>
+
+</sdf>

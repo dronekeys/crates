@@ -1,0 +1,35 @@
+<!-- This launch file spawns a gazebo server for a hardware experiment. When platforms
+     boot they bind to the ROS messaging service through HALs. These HALs are picked
+     up by the libexperiment.so plugin, which adds them into the 'simulator'. No
+     actual simulation (physics) is performed. Rather, Gazebo is used as a means of
+     displaying the experiment to the controller. Starts headless and unpaused.    -->
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example debug:=true gui:=true -->
+  <arg name="gui" default="true"/>
+  <arg name="seed" default="0"/>
+ 
+  <!-- set use_sim_time flag -->
+  <group>
+    <param name="/use_sim_time" value="false" />
+  </group>
+
+  <!-- start gazebo server-->
+  <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="--seed $(arg seed) -r worlds/test.world">
+    <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+    <env name="GAZEBO_MODEL_PATH" value="/usr/local/share/gazebo_models/models:/home/asymingt/Workspace/Source/crates/src/test/models"/>
+    <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:/home/asymingt/Workspace/Source/crates/src/test/resources"/>
+    <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+  </node>
+
+  <!-- start gazebo client (args="-g libgui.so")-->
+  <group if="$(arg gui)">
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient_debug" respawn="false" output="screen" >
+      <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+      <env name="GAZEBO_MODEL_PATH" value="/usr/local/share/gazebo_models/models:/home/asymingt/Workspace/Source/crates/src/test/models"/>
+      <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:/home/asymingt/Workspace/Source/crates/src/test/resources"/>
+      <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+    </node>
+  </group>
+
+</launch>

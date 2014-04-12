@@ -109,10 +109,8 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./mainpage.dox              \
-                         ./src/hal_quadrotor/src     \
-                         ./src/hal_quadrotor/include \
-                         ./src/controller/src        \
-                         ./src/platform_asctec/src
+                         ./examples                  \
+                         ./src
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
