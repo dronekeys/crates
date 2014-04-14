@@ -1,7 +1,6 @@
 /**
 
-\defgroup hal_sensor_gnss hal_sensor_gnss
-\brief A HAL for a Global Navigation Satellite System (GNSS) receiver
-
+\defgroup hal_sensor_hal hal_sensor_hal
+\brief A HAL for an Inertial Measurement Unit (IMU)
 
 */

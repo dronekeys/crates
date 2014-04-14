@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_sensor_imu)
+project(hal_sensor_pressure)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -16,7 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   message_generation
   std_msgs
-  geometry_msgs
   hal
 ) 
 
@@ -77,7 +76,6 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
     std_msgs
-    geometry_msgs
 )
 
 ###################################
@@ -94,7 +92,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    imu
+    pressure
   DEPENDS 
     roscpp
     message_runtime
@@ -111,8 +109,8 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(imu
-  src/IMU.cpp
+add_library(pressure
+  src/Pressure.cpp
 )
 ## Declare a cpp executable
 # add_executable(uav_driver 
@@ -121,10 +119,10 @@ add_library(imu
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(imu hal_sensor_imu_generate_messages_cpp)
+add_dependencies(pressure hal_sensor_imu_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(imu
+target_link_libraries(pressure
 	${catkin_LIBRARIES} 
 )
 
