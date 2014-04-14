@@ -1,0 +1,8 @@
+# INSTRUCTION
+Header                   header
+string                   destination
+std_msgs/ByteMultiArray  payload
+---
+# RESULT
+bool    success
+string  status

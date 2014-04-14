@@ -1,8 +1,6 @@
 /**
 
-\defgroup hal_sensor_radio hal_sensor_radio
+\defgroup hal_sensor_hal hal_sensor_hal
 \brief A HAL for a radio transceiver
-
-
 
 */

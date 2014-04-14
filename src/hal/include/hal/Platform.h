@@ -15,7 +15,7 @@ namespace hal
         /*!
           This class provides thbasic platform functionality.
         */
-        class Platform : hal::HAL
+        class Platform : public hal::HAL
         {    
 
         public:

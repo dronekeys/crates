@@ -19,7 +19,7 @@ namespace hal
           it at a given rate. The rate can be adapted.
         */
         template <class DataMsgClass>
-        class Sensor : hal::HAL
+        class Sensor : public hal::HAL
         {    
 
         private:
