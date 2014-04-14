@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+
+  <model name="hummingbird">
+    
+    <!-- Will the physics engine move this platform -->  
+    <static>false</static>
+
+    <!-- Initial pose -->
+    <pose>0 0 1  0 0 0</pose>
+
+    <!-- Frame -->
+    <link name="body">
+      <pose>0 0 0  0 0 0</pose>
+      <inertial>
+        <mass>1.680</mass>
+      </inertial>
+      <collision name="body_collision">
+        <pose>0 0 0.035 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>.35</radius>
+            <length>.08</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="body_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://hummingbird/meshes/hummingbird.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <include>
+      <uri>model://blade</uri>
+      <name>blade0</name>
+      <pose>0.241 0.0 0.05 0 0 0</pose>
+    </include>
+    <joint name="motor0" type="revolute">
+      <parent>body</parent>
+      <child>blade0::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <include>
+      <uri>model://blade</uri>
+      <name>blade1</name>
+      <pose>-0.241 0.0 0.05 0 0 0</pose>
+    </include>
+    <joint name="motor1" type="revolute">
+      <parent>body</parent>
+      <child>blade1::blade_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <include>
+      <uri>model://blade</uri>
+      <name>blade2</name>
+      <pose>0.0 -0.241 0.05 0 0 0</pose>
+    </include>
+    <joint name="motor2" type="revolute">
+      <parent>body</parent>
+      <child>blade2::blade_link</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <include>
+      <uri>model://blade</uri>
+      <name>blade3</name>
+      <pose>0.0 0.241 0.05 0 0 0</pose>
+    </include>
+    <joint name="motor3" type="revolute">
+      <parent>body</parent>
+      <child>blade3::blade_link</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+      </axis>
+    </joint>
+
+    <!-- Provides a model for a quadrotor -->
+    <plugin name="quadrotor" filename="libquadrotor.so">
+
+      <!-- Propulsion model -->
+      <propulsion>
+
+        <!-- Dynamics -->
+        <dynamics>
+          <low_throttle>300</low_throttle>
+          <max_angvel>2.617993877991494</max_angvel>
+          <pq0>-3.25060e-04</pq0>
+          <pq1>1.79797e+02</pq1>
+          <pq2>-24.3536</pq2>
+          <r0>-4.81783e-03</r0>
+          <r1>-5.08944</r1>
+          <Cth0>6.63881e-01</Cth0>
+          <Cth1>7.44649e-04</Cth1>
+          <Cth2>2.39855e-06</Cth2>
+          <Cvb0>-18.0007</Cvb0>
+          <Cvb1>4.23754</Cvb1>
+          <tau0>3.07321</tau0>
+          <tau1>46.8004</tau1>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </dynamics>
+
+        <!-- Control -->
+        <control>
+          <pitch>
+            <scale>-2291.83118052329</scale>
+            <min>-0.9</min>
+            <max> 0.9</max>
+          </pitch>
+          <roll>
+            <scale>-2291.83118052329</scale>
+            <min>-0.9</min>
+            <max> 0.9</max>
+          </roll>
+          <throttle>
+            <scale>4097</scale>
+            <min>0.0</min>
+            <max>1.0</max>
+          </throttle>
+          <yaw>
+            <scale>-460.597254433196</scale>
+            <min>-4.5</min>
+            <max> 4.5</max>
+          </yaw>
+          <voltage>
+            <scale>1.0</scale>
+            <min> 9.0</min>
+            <max>12.0</max>
+          </voltage>
+        </control>
+
+      </propulsion>
+
+      <!-- Shear  -->
+      <shear>
+        <speed>0.0</speed>
+        <direction>90</direction>
+        <drag>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </drag>
+        <floor>0.05</floor>
+        <const>0.15</const>
+      </shear>
+      
+      <!-- Turbulence  -->
+      <turbulence>
+        <speed>5.0</speed>
+        <direction>90.0</direction>
+        <drag>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </drag>
+        <bsiter>1000</bsiter>
+        <bstime>0.02</bstime>
+      </turbulence>
+
+      <!-- AHRS (orientation)  -->
+      <ahrs>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/ahrs, 0 = off -->
+        <rate>8</rate>
+
+      </ahrs>
+
+      <!-- Altimeter -->
+      <altimeter>
+
+        <!-- Data devlicery rate to ROS topic /hal/UAV/XXX/sensor/altimeter, 0 = off -->
+        <rate>8</rate>
+      
+      </altimeter>
+
+      <!-- Compass -->
+      <compass>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/compass, 0 = off -->
+        <rate>8</rate>
+
+      </compass>
+
+      <!-- Energy -->
+      <energy>
+
+        <!-- Data delivery rate to ROS topic /hal/UAV/XXX/sensor/battery, 0 = off -->
+        <rate>8</rate>
+
+        <total>2.2</total>
+        <remaining>2.2</remaining>
+        <consumption>
+          <base>0.2</base>
+          <flight>6.6</flight>
+        </consumption>
+        <limits>
+          <kill>0.1</kill>
+          <warn>0.2</warn>
+        </limits>
+        <throttle>0.001</throttle>
+      </energy>
+
+      <!-- GNSS receiver (imporatantly, it will be assumed that there is a very short -->
+      <!-- baseline between the platforms, to correct ionosphere and troposphere del) -->
+      <gnss>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/gnss, 0 = off -->    
+        <rate>8</rate>
+      
+        <!-- GPS support (negative errors = from REAL data, 0 = no error) -->
+        <gps>
+          <signal>L1</signal>   <!-- L1, L2, DUAL, DISABLED -->
+          <corrections>         <!--ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>      <!--Signal tracking error -->
+            <clk>0.0</clk>      <!--Satellite clock error -->
+            <rel>0.0</rel>      <!--Relativity error -->
+            <rot>0.0</rot>      <!--Earth rotation error -->
+            <eph>0.0</eph>      <!--Satellite ephemeris error -->
+            <tro>0.0</tro>      <!--Troposphere error error -->
+            <ion>0.0</ion>      <!--Ionosphere error -->
+          </corrections>
+        </gps> 
+
+        <!-- Glonass support (negative errors = from REAL data, 0 = no error) -->
+        <glonass>
+          <signal>DISABLED</signal> <!--L1O, L2O, DUAL, DISABLED -->
+          <corrections>         <!--ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>      <!--Signal tracking error -->
+            <clk>0.0</clk>      <!--Satellite clock error -->
+            <rel>0.0</rel>      <!--Relativity error -->
+            <rot>0.0</rot>      <!--Earth rotation error -->
+            <eph>0.0</eph>      <!--Satellite ephemeris error -->
+            <tro>0.0</tro>      <!--Troposphere error error -->
+            <ion>0.0</ion>      <!--Ionosphere error -->
+          </corrections>
+        </glonass> 
+
+      </gnss>
+
+      <!-- Inertial measurement unit -->
+      <imu>
+
+        <!-- Data devlivery rate to ROS topic /hal/UAV/XXX/sensor/imu, 0 = off -->
+        <rate>128</rate>
+        
+      </imu>
+
+
+    </plugin>
+
+  </model>
+
+</sdf>

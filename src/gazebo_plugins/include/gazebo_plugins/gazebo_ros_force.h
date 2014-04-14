@@ -45,12 +45,7 @@
 
 namespace gazebo
 {
-/// @addtogroup gazebo_dynamic_plugins Gazebo ROS Dynamic Plugins
-/// @{
-/** \defgroup GazeboRosForce Plugin XML Reference and Example
-
-  \brief Ros Force Plugin.
-  
+/**
   This is a Plugin that collects data from a ROS topic and applies wrench to a body accordingly.
 
   Example Usage:

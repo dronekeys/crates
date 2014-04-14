@@ -1,0 +1,7 @@
+/**
+
+\defgroup hal_sensor_gnss hal_sensor_gnss
+\brief A HAL for a Global Navigation Satellite System (GNSS) receiver
+
+
+*/

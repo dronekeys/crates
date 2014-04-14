@@ -1,0 +1,6 @@
+/**
+
+\defgroup hal_sensor_camera hal_sensor_camera
+\brief A HAL for a RGB camera sensor
+
+*/

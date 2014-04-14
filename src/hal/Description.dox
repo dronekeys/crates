@@ -1,0 +1,8 @@
+/**
+
+\defgroup hal hal
+\brief The base class from which all child HAL classes are derived
+
+This is a set of base hardware abstraction layer classes.
+
+*/

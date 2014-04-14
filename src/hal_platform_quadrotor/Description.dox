@@ -1,0 +1,6 @@
+/**
+
+\defgroup platform_asctec platform_asctec
+\brief A HAL for a quadrotor flight platform
+
+*/

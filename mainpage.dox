@@ -66,5 +66,4 @@ Quadrotors are rotationally symmetric, and hence there is ambiguity as to which 
 
 One of the drawbacks of describing rotations by Euler angles is that it introduces rotational ambiguity: the order in which the angles are applied matters. Although superior representation exist, they are less intuitive to work with. Rather than project a representation on users of the system, we have chosen to adopt a X-Y-Z angle application ordering. In o
 
-
 */

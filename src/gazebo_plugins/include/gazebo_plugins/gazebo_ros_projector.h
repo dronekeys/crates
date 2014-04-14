@@ -40,12 +40,8 @@ namespace Ogre
 namespace gazebo
 {
 
-/// @addtogroup gazebo_dynamic_plugins Gazebo ROS Dynamic Plugins
-/// @{
-/** \defgroup GazeboRosProjector Plugin XML Reference and Example
+/**
 
-  \brief Ros Texture Projector Controller.
-  
   This is a controller that controls texture projection into the world from a given body.
 
   Example Usage:

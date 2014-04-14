@@ -14,16 +14,12 @@
 
 
 /**
- * \defgroup vartype Variable Types
- * \brief A List of all Variable Types.
- *
+ * 
  *	The varible types are needed for describing the content of a variable. The problem is, that only the size are not only describe the type of a variable fully (mostly because of signed and unsigned). Every time, if you want to get a variable, you get the type and size of the variable for finding it from the buffer.
  */
 
 /**
- * \defgroup callbacks Callback Functions
- * \brief This is a list of all callback functions, you have to call at the beginning of your code.
- *
+ * 
  * This module describes all important functions, that should be declared at the beginning of the program. If you don't do that, the fully functionality of ACI cannot be guaranteed.
  *
  */
