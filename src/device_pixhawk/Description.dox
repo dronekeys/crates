@@ -1,0 +1,7 @@
+/**
+
+\defgroup platform_pixhawk platform_pixhawk
+\brief Code that is unique to PixHawk flight platforms
+
+
+*/

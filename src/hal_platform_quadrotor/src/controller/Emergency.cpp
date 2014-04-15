@@ -1,25 +1,23 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Emergency.h>
+#include <hal_platform_quadrotor/controller/Emergency.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Emergency::Receive(ControlEmergency::Request &req, ControlEmergency::Response &res)
-{
-    // Eveything OK
+bool Emergency::Receive(
+	hal_platform_quadrotor::Emergency::Request &req, 
+	hal_platform_quadrotor::Emergency::Response &res
+) {
     return true;
 }
 
-// Constructor
-Emergency::Emergency(ros::NodeHandle &node, std::string name) 
-    : Controller(EmergencyType)
-{
-    service = node.advertiseService(name.c_str(), &Emergency::Receive, this);
-}
+Emergency::Emergency() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>("control/emergency")
+{}
 
-// Get new control from current state and time step
-Control Emergency::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Emergency::Update(
+	const hal_platform_quadrotor::State &state, 
+	const double &dt
+) {
+	hal_platform_quadrotor::Control control;
     return control;
 }
 

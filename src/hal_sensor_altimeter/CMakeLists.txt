@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal)
+project(hal_sensor_altimeter)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,8 +14,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
+  message_generation
   std_msgs
-	message_generation
+  hal
 ) 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -52,16 +53,17 @@ add_message_files(
   DIRECTORY
     msg
   FILES  
-    Status.msg
+    Data.msg
 )
 
+
 ## Generate services in the 'srv' folder
- add_service_files(
-   DIRECTORY
-     srv
-   FILES
-     SetRate.srv
-)
+## add_service_files(
+##   DIRECTORY
+##     srv
+##   FILES
+##     SetRate.srv
+## )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -90,7 +92,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    hal
+    altimeter
   DEPENDS 
     roscpp
     message_runtime
@@ -107,19 +109,20 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(hal
-  src/HAL.cpp
-  src/Platform.cpp
-  src/Sensor.cpp
-  src/Controller.cpp
+add_library(altimeter
+  src/Altimeter.cpp
 )
+## Declare a cpp executable
+# add_executable(uav_driver 
+#	src/checksum.cpp
+#)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal hal_generate_messages_cpp)
+add_dependencies(altimeter hal_sensor_altimeter_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal
+target_link_libraries(altimeter
 	${catkin_LIBRARIES} 
 )
 

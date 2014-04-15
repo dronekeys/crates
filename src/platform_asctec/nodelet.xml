@@ -1,7 +1,0 @@
-<library path="lib/libfcs">
-  <class name="platform_complacs/FlightControlSystem" type="platform_complacs::FlightControlSystem" base_class_type="nodelet::Nodelet">
-    <description> 
-		The objective of the FlightControlSystem class is to interface with the flight control system (FCS) provided by Ascending Technologies (AscTec). The class instantiates a single asynchronous serial class, which binds to port /dev/ttyUSB0 at 57600 baud to interface with the High Level (HL) controller on the FCS. The communication protocol used is the AscTec Control Interface (ACI) and the HL is flashed with the stock firmware (V3). This firmware provides the ability to do three major things – requets variables, control commands and set parameters. 
-    </description>
-  </class>
-</library>

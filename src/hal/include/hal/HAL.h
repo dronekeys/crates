@@ -42,16 +42,17 @@ namespace hal
 
     protected:
 
-        /// Handle to a ROS node
-        ros::NodeHandle rosNode;
+        /// Handle to a ROS node, shared by all children
+        static ros::NodeHandle rosNode;
 
     public:    
 
-        //! Create a new Platform HAL
+
+        //! Create a new HAL
         /*!
-          \param name the name of the sensor
+          \param name the name of the entity
         */
-        HAL(const char *name);
+        HAL(const char* name);
 
         //! Set the state of the sensor
         /*!
@@ -59,6 +60,18 @@ namespace hal
           \param message a string representation of the current status
         */
         void SetStatus(const HardwareStatus &status, const std::string &msg);
+
+        //! Initialise the to use a particular ROS node
+        /*!
+          \param node the ROS node to which the entity will be attached
+        */
+        void Init(ros::NodeHandle& node);
+
+        //! Initialise the to create a new ROS node
+        /*!
+          \param name the name of the new ROS node
+        */
+        void Init(const char* name);
         
     };
 }

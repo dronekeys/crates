@@ -7,7 +7,7 @@
 #define _Z      2
 #define _YAW    3
 
-using namespace hal_quadrotor;
+using namespace hal::platform;
 
 // Configure data broadcast at a given rate (<= 0.0 means disable)
 bool Waypoint::Receive(ControlWaypoint::Request &req, ControlWaypoint::Response &res)

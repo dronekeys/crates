@@ -1,21 +1,24 @@
-# Minimum build environment
 cmake_minimum_required(VERSION 2.8.3)
-
-# Project name
-project(hal)
+project(platform_asctec)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-# Add custom cmake
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
-  std_msgs
-	message_generation
+  nodelet
+  hal_platform_quadrotor
+  hal_sensor_imu
+  hal_sensor_compass
+  hal_sensor_pressure
+  hal_sensor_gnss
+) 
+
+# Find Boost
+find_package(Boost REQUIRED COMPONENTS
+  thread
 ) 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -48,33 +51,29 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  DIRECTORY
-    msg
-  FILES  
-    Status.msg
-)
+#add_message_files(
+#   FILES
+#   MessageTest.msg
+#
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   DIRECTORY
-     srv
-   FILES
-     SetRate.srv
-)
+#add_service_files(
+#   FILES
+#   ServiceTest.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
-#   DIRECTORY 
-#     action
-#  FILES 
+#   FILES
+#   Action1.action
+#   Action2.action
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-    std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -86,41 +85,50 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
-catkin_package(
-  INCLUDE_DIRS 
-    include
-  LIBRARIES
-    hal
-  DEPENDS 
-    roscpp
-    message_runtime
-)
+#catkin_package(
+#  LIBRARIES
+#    fcs
+#)
 
 ###########
 ## Build ##
 ###########
 
+## Because C is a great language...
+set(CMAKE_C_FLAGS "-std=c99") 
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include 
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
 
 ## Declare a cpp library
-add_library(hal
-  src/HAL.cpp
-  src/Platform.cpp
-  src/Sensor.cpp
-  src/Controller.cpp
+add_library(fcs
+  src/serial/AsyncSerial.cpp
+  src/aci/asctecCommIntf.c
+  src/FlightControlSystem.cpp
 )
+
+## Declare a cpp executable
+#add_executable(platform_asctec 
+#	src/serial/AsyncSerial.cpp
+#	src/serial/BufferedAsyncSerial.cpp
+# src/Driver.cpp
+#)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal hal_generate_messages_cpp)
+add_dependencies(fcs 
+  hal_platform_quadrotor
+  hal_sensor_imu
+  hal_sensor_compass
+  hal_sensor_pressure
+  hal_sensor_gnss
+)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal
+target_link_libraries(fcs 
 	${catkin_LIBRARIES} 
+	${Boost_LIBRARIES}
 )
 
 #############

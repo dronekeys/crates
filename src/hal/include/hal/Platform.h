@@ -1,8 +1,6 @@
 #ifndef HAL_PLATFORM_H
 #define HAL_PLATFORM_H
 
-#include <string>
-#include <ros/ros.h>
 #include <hal/HAL.h>
 
 #define DEFAULT_SENSOR_RATE   1.0

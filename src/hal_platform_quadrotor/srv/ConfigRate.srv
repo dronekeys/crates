@@ -1,7 +1,0 @@
-# INSTRUCTION
-string  name
-float64 rate
----
-# RESULT
-bool    success
-string  status

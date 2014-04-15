@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package>
+
+  <name>device_asctec</name>
+  
+  <version>0.0.1</version>
+  
+  <description>The device_asctec spackage</description>
+  
+  <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
+  <author email="r.denardi@ucl.ac.uk">Renzo De Nardi</author>
+  
+  <license>BSD</license>
+  
+  <url type="website">https://github.com/UCL-CompLACS/qrsim</url>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>hal_platform_quadrotor</build_depend>
+  <build_depend>hal_sensor_compass</build_depend>
+  <build_depend>hal_sensor_gnss</build_depend>
+  <build_depend>hal_sensor_imu</build_depend>
+  <build_depend>hal_sensor_pressure</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>hal_platform_quadrotor</run_depend>
+  <run_depend>hal_sensor_compass</run_depend>
+  <run_depend>hal_sensor_gnss</run_depend>
+  <run_depend>hal_sensor_imu</run_depend>
+  <run_depend>hal_sensor_pressure</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet.xml"/>
+  </export>
+
+</package>

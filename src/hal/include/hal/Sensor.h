@@ -1,8 +1,6 @@
 #ifndef HAL_SENSOR_H
 #define HAL_SENSOR_H
 
-#include <string>
-#include <ros/ros.h>
 #include <hal/HAL.h>
 
 #include <hal/SetRate.h>
@@ -46,6 +44,7 @@ namespace hal
             /*!
               \param req the rate request message
               \param res the rate response message
+              \return whether the rate updated was accepted
             */
             bool SetRate(hal::SetRate::Request &req, hal::SetRate::Response &res);
 

@@ -1,6 +1,6 @@
 /**
 
-\defgroup hal_sensor_hal hal_sensor_hal
-\brief A HAL for an Inertial Measurement Unit (IMU)
+\defgroup hal_sensor_compass hal_sensor_compass
+\brief A HAL for a triaxial magnetometer.
 
 */

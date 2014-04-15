@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal)
+project(hal_platform_quadrotor)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -15,7 +15,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
   std_msgs
+  geometry_msgs
 	message_generation
+  hal
 ) 
 
 # General algorithm libraries
@@ -58,15 +60,8 @@ add_message_files(
   DIRECTORY
     msg
   FILES  
-    Altitude.msg
-    Inertial.msg
-    Magnetic.msg
-    Energy.msg
-    Orientation.msg
-    Position.msg
-    Information.msg
-    Control.msg
     State.msg
+    Control.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -74,16 +69,15 @@ add_service_files(
   DIRECTORY
     srv
   FILES
-    ControlIdle.srv
-    ControlTakeoff.srv
-    ControlHover.srv
-    ControlLand.srv
-    ControlEmergency.srv
-    ControlAnglesHeight.srv
-    ControlVelocity.srv
-    ControlVelocityHeight.srv
-    ControlWaypoint.srv
-    ConfigRate.srv
+    Idle.srv
+    Takeoff.srv
+    Hover.srv
+    Land.srv
+    Emergency.srv
+    AnglesHeight.srv
+    Velocity.srv
+    VelocityHeight.srv
+    Waypoint.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -97,6 +91,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
     std_msgs
+    geometry_msgs
 )
 
 ###################################
@@ -125,23 +120,24 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR} ${GeographicLib_INCLUDE_DIRS})
+include_directories(include 
+  ${catkin_INCLUDE_DIRS} 
+  ${Boost_INCLUDE_DIR} 
+  ${GeographicLib_INCLUDE_DIRS}
+)
 
 ## Declare a cpp library
 add_library(quadrotor
-  src/controller/Idle.cpp
-  src/controller/Takeoff.cpp
-  src/controller/Hover.cpp
-  src/controller/Land.cpp
+#  src/controller/Idle.cpp
+#  src/controller/Takeoff.cpp
+#  src/controller/Hover.cpp
+#  src/controller/Land.cpp
   src/controller/Emergency.cpp
-  src/controller/AnglesHeight.cpp
-  src/controller/Velocity.cpp
-  src/controller/VelocityHeight.cpp
-  src/controller/Waypoint.cpp
-  src/configuration/Rate.cpp
-  src/Topic.cpp
-  src/Navigation.cpp
-  src/HAL.cpp
+#  src/controller/AnglesHeight.cpp
+#  src/controller/Velocity.cpp
+#  src/controller/VelocityHeight.cpp
+#  src/controller/Waypoint.cpp
+  src/Quadrotor.cpp
 )
 ## Declare a cpp executable
 # add_executable(uav_driver 
@@ -150,10 +146,10 @@ add_library(quadrotor
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal_quadrotor hal_quadrotor_generate_messages_cpp)
+add_dependencies(quadrotor hal_platform_quadrotor_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_quadrotor
+target_link_libraries(quadrotor
 	${catkin_LIBRARIES} 
 	${Boost_LIBRARIES}
   ${GeographicLib_LIBRARIES}
