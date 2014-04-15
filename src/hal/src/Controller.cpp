@@ -26,7 +26,7 @@ double Controller<STATE,CONTROL,REQUEST,RESPONSE>::limit(const double& val, cons
 }
 
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
-Controller<STATE,CONTROL,REQUEST,RESPONSE>::Controller(const char* name)
+Controller<STATE,CONTROL,REQUEST,RESPONSE>::Controller(const char* n) : name(n), ControllerBase<STATE,CONTROL>()
 {
-    service = rosNode.advertiseService(name, &Controller<STATE,CONTROL,REQUEST,RESPONSE>::Receive, this);
+    service = rosNode.advertiseService(n, &Controller<STATE,CONTROL,REQUEST,RESPONSE>::Receive, this);
 }

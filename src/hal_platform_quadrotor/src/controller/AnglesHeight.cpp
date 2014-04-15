@@ -1,11 +1,11 @@
-// Standard libraries
-#include <hal_quadrotor/controller/AnglesHeight.h>
+#include <hal_platform_quadrotor/controller/AnglesHeight.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool AnglesHeight::Receive(ControlAnglesHeight::Request &req, ControlAnglesHeight::Response &res)
-{
+bool AnglesHeight::Receive(
+    hal_platform_quadrotor::AnglesHeight::Request  &req, 
+    hal_platform_quadrotor::AnglesHeight::Response &res
+) {
     // Rest the controller
     Reset();
 
@@ -19,16 +19,14 @@ bool AnglesHeight::Receive(ControlAnglesHeight::Request &req, ControlAnglesHeigh
     return true;
 }
 
-// Constructor
-AnglesHeight::AnglesHeight(ros::NodeHandle &node, std::string name) 
-    : Controller(ActionType)
-{
-    service = node.advertiseService(name.c_str(), &AnglesHeight::Receive, this);
-}
+AnglesHeight::AnglesHeight() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>("AnglesHeight")
+{}
 
-// Get new control from current state and time step
-Control AnglesHeight::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control AnglesHeight::Update(
+    const hal_platform_quadrotor::State &state, 
+    const double &dt
+) {
     /******************************************************************
     %  Computes the quadrotor control signals given the current state, 
     %  desired angles, heading and altitude

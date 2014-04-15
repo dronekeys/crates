@@ -1,25 +1,22 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Idle.h>
+#include <hal_platform_quadrotor/controller/Idle.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Idle::Receive(ControlIdle::Request &req, ControlIdle::Response &res)
-{
-    // Eveything OK
+bool Idle::Receive(
+    hal_platform_quadrotor::Idle::Request  &req, 
+    hal_platform_quadrotor::Idle::Response &res
+) {
     return true;
 }
 
-// Constructor
-Idle::Idle(ros::NodeHandle &node, std::string name) 
-    : Controller(IdleType)
-{
-    service = node.advertiseService(name.c_str(), &Idle::Receive, this);
-}
+Idle::Idle() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>("Idle")
+{}
 
-// Get new control from current state and time step
-Control Idle::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Idle::Update(
+	const hal_platform_quadrotor::State &state, 
+	const double &dt
+) {
     return control;
 }
 

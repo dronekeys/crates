@@ -1,17 +1,17 @@
-// Standard libraries
-#include <hal_quadrotor/controller/VelocityHeight.h>
+#include <hal_platform_quadrotor/controller/VelocityHeight.h>
 
-// Convenience declarations
 #define _U      0
 #define _V      1
 #define _YAW    2
 #define _HEIGHT 3
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool VelocityHeight::Receive(ControlVelocityHeight::Request &req, ControlVelocityHeight::Response &res)
-{
+bool VelocityHeight::Receive(
+    hal_platform_quadrotor::VelocityHeight::Request  &req, 
+    hal_platform_quadrotor::VelocityHeight::Response &res
+) {
+
     // Rest the controller
     Reset();
 
@@ -25,17 +25,14 @@ bool VelocityHeight::Receive(ControlVelocityHeight::Request &req, ControlVelocit
     return true;
 }
 
+VelocityHeight::VelocityHeight() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>("VelocityHeight")
+{}
 
-// Constructor
-VelocityHeight::VelocityHeight(ros::NodeHandle &node, std::string name) 
-    : Controller(ActionType)
-{
-    service = node.advertiseService(name.c_str(), &VelocityHeight::Receive, this);
-}
-
-// Get new control from current state and time step
-Control VelocityHeight::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control VelocityHeight::Update(
+    const hal_platform_quadrotor::State &state, 
+    const double &dt
+) {
     /******************************************************************
     %  Computes the quadrotor control signals given the current state,
     %  desired altitude, heading and velocity in global frame (NE  coords)

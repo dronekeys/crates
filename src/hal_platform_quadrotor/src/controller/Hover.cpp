@@ -1,25 +1,22 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Hover.h>
+#include <hal_platform_quadrotor/controller/Hover.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Hover::Receive(ControlHover::Request &req, ControlHover::Response &res)
-{
-    // Eveything OK
+bool Hover::Receive(
+    hal_platform_quadrotor::Hover::Request  &req, 
+    hal_platform_quadrotor::Hover::Response &res
+) {
     return true;
 }
 
-// Constructor
-Hover::Hover(ros::NodeHandle &node, std::string name) 
-    : Controller(HoverType)
-{
-    service = node.advertiseService(name.c_str(), &Hover::Receive, this);
-}
+Hover::Hover() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Hover::Request, hal_platform_quadrotor::Hover::Response>("Hover")
+{}
 
-// Get new control from current state and time step
-Control Hover::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Hover::Update(
+	const hal_platform_quadrotor::State &state, 
+	const double &dt
+) {
     return control;
 }
 

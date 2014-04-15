@@ -1,25 +1,22 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Takeoff.h>
+#include <hal_platform_quadrotor/controller/Takeoff.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Takeoff::Receive(ControlTakeoff::Request &req, ControlTakeoff::Response &res)
-{
-    // Eveything OK
+bool Takeoff::Receive(
+    hal_platform_quadrotor::Takeoff::Request  &req, 
+    hal_platform_quadrotor::Takeoff::Response &res
+) {
     return true;
 }
 
-// Constructor
-Takeoff::Takeoff(ros::NodeHandle &node, std::string name) 
-    : Controller(TakeoffType)
-{
-    service = node.advertiseService(name.c_str(), &Takeoff::Receive, this);
-}
+Takeoff::Takeoff() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>("Takeoff")
+{}
 
-// Get new control from current state and time step
-Control Takeoff::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Takeoff::Update(
+	const hal_platform_quadrotor::State &state, 
+	const double &dt
+) {
     return control;
 }
 

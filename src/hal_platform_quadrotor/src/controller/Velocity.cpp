@@ -1,17 +1,17 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Velocity.h>
+#include <hal_platform_quadrotor/controller/Velocity.h>
 
-// Convenience declarations
 #define _X      0
 #define _Y      1
 #define _Z      2
 #define _YAW    3
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Velocity::Receive(ControlVelocity::Request &req, ControlVelocity::Response &res)
-{
+bool Velocity::Receive(
+    hal_platform_quadrotor::Velocity::Request  &req, 
+    hal_platform_quadrotor::Velocity::Response &res
+) {
+
     // Rest the controller
     Reset();
 
@@ -25,16 +25,14 @@ bool Velocity::Receive(ControlVelocity::Request &req, ControlVelocity::Response 
     return true;
 }
 
-// Constructor
-Velocity::Velocity(ros::NodeHandle &node, std::string name) 
-    : Controller(ActionType)
-{
-    service = node.advertiseService(name.c_str(), &Velocity::Receive, this);
-}
+Velocity::Velocity() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>("Velocity")
+{}
 
-// Get new control from current state and time step
-Control Velocity::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Velocity::Update(
+    const hal_platform_quadrotor::State &state, 
+    const double &dt
+) {
     /******************************************************************
     %  Computes the quadtotor control signals given the current state 
     %  and a target navigation frame velocity and heading

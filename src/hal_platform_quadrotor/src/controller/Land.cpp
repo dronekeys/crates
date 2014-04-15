@@ -1,25 +1,22 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Land.h>
+#include <hal_platform_quadrotor/controller/Land.h>
 
-using namespace hal_quadrotor;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Land::Receive(ControlLand::Request &req, ControlLand::Response &res)
-{
-    // Eveything OK
+bool Land::Receive(
+    hal_platform_quadrotor::Land::Request  &req, 
+    hal_platform_quadrotor::Land::Response &res
+) {
     return true;
 }
 
-// Constructor
-Land::Land(ros::NodeHandle &node, std::string name) 
-    : Controller(LandType)
-{
-    service = node.advertiseService(name.c_str(), &Land::Receive, this);
-}
+Land::Land() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>("Land")
+{}
 
-// Get new control from current state and time step
-Control Land::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Land::Update(
+	const hal_platform_quadrotor::State &state, 
+	const double &dt
+) {
     return control;
 }
 

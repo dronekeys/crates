@@ -1,11 +1,15 @@
-#ifndef HAL_QUADROTOR_ANGLESHEIGHT_H
-#define HAL_QUADROTOR_ANGLESHEIGHT_H
+#ifndef HAL_PLATFORM_QUADROTOR_ANGLESHEIGHT_H
+#define HAL_PLATFORM_QUADROTOR_ANGLESHEIGHT_H
 
-// Messages used and produced by this controller
-#include <hal_quadrotor/AnglesHeight.h>
+// Base controller type
+#include <hal/Controller.h>
 
-// Base type
-#include "Controller.h"
+// Messages used by this controller
+#include <hal_platform_quadrotor/State.h>
+#include <hal_platform_quadrotor/Control.h>
+
+// Services used by this controller
+#include <hal_platform_quadrotor/AnglesHeight.h>
 
 // Convenience declarations
 #define _ROLL   0 
@@ -17,12 +21,17 @@ namespace hal
 {
     namespace controller
     {
-        class AnglesHeight : public Controller
+        //! A quadrotor Emergency controller
+        /*!
+          A more elaborate class description.
+        */
+        class AnglesHeight : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>
         {
 
         private:
 
-            // If this is the first iteration since reset
+            /// If this is the first iteration since reset
             bool first;
 
         	// Constant parameters
@@ -36,20 +45,38 @@ namespace hal
             static const double _th_hover   = 0.59;     // throttle hover offset
 
             // PID parameters
-            double iz, ez, sp[4];
+            double iz;
+            double ez;
+            double sp[4];
 
-            // Configure data broadcast at a given rate (<= 0.0 means disable)
-            bool Receive(ControlAnglesHeight::Request &req, ControlAnglesHeight::Response &res);
+            //! Callback for goal update
+            /*!
+              \param req the goal request
+              \param res the goal response
+              \return whether the control was accepted
+            */
+            bool Receive(
+                hal_platform_quadrotor::AnglesHeight::Request& req, 
+                hal_platform_quadrotor::AnglesHeight::Response& res
+            );
 
         public:
 
-            // Constructor
-            AnglesHeight(ros::NodeHandle &node, std::string name);
+            /// Constructor
+            AnglesHeight();
 
-            // Get new control from current state and time step
-            Control Update(const State &state, const double &dt);
+            //! Control update implementations
+            /*!
+              \param state the current platform state
+              \param dt the discrete time tick
+              \return the control required to move from the current state to the goal 
+            */
+            hal_platform_quadrotor::Control Update(
+                const hal_platform_quadrotor::State &state, 
+                const double &dt
+            );
 
-            // Reset the current state
+            /// Reset the current state
             void Reset();
         };
     }

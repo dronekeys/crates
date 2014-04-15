@@ -1,17 +1,16 @@
-// Standard libraries
-#include <hal_quadrotor/controller/Waypoint.h>
+#include <hal_platform_quadrotor/controller/Waypoint.h>
 
-// Convenience declarations
 #define _X      0
 #define _Y      1
 #define _Z      2
 #define _YAW    3
 
-using namespace hal::platform;
+using namespace hal::controller;
 
-// Configure data broadcast at a given rate (<= 0.0 means disable)
-bool Waypoint::Receive(ControlWaypoint::Request &req, ControlWaypoint::Response &res)
-{
+bool Waypoint::Receive(
+    hal_platform_quadrotor::Waypoint::Request  &req, 
+    hal_platform_quadrotor::Waypoint::Response &res
+) {
     // Rest the controller
     Reset();
 
@@ -25,16 +24,14 @@ bool Waypoint::Receive(ControlWaypoint::Request &req, ControlWaypoint::Response 
     return true;
 }
 
-// Constructor
-Waypoint::Waypoint(ros::NodeHandle &node, std::string name) 
-    : Controller(ActionType)
-{
-    service = node.advertiseService(name.c_str(), &Waypoint::Receive, this);
-}
+Waypoint::Waypoint() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>("Waypoint")
+{}
 
-// Get new control from current state and time step
-Control Waypoint::Update(const State &state, const double &dt)
-{
+hal_platform_quadrotor::Control Waypoint::Update(
+    const hal_platform_quadrotor::State &state, 
+    const double &dt
+) {
     /******************************************************************
     %  Computes the quadtotor control signals given the current state 
     %  and a desired waypoint. The desired attitude is enforced by a

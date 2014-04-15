@@ -31,7 +31,10 @@ namespace hal
               \param res the goal response
               \return whether the control was accepted
             */
-            bool Receive(hal_platform_quadrotor::Emergency::Request &req, hal_platform_quadrotor::Emergency::Response &res);
+            bool Receive(
+                hal_platform_quadrotor::Emergency::Request& req, 
+                hal_platform_quadrotor::Emergency::Response& res
+            );
 
         public:
 
@@ -44,7 +47,10 @@ namespace hal
               \param dt the discrete time tick
               \return the control required to move from the current state to the goal 
             */
-            hal_platform_quadrotor::Control Update(const hal_platform_quadrotor::State &state, const double &dt);
+            hal_platform_quadrotor::Control Update(
+                const hal_platform_quadrotor::State &state, 
+                const double &dt
+            );
 
             /// Reset the controller
             void Reset();

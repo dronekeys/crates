@@ -1,33 +1,61 @@
-#ifndef HAL_QUADROTOR_LAND_H
-#define HAL_QUADROTOR_LAND_H
+#ifndef HAL_PLATFORM_QUADROTOR_LAND_H
+#define HAL_PLATFORM_QUADROTOR_LAND_H
 
-// Messages used and produced by this controller
-#include <hal_quadrotor/ControlLand.h>
+// Base controller type
+#include <hal/Controller.h>
 
-// Base class type
-#include "Controller.h"
+// Messages used by this controller
+#include <hal_platform_quadrotor/State.h>
+#include <hal_platform_quadrotor/Control.h>
 
-namespace hal_quadrotor
+// Services used by this controller
+#include <hal_platform_quadrotor/Land.h>
+
+namespace hal
 {
-    class Land : public Controller
+    namespace controller
     {
+        //! A quadrotor Emergency controller
+        /*!
+          A more elaborate class description.
+        */
+        class Land : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>
+        {
 
-    private:
+        private:
 
-        // Configure data broadcast at a given rate (<= 0.0 means disable)
-        bool Receive(ControlLand::Request &req, ControlLand::Response &res);
+            //! Callback for goal update
+            /*!
+              \param req the goal request
+              \param res the goal response
+              \return whether the control was accepted
+            */
+            bool Receive(
+                hal_platform_quadrotor::Land::Request& req, 
+                hal_platform_quadrotor::Land::Response& res
+            );
 
-    public:
+        public:
 
-        // Constructor
-        Land(ros::NodeHandle &node, std::string name);
+            /// Constructor
+            Land();
 
-        // Get new control from current state and time step
-        Control Update(const State &state, const double &dt);
+            //! Control update implementations
+            /*!
+              \param state the current platform state
+              \param dt the discrete time tick
+              \return the control required to move from the current state to the goal 
+            */
+            hal_platform_quadrotor::Control Update(
+                const hal_platform_quadrotor::State &state, 
+                const double &dt
+            );
 
-        // Reset the current state
-        void Reset();
-    };
+            /// Reset the current state
+            void Reset();
+        };
+    }
 }
 
 #endif

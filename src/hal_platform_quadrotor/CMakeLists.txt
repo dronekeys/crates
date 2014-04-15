@@ -20,12 +20,6 @@ find_package(catkin REQUIRED COMPONENTS
   hal
 ) 
 
-# General algorithm libraries
-find_package(Boost REQUIRED) 
-
-# Geographic routine libraries
-find_package(GeographicLib REQUIRED)
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -69,11 +63,11 @@ add_service_files(
   DIRECTORY
     srv
   FILES
+    Emergency.srv
     Idle.srv
     Takeoff.srv
     Hover.srv
     Land.srv
-    Emergency.srv
     AnglesHeight.srv
     Velocity.srv
     VelocityHeight.srv
@@ -122,23 +116,22 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include 
   ${catkin_INCLUDE_DIRS} 
-  ${Boost_INCLUDE_DIR} 
-  ${GeographicLib_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
 add_library(quadrotor
-#  src/controller/Idle.cpp
-#  src/controller/Takeoff.cpp
-#  src/controller/Hover.cpp
-#  src/controller/Land.cpp
+  src/controller/Idle.cpp
+  src/controller/Takeoff.cpp
+  src/controller/Hover.cpp
+  src/controller/Land.cpp
   src/controller/Emergency.cpp
-#  src/controller/AnglesHeight.cpp
-#  src/controller/Velocity.cpp
-#  src/controller/VelocityHeight.cpp
-#  src/controller/Waypoint.cpp
+  src/controller/AnglesHeight.cpp
+  src/controller/Velocity.cpp
+  src/controller/VelocityHeight.cpp
+  src/controller/Waypoint.cpp
   src/Quadrotor.cpp
 )
+
 ## Declare a cpp executable
 # add_executable(uav_driver 
 #	src/checksum.cpp
@@ -146,13 +139,13 @@ add_library(quadrotor
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(quadrotor hal_platform_quadrotor_generate_messages_cpp)
+add_dependencies(quadrotor 
+  hal_platform_quadrotor_generate_messages_cpp
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(quadrotor
 	${catkin_LIBRARIES} 
-	${Boost_LIBRARIES}
-  ${GeographicLib_LIBRARIES}
 )
 
 #############

@@ -3,14 +3,14 @@
 using namespace hal::controller;
 
 bool Emergency::Receive(
-	hal_platform_quadrotor::Emergency::Request &req, 
-	hal_platform_quadrotor::Emergency::Response &res
+    hal_platform_quadrotor::Emergency::Request  &req, 
+    hal_platform_quadrotor::Emergency::Response &res
 ) {
-    return true;
+	return SwitchController(name);
 }
 
 Emergency::Emergency() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>("control/emergency")
+	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>("Emergency")
 {}
 
 hal_platform_quadrotor::Control Emergency::Update(

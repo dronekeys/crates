@@ -1,51 +1,81 @@
-#ifndef HAL_QUADROTOR_VELOCITY_H
-#define HAL_QUADROTOR_VELOCITY_H
+#ifndef HAL_PLATFORM_QUADROTOR_VELOCITY_H
+#define HAL_PLATFORM_QUADROTOR_VELOCITY_H
 
-// Messages used and produced by this controller
-#include <hal_quadrotor/ControlVelocity.h>
+// Base controller type
+#include <hal/Controller.h>
 
-// Basic HAL : provides Controller class
-#include "Controller.h"
+// Messages used by this controller
+#include <hal_platform_quadrotor/State.h>
+#include <hal_platform_quadrotor/Control.h>
 
-namespace hal_quadrotor
+// Services used by this controller
+#include <hal_platform_quadrotor/Velocity.h>
+
+namespace hal
 {
-    class Velocity : public Controller
+    namespace controller
     {
+        //! A quadrotor Emergency controller
+        /*!
+          A more elaborate class description.
+        */
+        class Velocity : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>
+        {
 
-    private:
+        private:
 
-        // If this is the first iteration since reset
-        bool first;
+            // If this is the first iteration since reset
+            bool first;
 
-        static const double _Kvp        =  0.25;     // xy velocity proportional constant 
-        static const double _Kvi        =  0.003;    // xy velocity integrative constant 
-        static const double _Kvd        =  0.05;     // xy velocity derivative constant
-        static const double _Kwp        = -0.2;     // z velocity proportional constant 
-        static const double _Kwi        = -0.002;   // z velocity integrative constant 
-        static const double _Kwd        = -0.0;     // z velocity derivative constant
-        static const double _th_hover   =  0.59;     // throttle hover offset
-        static const double _maxtilt    =  0.34;     // max pitch/roll angle
-        static const double _Kya        =  6.0;      // yaw proportional constant
-        static const double _maxyawrate =  4.4;      // max allowed yaw rate
-        static const double _maxv       =  3.0;      // max allowed xy velocity
+            static const double _Kvp        =  0.25;     // xy velocity proportional constant 
+            static const double _Kvi        =  0.003;    // xy velocity integrative constant 
+            static const double _Kvd        =  0.05;     // xy velocity derivative constant
+            static const double _Kwp        = -0.2;     // z velocity proportional constant 
+            static const double _Kwi        = -0.002;   // z velocity integrative constant 
+            static const double _Kwd        = -0.0;     // z velocity derivative constant
+            static const double _th_hover   =  0.59;     // throttle hover offset
+            static const double _maxtilt    =  0.34;     // max pitch/roll angle
+            static const double _Kya        =  6.0;      // yaw proportional constant
+            static const double _maxyawrate =  4.4;      // max allowed yaw rate
+            static const double _maxv       =  3.0;      // max allowed xy velocity
 
-        // PID parameters
-        double ei[3], ep[3], sp[4];
+            // PID parameters
+            double ei[3];
+            double ep[3];
+            double sp[4];
 
-        // Configure data broadcast at a given rate (<= 0.0 means disable)
-        bool Receive(ControlVelocity::Request &req, ControlVelocity::Response &res);
+            //! Callback for goal update
+            /*!
+              \param req the goal request
+              \param res the goal response
+              \return whether the control was accepted
+            */
+            bool Receive(
+                hal_platform_quadrotor::Velocity::Request& req, 
+                hal_platform_quadrotor::Velocity::Response& res
+            );
 
-    public:
+        public:
 
-        // Constructor
-        Velocity(ros::NodeHandle &node, std::string name);
+            /// Constructor
+            Velocity();
 
-        // Get new control from current state and time step
-        Control Update(const State &state, const double &dt);
+            //! Control update implementations
+            /*!
+              \param state the current platform state
+              \param dt the discrete time tick
+              \return the control required to move from the current state to the goal 
+            */
+            hal_platform_quadrotor::Control Update(
+                const hal_platform_quadrotor::State &state, 
+                const double &dt
+            );
 
-        // Reset the current state
-        void Reset();
-    };
+            /// Reset the current state
+            void Reset();
+        };
+    }
 }
 
 #endif
