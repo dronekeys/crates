@@ -95,16 +95,15 @@ hal_platform_quadrotor::Control Velocity::Update(
 
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
+    // This is no longer the first iteration
+    first = false;
+
     // This will be returned
+    hal_platform_quadrotor::Control control;
     control.roll     = desR;
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = desT;
-
-    // This is no longer the first iteration
-    first = false;
-
-    // Return the control
     return control;
 }
 

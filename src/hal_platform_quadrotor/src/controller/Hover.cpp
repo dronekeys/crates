@@ -17,6 +17,7 @@ hal_platform_quadrotor::Control Hover::Update(
 	const hal_platform_quadrotor::State &state, 
 	const double &dt
 ) {
+	hal_platform_quadrotor::Control control;	
     return control;
 }
 

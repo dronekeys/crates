@@ -83,16 +83,15 @@ hal_platform_quadrotor::Control Waypoint::Update(
 
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
+    // This is no longer the first iteration
+    first = false;
+
     // This will be returned
+    hal_platform_quadrotor::Control control;
     control.roll     = desR;
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
-
-    // This is no longer the first iteration
-    first = false;
-
-    // Return the control
     return control;
 }
 

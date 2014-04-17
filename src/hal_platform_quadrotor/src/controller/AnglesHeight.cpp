@@ -65,16 +65,15 @@ hal_platform_quadrotor::Control AnglesHeight::Update(
     
     //////////////////////// CONTROL PACKAGING /////////////////////////
 
+    // This is no longer the first iteration
+    first = false;
+    
     // This will be returned
+    hal_platform_quadrotor::Control control;
     control.roll     = sp[_ROLL];
     control.pitch    = sp[_PITCH];
     control.yaw      = ya;
     control.throttle = th;
-
-    // This is no longer the first iteration
-    first = false;
-
-    // Return the control
     return control;
 }
 

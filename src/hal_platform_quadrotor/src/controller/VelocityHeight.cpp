@@ -35,7 +35,7 @@ hal_platform_quadrotor::Control VelocityHeight::Update(
 ) {
     /******************************************************************
     %  Computes the quadrotor control signals given the current state,
-    %  desired altitude, heading and velocity in global frame (NE  coords)
+    %  desired altitude, heading and velocity in global frame (ENU coords)
     %
     %  The desidred 2D velocity is enforced by a P controller that controls
     %  the pitch and roll angles of the platform as necessary. Altitude 
@@ -110,16 +110,15 @@ hal_platform_quadrotor::Control VelocityHeight::Update(
 
     //////////////////////// CONTROL PACKAGING /////////////////////////
     
+    // This is no longer the first iteration
+    first = false;
+
     // This will be returned
+    hal_platform_quadrotor::Control control;
     control.roll     = desR;
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
-
-    // This is no longer the first iteration
-    first = false;
-
-    // Return the control
     return control;
 }
 
