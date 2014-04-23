@@ -32,31 +32,28 @@ Controller<STATE,CONTROL,REQUEST,RESPONSE>::Controller(const char *n) : name(n),
     service = rosNode.advertiseService(n, &Controller<STATE,CONTROL,REQUEST,RESPONSE>::Receive, this);
 
     // Add to the controller map
-    controllers[n] = (ControllerBase<STATE,CONTROL>*) this;
+    controllers[static_cast<std::string>(n)] = (ControllerBase<STATE,CONTROL>*) this;
 }
 
 // Add an immediate transition
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
-bool Controller<STATE,CONTROL,REQUEST,RESPONSE>::PermitInstant(int num, ...)
+bool Controller<STATE,CONTROL,REQUEST,RESPONSE>::PermitInstant(const char* from, const char* to)
 {
-    va_list arguments;
-    va_start(arguments,num);    
-    for (int i = 0; i < num; i++)
-        sum += va_arg(arguments, const char *); 
-    va_end(arguments);
+    allowed[std::make_pair(static_cast<std::string>(from),static_cast<std::string>(to))] = true;
 }
 
 // Allow a wait-based controller transition
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
 bool Controller<STATE,CONTROL,REQUEST,RESPONSE>::PermitQueued(const char* from, const char* to)
 {
-    allowed.push_back(std::pair(<static_cast<std::string>(from),static_cast<std::string>(to)>);
+    allowed[std::make_pair(static_cast<std::string>(from),static_cast<std::string>(to))] = false;
 }
 
 // Get the control
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
 CONTROL Controller<STATE,CONTROL,REQUEST,RESPONSE>::GetControl(const STATE &state, const double &dt)
 {
+    // Call Update() on the current controller
     return controllers[current]->Update(state,dt);
 }
 
@@ -64,19 +61,19 @@ CONTROL Controller<STATE,CONTROL,REQUEST,RESPONSE>::GetControl(const STATE &stat
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
 bool Controller<STATE,CONTROL,REQUEST,RESPONSE>::SetController(const char* controller)
 {
-    // Special case
-    if (controller.compare("")==0 &&)
-    {
-        SetController(controller);
-        return true;        
-    }
-
     // Check that this transition is allowed
     std::string next = static_cast<std::string>(controller);
-    if (std::find_if(allow.begin(),allow.end(),Comparator(current,next)) != allow.end())
+    if (std::find_if(allowed.begin(),allowed.end(),Comparator(current,next)) != allowed.end())
     {
-        SetController(controller);
-        return true;
+        // Is this an instant transition?
+        bool instant = allowed[std::make_pair(current,next)];
+
+        // Transition logic
+        if (instant || (!instant && controllers[current]->HasGoalBeenReached()))
+        {
+            current = next;
+            return true;
+        }
     }
     return false;
 }

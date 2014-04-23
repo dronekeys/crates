@@ -45,6 +45,12 @@ namespace hal
               \return the resultant control
             */
             virtual CONTROL Update(const STATE &state, const double &dt) = 0;       
+        
+            //! Goal reach check
+            /*!
+              \return whether the goal has been reached
+            */
+            virtual bool HasGoalBeenReached() = 0;
         };
 
         //! Controller core
@@ -63,7 +69,7 @@ namespace hal
             static std::map<std::string,ControllerBase<STATE,CONTROL>*> controllers;
 
             /// A list of permissable transitions
-            static std::vector < std::pair<std::string,std::string> > allow;
+            static std::map<std::pair<std::string,std::string>,bool> allowed;
 
             /// The current controller
             static std::string current;
@@ -124,28 +130,22 @@ namespace hal
             /// Reset the current state
             virtual void Reset() = 0;
 
-            //! Goal reach check
-            /*!
-              \return whether the goal has been reached
-            */
-            virtual bool HasGoalBeenReached() = 0;
-
             // STATIC METHODS /////////////////////////////////////////////////////////
 
-            //! Add an immediately permissable transition
+            //! Add a permissable transition that occurs immediately
             /*!
               \param controller list of controllers
               \return whether the transition could be added
             */
-            static bool Instant(int num, ...);
+            static bool PermitInstant(const char* from, const char* to);
 
-            //! Add a permissable transition that must wait for current to completr 
+            //! Add a permissable transition that must wait for current to complete 
             /*!
               \param from the active controller
               \param to the proposed controller
               \return whether the transition could be added
             */
-            static bool Controller<STATE,CONTROL,REQUEST,RESPONSE>::Buffered(const char* from, const char* to)
+            static bool PermitQueued(const char* from, const char* to);
 
             //! Switch to a new controller 
             /*!
