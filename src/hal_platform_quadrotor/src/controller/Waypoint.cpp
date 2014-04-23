@@ -35,9 +35,11 @@ bool Waypoint::Receive(
     return Switch();
 }
 
-Waypoint::Waypoint() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>("Waypoint")
-{}
+Waypoint::Waypoint(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Waypoint::Update(
     const hal_platform_quadrotor::State &state, 
@@ -106,6 +108,12 @@ hal_platform_quadrotor::Control Waypoint::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Waypoint::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Waypoint::Reset()
 {
@@ -121,4 +129,5 @@ void Waypoint::Reset()
 
     // Reset
     first = true;
+    reach = false;
 }

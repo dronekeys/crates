@@ -37,9 +37,11 @@ bool VelocityHeight::Receive(
     return Switch();
 }
 
-VelocityHeight::VelocityHeight() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>("VelocityHeight")
-{}
+VelocityHeight::VelocityHeight(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control VelocityHeight::Update(
     const hal_platform_quadrotor::State &state, 
@@ -134,6 +136,12 @@ hal_platform_quadrotor::Control VelocityHeight::Update(
     return control;
 }
 
+// Goal reach implementations
+bool VelocityHeight::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void VelocityHeight::Reset()
 {
@@ -154,4 +162,5 @@ void VelocityHeight::Reset()
 
     // Reset
     first = true;
+    reach = false;
 }

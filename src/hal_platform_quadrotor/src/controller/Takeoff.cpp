@@ -9,9 +9,11 @@ bool Takeoff::Receive(
     return Switch();
 }
 
-Takeoff::Takeoff() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>("Takeoff")
-{}
+Takeoff::Takeoff(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Takeoff::Update(
 	const hal_platform_quadrotor::State &state, 
@@ -19,6 +21,12 @@ hal_platform_quadrotor::Control Takeoff::Update(
 ) {
 	hal_platform_quadrotor::Control control;
     return control;
+}
+
+// Goal reach implementations
+bool Takeoff::HasGoalBeenReached()
+{
+    return reach;
 }
 
 // Reset the current state

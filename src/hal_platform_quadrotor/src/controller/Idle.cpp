@@ -9,9 +9,11 @@ bool Idle::Receive(
    return Switch();
 }
 
-Idle::Idle() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>("Idle")
-{}
+Idle::Idle(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Idle::Update(
 	const hal_platform_quadrotor::State &state, 
@@ -21,8 +23,14 @@ hal_platform_quadrotor::Control Idle::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Idle::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Idle::Reset()
 {
-
+	reach = false;
 }

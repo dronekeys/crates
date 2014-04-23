@@ -12,7 +12,9 @@ using namespace hal::platform;
 void Quadrotor::Update(const ros::TimerEvent& event)
 {
     // Determine the required control to satisfy action, given current state
-    control = controllers[current]->Update(state, event.current_real.toSec() - tick);
+    control = hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::GetControl(
+        state, event.current_real.toSec() - tick
+    );
     
     // Update the flight control system
     ReceiveControl(control);
@@ -31,55 +33,12 @@ void Quadrotor::BroadcastState(const ros::TimerEvent& event)
     pubState.publish(state);
 }
 
-bool Quadrotor::SwitchController(const std::string& request)
-{
-    // Only accept valid controllers
-    if (controllers.find(request) == controllers.end())
-        return false;
-
-    // Determine the controller type
-    FlightLogicType next = controllers[request]->GetType();
-    FlightLogicType curr = controllers[current]->GetType();
-
-    // Permissable
-    bool allowed = false;
-
-    // Always permit a transition to emergency
-    if (next == EmergencyType)
-        allowed = true;
-    else
-    {
-        // Flight logic
-        switch (curr)
-        {
-        case EmergencyType: allowed = false;
-            break;
-        case IdleType:      allowed = (next == TakeoffType);
-            break;
-        case TakeoffType:   allowed = false;   
-            break;
-        case HoverType:     allowed = (next == LandType || next == ActionType);
-            break;
-        case LandType:      allowed = false;
-            break;
-        case ActionType:    allowed = (next == LandType || next == HoverType || next == ActionType);
-            break;
-        }
-    }
-
-    // If this transition is allowed, and the lookup key exists
-    if (allowed)
-        current = request;
-    
-    // Default not permit
-    return allowed;
-} 
-
 Quadrotor::Quadrotor(const char *name) : hal::platform::Platform(name),
-    hal::controller::Emergency("Emergency"),
-    hal::controller::Hover("Hover"),
-    hal::controller::Land("Land"),
-    hal::controller::Takeoff("Takeoff"),
+    hal::controller::Emergency("Emergency"),                /* Motors off           */
+    hal::controller::Hover("Hover"),                        /* Hold position        */
+    hal::controller::Land("Land"),                          /* Land in place        */
+    hal::controller::Idle("Idle"),                          /* Ground, motors off   */
+    hal::controller::Takeoff("Takeoff"),                    /* Takeoff to altitude  */
     hal::controller::Velocity("Velocity"),
     hal::controller::AnglesHeight("AnglesHeight"),
     hal::controller::VelocityHeight("VelocityHeight"),
@@ -88,18 +47,28 @@ Quadrotor::Quadrotor(const char *name) : hal::platform::Platform(name),
     // DEFINE A VALID SET OF TRANSITIONS /////////////////////////////////////////////////////////////
 
     // 1 argument: any node can transition to these controllers immediately
-    hal::controller::Controller::AddImmediate("Emergency");
-    hal::controller::Controller::AddImmediate("Land");
-    
-    // 2 arguments: directional transition
-    hal::controller::Controller::AddWait("Land", "Takeoff");
-    hal::controller::Controller::AddWait("Takeoff", "Hover");
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitInstant("Emergency");
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitInstant("Land");
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitInstant("Idle","Takeoff");
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitQueued("Land","Takeoff");
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitQueued("Land","Idle");
 
-    // 2+ arguments: fully connected transitions
-    hal::controller::Controller::AddImmediate("Hover","AnglesHeight","VelocityHeight","Velocity","Waypoint");
+    // All non-critical actions can be switched between automatically
+    std::vector<const char*> actions;
+    actions.push_back("Hover");
+    actions.push_back("AnglesHeight");
+    actions.push_back("VelocityHeight");
+    actions.push_back("Velocity");
+    actions.push_back("Waypoint");
+    for (std::vector<const char*>::iterator i = actions.begin(); i != actions.end(); ++i)
+    {
+        hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitQueued("Takeoff",*i);
+        for (std::vector<const char*>::iterator j = actions.begin(); j != actions.end(); ++j)
+            hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::PermitInstant(*i,*j);
+    }
 
-    // Assume the UAV is started on the ground
-    hal::controller::Controller::SetStartController("Idle");
+    // The UAV is always started on the ground
+    hal::controller::ControllerBase<hal_platform_quadrotor::State,hal_platform_quadrotor::Control>::SetController("Idle");
 
     // CREATE THE DATA BROADCAST TIMERS ///////////////////////////////////////////////////////////////
 

@@ -9,9 +9,11 @@ bool Emergency::Receive(
     return Switch();
 }
 
-Emergency::Emergency() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>("Emergency")
-{}
+Emergency::Emergency(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>(name)
+{
+	Reset();
+}
 
 hal_platform_quadrotor::Control Emergency::Update(
 	const hal_platform_quadrotor::State &state, 
@@ -21,8 +23,14 @@ hal_platform_quadrotor::Control Emergency::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Emergency::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Emergency::Reset()
 {
-
+	reach = false;
 }

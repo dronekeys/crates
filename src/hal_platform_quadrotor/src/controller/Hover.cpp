@@ -10,9 +10,11 @@ bool Hover::Receive(
     return Switch();
 }
 
-Hover::Hover() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Hover::Request, hal_platform_quadrotor::Hover::Response>("Hover")
-{}
+Hover::Hover(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Hover::Request, hal_platform_quadrotor::Hover::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Hover::Update(
 	const hal_platform_quadrotor::State &state, 
@@ -22,8 +24,14 @@ hal_platform_quadrotor::Control Hover::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Hover::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Hover::Reset()
 {
-
+	reach = false;
 }

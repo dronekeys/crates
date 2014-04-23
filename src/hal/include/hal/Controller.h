@@ -36,7 +36,20 @@ namespace hal
         template <class STATE, class CONTROL>
         class ControllerBase
         {
+        protected:
+
+            /// A list of all controllers
+            static std::map<std::string,ControllerBase<STATE,CONTROL>*> controllers;
+
+            /// A list of permissable transitions
+            static std::map<std::pair<std::string,std::string>,bool> allowed;
+
+            /// The current controller
+            static std::string current;
+
         public:
+
+            // THESE METHODS MUST BE OVERRIDEN BY THE CHILD CLASS ///////////////////////
 
             //! Perform a control update, given a state and discrete time update
             /*!
@@ -51,13 +64,50 @@ namespace hal
               \return whether the goal has been reached
             */
             virtual bool HasGoalBeenReached() = 0;
+
+            /// Reset the current state
+            virtual void Reset() = 0;
+
+            // THESE METHODS ARE CALLED TO SETUP TRANSITIONS CORRECTLY //////////////////
+            
+            //! Add a permissable transition that occurs immediately
+            /*!
+              \param controller list of controllers
+              \return whether the transition could be added
+            */
+            static bool PermitInstant(const char* a, const char* b = NULL);
+
+            //! Add a permissable transition that must wait for current to complete 
+            /*!
+              \param from the active controller
+              \param to the proposed controller
+              \return whether the transition could be added
+            */
+            static bool PermitQueued(const char* a, const char* b = NULL);
+
+            // STATIC METHODS /////////////////////////////////////////////////////////
+
+            //! Set the current controller
+            /*!
+              \param controller the new controller
+              \return whether the transition is allowed
+            */
+            static bool SetController(const char* controller);  
+
+            //! Get the control for the current 
+            /*!
+              \param state the current state
+              \param dt the time tick
+              \return the control vector
+            */
+            static CONTROL GetControl(const STATE &state, const double &dt);    
         };
 
         //! Controller core
         /*!
           Each controller receives goals over the ROS network, and therefore it offers a service.
           This class deals with the creation of such a service, as well as the ability to switch
-          between controllers. The deriv
+          between controllers.
         */
         template <class STATE, class CONTROL, class REQUEST, class RESPONSE>
         class Controller : public hal::HAL, public ControllerBase<STATE,CONTROL>
@@ -65,21 +115,12 @@ namespace hal
 
         private:
 
-            /// A list of all controllers
-            static std::map<std::string,ControllerBase<STATE,CONTROL>*> controllers;
-
-            /// A list of permissable transitions
-            static std::map<std::pair<std::string,std::string>,bool> allowed;
-
-            /// The current controller
-            static std::string current;
+            /// Name of this controller
+            const char* name;
 
         protected: 
 
             // INSTANCE METHODS /////////////////////////////////////////////////////////
-
-            /// Name of this controller
-            const char* name;
 
             /// Used to receive a new goal
             ros::ServiceServer service;
@@ -125,49 +166,7 @@ namespace hal
               \param name name of this controller
               \return new object
             */
-            Controller(const char* n);
-
-            /// Reset the current state
-            virtual void Reset() = 0;
-
-            // STATIC METHODS /////////////////////////////////////////////////////////
-
-            //! Add a permissable transition that occurs immediately
-            /*!
-              \param controller list of controllers
-              \return whether the transition could be added
-            */
-            static bool PermitInstant(const char* from, const char* to);
-
-            //! Add a permissable transition that must wait for current to complete 
-            /*!
-              \param from the active controller
-              \param to the proposed controller
-              \return whether the transition could be added
-            */
-            static bool PermitQueued(const char* from, const char* to);
-
-            //! Switch to a new controller 
-            /*!
-              \param controller the new controller
-              \return whether the transition is allowed
-            */
-            static bool Switch(const char* controller);
-
-            //! Get the control for the current 
-            /*!
-              \param state the current state
-              \param dt the time tick
-              \return the control vector
-            */
-            static CONTROL GetControl(const STATE &state, const double &dt);    
-
-            //! Set the current controller
-            /*!
-              \param controller the new controller
-              \return whether the transition is allowed
-            */
-            static bool SetController(const char* controller);                      
+            Controller(const char* n);                    
         };
     }
 }

@@ -25,8 +25,11 @@ namespace hal
 
         private:
 
-            // If this is the first iteration since reset
-            bool first;
+            /// If this is the first iteration since reset
+            bool first; 
+            
+            /// If we have reached the goal
+            bool reach;
 
             // PID parameters
             double ei[3];
@@ -47,7 +50,7 @@ namespace hal
         public:
 
             /// Constructor
-            Velocity();
+            Velocity(const char* name);
 
             //! Control update implementations
             /*!
@@ -59,6 +62,12 @@ namespace hal
                 const hal_platform_quadrotor::State &state, 
                 const double &dt
             );
+
+            //! Goal reach implementations
+            /*!
+              \return Whether the goal has been reached
+            */
+            bool HasGoalBeenReached();
 
             /// Reset the current state
             void Reset();

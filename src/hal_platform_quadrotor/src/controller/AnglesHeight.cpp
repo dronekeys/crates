@@ -29,9 +29,11 @@ bool AnglesHeight::Receive(
     return Switch();
 }
 
-AnglesHeight::AnglesHeight() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>("AnglesHeight")
-{}
+AnglesHeight::AnglesHeight(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control AnglesHeight::Update(
     const hal_platform_quadrotor::State &state, 
@@ -87,6 +89,12 @@ hal_platform_quadrotor::Control AnglesHeight::Update(
     return control;
 }
 
+// Goal reach implementations
+bool AnglesHeight::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void AnglesHeight::Reset()
 {
@@ -102,4 +110,5 @@ void AnglesHeight::Reset()
 
     // Reset
     first = true;
+    reach = false;
 }

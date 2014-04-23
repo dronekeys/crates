@@ -37,9 +37,11 @@ bool Velocity::Receive(
     return Switch();
 }
 
-Velocity::Velocity() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>("Velocity")
-{}
+Velocity::Velocity(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Velocity::Update(
     const hal_platform_quadrotor::State &state, 
@@ -119,6 +121,12 @@ hal_platform_quadrotor::Control Velocity::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Velocity::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Velocity::Reset()
 {
@@ -137,4 +145,5 @@ void Velocity::Reset()
 
     // Reset
     first = true;
+    reach = false;
 }

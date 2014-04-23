@@ -9,9 +9,11 @@ bool Land::Receive(
     return Switch();
 }
 
-Land::Land() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>("Land")
-{}
+Land::Land(const char *name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>(name)
+{
+    Reset();
+}
 
 hal_platform_quadrotor::Control Land::Update(
 	const hal_platform_quadrotor::State &state, 
@@ -21,8 +23,14 @@ hal_platform_quadrotor::Control Land::Update(
     return control;
 }
 
+// Goal reach implementations
+bool Land::HasGoalBeenReached()
+{
+    return reach;
+}
+
 // Reset the current state
 void Land::Reset()
 {
-
+	reach = false;
 }
