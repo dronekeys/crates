@@ -6,7 +6,7 @@ bool Takeoff::Receive(
     hal_platform_quadrotor::Takeoff::Request  &req, 
     hal_platform_quadrotor::Takeoff::Response &res
 ) {
-    return true;
+    return Switch();
 }
 
 Takeoff::Takeoff() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,

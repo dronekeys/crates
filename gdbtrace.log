@@ -1,0 +1,177 @@
+warning: Currently logging to gdbtrace.log.  Turn the logging off and on to make the new setting effective.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffe0b10700 (LWP 11996)]
+[New Thread 0x7fffdf39d700 (LWP 11997)]
+[New Thread 0x7fffdeb9c700 (LWP 11998)]
+[New Thread 0x7fffd7fff700 (LWP 11999)]
+[New Thread 0x7fffd77fe700 (LWP 12000)]
+[New Thread 0x7fffd5edf700 (LWP 12001)]
+[New Thread 0x7fffd56de700 (LWP 12002)]
+[New Thread 0x7fffd4edd700 (LWP 12003)]
+[New Thread 0x7fffbbfff700 (LWP 12005)]
+[Thread 0x7fffd56de700 (LWP 12002) exited]
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff6f72bf2 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#0  0x00007ffff6f72bf2 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#1  0x00007ffff6daff16 in SvXMLImport::endElement(rtl::OUString const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#2  0x00007fffba2121e6 in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#3  0x00007ffff2454694 in ?? () from /lib/x86_64-linux-gnu/libexpat.so.1
+#4  0x00007ffff245564e in ?? () from /lib/x86_64-linux-gnu/libexpat.so.1
+#5  0x00007ffff24575df in XML_ParseBuffer () from /lib/x86_64-linux-gnu/libexpat.so.1
+#6  0x00007fffba211579 in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#7  0x00007fffba21441f in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#8  0x00007fffbb0e2ded in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#9  0x00007fffbb0e39b3 in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#10 0x00007fffbb0e58f3 in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#11 0x00007fffbb0411bc in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#12 0x00007fffbb1385cf in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#13 0x00007ffff5cbe107 in SfxObjectShell::LoadOwnFormat(SfxMedium&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#14 0x00007ffff5ccc5e3 in SfxObjectShell::DoLoad(SfxMedium*) () from /usr/lib/libreoffice/program/libmergedlo.so
+#15 0x00007ffff5cf991b in SfxBaseModel::load(com::sun::star::uno::Sequence<com::sun::star::beans::PropertyValue> const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#16 0x00007ffff5cf5b2c in SfxBaseModel::recoverFromFile(rtl::OUString const&, rtl::OUString const&, com::sun::star::uno::Sequence<com::sun::star::beans::PropertyValue> const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#17 0x00007ffff57556fe in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#18 0x00007ffff575ad34 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#19 0x00007ffff575b583 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#20 0x00007ffff575d8e3 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#21 0x00007ffff575de6b in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#22 0x00007ffff578ac92 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#23 0x00007ffff5dcf809 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#24 0x00007ffff5dd00b0 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#25 0x00007ffff6c4f1b4 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#26 0x00007ffff6c55918 in SalGenericDisplay::DispatchInternalEvent() () from /usr/lib/libreoffice/program/libmergedlo.so
+#27 0x00007fffdf87525f in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#28 0x00007fffdf8752d1 in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#29 0x00007ffff26bcce5 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#30 0x00007ffff26bd048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#31 0x00007ffff26bd0ec in g_main_context_iteration () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#32 0x00007fffdf874ff5 in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#33 0x00007ffff6985d22 in Application::Yield() () from /usr/lib/libreoffice/program/libmergedlo.so
+#34 0x00007ffff6985db5 in Application::Execute() () from /usr/lib/libreoffice/program/libmergedlo.so
+#35 0x00007ffff5dd1333 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#36 0x00007ffff698c7d1 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#37 0x00007ffff698c7f2 in SVMain() () from /usr/lib/libreoffice/program/libmergedlo.so
+#38 0x00007ffff5decf95 in soffice_main () from /usr/lib/libreoffice/program/libmergedlo.so
+#39 0x000000000040071b in ?? ()
+#40 0x00007ffff41ddec5 in __libc_start_main (main=0x400710, argc=2, argv=0x7fffffffda58, init=<optimised out>, fini=<optimised out>, rtld_fini=<optimised out>, stack_end=0x7fffffffda48) at libc-start.c:287
+#41 0x0000000000400751 in ?? ()
+
+Thread 10 (Thread 0x7fffbbfff700 (LWP 12005)):
+#0  0x00007ffff42a9fbd in poll () at ../sysdeps/unix/syscall-template.S:81
+#1  0x00007fffdf5e1198 in ?? () from /usr/lib/libreoffice/program/libvclplug_genlo.so
+#2  0x00007ffff45990b7 in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#3  0x00007fffec090182 in start_thread (arg=0x7fffbbfff700) at pthread_create.c:312
+#4  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 9 (Thread 0x7fffd4edd700 (LWP 12003)):
+#0  pthread_cond_timedwait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S:238
+#1  0x00007ffff26fecf5 in g_cond_wait_until () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#2  0x00007ffff26931c1 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#3  0x00007ffff269374b in g_async_queue_timeout_pop () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#4  0x00007ffff26e2966 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007ffff26e1f15 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#6  0x00007fffec090182 in start_thread (arg=0x7fffd4edd700) at pthread_create.c:312
+#7  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 7 (Thread 0x7fffd5edf700 (LWP 12001)):
+#0  0x00007ffff42a9fbd in poll () at ../sysdeps/unix/syscall-template.S:81
+#1  0x00007ffff26bcfe4 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#2  0x00007ffff26bd0ec in g_main_context_iteration () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#3  0x00007ffff26bd129 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#4  0x00007ffff26e1f15 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007fffec090182 in start_thread (arg=0x7fffd5edf700) at pthread_create.c:312
+#6  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 6 (Thread 0x7fffd77fe700 (LWP 12000)):
+#0  0x00007ffff42a9fbd in poll () at ../sysdeps/unix/syscall-template.S:81
+#1  0x00007ffff26bcfe4 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#2  0x00007ffff26bd30a in g_main_loop_run () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#3  0x00007ffff1f7ee16 in ?? () from /usr/lib/x86_64-linux-gnu/libgio-2.0.so.0
+#4  0x00007ffff26e1f15 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007fffec090182 in start_thread (arg=0x7fffd77fe700) at pthread_create.c:312
+#6  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 5 (Thread 0x7fffd7fff700 (LWP 11999)):
+#0  0x00007ffff42a9fbd in poll () at ../sysdeps/unix/syscall-template.S:81
+#1  0x00007ffff26bcfe4 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#2  0x00007ffff26bd0ec in g_main_context_iteration () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#3  0x00007fffdc67d1ad in ?? () from /usr/lib/x86_64-linux-gnu/gio/modules/libdconfsettings.so
+#4  0x00007ffff26e1f15 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#5  0x00007fffec090182 in start_thread (arg=0x7fffd7fff700) at pthread_create.c:312
+#6  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 4 (Thread 0x7fffdeb9c700 (LWP 11998)):
+#0  0x00007ffff42b807d in accept () at ../sysdeps/unix/syscall-template.S:81
+#1  0x00007ffff4593930 in osl_acceptPipe () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#2  0x00007ffff5de98d3 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#3  0x00007fffead92c96 in salhelper::Thread::run() () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_salhelpergcc3.so.3
+#4  0x00007fffead92e6a in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_salhelpergcc3.so.3
+#5  0x00007ffff45990b7 in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#6  0x00007fffec090182 in start_thread (arg=0x7fffdeb9c700) at pthread_create.c:312
+#7  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 3 (Thread 0x7fffdf39d700 (LWP 11997)):
+#0  pthread_cond_timedwait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S:238
+#1  0x00007ffff45b732e in osl_waitCondition () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#2  0x00007ffff530f414 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#3  0x00007fffead92c96 in salhelper::Thread::run() () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_salhelpergcc3.so.3
+#4  0x00007fffead92e6a in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_salhelpergcc3.so.3
+#5  0x00007ffff45990b7 in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#6  0x00007fffec090182 in start_thread (arg=0x7fffdf39d700) at pthread_create.c:312
+#7  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 2 (Thread 0x7fffe0b10700 (LWP 11996)):
+#0  pthread_cond_timedwait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S:238
+#1  0x00007ffff459f5e0 in ?? () from /usr/lib/libreoffice/program/../ure-link/lib/libuno_sal.so.3
+#2  0x00007fffec090182 in start_thread (arg=0x7fffe0b10700) at pthread_create.c:312
+#3  0x00007ffff42b730d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+
+Thread 1 (Thread 0x7ffff7f83a40 (LWP 11992)):
+#0  0x00007ffff6f72bf2 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#1  0x00007ffff6daff16 in SvXMLImport::endElement(rtl::OUString const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#2  0x00007fffba2121e6 in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#3  0x00007ffff2454694 in ?? () from /lib/x86_64-linux-gnu/libexpat.so.1
+#4  0x00007ffff245564e in ?? () from /lib/x86_64-linux-gnu/libexpat.so.1
+#5  0x00007ffff24575df in XML_ParseBuffer () from /lib/x86_64-linux-gnu/libexpat.so.1
+#6  0x00007fffba211579 in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#7  0x00007fffba21441f in ?? () from /usr/lib/libreoffice/program/../program/libexpwraplo.so
+#8  0x00007fffbb0e2ded in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#9  0x00007fffbb0e39b3 in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#10 0x00007fffbb0e58f3 in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#11 0x00007fffbb0411bc in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#12 0x00007fffbb1385cf in ?? () from /usr/lib/libreoffice/program/../program/libswlo.so
+#13 0x00007ffff5cbe107 in SfxObjectShell::LoadOwnFormat(SfxMedium&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#14 0x00007ffff5ccc5e3 in SfxObjectShell::DoLoad(SfxMedium*) () from /usr/lib/libreoffice/program/libmergedlo.so
+#15 0x00007ffff5cf991b in SfxBaseModel::load(com::sun::star::uno::Sequence<com::sun::star::beans::PropertyValue> const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#16 0x00007ffff5cf5b2c in SfxBaseModel::recoverFromFile(rtl::OUString const&, rtl::OUString const&, com::sun::star::uno::Sequence<com::sun::star::beans::PropertyValue> const&) () from /usr/lib/libreoffice/program/libmergedlo.so
+#17 0x00007ffff57556fe in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#18 0x00007ffff575ad34 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#19 0x00007ffff575b583 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#20 0x00007ffff575d8e3 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#21 0x00007ffff575de6b in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#22 0x00007ffff578ac92 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#23 0x00007ffff5dcf809 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#24 0x00007ffff5dd00b0 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#25 0x00007ffff6c4f1b4 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#26 0x00007ffff6c55918 in SalGenericDisplay::DispatchInternalEvent() () from /usr/lib/libreoffice/program/libmergedlo.so
+#27 0x00007fffdf87525f in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#28 0x00007fffdf8752d1 in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#29 0x00007ffff26bcce5 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#30 0x00007ffff26bd048 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#31 0x00007ffff26bd0ec in g_main_context_iteration () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#32 0x00007fffdf874ff5 in ?? () from /usr/lib/libreoffice/program/libvclplug_gtklo.so
+#33 0x00007ffff6985d22 in Application::Yield() () from /usr/lib/libreoffice/program/libmergedlo.so
+#34 0x00007ffff6985db5 in Application::Execute() () from /usr/lib/libreoffice/program/libmergedlo.so
+#35 0x00007ffff5dd1333 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#36 0x00007ffff698c7d1 in ?? () from /usr/lib/libreoffice/program/libmergedlo.so
+#37 0x00007ffff698c7f2 in SVMain() () from /usr/lib/libreoffice/program/libmergedlo.so
+#38 0x00007ffff5decf95 in soffice_main () from /usr/lib/libreoffice/program/libmergedlo.so
+#39 0x000000000040071b in ?? ()
+#40 0x00007ffff41ddec5 in __libc_start_main (main=0x400710, argc=2, argv=0x7fffffffda58, init=<optimised out>, fini=<optimised out>, rtld_fini=<optimised out>, stack_end=0x7fffffffda48) at libc-start.c:287
+#41 0x0000000000400751 in ?? ()
+A debugging session is active.
+
+	Inferior 1 [process 11992] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

@@ -1,9 +1,20 @@
 #include <hal_platform_quadrotor/controller/Waypoint.h>
 
-#define _X      0
-#define _Y      1
-#define _Z      2
-#define _YAW    3
+// COntroller constants
+#define _X          0
+#define _Y          1
+#define _Z          2
+#define _YAW        3
+#define _Kxy        0.9         /* position proportional constant */
+#define _Kv         0.09        /* velocity proportional constant */
+#define _Kiz        0.0008      /* altitude integrative constant  */
+#define _Kpz        0.03        /* altitude proportional constant */ 
+#define _Kdz        0.04        /* altitude derivative constant   */      
+#define _th_hover   0.59        /* throttle hover offset          */
+#define _maxtilt    0.34        /* max pitch/roll angle           */
+#define _Kya        6.0         /* yaw proportional constant      */
+#define _maxyawrate 4.4         /* max allowed yaw rate           */
+#define _maxv       5.0         /* max allowed xy velocity        */
 
 using namespace hal::controller;
 
@@ -20,8 +31,8 @@ bool Waypoint::Receive(
     sp[_Z]   = req.z;
     sp[_YAW] = req.yaw;
     
-    // Eveything OK
-    return true;
+    // Try and switch control
+    return Switch();
 }
 
 Waypoint::Waypoint() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
@@ -42,30 +53,30 @@ hal_platform_quadrotor::Control Waypoint::Update(
     ******************************************************************/
     
     // Obtain a b-frame (u,v) velocities
-    double d = sqrt((sp[_X]-state.x)*(sp[_X]-state.x)
-                   +(sp[_Y]-state.y)*(sp[_Y]-state.y));
-    double a = atan2(sp[_Y]-state.y,sp[_X]-state.x) - state.yaw;
+    double d = sqrt((sp[_X]-state.position.x)*(sp[_X]-state.position.x)
+                   +(sp[_Y]-state.position.y)*(sp[_Y]-state.position.y));
+    double a = atan2(sp[_Y]-state.position.y , sp[_X]-state.position.x) - state.orientation.z;
     double bx = d * cos(a);
     double by = d * sin(a); 
     
     ////////////////////// P ROLL CONTROLLER ////////////////////////
 
     double desu = limit(_Kxy*bx,-_maxv,_maxv);
-    double desP = limit( _Kv*(desu - state.u), -_maxtilt, _maxtilt);
+    double desP = limit( _Kv*(desu - state.linvelocity.x), -_maxtilt, _maxtilt);
     
     ////////////////////// P PITCH CONTROLLER ////////////////////////
 
     double desv = limit(_Kxy*by,-_maxv,_maxv);
-    double desR = limit(-_Kv*(desv - state.v), -_maxtilt, _maxtilt);
+    double desR = limit(-_Kv*(desv - state.linvelocity.y), -_maxtilt, _maxtilt);
     
     //////////////////////// P YAW CONTROLLER ////////////////////////
 
-    double desY = limit(_Kya * (sp[_YAW] - state.yaw), -_maxyawrate, _maxyawrate);
+    double desY = limit(_Kya * (sp[_YAW] - state.orientation.z), -_maxyawrate, _maxyawrate);
     
     /////////////////// PID THROTTLE CONTROLLER //////////////////////
 
     // Get the (P)roportional component (Changed by Andrew)
-    double ez_ = sp[_Z] - state.z;
+    double ez_ = sp[_Z] - state.position.z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;

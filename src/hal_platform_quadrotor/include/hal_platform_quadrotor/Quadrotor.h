@@ -43,17 +43,6 @@ namespace hal
 
         private:
 
-            /// Controller hashing types
-            enum FlightState
-            {
-                FlightStateEmergency = 0,      /*!< Emergency               */
-                FlightStateIdle,               /*!< Idle (on ground)        */
-                FlightStateTakeoff,            /*!< Takeoff                 */
-                FlightStateLanding,            /*!< Land                    */
-                FlightStateHover,              /*!< Hover                   */
-                FlightStateAction              /*!< Action                  */
-            };
-
             /// Current state of the quadrotor
             hal_platform_quadrotor::State state;
 
@@ -90,27 +79,13 @@ namespace hal
             */
             void BroadcastState(const ros::TimerEvent& event);
 
-            /// Lookup table for all controllers
-            std::map<std::string, hal::controller::ControllerBase<hal_platform_quadrotor::State,
-                hal_platform_quadrotor::Control>*> controllers;
-
-            /// The current controller ID
-            std::string current;
-
-            //! Hash a string representation of a controller
-            /*!
-              \param controller name
-              \return hashed controller type
-            */
-            FlightLogicType Hash(const std::string &controller);
-
         protected:
 
             //! Accept a control message from the HAL
             /*!
               \param ctl
             */
-            virtual void OnControl(const hal_platform_quadrotor::Control &ctl) = 0;
+            virtual void ReceiveControl(const hal_platform_quadrotor::Control &ctl) = 0;
 
         public:
 

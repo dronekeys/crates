@@ -1,9 +1,21 @@
 #include <hal_platform_quadrotor/controller/Velocity.h>
 
-#define _X      0
-#define _Y      1
-#define _Z      2
-#define _YAW    3
+// Controller constants
+#define _X          0
+#define _Y          1
+#define _Z          2
+#define _YAW        3
+#define _Kvp        0.25     /* xy velocity proportional constant */
+#define _Kvi        0.003    /* xy velocity integrative constant  */
+#define _Kvd        0.05     /* xy velocity derivative constant   */
+#define _Kwp       -0.2      /* z velocity proportional constant  */
+#define _Kwi       -0.002    /* z velocity integrative constant   */
+#define _Kwd       -0.0      /* z velocity derivative constant    */
+#define _th_hover   0.59     /* throttle hover offset             */
+#define _maxtilt    0.34     /* max pitch/roll angle              */
+#define _Kya        6.0      /* yaw proportional constant         */
+#define _maxyawrate 4.4      /* max allowed yaw rate              */
+#define _maxv       3.0      /* max allowed xy velocity           */
 
 using namespace hal::controller;
 
@@ -21,8 +33,8 @@ bool Velocity::Receive(
     sp[_Z]   = req.w;
     sp[_YAW] = req.yaw;
 
-    // Eveything OK
-    return true;
+    // Try and switch control
+    return Switch();
 }
 
 Velocity::Velocity() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
@@ -48,9 +60,9 @@ hal_platform_quadrotor::Control Velocity::Update(
     ///////////////// ROTATE VELOCITY INTO B-FRAME /////////////////////
 
     // Get the Euler orientation
-    r[_X] = state.roll;
-    r[_Y] = state.pitch;
-    r[_Z] = state.yaw;
+    r[_X] = state.orientation.x;
+    r[_Y] = state.orientation.y;
+    r[_Z] = state.orientation.z;
 
     // Make a copy of the n-frame velocity
     for (int i =0; i < 3; i++)
@@ -62,7 +74,7 @@ hal_platform_quadrotor::Control Velocity::Update(
     //////////////////// PID CONTROLLER FOR ROLL //////////////////////
 
     // b-frame X
-    e = -(limit(vt[_X],-_maxv,_maxv) - state.u);  
+    e = -(limit(vt[_X],-_maxv,_maxv) - state.linvelocity.x);  
     de = (first ? 0 : (e - ep[_X]) / dt);
     ei[_X] += e; 
     ep[_X]  = e;
@@ -72,7 +84,7 @@ hal_platform_quadrotor::Control Velocity::Update(
     //////////////////// PID CONTROLLER FOR PITCH //////////////////////
 
     // b-frame Y
-    e = -(limit(vt[_Y],-_maxv,_maxv) - state.v);     
+    e = -(limit(vt[_Y],-_maxv,_maxv) - state.linvelocity.y);     
     de = (first ? 0 : (e - ep[_Y]) / dt);
     ei[_Y] += e; 
     ep[_Y]  = e;
@@ -82,7 +94,7 @@ hal_platform_quadrotor::Control Velocity::Update(
     //////////////////// PID CONTROLLER FOR THRUST //////////////////////
 
     // b-frame w
-    e = (limit(vt[_Z],-_maxv,_maxv) - state.w);
+    e = (limit(vt[_Z],-_maxv,_maxv) - state.linvelocity.z);
     de = (first ? 0 : (e - ep[_Z]) / dt);
     ei[_Z] += e;
     ep[_Z] =  e;
@@ -91,7 +103,7 @@ hal_platform_quadrotor::Control Velocity::Update(
 
     //////////////////// P CONTROLLER FOR YAW //////////////////////
 
-    double desY = limit(_Kya * (sp[_YAW] - state.yaw), -_maxyawrate, _maxyawrate);
+    double desY = limit(_Kya * (sp[_YAW] - state.orientation.z), -_maxyawrate, _maxyawrate);
 
     //////////////////////// CONTROL PACKAGING /////////////////////////
 

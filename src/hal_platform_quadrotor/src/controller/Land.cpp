@@ -6,7 +6,7 @@ bool Land::Receive(
     hal_platform_quadrotor::Land::Request  &req, 
     hal_platform_quadrotor::Land::Response &res
 ) {
-    return true;
+    return Switch();
 }
 
 Land::Land() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,

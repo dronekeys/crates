@@ -6,7 +6,8 @@ bool Hover::Receive(
     hal_platform_quadrotor::Hover::Request  &req, 
     hal_platform_quadrotor::Hover::Response &res
 ) {
-    return true;
+    // Try and switch control
+    return Switch();
 }
 
 Hover::Hover() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,

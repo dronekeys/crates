@@ -6,7 +6,7 @@ bool Idle::Receive(
     hal_platform_quadrotor::Idle::Request  &req, 
     hal_platform_quadrotor::Idle::Response &res
 ) {
-    return true;
+   return Switch();
 }
 
 Idle::Idle() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,

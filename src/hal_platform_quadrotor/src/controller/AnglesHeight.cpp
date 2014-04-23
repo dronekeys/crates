@@ -1,5 +1,15 @@
 #include <hal_platform_quadrotor/controller/AnglesHeight.h>
 
+// Constant parameters
+#define _Kv         0.09     /* xy velocity proportional constant  */
+#define _maxtilt    0.34     /* max pitch/roll angle               */
+#define _Kya        6.0      /* yaw proportional constant          */
+#define _maxyawrate 4.4      /* max allowed yaw rate               */
+#define _Kiz        0.0008   /* altitude integrative constant      */
+#define _Kpz        0.03     /* altitude proportional constant     */   
+#define _Kdz        0.04     /* altitude derivative constant       */
+#define _th_hover   0.59     /* throttle hover offset              */
+
 using namespace hal::controller;
 
 bool AnglesHeight::Receive(
@@ -16,7 +26,7 @@ bool AnglesHeight::Receive(
     sp[_HEIGHT] = req.z;
 
     // Eveything OK
-    return true;
+    return Switch();
 }
 
 AnglesHeight::AnglesHeight() : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
@@ -42,12 +52,12 @@ hal_platform_quadrotor::Control AnglesHeight::Update(
 
     ////////////////////////// YAW CONTROLLER /////////////////////////
 
-    double ya = limit(_Kya*(sp[_YAW] - state.yaw),-_maxyawrate,_maxyawrate);
+    double ya = limit(_Kya*(sp[_YAW] - state.orientation.z),-_maxyawrate,_maxyawrate);
 
     //////////////////////// THROTTLE CONTROLLER ////////////////////////
 
     // Get the (P)roportional component (sign change by Andrew)
-    double ez_ = sp[_HEIGHT] - state.z;
+    double ez_ = sp[_HEIGHT] - state.position.z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;
