@@ -108,10 +108,10 @@ include_directories(include
 
 ## Declare a cpp library
 add_library(hal
+  src/platform/Platform.cpp
+  src/sensor/Sensor.cpp
+  src/controller/Controller.cpp
   src/HAL.cpp
-  src/Platform.cpp
-  src/Sensor.cpp
-  src/Controller.cpp
 )
 
 ## Add cmake target dependencies of the executable/library

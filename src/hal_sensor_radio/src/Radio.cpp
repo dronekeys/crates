@@ -3,7 +3,7 @@
 
 using namespace hal::sensor;
 
-Radio::Radio() : Sensor<hal_sensor_radio::Data>("sensors/radio")
+Radio::Radio(ros::NodeHandle& node) : Sensor<hal_sensor_radio::Data>(node, "radio")
 {
     // Advertice the ability to receive a data packet
     service = rosNode.advertiseService("sensors/radio/Transmit", &Radio::Rx, this);

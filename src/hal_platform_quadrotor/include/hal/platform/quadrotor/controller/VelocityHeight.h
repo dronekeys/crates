@@ -1,21 +1,13 @@
-#ifndef HAL_PLATFORM_QUADROTOR_ANGLESHEIGHT_H
-#define HAL_PLATFORM_QUADROTOR_ANGLESHEIGHT_H
+#ifndef HAL_PLATFORM_QUADROTOR_VELOCITYHEIGHT_H
+#define HAL_PLATFORM_QUADROTOR_VELOCITYHEIGHT_H
 
 // Base controller type
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 // Messages used by this controller
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Services used by this controller
-#include <hal_platform_quadrotor/AnglesHeight.h>
-
-// Convenience declarations
-#define _ROLL   0 
-#define _PITCH  1
-#define _YAW    2
-#define _HEIGHT 3
+#include <hal_platform_quadrotor/VelocityHeight.h>
 
 namespace hal
 {
@@ -25,12 +17,12 @@ namespace hal
         /*!
           A more elaborate class description.
         */
-        class AnglesHeight : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-            hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>
+        class VelocityHeight : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>
         {
 
         private:
-
+            
             /// If this is the first iteration since reset
             bool first; 
             
@@ -40,6 +32,8 @@ namespace hal
             // PID parameters
             double iz;
             double ez;
+            double ei[2];
+            double ep[2];
             double sp[4];
 
             //! Callback for goal update
@@ -49,14 +43,14 @@ namespace hal
               \return whether the control was accepted
             */
             bool Receive(
-                hal_platform_quadrotor::AnglesHeight::Request& req, 
-                hal_platform_quadrotor::AnglesHeight::Response& res
+                hal_platform_quadrotor::VelocityHeight::Request& req, 
+                hal_platform_quadrotor::VelocityHeight::Response& res
             );
 
         public:
 
             /// Constructor
-            AnglesHeight(const char* name);
+            VelocityHeight(ros::NodeHandle& node, const char* name);
 
             //! Control update implementations
             /*!

@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/Land.h>
+#include <hal/platform/quadrotor/controller/Land.h>
 
 using namespace hal::controller;
 
@@ -9,8 +9,8 @@ bool Land::Receive(
     return Switch();
 }
 
-Land::Land(const char *name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>(name)
+Land::Land(ros::NodeHandle& node, const char *name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>(node, name)
 {
     Reset();
 }

@@ -1,8 +1,10 @@
 #ifndef HAL_SENSOR_H
 #define HAL_SENSOR_H
 
+// Parent class for this HAL
 #include <hal/HAL.h>
 
+// Messages used by this HAL
 #include <hal/SetRate.h>
 
 #define DEFAULT_SENSOR_RATE   1.0
@@ -52,9 +54,11 @@ namespace hal
 
             //! Create a new Sensor HAL
             /*!
-              \param name the name of the sensor
+                \param node the ROS node to which the HAL binds
+                \param name the name of the sensor
             */
-            Sensor(const char *name);
+            Sensor(ros::NodeHandle& node, const char* name);
+
         };
 
     }

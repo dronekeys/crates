@@ -3,7 +3,7 @@
 
 using namespace hal::sensor;
 
-IMU::IMU() : Sensor<hal_sensor_imu::Data>("sensors/inertial")
+IMU::IMU(ros::NodeHandle& node) : Sensor<hal_sensor_imu::Data>(node, "imu")
 {
 
 }        

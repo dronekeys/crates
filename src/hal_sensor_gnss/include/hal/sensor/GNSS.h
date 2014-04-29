@@ -2,7 +2,7 @@
 #define HAL_SENSOR_GNSS_H
 
 // Header libraries
-#include <hal/Sensor.h>
+#include <hal/sensor/Sensor.h>
 
 // Message libraries
 #include <hal_sensor_gnss/Data.h>
@@ -14,7 +14,7 @@ namespace hal
         class GNSS : public Sensor<hal_sensor_gnss::Data>
         {       
         public:
-        	GNSS();
+        	GNSS(ros::NodeHandle& node);
         };
     }
 }

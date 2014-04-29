@@ -3,7 +3,7 @@
 
 using namespace hal::sensor;
 
-Compass::Compass() : Sensor<hal_sensor_compass::Data>("sensors/compass")
+Compass::Compass(ros::NodeHandle& node) : Sensor<hal_sensor_compass::Data>(node,"compass")
 {
 
 }        

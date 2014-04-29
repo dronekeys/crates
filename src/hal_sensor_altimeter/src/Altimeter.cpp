@@ -3,7 +3,7 @@
 
 using namespace hal::sensor;
 
-Altimeter::Altimeter() : Sensor<hal_sensor_altimeter::Data>("sensors/altimeter")
+Altimeter::Altimeter(ros::NodeHandle& node) : Sensor<hal_sensor_altimeter::Data>(node, "altimeter")
 {
 
 }        

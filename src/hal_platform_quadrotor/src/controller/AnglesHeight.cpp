@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/AnglesHeight.h>
+#include <hal/platform/quadrotor/controller/AnglesHeight.h>
 
 // Constant parameters
 #define _Kv         0.09     /* xy velocity proportional constant  */
@@ -29,8 +29,8 @@ bool AnglesHeight::Receive(
     return Switch();
 }
 
-AnglesHeight::AnglesHeight(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>(name)
+AnglesHeight::AnglesHeight(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::AnglesHeight::Request, hal_platform_quadrotor::AnglesHeight::Response>(node, name)
 {
     Reset();
 }

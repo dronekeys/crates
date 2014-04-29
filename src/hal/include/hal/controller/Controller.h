@@ -1,10 +1,13 @@
 #ifndef HAL_CONTROLLER_H
 #define HAL_CONTROLLER_H
 
+// Standard library includes
 #include <algorithm>
 #include <map>
 #include <string>
 #include <cstdarg>
+
+// Parent class for this HAL
 #include <hal/HAL.h>
 
 namespace hal
@@ -110,7 +113,9 @@ namespace hal
           between controllers.
         */
         template <class STATE, class CONTROL, class REQUEST, class RESPONSE>
-        class Controller : public hal::HAL, public ControllerBase<STATE,CONTROL>
+        class Controller : 
+            public hal::HAL, 
+            public ControllerBase<STATE,CONTROL>
         {
 
         private:
@@ -166,7 +171,7 @@ namespace hal
               \param name name of this controller
               \return new object
             */
-            Controller(const char* n);                    
+            Controller(ros::NodeHandle& node, const char* name);                    
         };
     }
 }

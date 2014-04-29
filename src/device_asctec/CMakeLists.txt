@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(platform_asctec)
+project(device_asctec)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -9,10 +9,11 @@ project(platform_asctec)
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
   nodelet
+  hal
   hal_platform_quadrotor
   hal_sensor_imu
   hal_sensor_compass
-  hal_sensor_pressure
+  hal_sensor_altimeter
   hal_sensor_gnss
 ) 
 
@@ -94,7 +95,7 @@ find_package(Boost REQUIRED COMPONENTS
 ## Build ##
 ###########
 
-## Because C is a great language...
+## Remove some C build errors/warnings
 set(CMAKE_C_FLAGS "-std=c99") 
 
 ## Specify additional locations of header files
@@ -102,7 +103,7 @@ set(CMAKE_C_FLAGS "-std=c99")
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
 
 ## Declare a cpp library
-add_library(fcs
+add_library(device_asctec
   src/serial/AsyncSerial.cpp
   src/aci/asctecCommIntf.c
   src/FlightControlSystem.cpp
@@ -117,16 +118,17 @@ add_library(fcs
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(fcs 
+add_dependencies(device_asctec 
+  hal
   hal_platform_quadrotor
   hal_sensor_imu
   hal_sensor_compass
-  hal_sensor_pressure
+  hal_sensor_altimeter
   hal_sensor_gnss
 )
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(fcs 
+target_link_libraries(device_asctec 
 	${catkin_LIBRARIES} 
 	${Boost_LIBRARIES}
 )

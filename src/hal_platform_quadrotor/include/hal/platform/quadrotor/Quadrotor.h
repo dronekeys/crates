@@ -6,22 +6,22 @@
 #include <map>
 
 // Basic ROS stuff
-#include <hal/Platform.h>
+#include <hal/platform/Platform.h>
+
+// Quadrotor-specific controllers
+#include <hal/platform/quadrotor/controller/Emergency.h>
+#include <hal/platform/quadrotor/controller/Hover.h>
+#include <hal/platform/quadrotor/controller/Idle.h>
+#include <hal/platform/quadrotor/controller/Land.h>
+#include <hal/platform/quadrotor/controller/Takeoff.h>
+#include <hal/platform/quadrotor/controller/AnglesHeight.h>
+#include <hal/platform/quadrotor/controller/Velocity.h>
+#include <hal/platform/quadrotor/controller/VelocityHeight.h>
+#include <hal/platform/quadrotor/controller/Waypoint.h>
 
 // State and control messages
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Quadrotor-specific controllers
-#include <hal_platform_quadrotor/controller/Emergency.h>
-#include <hal_platform_quadrotor/controller/Hover.h>
-#include <hal_platform_quadrotor/controller/Idle.h>
-#include <hal_platform_quadrotor/controller/Land.h>
-#include <hal_platform_quadrotor/controller/Takeoff.h>
-#include <hal_platform_quadrotor/controller/AnglesHeight.h>
-#include <hal_platform_quadrotor/controller/Velocity.h>
-#include <hal_platform_quadrotor/controller/VelocityHeight.h>
-#include <hal_platform_quadrotor/controller/Waypoint.h>
 
 namespace hal
 {
@@ -91,9 +91,9 @@ namespace hal
 
             //! Create a new Quadrotor object
             /*!
-              \param name name of the quadrotor
+              \param node ROS node tow hich the HAL will bind
             */
-            Quadrotor(const char *name);
+            Quadrotor(ros::NodeHandle& node);
 
             //! Update the state of the platform
             /*!

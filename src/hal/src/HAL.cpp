@@ -2,7 +2,7 @@
 
 using namespace hal;
 
-HAL::HAL(const char *name)
+HAL::HAL(ros::NodeHandle& node, const char* name) : rosNode(node)
 {
     // Maske sure that ROS actually started, or there will be some issues...
     if (!ros::isInitialized())
@@ -34,14 +34,4 @@ void HAL::SetStatus(const hal::HardwareStatus &status, const std::string &msg)
 void HAL::Broadcast(const ros::TimerEvent& event)
 {                  
     publisher.publish(message);
-}
-
-void HAL::Init(ros::NodeHandle& node)
-{
-    rosNode = node;
-}
-
-void HAL::Init(const char* name)
-{
-    rosNode = ros::NodeHandle(name);
 }

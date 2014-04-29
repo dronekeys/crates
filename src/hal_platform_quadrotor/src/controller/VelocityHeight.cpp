@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/VelocityHeight.h>
+#include <hal/platform/quadrotor/controller/VelocityHeight.h>
 
 // Controller constants
 #define _U          0       
@@ -37,8 +37,8 @@ bool VelocityHeight::Receive(
     return Switch();
 }
 
-VelocityHeight::VelocityHeight(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>(name)
+VelocityHeight::VelocityHeight(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::VelocityHeight::Request, hal_platform_quadrotor::VelocityHeight::Response>(node, name)
 {
     Reset();
 }

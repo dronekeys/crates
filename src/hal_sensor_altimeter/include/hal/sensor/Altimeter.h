@@ -2,7 +2,7 @@
 #define HAL_SENSOR_ALTIMETER_H
 
 // Header libraries
-#include <hal/Sensor.h>
+#include <hal/sensor/Sensor.h>
 
 // Message libraries
 #include <hal_sensor_altimeter/Data.h>
@@ -14,7 +14,7 @@ namespace hal
         class Altimeter : public Sensor<hal_sensor_altimeter::Data>
         {       
         public:
-        	Altimeter();
+        	Altimeter(ros::NodeHandle& node);
         };
     }
 }

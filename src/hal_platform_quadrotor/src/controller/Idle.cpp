@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/Idle.h>
+#include <hal/platform/quadrotor/controller/Idle.h>
 
 using namespace hal::controller;
 
@@ -9,8 +9,8 @@ bool Idle::Receive(
    return Switch();
 }
 
-Idle::Idle(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>(name)
+Idle::Idle(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>(node, name)
 {
     Reset();
 }

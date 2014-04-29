@@ -1,15 +1,13 @@
-#ifndef HAL_PLATFORM_QUADROTOR_VELOCITY_H
-#define HAL_PLATFORM_QUADROTOR_VELOCITY_H
+#ifndef HAL_PLATFORM_QUADROTOR_WAYPOINT_H
+#define HAL_PLATFORM_QUADROTOR_WAYPOINT_H
 
 // Base controller type
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 // Messages used by this controller
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Services used by this controller
-#include <hal_platform_quadrotor/Velocity.h>
+#include <hal_platform_quadrotor/Waypoint.h>
 
 namespace hal
 {
@@ -19,12 +17,12 @@ namespace hal
         /*!
           A more elaborate class description.
         */
-        class Velocity : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-            hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>
+        class Waypoint : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>
         {
 
         private:
-
+            
             /// If this is the first iteration since reset
             bool first; 
             
@@ -32,8 +30,8 @@ namespace hal
             bool reach;
 
             // PID parameters
-            double ei[3];
-            double ep[3];
+            double iz;
+            double ez;
             double sp[4];
 
             //! Callback for goal update
@@ -43,14 +41,14 @@ namespace hal
               \return whether the control was accepted
             */
             bool Receive(
-                hal_platform_quadrotor::Velocity::Request& req, 
-                hal_platform_quadrotor::Velocity::Response& res
+                hal_platform_quadrotor::Waypoint::Request& req, 
+                hal_platform_quadrotor::Waypoint::Response& res
             );
 
         public:
 
             /// Constructor
-            Velocity(const char* name);
+            Waypoint(ros::NodeHandle& node, const char* name);
 
             //! Control update implementations
             /*!
@@ -68,7 +66,7 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
+            
             /// Reset the current state
             void Reset();
         };

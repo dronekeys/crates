@@ -1,4 +1,4 @@
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 using namespace hal::controller;
 
@@ -73,13 +73,14 @@ bool ControllerBase<STATE,CONTROL>::SetController(const char* controller)
 // CONTROLLER IMPLEMENTATIONS ////////////////////////////////////////////////////////////////////////
 
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>
-Controller<STATE,CONTROL,REQUEST,RESPONSE>::Controller(const char *n) : name(n), ControllerBase<STATE,CONTROL>()
+Controller<STATE,CONTROL,REQUEST,RESPONSE>::Controller(ros::NodeHandle& node, const char* name) : 
+    hal::HAL(node, name), ControllerBase<STATE,CONTROL>(), name(name)
 {
     // Advertise this service
-    service = rosNode.advertiseService(n, &Controller<STATE,CONTROL,REQUEST,RESPONSE>::Receive, this);
+    service = rosNode.advertiseService(name, &Controller<STATE,CONTROL,REQUEST,RESPONSE>::Receive, this);
 
     // Add to the controller map
-    ControllerBase<STATE,CONTROL>::controllers[static_cast<std::string>(n)] = (ControllerBase<STATE,CONTROL>*) this;
+    ControllerBase<STATE,CONTROL>::controllers[static_cast<std::string>(name)] = (ControllerBase<STATE,CONTROL>*) this;
 }
 
 template<class STATE, class CONTROL, class REQUEST, class RESPONSE>

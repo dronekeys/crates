@@ -15,10 +15,12 @@
 #include <pluginlib/class_list_macros.h>
 
 // Hardware abstraction layer for a UAV
-#include <hal/platform/Quadrotor.h>
+#include <hal/platform/quadrotor/Quadrotor.h>
+
+// Hardware abstraction layer for UAV sensors    
 #include <hal/sensor/IMU.h>
-#include <hal/sensor/Compass.h>
 #include <hal/sensor/GNSS.h>
+#include <hal/sensor/Compass.h>
 #include <hal/sensor/Altimeter.h>
 
 // Required serial engine
@@ -402,7 +404,7 @@ namespace platform
             }
 
             // Derived classes of HAL must implement a control reception mechanism
-            void AcceptControl(const uas_hal::MsgControl &msg)
+            void ReceiveControl(const hal_platform_quadrotor::Control &ctl)
             {
                 // Do something with the control
             }
@@ -411,11 +413,11 @@ namespace platform
 
             // Constructor
             FlightControlSystem() : 
-                hal::platform::Quadrotor(getPrivateNodeHandle()),
-                hal::sensor::IMU(getPrivateNodeHandle()),
-                hal::sensor::Compass(getPrivateNodeHandle()),
-                hal::sensor::Pressure(getPrivateNodeHandle()),
-                hal::sensor::GNSS(getPrivateNodeHandle())
+                hal::platform::Quadrotor(getPrivateNodeHandle()),                 // Instantiate quadrotor HAL       
+                hal::sensor::IMU(getPrivateNodeHandle()),                         // Instantiate IMU
+                hal::sensor::Compass(getPrivateNodeHandle()),                     // Instantiate compass HAL
+                hal::sensor::Altimeter(getPrivateNodeHandle()),                   // Instantiate altimeter HAL
+                hal::sensor::GNSS(getPrivateNodeHandle())                         // Instantiate GNSS HAL
             {}
 
             // Called when nodelet is initialised

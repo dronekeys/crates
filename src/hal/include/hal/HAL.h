@@ -1,8 +1,11 @@
 #ifndef HAL_H
 #define HAL_H
 
+// Standard library includes
 #include <string>
 #include <ros/ros.h>
+
+// Messages used by this HAL
 #include <hal/Status.h>
 
 #define DEFAULT_QUEUE_LENGTH 10
@@ -43,16 +46,16 @@ namespace hal
     protected:
 
         /// Handle to a ROS node, shared by all children
-        static ros::NodeHandle rosNode;
+        ros::NodeHandle rosNode;
 
     public:    
 
-
         //! Create a new HAL
         /*!
+          \param node the ROS node to which the entity will be attached
           \param name the name of the entity
         */
-        HAL(const char* name);
+        HAL(ros::NodeHandle& node, const char* name);
 
         //! Set the state of the sensor
         /*!
@@ -60,18 +63,6 @@ namespace hal
           \param message a string representation of the current status
         */
         void SetStatus(const HardwareStatus &status, const std::string &msg);
-
-        //! Initialise the to use a particular ROS node
-        /*!
-          \param node the ROS node to which the entity will be attached
-        */
-        void Init(ros::NodeHandle& node);
-
-        //! Initialise the to create a new ROS node
-        /*!
-          \param name the name of the new ROS node
-        */
-        void Init(const char* name);
         
     };
 }

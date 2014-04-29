@@ -1,15 +1,13 @@
-#ifndef HAL_PLATFORM_QUADROTOR_IDLE_H
-#define HAL_PLATFORM_QUADROTOR_IDLE_H
+#ifndef HAL_PLATFORM_QUADROTOR_TAKEOFF_H
+#define HAL_PLATFORM_QUADROTOR_TAKEOFF_H
 
 // Base controller type
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 // Messages used by this controller
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Services used by this controller
-#include <hal_platform_quadrotor/Idle.h>
+#include <hal_platform_quadrotor/Takeoff.h>
 
 namespace hal
 {
@@ -19,8 +17,8 @@ namespace hal
         /*!
           A more elaborate class description.
         */
-        class Idle : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-            hal_platform_quadrotor::Idle::Request, hal_platform_quadrotor::Idle::Response>
+        class Takeoff : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>
         {
 
         private:
@@ -38,15 +36,15 @@ namespace hal
               \return whether the control was accepted
             */
             bool Receive(
-                hal_platform_quadrotor::Idle::Request& req, 
-                hal_platform_quadrotor::Idle::Response& res
+                hal_platform_quadrotor::Takeoff::Request& req, 
+                hal_platform_quadrotor::Takeoff::Response& res
             );
 
         public:
 
             /// Constructor
-            Idle(const char* name);
-
+            Takeoff(ros::NodeHandle& node, const char* name);
+            
             //! Control update implementations
             /*!
               \param state the current platform state

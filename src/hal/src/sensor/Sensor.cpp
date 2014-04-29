@@ -1,9 +1,9 @@
-#include <hal/Sensor.h>
+#include <hal/sensor/Sensor.h>
 
 using namespace hal::sensor;
 
 template <class DataMsgClass>
-Sensor<DataMsgClass>::Sensor(const char *name) : hal::HAL(name)
+Sensor<DataMsgClass>::Sensor(ros::NodeHandle& node, const char *name) : hal::HAL(node, name)
 {
     // Advertise this message on the ROS backbone
     publisher = rosNode.advertise<DataMsgClass>(name, DEFAULT_QUEUE_LENGTH);

@@ -3,7 +3,7 @@
 
 using namespace hal::sensor;
 
-GNSS::GNSS() : Sensor<hal_sensor_gnss::Data>("sensors/gnss")
+GNSS::GNSS(ros::NodeHandle& node) : Sensor<hal_sensor_gnss::Data>(node, "gnss")
 {
 
 }        

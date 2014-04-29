@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/Takeoff.h>
+#include <hal/platform/quadrotor/controller/Takeoff.h>
 
 using namespace hal::controller;
 
@@ -9,8 +9,8 @@ bool Takeoff::Receive(
     return Switch();
 }
 
-Takeoff::Takeoff(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>(name)
+Takeoff::Takeoff(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Takeoff::Request, hal_platform_quadrotor::Takeoff::Response>(node, name)
 {
     Reset();
 }

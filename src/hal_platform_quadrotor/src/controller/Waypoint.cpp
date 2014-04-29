@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/Waypoint.h>
+#include <hal/platform/quadrotor/controller/Waypoint.h>
 
 // COntroller constants
 #define _X          0
@@ -35,8 +35,8 @@ bool Waypoint::Receive(
     return Switch();
 }
 
-Waypoint::Waypoint(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-    hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>(name)
+Waypoint::Waypoint(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+    hal_platform_quadrotor::Waypoint::Request, hal_platform_quadrotor::Waypoint::Response>(node, name)
 {
     Reset();
 }

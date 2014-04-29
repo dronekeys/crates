@@ -1,15 +1,13 @@
-#ifndef HAL_PLATFORM_QUADROTOR_EMERGENCY_H
-#define HAL_PLATFORM_QUADROTOR_EMERGENCY_H
+#ifndef HAL_PLATFORM_QUADROTOR_HOVER_H
+#define HAL_PLATFORM_QUADROTOR_HOVER_H
 
 // Base controller type
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 // Messages used by this controller
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Services used by this controller
-#include <hal_platform_quadrotor/Emergency.h>
+#include <hal_platform_quadrotor/Hover.h>
 
 namespace hal
 {
@@ -19,8 +17,8 @@ namespace hal
         /*!
           A more elaborate class description.
         */
-        class Emergency : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-            hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>
+        class Hover : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Hover::Request, hal_platform_quadrotor::Hover::Response>
         {
 
         private:
@@ -38,14 +36,14 @@ namespace hal
               \return whether the control was accepted
             */
             bool Receive(
-                hal_platform_quadrotor::Emergency::Request& req, 
-                hal_platform_quadrotor::Emergency::Response& res
+                hal_platform_quadrotor::Hover::Request& req, 
+                hal_platform_quadrotor::Hover::Response& res
             );
 
         public:
 
-            /// Default constructor takes no arguments
-            Emergency(const char* name);
+            /// Constructor
+            Hover(ros::NodeHandle& node, const char* name);
 
             //! Control update implementations
             /*!
@@ -64,9 +62,8 @@ namespace hal
             */
             bool HasGoalBeenReached();
 
-            /// Reset the controller
+            /// Reset the current state
             void Reset();
-
         };
     }
 }

@@ -1,4 +1,4 @@
-#include <hal_platform_quadrotor/controller/Emergency.h>
+#include <hal/platform/quadrotor/controller/Emergency.h>
 
 using namespace hal::controller;
 
@@ -9,8 +9,8 @@ bool Emergency::Receive(
     return Switch();
 }
 
-Emergency::Emergency(const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>(name)
+Emergency::Emergency(ros::NodeHandle& node, const char* name) : Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+	hal_platform_quadrotor::Emergency::Request, hal_platform_quadrotor::Emergency::Response>(node, name)
 {
 	Reset();
 }

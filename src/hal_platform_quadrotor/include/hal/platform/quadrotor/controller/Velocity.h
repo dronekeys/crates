@@ -1,15 +1,13 @@
-#ifndef HAL_PLATFORM_QUADROTOR_LAND_H
-#define HAL_PLATFORM_QUADROTOR_LAND_H
+#ifndef HAL_PLATFORM_QUADROTOR_VELOCITY_H
+#define HAL_PLATFORM_QUADROTOR_VELOCITY_H
 
 // Base controller type
-#include <hal/Controller.h>
+#include <hal/controller/Controller.h>
 
 // Messages used by this controller
 #include <hal_platform_quadrotor/State.h>
 #include <hal_platform_quadrotor/Control.h>
-
-// Services used by this controller
-#include <hal_platform_quadrotor/Land.h>
+#include <hal_platform_quadrotor/Velocity.h>
 
 namespace hal
 {
@@ -19,8 +17,8 @@ namespace hal
         /*!
           A more elaborate class description.
         */
-        class Land : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
-            hal_platform_quadrotor::Land::Request, hal_platform_quadrotor::Land::Response>
+        class Velocity : public Controller<hal_platform_quadrotor::State, hal_platform_quadrotor::Control,
+            hal_platform_quadrotor::Velocity::Request, hal_platform_quadrotor::Velocity::Response>
         {
 
         private:
@@ -31,6 +29,11 @@ namespace hal
             /// If we have reached the goal
             bool reach;
 
+            // PID parameters
+            double ei[3];
+            double ep[3];
+            double sp[4];
+
             //! Callback for goal update
             /*!
               \param req the goal request
@@ -38,14 +41,14 @@ namespace hal
               \return whether the control was accepted
             */
             bool Receive(
-                hal_platform_quadrotor::Land::Request& req, 
-                hal_platform_quadrotor::Land::Response& res
+                hal_platform_quadrotor::Velocity::Request& req, 
+                hal_platform_quadrotor::Velocity::Response& res
             );
 
         public:
 
             /// Constructor
-            Land(const char* name);
+            Velocity(ros::NodeHandle& node, const char* name);
 
             //! Control update implementations
             /*!

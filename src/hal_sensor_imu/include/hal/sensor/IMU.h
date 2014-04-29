@@ -2,7 +2,7 @@
 #define HAL_SENSOR_IMU_H
 
 // Header libraries
-#include <hal/Sensor.h>
+#include <hal/sensor/Sensor.h>
 
 // Message libraries
 #include <hal_sensor_imu/Data.h>
@@ -14,7 +14,7 @@ namespace hal
         class IMU : public Sensor<hal_sensor_imu::Data>
         {       
         public:
-        	IMU();
+        	IMU(ros::NodeHandle& node);
         };
     }
 }

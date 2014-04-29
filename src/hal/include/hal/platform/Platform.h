@@ -1,6 +1,7 @@
 #ifndef HAL_PLATFORM_H
 #define HAL_PLATFORM_H
 
+// Parent class for this HAL
 #include <hal/HAL.h>
 
 #define DEFAULT_SENSOR_RATE   1.0
@@ -22,7 +23,7 @@ namespace hal
             /*!
               \param name the name of the platform
             */
-            Platform(const char *name);
+            Platform(ros::NodeHandle& node, const char *name);
 
         };
 
