@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.4">
+
+  <world name="uas">
+
+    <!-- Set the scene properties -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>51.71190</latitude_deg>
+      <longitude_deg>-0.21052</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- Setup a basic scene -->
+    <scene>
+      <sky>
+        <time>10.00</time>
+        <sunrise>06.23</sunrise>
+        <sunset>17.59</sunset>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>false</shadows>
+    </scene>
+
+    <include>
+      <uri>model://rvc</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Code to run the entire simulation -->
+    <plugin name="experiment" filename="libexperiment.so" />
+    
+  </world>
+
+</sdf>

@@ -1,0 +1,17 @@
+package controller.msgs;
+
+// Information broadcast about the environment
+message Wind
+{
+	required int32  speed              = 1;
+	required int32  direction          = 2;
+}
+
+// Information broadcast about the environment
+message Meteorological
+{
+	required double 	temperature		= 1;
+	required double 	humidity		= 2;
+	required double 	pressure		= 3;
+	required Wind 	    wind		    = 4;
+}

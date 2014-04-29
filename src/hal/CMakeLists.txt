@@ -108,7 +108,7 @@ include_directories(include
 
 ## Declare a cpp library
 add_library(hal
-  src/platform/Platform.cpp
+  src/model/Model.cpp
   src/sensor/Sensor.cpp
   src/controller/Controller.cpp
   src/HAL.cpp
