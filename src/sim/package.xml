@@ -7,7 +7,7 @@
     Formally simulator_gazebo/gazebo
   </description>
 
-  <maintainer email="hsu@osrfoundation.org">John Hsu</maintainer>
+  <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
   <maintainer email="davetcoleman@gmail.com">Dave Coleman</maintainer>
 
   <license>Apache 2.0</license>

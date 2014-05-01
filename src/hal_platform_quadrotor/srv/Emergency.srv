@@ -1,6 +1,0 @@
-# INSTRUCTION
-string  reason
----
-# RESULT
-bool    success
-string  status

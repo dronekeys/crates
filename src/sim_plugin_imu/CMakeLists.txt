@@ -22,10 +22,27 @@ find_package(catkin REQUIRED COMPONENTS
 
 # Find Boost
 find_package(Boost REQUIRED COMPONENTS 
-	thread
+	system 
+	filesystem 
 ) 
 
 # Find Gazebo
+find_package(gazebo REQUIRED COMPONENTS)
+
+# Find Protobuf
+find_package(Protobuf REQUIRED)
+
+# Find GPS toolkit
+find_package(GPSTK REQUIRED)
+
+# Find GPS toolkit
+find_package(GeographicLib REQUIRED)
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+# catkin_python_setup()
+
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
@@ -34,11 +51,6 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(CEGUI CEGUI)
   pkg_check_modules(CEGUI-OGRE CEGUI-OGRE)
 endif()
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -66,24 +78,45 @@ endif()
 
 ## Generate messages in the 'msg' folder
 add_message_files(
-    DIRECTORY 
-        msg
-    FILES
-        ContactsState.msg
-        ContactState.msg
-        ModelState.msg
-        ModelStates.msg
+	DIRECTORY 
+		msg
+	FILES
+		ContactsState.msg
+		ContactState.msg
+		LinkState.msg
+		LinkStates.msg
+		ModelState.msg
+		ModelStates.msg
+		ODEJointProperties.msg
+		ODEPhysics.msg
+		WorldState.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
-    DIRECTORY 
-        srv 
+	DIRECTORY
+		srv
     FILES
-        AddModel.srv
-        DelModel.srv
-        SetModelState.srv
-        GetModelState.srv
+		ApplyBodyWrench.srv
+		DeleteModel.srv
+		GetLinkState.srv
+		GetPhysicsProperties.srv
+		SetJointProperties.srv
+		SetModelConfiguration.srv
+		SpawnModel.srv
+		ApplyJointEffort.srv
+		GetJointProperties.srv
+		GetModelProperties.srv
+		GetWorldProperties.srv
+		SetLinkProperties.srv
+		SetModelState.srv
+		BodyRequest.srv
+		GetLinkProperties.srv
+		GetModelState.srv
+		JointRequest.srv
+		SetLinkState.srv
+		SetPhysicsProperties.srv
+		SetJointTrajectory.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -94,13 +127,16 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(DEPENDENCIES
-    std_msgs
-    geometry_msgs
+generate_messages(
+	DEPENDENCIES
+		std_msgs
+		geometry_msgs
+		sensor_msgs
+		trajectory_msgs
 )
 
 ## Generate gazebo messages
-#add_subdirectory(src/msgs)
+add_subdirectory(src/msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -113,20 +149,15 @@ generate_messages(DEPENDENCIES
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-    LIBRARIES
-        server_exp
-        server_sim
-        client
-    CATKIN_DEPENDS
-        geometry_msgs
-        message_generation
-        message_runtime
-        rosgraph_msgs
-        roslib
-        roscpp
-        std_msgs
-        std_srvs
-        trajectory_msgs
+  DEPENDS 
+    roscpp
+	message_runtime
+	std_msgs
+	trajectory_msgs
+	geometry_msgs
+	sensor_msgs
+	std_srvs
+	message_generation
 )
 
 ###########
@@ -137,6 +168,8 @@ catkin_package(
 include_directories(include
 	${catkin_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR} 
+	${GPSTK_INCLUDE_DIR} 
+	${GEOGRAPHICLIB_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
 	${GAZEBO_INCLUDE_DIRS}
 	${OGRE_INCLUDE_DIRS}
@@ -150,6 +183,8 @@ include_directories(include
 link_directories(
 	${catkin_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS} 
+	${GPSTK_LIBRARY_DIRS}
+	${GEOGRAPHICLIB_LIBRARY_DIRS} 
 	${SDFormat_LIBRARY_DIRS} 
 	${GAZEBO_LIBRARY_DIRS} 
 	${OGRE_LIBRARY_DIRS}
@@ -162,32 +197,49 @@ link_directories(
 ################################
 # Define libraries to be built #
 
-# For the simulation client
-add_library(client  		  			
-	src/Client.cpp
+## GUI / system plugins
+add_library(interface  		  			
+	src/Interface.cpp
 )
 
-# For the simulation client
-#add_library(server_exp  			
-#	src/SimulationServer.cpp
-#)
+## World plugins
+add_library(simulation	
+	src/world/Meteorological.cpp
+	src/world/Satellites.cpp
+	src/world/Environment.cpp
+	src/Simulation.cpp
+)
+add_library(experiment 				
+	src/Experiment.cpp
+)
 
-# For the simulation client
-#add_library(server_sim
-#	src/SimulationServer.cpp
-#)
+## Model plugins
+add_library(quadrotor 				
+	src/model/Propulsion.cpp
+	src/model/Turbulence.cpp
+	src/model/Shear.cpp
+	src/model/Energy.cpp
+	src/model/Altimeter.cpp
+	src/model/Compass.cpp
+	src/model/PRSolutionNoRotation.cpp
+	src/model/GNSS.cpp
+	src/model/IMU.cpp
+	src/Quadrotor.cpp
+)
 
 ##################################
 ## Add cmake target dependencies #
 
-#add_dependencies(server_exp  custom_msgs)
-#add_dependencies(server_sim  custom_msgs)
+add_dependencies(interface  custom_msgs)
+add_dependencies(quadrotor  custom_msgs)
+add_dependencies(simulation custom_msgs)
+add_dependencies(experiment	custom_msgs)
 
 ###########################
 ## Set up dynamic linking #
 
 ## GUI plugin
-target_link_libraries(client       	
+target_link_libraries(interface       	
 	${catkin_LIBRARIES} 
 	${GAZEBO_LIBRARIES} 
 	${Boost_LIBRARIES}
@@ -198,20 +250,32 @@ target_link_libraries(client
 )
 
 ## World plugin (simulation)
-#target_link_libraries(server_exp	
-#	${catkin_LIBRARIES} 
-#	${GAZEBO_LIBRARIES} 
-#	${Boost_LIBRARIES} 
-#	custom_msgs
-#)
+target_link_libraries(simulation	
+	${catkin_LIBRARIES} 
+	${GAZEBO_LIBRARIES} 
+	${Boost_LIBRARIES} 
+	${GPSTK_LIBRARIES} 
+	${GEOGRAPHICLIB_LIBRARY} 
+	custom_msgs
+)
 
 ## World plugin (experiment)
-#target_link_libraries(server_sim	
-#	${catkin_LIBRARIES} 
-#	${GAZEBO_LIBRARIES} 
-#	${Boost_LIBRARIES}
-#	custom_msgs
-#)
+target_link_libraries(experiment	
+	${catkin_LIBRARIES} 
+	${GAZEBO_LIBRARIES} 
+	${Boost_LIBRARIES}
+	custom_msgs
+)
+
+## Model plugins
+target_link_libraries(quadrotor		
+	${catkin_LIBRARIES}
+	${GAZEBO_LIBRARIES}
+	${Boost_LIBRARIES}
+	${GPSTK_LIBRARIES} 
+	custom_msgs
+)
+
 
 #############
 ## Install ##

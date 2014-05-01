@@ -1,6 +1,3 @@
-Quick Installation Instructions
-===============================
-
 The CRATES applications requires Ubuntu, the Robotic Operating System (ROS) and Gazebo. Each of these dependencies is under active development, with its own release schedule. The installation methodology was chosen to balance ease of installation with feature support. In order for CRATES to take advantage of new Gazebo 3.0 features, like DEM terrain paging, we will compile 
 
 Importantly, CRATES does not make use of the gazebo_ros package.
