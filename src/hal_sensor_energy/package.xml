@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>hal_sensor_compass</name>
+  <name>hal_sensor_energy</name>
   
   <version>0.0.1</version>
   
-  <description>The platform_complacs spackage</description>
+  <description>The hal_sensor_energy package</description>
   
   <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
   <author email="r.denardi@ucl.ac.uk">Renzo De Nardi</author>

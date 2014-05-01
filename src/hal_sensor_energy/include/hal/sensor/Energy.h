@@ -2,19 +2,19 @@
 #define HAL_SENSOR_ENERGY_H
 
 // Header libraries
-#include <hal/sensor/ENERGY.h>
+#include <hal/sensor/Sensor.h>
 
 // Message libraries
-#include <hal_sensor_compass/Data.h>
+#include <hal_sensor_energy/Data.h>
 
 namespace hal
 {
     namespace sensor
     {
-        class Compass : public ENERGY<hal_energy_compass::Data>
+        class Energy : public Sensor<hal_sensor_energy::Data>
         {       
         public:
-        	Compass(ros::NodeHandle& node);
+        	Energy(ros::NodeHandle& node);
         };
     }
 }

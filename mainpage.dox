@@ -1,6 +1,8 @@
 /**
 \mainpage Overview
 
+\image html highlevel.png "Hardware Abstraction Layer" width=10cm
+
 The overarching objective of the CRATES project is to develop a framework for rapidly developing high-level cognitive controllers for multi-platform robot experiments. The toolchain itself spawned from the European Research Council funded <a href='http://www.complacs.org'>CompLACS project</a>, motivated by a need for an easy-to-use mechanism for applying machine learning control algorithms to coordinating swarms of unmanned aerial vehicles.
 
 One of the key advantages of the CRATES architecture is that it seeks to shorten the step between simulations and experiments. It does this through the introduction of a Hardware Abstraction Layer (HAL) that sits between the platform itself and the high-level controller. The HAL exposes topics and services for a class of robot, such as a quadrotor. This architecture has the following key benefits.

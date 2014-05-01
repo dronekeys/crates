@@ -1,4 +1,4 @@
-package controller.msgs;
+package gazebo.msgs;
 
 // 3D position
 message Vec3D
@@ -11,6 +11,7 @@ message Vec3D
 // Information broadcast about the environment
 message Environment
 {
-	required Vec3D      gravity     = 1;
-	required Vec3D      magnetic    = 2;
+	required double     utc         = 1;
+	required Vec3D      gravity     = 2;
+	required Vec3D      magnetic    = 3;
 }

@@ -1,6 +1,6 @@
 # Minimum cmake version
 cmake_minimum_required(VERSION 2.8.3)
-project(sim)
+project(sim_plugin_environment)
 
 # Add custom cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -12,25 +12,10 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
 	roscpp
-	std_msgs
-	trajectory_msgs
-	geometry_msgs
-	sensor_msgs
-	std_srvs
-	message_generation
-) 
-
-# Find Boost
-find_package(Boost REQUIRED COMPONENTS 
-	system 
-	filesystem 
 ) 
 
 # Find Gazebo
 find_package(gazebo REQUIRED COMPONENTS)
-
-# Find Protobuf
-find_package(Protobuf REQUIRED)
 
 # Find GPS toolkit
 find_package(GPSTK REQUIRED)
@@ -77,47 +62,20 @@ endif()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-	DIRECTORY 
-		msg
-	FILES
-		ContactsState.msg
-		ContactState.msg
-		LinkState.msg
-		LinkStates.msg
-		ModelState.msg
-		ModelStates.msg
-		ODEJointProperties.msg
-		ODEPhysics.msg
-		WorldState.msg
-)
+#add_message_files(
+#	DIRECTORY 
+#		msg
+#	FILES
+#		ContactsState.msg
+#)
 
 ## Generate services in the 'srv' folder
-add_service_files(
-	DIRECTORY
-		srv
-    FILES
-		ApplyBodyWrench.srv
-		DeleteModel.srv
-		GetLinkState.srv
-		GetPhysicsProperties.srv
-		SetJointProperties.srv
-		SetModelConfiguration.srv
-		SpawnModel.srv
-		ApplyJointEffort.srv
-		GetJointProperties.srv
-		GetModelProperties.srv
-		GetWorldProperties.srv
-		SetLinkProperties.srv
-		SetModelState.srv
-		BodyRequest.srv
-		GetLinkProperties.srv
-		GetModelState.srv
-		JointRequest.srv
-		SetLinkState.srv
-		SetPhysicsProperties.srv
-		SetJointTrajectory.srv
-)
+#add_service_files(
+#	DIRECTORY
+#		srv
+#    FILES
+#		ApplyBodyWrench.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -127,13 +85,13 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-	DEPENDENCIES
-		std_msgs
-		geometry_msgs
-		sensor_msgs
-		trajectory_msgs
-)
+#generate_messages(
+#	DEPENDENCIES
+#		std_msgs
+#		geometry_msgs
+#		sensor_msgs
+#		trajectory_msgs
+#)
 
 ## Generate gazebo messages
 add_subdirectory(src/msgs)
@@ -151,13 +109,6 @@ add_subdirectory(src/msgs)
 catkin_package(
   DEPENDS 
     roscpp
-	message_runtime
-	std_msgs
-	trajectory_msgs
-	geometry_msgs
-	sensor_msgs
-	std_srvs
-	message_generation
 )
 
 ###########
@@ -167,7 +118,6 @@ catkin_package(
 ## Specify additional locations of header files
 include_directories(include
 	${catkin_INCLUDE_DIRS}
-	${Boost_INCLUDE_DIR} 
 	${GPSTK_INCLUDE_DIR} 
 	${GEOGRAPHICLIB_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
@@ -181,8 +131,7 @@ include_directories(include
 
 ## Specify additional locations of library files
 link_directories(
-	${catkin_LIBRARY_DIRS}
-	${Boost_LIBRARY_DIRS} 
+	${catkin_LIBRARY_DIRS} 
 	${GPSTK_LIBRARY_DIRS}
 	${GEOGRAPHICLIB_LIBRARY_DIRS} 
 	${SDFormat_LIBRARY_DIRS} 
@@ -197,85 +146,29 @@ link_directories(
 ################################
 # Define libraries to be built #
 
-## GUI / system plugins
-add_library(interface  		  			
-	src/Interface.cpp
-)
-
 ## World plugins
-add_library(simulation	
-	src/world/Meteorological.cpp
-	src/world/Satellites.cpp
-	src/world/Environment.cpp
-	src/Simulation.cpp
-)
-add_library(experiment 				
-	src/Experiment.cpp
-)
-
-## Model plugins
-add_library(quadrotor 				
-	src/model/Propulsion.cpp
-	src/model/Turbulence.cpp
-	src/model/Shear.cpp
-	src/model/Energy.cpp
-	src/model/Altimeter.cpp
-	src/model/Compass.cpp
-	src/model/PRSolutionNoRotation.cpp
-	src/model/GNSS.cpp
-	src/model/IMU.cpp
-	src/Quadrotor.cpp
+add_library(environment	
+	src/Environment.cpp
 )
 
 ##################################
 ## Add cmake target dependencies #
 
-add_dependencies(interface  custom_msgs)
-add_dependencies(quadrotor  custom_msgs)
-add_dependencies(simulation custom_msgs)
-add_dependencies(experiment	custom_msgs)
+add_dependencies(environment
+ 	environment_msg
+ )
 
 ###########################
 ## Set up dynamic linking #
 
 ## GUI plugin
-target_link_libraries(interface       	
+target_link_libraries(environment       	
 	${catkin_LIBRARIES} 
 	${GAZEBO_LIBRARIES} 
-	${Boost_LIBRARIES}
-	${OGRE_LIBRARIES}
-	${OGRE-Terrain_LIBRARIES}
-	${CEGUI_LIBRARIES}
-	${CEGUI-OGRE_LIBRARIES}
-)
-
-## World plugin (simulation)
-target_link_libraries(simulation	
-	${catkin_LIBRARIES} 
-	${GAZEBO_LIBRARIES} 
-	${Boost_LIBRARIES} 
 	${GPSTK_LIBRARIES} 
-	${GEOGRAPHICLIB_LIBRARY} 
-	custom_msgs
+	${GEOGRAPHICLIB_LIBRARY}
+	environment_msg
 )
-
-## World plugin (experiment)
-target_link_libraries(experiment	
-	${catkin_LIBRARIES} 
-	${GAZEBO_LIBRARIES} 
-	${Boost_LIBRARIES}
-	custom_msgs
-)
-
-## Model plugins
-target_link_libraries(quadrotor		
-	${catkin_LIBRARIES}
-	${GAZEBO_LIBRARIES}
-	${Boost_LIBRARIES}
-	${GPSTK_LIBRARIES} 
-	custom_msgs
-)
-
 
 #############
 ## Install ##

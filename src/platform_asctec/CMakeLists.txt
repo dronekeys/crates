@@ -11,10 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   hal
   hal_model_quadrotor
-  hal_sensor_imu
-  hal_sensor_compass
   hal_sensor_altimeter
+  hal_sensor_compass
+  hal_sensor_energy
   hal_sensor_gnss
+  hal_sensor_imu
 ) 
 
 # Find Boost
@@ -121,10 +122,11 @@ add_library(platform_asctec
 add_dependencies(platform_asctec 
   hal
   hal_model_quadrotor
-  hal_sensor_imu
-  hal_sensor_compass
   hal_sensor_altimeter
+  hal_sensor_compass
+  hal_sensor_energy
   hal_sensor_gnss
+  hal_sensor_imu
 )
 
 ## Specify libraries to link a library or executable target against

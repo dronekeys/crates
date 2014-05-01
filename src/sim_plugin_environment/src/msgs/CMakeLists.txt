@@ -8,17 +8,13 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
 endforeach()
 
 # List of custom messages
-set(msgs
-	environment.proto 
-	meteorological.proto 
-	satellites.proto
-)
+set(msgs environment.proto)
 
 # Generate the message source and header files
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 
 # Compile the message library
-add_library(custom_msgs ${PROTO_SRCS})
+add_library(environment_msg ${PROTO_SRCS})
 
 # Link the message library
-target_link_libraries(custom_msgs ${PROTOBUF_LIBRARY})
+target_link_libraries(environment_msg ${PROTOBUF_LIBRARY})

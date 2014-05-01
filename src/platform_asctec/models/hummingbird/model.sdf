@@ -220,28 +220,28 @@
         <!-- GPS support (negative errors = from REAL data, 0 = no error) -->
         <gps>
           <signal>L1</signal>   <!-- L1, L2, DUAL, DISABLED -->
-          <corrections>         <!--ERROR = BROADCAST - FINAL -->
-            <sig>0.0</sig>      <!--Signal tracking error -->
-            <clk>0.0</clk>      <!--Satellite clock error -->
-            <rel>0.0</rel>      <!--Relativity error -->
-            <rot>0.0</rot>      <!--Earth rotation error -->
-            <eph>0.0</eph>      <!--Satellite ephemeris error -->
-            <tro>0.0</tro>      <!--Troposphere error error -->
-            <ion>0.0</ion>      <!--Ionosphere error -->
+          <corrections>         <!-- ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>      <!-- Signal tracking error -->
+            <clk>0.0</clk>      <!-- Satellite clock error -->
+            <rel>0.0</rel>      <!-- Relativity error -->
+            <rot>0.0</rot>      <!-- Earth rotation error -->
+            <eph>0.0</eph>      <!-- Satellite ephemeris error -->
+            <tro>0.0</tro>      <!-- Troposphere error error -->
+            <ion>0.0</ion>      <!-- Ionosphere error -->
           </corrections>
         </gps> 
 
         <!-- Glonass support (negative errors = from REAL data, 0 = no error) -->
         <glonass>
-          <signal>DISABLED</signal> <!--L1O, L2O, DUAL, DISABLED -->
-          <corrections>         <!--ERROR = BROADCAST - FINAL -->
-            <sig>0.0</sig>      <!--Signal tracking error -->
-            <clk>0.0</clk>      <!--Satellite clock error -->
-            <rel>0.0</rel>      <!--Relativity error -->
-            <rot>0.0</rot>      <!--Earth rotation error -->
-            <eph>0.0</eph>      <!--Satellite ephemeris error -->
-            <tro>0.0</tro>      <!--Troposphere error error -->
-            <ion>0.0</ion>      <!--Ionosphere error -->
+          <signal>DISABLED</signal> <!-- L1O, L2O, DUAL, DISABLED -->
+          <corrections>             <!-- ERROR = BROADCAST - FINAL -->
+            <sig>0.0</sig>          <!-- Signal tracking error -->
+            <clk>0.0</clk>          <!-- Satellite clock error -->
+            <rel>0.0</rel>          <!-- Relativity error -->
+            <rot>0.0</rot>          <!-- Earth rotation error -->
+            <eph>0.0</eph>          <!-- Satellite ephemeris error -->
+            <tro>0.0</tro>          <!-- Troposphere error error -->
+            <ion>0.0</ion>          <!-- Ionosphere error -->
           </corrections>
         </glonass> 
 

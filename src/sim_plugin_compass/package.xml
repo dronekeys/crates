@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>controller</name>
+  <name>sim_plugin_compass</name>
   <version>0.0.1</version>
 
-  <description>The controller package</description>
+  <description>The sim_plugin_compass package</description>
 
   <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
 
@@ -17,15 +17,17 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   <build_depend>roscpp</build_depend>
-  <build_depend>gazebo_ros</build_depend>
-  <build_depend>hal_quadrotor</build_depend>
+  <build_depend>sim</build_depend>
+  <build_depend>hal</build_depend>
+  <build_depend>hal_sensor_compass</build_depend>
 
   <run_depend>roscpp</run_depend>
-  <run_depend>gazebo_ros</run_depend>
-  <run_depend>hal_quadrotor</run_depend>
+  <run_depend>sim</run_depend>
+  <run_depend>hal</run_depend>
+  <run_depend>hal_sensor_compass</run_depend>
   
   <export>
-    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}/resources"/>
+    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/resources/models"/>
   </export>
   
 </package>

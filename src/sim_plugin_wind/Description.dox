@@ -1,8 +1,6 @@
 /**
 
-\defgroup crates crates
+\defgroup sim_plugin_wind sim_plugin_wind
 \brief The CRATES primary experiment / simulation controller
-
-\section Hi
 
 */

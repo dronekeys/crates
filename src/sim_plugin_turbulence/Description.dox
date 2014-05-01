@@ -1,8 +1,6 @@
 /**
 
-\defgroup crates crates
+\defgroup sim_plugin_turbulence sim_plugin_turbulence
 \brief The CRATES primary experiment / simulation controller
-
-\section Hi
 
 */
