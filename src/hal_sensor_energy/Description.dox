@@ -1,0 +1,6 @@
+/**
+
+\defgroup hal_sensor_energy hal_sensor_energy
+\brief A HAL for an energy sensor.
+
+*/

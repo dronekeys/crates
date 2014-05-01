@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>hal_sensor_radio</name>
+  <name>hal_sensor_compass</name>
   
   <version>0.0.1</version>
   

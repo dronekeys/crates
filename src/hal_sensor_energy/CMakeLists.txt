@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_sensor_radio)
+project(hal_sensor_energy)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -59,12 +59,12 @@ add_message_files(
 
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  DIRECTORY
-    srv
-  FILES
-    Packet.srv
-)
+## add_service_files(
+##   DIRECTORY
+##     srv
+##   FILES
+##     SetRate.srv
+## )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -94,7 +94,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    radio
+    compass
   DEPENDS 
     roscpp
     message_runtime
@@ -111,8 +111,8 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(radio
-  src/Radio.cpp
+add_library(energy
+  src/Energy.cpp
 )
 ## Declare a cpp executable
 # add_executable(uav_driver 
@@ -121,10 +121,10 @@ add_library(radio
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(radio hal_sensor_radio_generate_messages_cpp)
+add_dependencies(energy hal_sensor_energy_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(radio
+target_link_libraries(energy
 	${catkin_LIBRARIES} 
 )
 
