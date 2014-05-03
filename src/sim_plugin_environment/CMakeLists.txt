@@ -14,20 +14,16 @@ find_package(catkin REQUIRED COMPONENTS
 	roscpp
 ) 
 
-# Find Gazebo
-find_package(gazebo REQUIRED COMPONENTS)
-
 # Find GPS toolkit
 find_package(GPSTK REQUIRED)
 
 # Find GPS toolkit
 find_package(GeographicLib REQUIRED)
 
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+# Find Gazebo and configure
+find_package(gazebo REQUIRED COMPONENTS)
 
+# Do some component loading
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
@@ -36,6 +32,11 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(CEGUI CEGUI)
   pkg_check_modules(CEGUI-OGRE CEGUI-OGRE)
 endif()
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -94,7 +95,7 @@ endif()
 #)
 
 ## Generate gazebo messages
-add_subdirectory(src/msgs)
+add_subdirectory(include/sim/msg)
 
 ###################################
 ## catkin specific configuration ##
@@ -107,8 +108,10 @@ add_subdirectory(src/msgs)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-  DEPENDS 
-    roscpp
+	INCLUDE_DIRS
+		include
+  	DEPENDS 
+    	roscpp
 )
 
 ###########
@@ -126,7 +129,7 @@ include_directories(include
   	${OGRE-Terrain_INCLUDE_DIRS}
   	${CEGUI_INCLUDE_DIRS}
   	${CEGUI-OGRE_INCLUDE_DIRS}
-	${CMAKE_CURRENT_BINARY_DIR}/src/msgs
+	${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
 ## Specify additional locations of library files
@@ -140,14 +143,14 @@ link_directories(
   	${OGRE-Terrain_LIBRARY_DIRS}
   	${CEGUI_LIBRARY_DIRS}
   	${CEGUI-OGRE_LIBRARY_DIRS}
-	${CMAKE_CURRENT_BINARY_DIR}/src/msgs
+	${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
 ################################
 # Define libraries to be built #
 
 ## World plugins
-add_library(environment	
+add_library(environment
 	src/Environment.cpp
 )
 
@@ -155,7 +158,7 @@ add_library(environment
 ## Add cmake target dependencies #
 
 add_dependencies(environment
- 	environment_msg
+ 	msg_environment
  )
 
 ###########################
@@ -167,7 +170,7 @@ target_link_libraries(environment
 	${GAZEBO_LIBRARIES} 
 	${GPSTK_LIBRARIES} 
 	${GEOGRAPHICLIB_LIBRARY}
-	environment_msg
+	msg_environment
 )
 
 #############

@@ -14,6 +14,8 @@
 // ROS communication subsystem (mainly for debugging)
 #include <ros/ros.h>
 
+#include <sim/msg/environment.pb.h>
+
 // ROS communication subsystem (mainly for debugging)
 #include "meteorological.pb.h"
 
@@ -33,7 +35,8 @@ namespace gazebo
 	    physics::WorldPtr 		worldPtr;
 		transport::NodePtr 		nodePtr;
 		transport::PublisherPtr pubPtr;
-		ros::Timer 						timer;
+		ros::Timer 				timer;
+		ros::NodeHandle 		rosNode;
 
 	    // For storing RINEX meteorlogical data
 	    std::list<gpstk::RinexMetData> ml;
@@ -98,7 +101,7 @@ namespace gazebo
 	public:
 
 		// Default constructor
-		Meteorological() : te(273), pr(1000.0), hu(95.0), rate(1.0), ws(0.0), wd(0.0) 
+		Meteorological() : rosNode(ros::NodeHandle("meteorlogical")), te(273), pr(1000.0), hu(95.0), rate(1.0)
 		{
 			// Make sure that ROS actually started, or there will be some issues...
 			if (!ros::isInitialized())

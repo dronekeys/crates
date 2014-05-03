@@ -12,6 +12,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
 	roscpp
+	sim_plugin_environment
 ) 
 
 # Find Gazebo

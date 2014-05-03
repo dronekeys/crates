@@ -14,7 +14,7 @@
 #include <ros/ros.h>
 
 // ROS communication subsystem (mainly for debugging)
-#include "environment.pb.h"
+#include "sim/msg/environment.pb.h"
 
 namespace gazebo
 {

@@ -14,7 +14,7 @@ set(msgs environment.proto)
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 
 # Compile the message library
-add_library(environment_msg ${PROTO_SRCS})
+add_library(msg_environment ${PROTO_SRCS})
 
 # Link the message library
-target_link_libraries(environment_msg ${PROTOBUF_LIBRARY})
+target_link_libraries(msg_environment ${PROTOBUF_LIBRARY})

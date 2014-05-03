@@ -91,12 +91,18 @@ namespace gazebo
 
     public:
 
-        // Default constructor
+        // Constructor
         Shear() : mA(0.05), z0(0.15), speed(0), dir(0), kuv(-4.97391e-01), kw(-1.35341) 
         {
             // Make sure that ROS actually started, or there will be some issues...
             if (!ros::isInitialized())
                 ROS_FATAL("A ROS node has not been initialized");
+        }
+
+        // Destructor
+        ~Shear()
+        {
+            transport::fini();
         }
 
         //  Configure the propulsion engine
@@ -115,7 +121,7 @@ namespace gazebo
 
             // Aerodynamic drag (math::Rand::GetDblUniform(-MATH_PI,MATH_PI)))
             root->GetElement("drag")->GetElement("kuv")->GetValue()->Get(kuv);
-            root->GetElement("drag")->GetElement("k")->GetValue()->Get(kw);
+            root->GetElement("drag")->GetElement("kw")->GetValue()->Get(kw);
 
             // Find the drag vector
             drag.Set(kuv,kuv,kw);
@@ -152,3 +158,6 @@ namespace gazebo
     // Register the plugin
     GZ_REGISTER_MODEL_PLUGIN(Shear);
 }
+
+
+
