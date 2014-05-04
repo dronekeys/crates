@@ -23,15 +23,30 @@ Update the system packages list
 
 	sudo apt-get update
 
-Follow the instructions to build Gazebo 3.0 from source:
+Follow the instructions to build Gazebo 3.0 from source using ODE only:
 
 	http://gazebosim.org/wiki/3.0/install
 
-Take note that you may need need to update your OS's library search path. For example, adding '/usr/local/lib/x86_64-linux-gnu'.
+Follow the instructions to build Gazebo 3.0 models
 
-Install ROS Indigo
+	http://gazebosim.org/wiki/3.0/install
 
-	sudo apt-get install ros-indigo-roscpp
+Follow the instructions to build Gazebo 3.0 from source:
+
+	ln -s ~/.gazebo/models /usr/share/models
+
+Take note that you may need need to update your OS's library search path. For example, add the following to /etc/ld.so.conf.d/gazebo.config
+
+	/usr/local/lib/x86_64-linux-gnu
+	/usr/local/lib
+
+Then run
+
+	sudo ldconfig
+
+Install basic ROS Indigo
+
+	sudo apt-get install ros-indigo-roscpp ros-indigo-roslaunch ros-indigo-rosbash ros-indigo-geometry-msgs ros-indigo-std-msgs ros-indigo-std-srvs ros-indigo-rostopic ros-indigo-std-rosservice
 
 Initialise and update ROS
 

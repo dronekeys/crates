@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package>
+  <name>bs</name>
+  <version>0.0.1</version>
+  <description>
+    Provides base station functionality a swarm of simulated or actual robots.
+  </description>
+
+  <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>message_runtime</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>rosgraph_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <run_depend>roslib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>message_generation</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>rosgraph_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+  <export>
+    <bs plugin_path="${prefix}/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/resources/models"/>
+  </export>
+
+</package>
