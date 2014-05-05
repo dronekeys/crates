@@ -80,6 +80,7 @@ add_service_files(
     FILES
         Insert.srv
         Delete.srv
+        Step.srv
 )
 
 ## Generate actions in the 'action' folder

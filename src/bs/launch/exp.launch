@@ -3,6 +3,7 @@
 
   <!-- these are the arguments you can pass this launch file, for example debug:=true gui:=true -->
   <arg name="gui" default="true"/>
+  <arg name="world" default="worlds/empty.world"/>
  
   <!-- set use_sim_time flag -->
   <group>
@@ -10,7 +11,7 @@
   </group>
 
   <!-- start gazebo server-->
-  <node name="expserver" pkg="bs" type="server" respawn="false" output="screen" args="-s libbsexp.so -s libbspth.so -r worlds/hawkshead.world">
+  <node name="experiment" pkg="bs" type="server" respawn="false" output="screen" args="-s libbsexp.so -s libbspth.so -r $(arg world)">
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find bs)/resources/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find bs)/resources"/>

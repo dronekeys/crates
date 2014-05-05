@@ -17,6 +17,7 @@
 // Services
 #include <bs/Insert.h>
 #include <bs/Delete.h>
+#include <bs/Step.h>
 
 namespace gazebo
 {
@@ -63,6 +64,7 @@ namespace gazebo
 	ros::ServiceServer 		servicePause;
 	ros::ServiceServer 		serviceInsert;
 	ros::ServiceServer 		serviceDelete;
+	ros::ServiceServer 		serviceStep;
 
 	// Two time representations
 	rosgraph_msgs::Clock 	timeRos;
@@ -179,39 +181,40 @@ namespace gazebo
 		topicClock = rosNode->advertise<rosgraph_msgs::Clock>("/clock",10);
 
 	  	// Add a model
-		serviceInsert = rosNode->advertiseService(
-			ros::AdvertiseServiceOptions::create<bs::Insert>(
-				"insert",boost::bind(&Simulation::Insert,this,_1,_2),ros::VoidPtr(), &queue
-			)
+		ros::AdvertiseServiceOptions adInsert = ros::AdvertiseServiceOptions::create<bs::Insert>(
+			"insert",boost::bind(&Simulation::Insert,this,_1,_2),ros::VoidPtr(), &queue
 		);
+		serviceInsert = rosNode->advertiseService(adInsert);
 
 	  	// Delete a model
-		serviceDelete = rosNode->advertiseService(
-			ros::AdvertiseServiceOptions::create<bs::Delete>(
-				"delete",boost::bind(&Simulation::Delete,this,_1,_2),ros::VoidPtr(), &queue
-			)
+		ros::AdvertiseServiceOptions adDelete = ros::AdvertiseServiceOptions::create<bs::Delete>(
+			"delete",boost::bind(&Simulation::Delete,this,_1,_2),ros::VoidPtr(), &queue
 		);
+		serviceDelete = rosNode->advertiseService(adDelete);
 
 		// Advertise more services on the custom queue
-		servicePause = rosNode->advertiseService(
-			ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-				"pause",boost::bind(&Simulation::Pause,this,_1,_2),ros::VoidPtr(), &queue
-			)
+		ros::AdvertiseServiceOptions adPause = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+			"pause",boost::bind(&Simulation::Pause,this,_1,_2),ros::VoidPtr(), &queue
 		);
+		servicePause = rosNode->advertiseService(adPause);
 
 		// Advertise more services on the custom queue
-		serviceResume = rosNode->advertiseService(
-			ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-				"resume",boost::bind(&Simulation::Resume,this,_1,_2),ros::VoidPtr(), &queue
-			)
+		ros::AdvertiseServiceOptions adResume = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+			"resume",boost::bind(&Simulation::Resume,this,_1,_2),ros::VoidPtr(), &queue
 		);
+		serviceResume = rosNode->advertiseService(adResume);
 
 		// Advertise more services on the custom queue
-		serviceReset = rosNode->advertiseService(
-			ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-				"reset",boost::bind(&Simulation::Reset,this,_1,_2),ros::VoidPtr(), &queue
-			)
+		ros::AdvertiseServiceOptions adReset = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+			"reset",boost::bind(&Simulation::Reset,this,_1,_2),ros::VoidPtr(), &queue
 		);
+		serviceReset = rosNode->advertiseService(adReset);
+
+		// Advertise more services on the custom queue
+		ros::AdvertiseServiceOptions adStep = ros::AdvertiseServiceOptions::create<bs::Step>(
+			"step",boost::bind(&Simulation::Step,this,_1,_2),ros::VoidPtr(), &queue
+		);
+		serviceStep = rosNode->advertiseService(adStep);
 
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time", true);
@@ -221,7 +224,7 @@ namespace gazebo
 	void SetupThreadQueue()
 	{
 		while (rosNode->ok())
-			threadQueue.callAvailable(ros::WallDuration(0.001));
+			queue.callAvailable(ros::WallDuration(0.001));
 	}
 
     // Called on every time tick
@@ -244,6 +247,7 @@ namespace gazebo
 
 	bool Insert(bs::Insert::Request &req, bs::Insert::Response &res)
 	{
+		world->InsertModelFile((std::string)"model://"+req.model_type);
 		res.success = true;
 		res.status_message = std::string("Insert: successfully inserted model");
 		return true;
@@ -303,6 +307,26 @@ namespace gazebo
 	bool Resume(std_srvs::Empty::Request &req,std_srvs::Empty::Response &res)
 	{
 		world->SetPaused(false);
+		return true;
+	}
+
+	// Resume physics
+	bool Step(bs::Step::Request &req, bs::Step::Response &res)
+	{
+		// Keep steps to a reasonable length
+		if (req.num_steps > 128)
+		{
+			res.success = false;
+			res.status_message = std::string("Step: number of steps must be less than 128");
+			return true;
+		}
+
+		// Step the world forward
+		world->Step(req.num_steps);
+
+		// Error message
+		res.success = true;
+		res.status_message = std::string("Step: successfully stepped the simulaor");
 		return true;
 	}
 
