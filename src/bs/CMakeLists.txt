@@ -19,21 +19,22 @@ find_package(catkin REQUIRED COMPONENTS
 	message_generation
 ) 
 
-# Find Boost
-find_package(Boost REQUIRED COMPONENTS
-	system
-  filesystem
-) 
-
 # Find Gazebo
 include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
+  pkg_check_modules(TinyXML tinyxml2)
   pkg_check_modules(GAZEBO gazebo)
   pkg_check_modules(OGRE OGRE)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
   pkg_check_modules(CEGUI CEGUI)
   pkg_check_modules(CEGUI-OGRE CEGUI-OGRE)
 endif()
+
+# Find Boost
+find_package(Boost REQUIRED COMPONENTS
+  system
+  filesystem
+) 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -134,6 +135,7 @@ include_directories(include
 	${catkin_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
+  ${TinyXML_INCLUDE_DIRS}
 	${GAZEBO_INCLUDE_DIRS}
 	${OGRE_INCLUDE_DIRS}
 	${OGRE-Terrain_INCLUDE_DIRS}
@@ -145,7 +147,8 @@ include_directories(include
 link_directories(
 	${catkin_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS} 
-	${SDFormat_LIBRARY_DIRS} 
+	${SDFormat_LIBRARY_DIRS}
+  ${TinyXML_LIBRARY_DIRS} 
 	${GAZEBO_LIBRARY_DIRS} 
 	${OGRE_LIBRARY_DIRS}
   ${OGRE-Terrain_LIBRARY_DIRS}
@@ -169,13 +172,13 @@ add_library(bssim src/Simulation.cpp)
 ## Set up dynamic linking #
 
 ## GUI plugin
-target_link_libraries(bspth ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(bspth ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
 
 ## World plugin (experiment)
-target_link_libraries(bsexp	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(bsexp	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
 
 ## World plugin (simulation)
-target_link_libraries(bssim ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(bssim ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
 
 #############
 ## Install ##

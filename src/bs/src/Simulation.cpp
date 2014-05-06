@@ -1,3 +1,6 @@
+// Needed for SDF parsing
+#include <tinyxml2.h>
+
 // Gazebo
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
@@ -18,9 +21,11 @@
 #include <std_srvs/Empty.h>
 
 // Services
-#include <bs/Insert.h>
-#include <bs/Delete.h>
-#include <bs/Step.h>
+#include "bs/Insert.h"
+#include "bs/Delete.h"
+#include "bs/Step.h"
+
+#define ROS_TIMEOUT_SECONDS 1.0
 
 namespace gazebo
 {
@@ -114,7 +119,7 @@ namespace gazebo
     {
 		// When a SIGINT is receiver, send the sudown signal
 		eventSigint = event::Events::ConnectSigInt(
-		boost::bind(&Simulation::Shutdown,this)
+			boost::bind(&Simulation::Shutdown,this)
 		);
 
 		// Start ROS without SIGINT ability
@@ -254,22 +259,65 @@ namespace gazebo
 	bool Insert(bs::Insert::Request &req, bs::Insert::Response &res)
 	{
 		// Resolve the model file name
-  		std::string filename = common::ModelDatabase::Instance()->GetModelFile((std::string)"model://"+req.model_type);
+  		std::string filename = common::ModelDatabase::Instance()->GetModelFile(req.model_type);
+		
+		// For XML
+		tinyxml2::XMLDocument   xmlDocument;
+		tinyxml2::XMLPrinter    xmlPrinter;
 
-  		// Check to see that the file is readable
-        if (!sdf::readFile(filename,sdfPtr))
-        {
-			// Print success
+		// Create a new tinyxml document
+		if (xmlDocument.LoadFile(filename.c_str()))
+		{
 			res.success = false;
-			res.status_message = std::string("Insert: model could not be found -- ")+filename;
+			res.status_message = std::string("Insert: could not load model file");
 			return true;
-        }
-        ROS_WARN(sdfPtr->ToString().c_str());
+		}
 
-		// Change the name of the model
-		//world->InsertModelSDF(*sdfPtr);
+		// Get the first <sdf> element
+  		tinyxml2::XMLElement* xmlElementSDF = xmlDocument.FirstChildElement("sdf");
+		if (!xmlElementSDF)
+		{
+			res.success = false;
+			res.status_message = std::string("Insert: no <sdf> tag");
+			return true;
+		}
+		
+		// Get the first <model> element
+  		tinyxml2::XMLElement* xmlElementMODEL = xmlElementSDF->FirstChildElement("model");
+		if (!xmlElementMODEL)
+		{
+			res.success = false;
+			res.status_message = std::string("Insert: no <model> tag");
+			return true;
+		}
 
-		// Print success
+		// Update the model name
+		xmlElementMODEL->SetAttribute("name",req.model_name.c_str());
+
+		// Extract the XML data
+		xmlDocument.Print(&xmlPrinter);
+
+		// Create and publish the message
+		msgs::Factory msg;
+		msg.set_sdf(xmlPrinter.CStr());
+		pubFactory->Publish(msg);
+	
+		// Wait until the model has been deleted
+		ros::Time timeout = ros::Time::now() + ros::Duration(ROS_TIMEOUT_SECONDS);
+		while (true)
+		{
+			if (ros::Time::now() > timeout)
+			{
+				res.success = false;
+				res.status_message = std::string("Insert: Added to the insertion queue, but failed to appear in the world. Did you forget the model:// prefix?");
+				return true;
+			}
+			if (world->GetModel(req.model_name)) 
+				break;
+			ROS_DEBUG("Waiting for model insertion (%s)",req.model_name.c_str());
+			usleep(1000);
+		}
+
 		res.success = true;
 		res.status_message = std::string("Insert: successfully inserted model");
 		return true;
@@ -292,7 +340,7 @@ namespace gazebo
 		pubRequest->Publish(*msg,true);
 
 		// Wait until the model has been deleted
-		ros::Time timeout = ros::Time::now() + ros::Duration(60.0);
+		ros::Time timeout = ros::Time::now() + ros::Duration(ROS_TIMEOUT_SECONDS);
 		while (true)
 		{
 			if (ros::Time::now() > timeout)
