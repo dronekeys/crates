@@ -3,6 +3,9 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 
+// SDF
+#include <sdf/sdf.hh>
+
 // ROS
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
@@ -69,12 +72,15 @@ namespace gazebo
 	// Two time representations
 	rosgraph_msgs::Clock 	timeRos;
 
+	// For injecting an ID into model code
+	sdf::SDFPtr				sdfPtr;
+
   public:
 
     // Constructor
     Simulation() : created(false), stop(false), loaded(false)
     {
-      // Do nothing
+    	sdfPtr.reset(new sdf::SDF);
     }
 
     // Destructor
@@ -247,7 +253,23 @@ namespace gazebo
 
 	bool Insert(bs::Insert::Request &req, bs::Insert::Response &res)
 	{
-		world->InsertModelFile((std::string)"model://"+req.model_type);
+		// Resolve the model file name
+  		std::string filename = common::ModelDatabase::Instance()->GetModelFile((std::string)"model://"+req.model_type);
+
+  		// Check to see that the file is readable
+        if (!sdf::readFile(filename,sdfPtr))
+        {
+			// Print success
+			res.success = false;
+			res.status_message = std::string("Insert: model could not be found -- ")+filename;
+			return true;
+        }
+        ROS_WARN(sdfPtr->ToString().c_str());
+
+		// Change the name of the model
+		//world->InsertModelSDF(*sdfPtr);
+
+		// Print success
 		res.success = true;
 		res.status_message = std::string("Insert: successfully inserted model");
 		return true;
