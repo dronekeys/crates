@@ -7,10 +7,12 @@
 # also defined, but not for general use are
 #  GPSTK_LIBRARY, where to find the GPSTK library.
 
-FIND_PATH(GPSTK_INCLUDE_DIR gpstk/Matrix.hpp)
+MESSAGE(GPSTK_ROOT=${GPSTK_ROOT})
+
+FIND_PATH(GPSTK_INCLUDE_DIR gpstk/Matrix.hpp HINTS ${GPSTK_ROOT}/include)
 
 SET(GPSTK_NAMES ${GPSTK_NAMES} gpstk libgpstk)
-FIND_LIBRARY(GPSTK_LIBRARY NAMES ${GPSTK_NAMES} )
+FIND_LIBRARY(GPSTK_LIBRARY NAMES ${GPSTK_NAMES} HINTS ${GPSTK_ROOT}/lib)
 
 # handle the QUIETLY and REQUIRED arguments and set GPSTK_FOUND to TRUE if 
 # all listed variables are TRUE
