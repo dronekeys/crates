@@ -36,6 +36,9 @@ find_package(Boost REQUIRED COMPONENTS
   filesystem
 ) 
 
+# Find protocol buffers
+find_package(Protobuf REQUIRED)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -141,6 +144,7 @@ include_directories(include
 	${OGRE-Terrain_INCLUDE_DIRS}
 	${CEGUI_INCLUDE_DIRS}
 	${CEGUI-OGRE_INCLUDE_DIRS}
+        ${PROTOBUF_INCLUDE_DIRS}
 )
 
 ## Specify additional locations of library files
@@ -154,6 +158,7 @@ link_directories(
   ${OGRE-Terrain_LIBRARY_DIRS}
   ${CEGUI_LIBRARY_DIRS}
   ${CEGUI-OGRE_LIBRARY_DIRS}
+  ${PROTOBUF_LIBRARY_DIRS}
 )
 
 ################################
@@ -175,10 +180,10 @@ add_library(bssim src/Simulation.cpp)
 target_link_libraries(bspth ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
 
 ## World plugin (experiment)
-target_link_libraries(bsexp	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
+target_link_libraries(bsexp	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 ## World plugin (simulation)
-target_link_libraries(bssim ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
+target_link_libraries(bssim ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 #############
 ## Install ##
