@@ -1,0 +1,32 @@
+<!-- This launch file spawns a gazebo server for a hardware experiment. -->
+<launch>
+
+  <!-- these are the arguments you can pass this launch file, for example debug:=true gui:=true -->
+  <arg name="gui" default="true"/>
+  <arg name="seed" default="0"/>
+  <arg name="world" default="worlds/empty.world"/>
+
+  <!-- set use_sim_time flag -->
+  <group>
+    <param name="/use_sim_time" value="true" />
+  </group>
+
+  <!-- start gazebo server-->
+  <node name="simulator" pkg="sim" type="server" respawn="false" output="screen" args="-s libsim_simulation.so -s libsim_resources.so --seed $(arg seed) -r $(arg world)">
+    <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+    <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/resources/models"/>
+    <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find sim)/resources"/>
+    <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+  </node>
+
+  <!-- start gazebo client -->
+  <group if="$(arg gui)">
+    <node name="client" pkg="sim" type="client" respawn="false" args="-g libsim_resources.so" output="screen">
+      <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
+      <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/resources/models"/>
+      <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find sim)/resources"/>
+      <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
+    </node>
+  </group>
+
+</launch>

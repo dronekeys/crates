@@ -1,0 +1,5 @@
+string model_name                 # name of the model to be spawn
+string model_type                 # spawn robot and all ROS interfaces under this namespace
+---
+bool success                      # return true if spawn successful
+string status_message             # comments if available
