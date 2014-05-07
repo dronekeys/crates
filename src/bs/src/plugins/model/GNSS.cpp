@@ -15,10 +15,16 @@
 // For logging
 #include <ros/ros.h>
 
+// Satellites message
+#include "satellites.pb.h"
+
 #define DEBUG TRUE
 
 namespace gazebo
 {
+    // Convenience declaraion
+    typedef const boost::shared_ptr<const msgs::Satellites> SatellitesPtr;
+
 	class GNSS : public ModelPlugin
 	{
 
@@ -30,24 +36,24 @@ namespace gazebo
 		double glo_sig, glo_clk, glo_rel, glo_rot, glo_eph, glo_tro, glo_ion;
 
 		// Pointer to the current model
-		physics::ModelPtr       modPtr;
+		physics::ModelPtr       		modPtr;
 
 		// Used to convert from gazebo local to spherical
-		WGS84Ellipsoid                  wgs84;
+		gpstk::WGS84Ellipsoid           wgs84;
 
 		// We will use this to model earth rotation
-		GPSEllipsoid                    ellip;
+		gpstk::GPSEllipsoid             ellip;
 
 		// RAIM solver without rotation correction (NB)
-		PRSolutionNoRotation            solver;
+		gpstk::PRSolution            	solver;
 
 		// Tropospheric correction model
-		ZeroTropModel                   tropModelZero;
-		TropModel*                      tropModel;
+		gpstk::ZeroTropModel            tropModelZero;
+		gpstk::TropModel*               tropModel;
 
 
 		// Current spherical position in gazebo world
-		math::Vector3           msPositionGlobal;
+		math::Vector3           		msPositionGlobal;
 
 		// Current spherical / ECEF position in gpstk world
 		gpstk::Position                 msPosGeodetic;
@@ -55,20 +61,20 @@ namespace gazebo
 		gpstk::Position                 msPosECEF;
 
 		// SoSlution information
-		vector<SatID::SatelliteSystem>  systems;        // List of satellite systems
-		vector<SatID>                   satellites;     // List of satellite vehicles
-		Matrix<double>                  covariance;     // For weighting variou solutions!
-		Matrix<double>                  ephemerides;    // All ephemerides
-		Matrix<double>                  SVD;            // Solution vector 
-		Vector<double>                  resids;         // Residual errors 
-		Vector<double>                  slopes;         // Residual slopes
+		std::vector<gpstk::SatID::SatelliteSystem>  systems;        // List of satellite systems
+		std::vector<gpstk::SatID>                   satellites;     // List of satellite vehicles
+		gpstk::Matrix<double>                  		covariance;     // For weighting variou solutions!
+		gpstk::Matrix<double>                  		ephemerides;    // All ephemerides
+		gpstk::Matrix<double>                  		SVD;            // Solution vector 
+		gpstk::Vector<double>                  		resids;         // Residual errors 
+		gpstk::Vector<double>                  		slopes;         // Residual slopes
 
 		// Intermediary store
-		CommonTime                      currentTime;
-		CommonTime                      oldTime;
+		gpstk::CommonTime               currentTime;
+		gpstk::CommonTime               oldTime;
+		gpstk::Position                 oldSolution;
 		bool                            statusFix;
 		bool                            statusDOP;
-		gpstk::Position                 oldSolution;
 
 		// Set the  GNSS navigation solution from gps and glonass ephemerides. These actually
 		// also contain the ephemeride error, tropospheric dry and wet delays, clock error and
@@ -86,7 +92,7 @@ namespace gazebo
 
 			// DETERMINE THE CURRENT TIME ////////////////////////////////////////////////////
 
-			currentTime.set(env->epoch(),(TimeSystem)TimeSystem::UTC);
+			currentTime.set(env->epoch(),(gpstk::TimeSystem) gpstk::TimeSystem::UTC);
 
 			// DETERMINE THE CURRENT POSITION ////////////////////////////////////////////////
 
@@ -120,21 +126,21 @@ namespace gazebo
 				try
 				{
 					// Satellite ID and system
-					SatID sid(env->gnss(i).prn(),(SatID::SatelliteSystem)env->gnss(i).system());
+					gpstk::SatID sid(env->gnss(i).prn(),(gpstk::SatID::SatelliteSystem)env->gnss(i).system());
 
 					// Param mapping		
 					bool rot, eph, tro, rel, ion, clk, sig;
 					std::string F1, F2, typ;
 					switch (env->gnss(i).system())
 					{
-					case ((int)SatID::systemGPS) :
+					case ((int)gpstk::SatID::systemGPS) :
 						rot = gps_rot; eph = gps_eph; tro = gps_tro;
 						rel = gps_rel; ion = gps_ion; clk = gps_clk;
 						sig = gps_sig; typ = gps_typ;
 						F1  = "L1"; F2  = "L2";
 						break;
 
-					case ((int)SatID::systemGlonass) :
+					case ((int)gpstk::SatID::systemGlonass) :
 						rot = glo_rot; eph = glo_eph; tro = glo_tro;
 						rel = glo_rel; ion = glo_ion; clk = glo_clk;
 						sig = glo_sig; typ = glo_typ;
@@ -382,7 +388,7 @@ namespace gazebo
 	    void Reset()
 	    {
 			// Reset the solver state
-			solver = PRSolutionNoRotation();
+			solver = gpstk::PRSolution();
 	    }
 
 
@@ -438,6 +444,7 @@ namespace gazebo
 }
 
 
+/*
 // Modification of PRSolution to drop the earth rotation
 namespace gpstk
 {
@@ -757,3 +764,4 @@ namespace gpstk
 
 	};
 }
+*/

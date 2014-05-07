@@ -10,12 +10,13 @@
 #include <ros/ros.h>
 
 // Thrust considered to be too low to animate :)
-#define MOTOR_ANIMATION_THRESHOLD 0.001
-#define MOTOR_ANIMATION_ON_RPM    200.0
+#define MOTOR_ANIMATION_THRESHOLD 	0.001
+#define MOTOR_ANIMATION_ON_RPM    	200.0
+#define MATH_PI						3.1415
 
 namespace gazebo
 {
-	class Propulsion : public ModelPlugin
+	class Quadrotor : public ModelPlugin
  	{
 
   	private:
@@ -35,7 +36,7 @@ namespace gazebo
 	    double _LOW_THROTT, _MAX_ANGVEL, _G,  _MASS_KG;         // Platform config
 	    double _pq0, _pq1, _pq2, _r0, _r1;                      // Rotational params
 	    double _Cth0, _Cth1, _Cth2, _Cvb0, _Cvb1, _tau0, _tau1; // Thrust params
-	    double _kuv, _kw;                                       // Drag parameters	    
+	    double _kuv, _kw;										// Drag parameters   
 
 	    // Current control parameters
 	    double roll, pitch, yaw, throttle, voltage; 
@@ -49,7 +50,6 @@ namespace gazebo
 
 	    // Are the motors currently animated?
 	    bool motors;
-
 
 		// Animate a motor without any dynamics
 		void AnimateMotors(bool enabled)
@@ -147,10 +147,18 @@ namespace gazebo
 				AnimateMotors(thrust > MOTOR_ANIMATION_THRESHOLD);
 		}
 
+		// Clamp a value to a given range
+		static double Clamp(const double& val, const double& minval, const double& maxval)
+		{
+		    if (val < minval) return minval;
+		    if (val > maxval) return maxval;
+		    return val;
+		}
+
   	public:
 
 	    // Default constructor
-	    Propulsion() : 
+	    Quadrotor() : 
 
 			// Control parameters
 			srs(-2291.83118052329), srl(-0.9), sru(0.9), 
@@ -187,39 +195,39 @@ namespace gazebo
 			modPtr      = model;
 
 			// Control parameters
-			srs 		= GetSDFDouble(root,"control.roll.scale",srs);
-			srl 		= GetSDFDouble(root,"control.roll.min",srl);
-			sru 		= GetSDFDouble(root,"control.roll.max",sru);
-			sps 		= GetSDFDouble(root,"control.pitch.scale",sps);
-			spl 		= GetSDFDouble(root,"control.pitch.min",spl);
-			spu 		= GetSDFDouble(root,"control.pitch.max",spu);
-			sys 		= GetSDFDouble(root,"control.yaw.scale",sys);
-			syl 		= GetSDFDouble(root,"control.yaw.min",syl);
-			syu 		= GetSDFDouble(root,"control.yaw.max",syu);
-			sts 		= GetSDFDouble(root,"control.throttle.scale",sts);
-			stl 		= GetSDFDouble(root,"control.throttle.min",stl);
-			stu 		= GetSDFDouble(root,"control.throttle.max",stu);
-			svs 		= GetSDFDouble(root,"control.voltage.scale",svs);
-			svl 		= GetSDFDouble(root,"control.voltage.min",svl);
-			svu 		= GetSDFDouble(root,"control.voltage.max",svu);
+			root->GetElement("control")->GetElement("roll")->GetElement("scale")->GetValue()->Get(srs);
+			root->GetElement("control")->GetElement("roll")->GetElement("min")->GetValue()->Get(srl);
+			root->GetElement("control")->GetElement("roll")->GetElement("max")->GetValue()->Get(sru);
+			root->GetElement("control")->GetElement("pitch")->GetElement("scale")->GetValue()->Get(sps);
+			root->GetElement("control")->GetElement("pitch")->GetElement("min")->GetValue()->Get(spl);
+			root->GetElement("control")->GetElement("pitch")->GetElement("max")->GetValue()->Get(spu);
+			root->GetElement("control")->GetElement("yaw")->GetElement("scale")->GetValue()->Get(sys);
+			root->GetElement("control")->GetElement("yaw")->GetElement("min")->GetValue()->Get(syl);
+			root->GetElement("control")->GetElement("yaw")->GetElement("max")->GetValue()->Get(syu);
+			root->GetElement("control")->GetElement("throttle")->GetElement("scale")->GetValue()->Get(sts);
+			root->GetElement("control")->GetElement("throttle")->GetElement("min")->GetValue()->Get(stl);
+			root->GetElement("control")->GetElement("throttle")->GetElement("max")->GetValue()->Get(stu);
+			root->GetElement("control")->GetElement("voltage")->GetElement("scale")->GetValue()->Get(svs);
+			root->GetElement("control")->GetElement("voltage")->GetElement("min")->GetValue()->Get(svl);
+			root->GetElement("control")->GetElement("voltage")->GetElement("max")->GetValue()->Get(svu);
 
 			// Dynamics parameters
-			_LOW_THROTT = GetSDFDouble(root, "dynamics.low_throttle", _LOW_THROTT);
-			_MAX_ANGVEL = GetSDFDouble(root, "dynamics.max_angvel", _MAX_ANGVEL);
-			_pq0        = GetSDFDouble(root, "dynamics.pq0", _pq0);
-			_pq1        = GetSDFDouble(root, "dynamics.pq1", _pq1);
-			_pq2        = GetSDFDouble(root, "dynamics.pq2", _pq2);
-			_r0         = GetSDFDouble(root, "dynamics.r0", _r0);
-			_r1         = GetSDFDouble(root, "dynamics.r1", _r1);
-			_Cth0       = GetSDFDouble(root, "dynamics.Cth0", _Cth0);
-			_Cth1       = GetSDFDouble(root, "dynamics.Cth1", _Cth1);
-			_Cth2       = GetSDFDouble(root, "dynamics.Cth2", _Cth2);
-			_Cvb0       = GetSDFDouble(root, "dynamics.Cvb0", _Cvb0);
-			_Cvb1       = GetSDFDouble(root, "dynamics.Cvb1", _Cvb1);
-			_tau0       = GetSDFDouble(root, "dynamics.tau0", _tau0);
-			_tau1       = GetSDFDouble(root, "dynamics.tau1", _tau1);
-			_kuv        = GetSDFDouble(root, "dynamics.kuv", _kuv);
-			_kw         = GetSDFDouble(root, "dynamics.kw", _kw);
+			root->GetElement("dynamics")->GetElement("low_throttle")->GetValue()->Get(_LOW_THROTT);
+			root->GetElement("dynamics")->GetElement("max_angvel")->GetValue()->Get(_MAX_ANGVEL);
+			root->GetElement("dynamics")->GetElement("pq0")->GetValue()->Get(_pq0);
+			root->GetElement("dynamics")->GetElement("pq1")->GetValue()->Get(_pq1);
+			root->GetElement("dynamics")->GetElement("pq2")->GetValue()->Get(_pq2);
+			root->GetElement("dynamics")->GetElement("r0")->GetValue()->Get(_r0);
+			root->GetElement("dynamics")->GetElement("r1")->GetValue()->Get(_r1);
+			root->GetElement("dynamics")->GetElement("Cth0")->GetValue()->Get(_Cth0);
+			root->GetElement("dynamics")->GetElement("Cth1")->GetValue()->Get(_Cth1);
+			root->GetElement("dynamics")->GetElement("Cth2")->GetValue()->Get(_Cth2);
+			root->GetElement("dynamics")->GetElement("Cvb0")->GetValue()->Get(_Cvb0);
+			root->GetElement("dynamics")->GetElement("Cvb1")->GetValue()->Get(_Cvb1);
+			root->GetElement("dynamics")->GetElement("tau0")->GetValue()->Get(_tau0);
+			root->GetElement("dynamics")->GetElement("tau1")->GetValue()->Get(_tau1);
+			root->GetElement("dynamics")->GetElement("kuv")->GetValue()->Get(_kuv);
+			root->GetElement("dynamics")->GetElement("kw")->GetValue()->Get(_kw);
 
 			// Get the pose of the model (not the link!)
 			pose = modPtr->GetWorldPose();
@@ -252,11 +260,11 @@ namespace gazebo
 		// Reset the internal control
 		void SetControl(const double &r,const double &p,const double &y,const double &t,const double &v)
 		{
-			roll 		= srs * limit(r,srl,sru);
-			pitch 		= sps * limit(p,spl,spu);
-			yaw 		= sys * limit(y,syl,syu);
-			throttle 	= sts * limit(t,stl,stu);
-			voltage 	= svs * limit(v,svl,svu);
+			roll 		= srs * Clamp(r,srl,sru);
+			pitch 		= sps * Clamp(p,spl,spu);
+			yaw 		= sys * Clamp(y,syl,syu);
+			throttle 	= sts * Clamp(t,stl,stu);
+			voltage 	= svs * Clamp(v,svl,svu);
 		}
 
 		// Get the current thurst force
@@ -267,5 +275,5 @@ namespace gazebo
 	};
 
 	// Register the plugin
-	GZ_REGISTER_MODEL_PLUGIN(Propulsion);
+	GZ_REGISTER_MODEL_PLUGIN(Quadrotor);
 }

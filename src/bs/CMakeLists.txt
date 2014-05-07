@@ -50,6 +50,26 @@ find_package(GeographicLib REQUIRED)
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
 
+
+#############################################
+## Declare Gazebo protocol buffer messages ##
+#############################################
+
+set(PROTOBUF_IMPORT_DIRS)
+foreach(ITR ${GAZEBO_INCLUDE_DIRS})
+  if(ITR MATCHES ".*gazebo-[0-9.]+$")
+    set(PROTOBUF_IMPORT_DIRS "${ITR}/gazebo/msgs/proto")
+  endif()
+endforeach()
+
+# Generate the message source and header files
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS 
+  src/msgs/meteorological.proto 
+  src/msgs/environment.proto 
+  src/msgs/satellites.proto
+  src/msgs/wind.proto
+)
+
 ################################################
 ## Declare ROS messages, services and actions ##
 ################################################
@@ -76,21 +96,21 @@ find_package(GeographicLib REQUIRED)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
-    DIRECTORY 
-        msg
-    FILES
-        Collision.msg
-        Collisions.msg
+  DIRECTORY 
+    msg
+  FILES
+    Collision.msg
+    Collisions.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
-    DIRECTORY 
-        srv 
-    FILES
-        Insert.srv
-        Delete.srv
-        Step.srv
+  DIRECTORY 
+    srv
+  FILES
+    Insert.srv
+    Delete.srv
+    Step.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -105,9 +125,6 @@ generate_messages(DEPENDENCIES
     std_msgs
     geometry_msgs
 )
-
-## Generate gazebo messages
-add_subdirectory(src/msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -153,6 +170,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
 	${catkin_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
@@ -165,11 +183,11 @@ include_directories(
 	${OGRE-Terrain_INCLUDE_DIRS}
 	${CEGUI_INCLUDE_DIRS}
 	${CEGUI-OGRE_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
 ## Specify additional locations of library files
 link_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
 	${catkin_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS} 
 	${SDFormat_LIBRARY_DIRS}
@@ -182,11 +200,13 @@ link_directories(
   ${OGRE-Terrain_LIBRARY_DIRS}
   ${CEGUI_LIBRARY_DIRS}
   ${CEGUI-OGRE_LIBRARY_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
 ################################
 # Define libraries to be built #
+
+# Compile the message library
+add_library(custom_msgs ${PROTO_SRCS})
 
 # The base system plugins gzclient and gzserver
 add_library(bs_resources       src/plugins/system/Resources.cpp)
@@ -205,12 +225,16 @@ add_library(bs_compass         src/plugins/model/Compass.cpp)
 add_library(bs_energy          src/plugins/model/Energy.cpp)
 add_library(bs_gnss            src/plugins/model/GNSS.cpp)
 add_library(bs_imu             src/plugins/model/IMU.cpp)
-add_library(bs_propulsion      src/plugins/model/Propulsion.cpp)
+add_library(bs_quadrotor       src/plugins/model/Quadrotor.cpp)
 add_library(bs_shear           src/plugins/model/Shear.cpp)
 add_library(bs_turbulence      src/plugins/model/Turbulence.cpp)
 
 ##################################
 ## Add cmake target dependencies #
+
+add_dependencies(bs_resources        bs_generate_messages_cpp)
+add_dependencies(bs_experiment       bs_generate_messages_cpp)
+add_dependencies(bs_simulation       bs_generate_messages_cpp)
 
 add_dependencies(bs_environment      custom_msgs)
 add_dependencies(bs_meteorological   custom_msgs)
@@ -221,7 +245,7 @@ add_dependencies(bs_compass          custom_msgs)
 add_dependencies(bs_energy           custom_msgs)
 add_dependencies(bs_gnss             custom_msgs)
 add_dependencies(bs_imu              custom_msgs)
-add_dependencies(bs_propulsion       custom_msgs)
+add_dependencies(bs_quadrotor        custom_msgs)
 add_dependencies(bs_shear            custom_msgs)
 add_dependencies(bs_turbulence       custom_msgs)
 
@@ -229,9 +253,12 @@ add_dependencies(bs_turbulence       custom_msgs)
 ## Set up dynamic linking #
 
 ## Convenience declarations
-set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
+set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
 set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
 set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
+
+# Link the message library
+target_link_libraries(custom_msgs        ${PROTOBUF_LIBRARY})
 
 ## System plugins
 target_link_libraries(bs_resources       ${SYS_LIBS})
@@ -250,7 +277,7 @@ target_link_libraries(bs_compass         ${MOD_LIBS})
 target_link_libraries(bs_energy          ${MOD_LIBS})
 target_link_libraries(bs_gnss            ${MOD_LIBS})
 target_link_libraries(bs_imu             ${MOD_LIBS})
-target_link_libraries(bs_propulsion      ${MOD_LIBS})
+target_link_libraries(bs_quadrotor       ${MOD_LIBS})
 target_link_libraries(bs_shear           ${MOD_LIBS})
 target_link_libraries(bs_turbulence      ${MOD_LIBS})
 
