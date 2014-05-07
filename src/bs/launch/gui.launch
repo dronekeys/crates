@@ -2,7 +2,7 @@
 <launch>
 
   <!-- start gazebo server-->
-  <node name="client" pkg="bs" type="client" respawn="false" args="-g libbspth.so" output="screen">
+  <node name="client" pkg="bs" type="client" respawn="false" args="-g libresources.so" output="screen">
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find bs)/resources/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find bs)/resources"/>

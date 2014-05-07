@@ -11,7 +11,7 @@
   </group>
 
   <!-- start gazebo server-->
-  <node name="experiment" pkg="bs" type="server" respawn="false" output="screen" args="-s libbsexp.so -s libbspth.so -r $(arg world)">
+  <node name="experiment" pkg="bs" type="server" respawn="false" output="screen" args="-s libexperiment.so -s libresources.so -r $(arg world)">
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find bs)/resources/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find bs)/resources"/>
@@ -20,7 +20,7 @@
 
   <!-- start gazebo client -->
   <group if="$(arg gui)">
-    <node name="client" pkg="bs" type="client" respawn="false" args="-g libbspth.so" output="screen">
+    <node name="client" pkg="bs" type="client" respawn="false" args="-g libresources.so" output="screen">
       <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
       <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find bs)/resources/models"/>
       <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find bs)/resources"/>

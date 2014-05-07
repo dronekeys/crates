@@ -39,6 +39,12 @@ find_package(Boost REQUIRED COMPONENTS
 # Find protocol buffers
 find_package(Protobuf REQUIRED)
 
+# Find GPS toolkit
+find_package(GPSTK REQUIRED)
+
+# Find GPS toolkit
+find_package(GeographicLib REQUIRED)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -101,7 +107,7 @@ generate_messages(DEPENDENCIES
 )
 
 ## Generate gazebo messages
-#add_subdirectory(src/msgs)
+add_subdirectory(src/msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -115,18 +121,30 @@ generate_messages(DEPENDENCIES
 
 catkin_package(
     LIBRARIES
-        bsexp
-        bssim
-        bspth
+      bs_resources
+      bs_experiment
+      bs_simulation
+      bs_environment
+      bs_meteorological
+      bs_satellites
+      bs_wind
+      bs_altimeter
+      bs_compass
+      bs_energy
+      bs_gnss
+      bs_imu
+      bs_propulsion
+      bs_shear
+      bs_turbulence
     CATKIN_DEPENDS
-        roslib
-        roscpp
-        std_msgs
-        std_srvs
-        message_generation
-        message_runtime
-        rosgraph_msgs
-        geometry_msgs
+      roslib
+      roscpp
+      std_msgs
+      std_srvs
+      message_generation
+      message_runtime
+      rosgraph_msgs
+      geometry_msgs
 )
 
 ###########
@@ -134,17 +152,20 @@ catkin_package(
 ###########
 
 ## Specify additional locations of header files
-include_directories(include
+include_directories(
 	${catkin_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR} 
 	${SDFormat_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
+  ${GPSTK_INCLUDE_DIR} 
+  ${GEOGRAPHICLIB_INCLUDE_DIR} 
+  ${PROTOBUF_INCLUDE_DIRS}
 	${GAZEBO_INCLUDE_DIRS}
 	${OGRE_INCLUDE_DIRS}
 	${OGRE-Terrain_INCLUDE_DIRS}
 	${CEGUI_INCLUDE_DIRS}
 	${CEGUI-OGRE_INCLUDE_DIRS}
-        ${PROTOBUF_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
 ## Specify additional locations of library files
@@ -152,38 +173,86 @@ link_directories(
 	${catkin_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS} 
 	${SDFormat_LIBRARY_DIRS}
-  ${TinyXML_LIBRARY_DIRS} 
+  ${TinyXML_LIBRARY_DIRS}
+  ${GPSTK_LIBRARY_DIRS}
+  ${GEOGRAPHICLIB_LIBRARY_DIRS} 
+  ${PROTOBUF_LIBRARY_DIRS}
 	${GAZEBO_LIBRARY_DIRS} 
 	${OGRE_LIBRARY_DIRS}
   ${OGRE-Terrain_LIBRARY_DIRS}
   ${CEGUI_LIBRARY_DIRS}
   ${CEGUI-OGRE_LIBRARY_DIRS}
-  ${PROTOBUF_LIBRARY_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}/src/msgs
 )
 
 ################################
 # Define libraries to be built #
 
-# For the simulation client
-add_library(bspth src/Paths.cpp)
+# The base system plugins gzclient and gzserver
+add_library(bs_resources       src/plugins/system/Resources.cpp)
+add_library(bs_experiment      src/plugins/system/Experiment.cpp)
+add_library(bs_simulation      src/plugins/system/Simulation.cpp)
 
-# For the simulation client
-add_library(bsexp src/Experiment.cpp)
+# The world plugins
+add_library(bs_environment     src/plugins/world/Environment.cpp)
+add_library(bs_meteorological  src/plugins/world/Meteorological.cpp)
+add_library(bs_satellites      src/plugins/world/Satellites.cpp)
+add_library(bs_wind            src/plugins/world/Wind.cpp)
 
-# For the simulation client
-add_library(bssim src/Simulation.cpp)
+# The model plugins
+add_library(bs_altimeter       src/plugins/model/Altimeter.cpp)
+add_library(bs_compass         src/plugins/model/Compass.cpp)
+add_library(bs_energy          src/plugins/model/Energy.cpp)
+add_library(bs_gnss            src/plugins/model/GNSS.cpp)
+add_library(bs_imu             src/plugins/model/IMU.cpp)
+add_library(bs_propulsion      src/plugins/model/Propulsion.cpp)
+add_library(bs_shear           src/plugins/model/Shear.cpp)
+add_library(bs_turbulence      src/plugins/model/Turbulence.cpp)
+
+##################################
+## Add cmake target dependencies #
+
+add_dependencies(bs_environment      custom_msgs)
+add_dependencies(bs_meteorological   custom_msgs)
+add_dependencies(bs_satellites       custom_msgs)
+add_dependencies(bs_wind             custom_msgs)
+add_dependencies(bs_altimeter        custom_msgs)
+add_dependencies(bs_compass          custom_msgs)
+add_dependencies(bs_energy           custom_msgs)
+add_dependencies(bs_gnss             custom_msgs)
+add_dependencies(bs_imu              custom_msgs)
+add_dependencies(bs_propulsion       custom_msgs)
+add_dependencies(bs_shear            custom_msgs)
+add_dependencies(bs_turbulence       custom_msgs)
 
 ###########################
 ## Set up dynamic linking #
 
-## GUI plugin
-target_link_libraries(bspth ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
+## Convenience declarations
+set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
+set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
+set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
 
-## World plugin (experiment)
-target_link_libraries(bsexp	${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
+## System plugins
+target_link_libraries(bs_resources       ${SYS_LIBS})
+target_link_libraries(bs_experiment      ${SYS_LIBS})
+target_link_libraries(bs_simulation      ${SYS_LIBS})
 
-## World plugin (simulation)
-target_link_libraries(bssim ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
+## System plugins
+target_link_libraries(bs_environment     ${WLD_LIBS})
+target_link_libraries(bs_meteorological  ${WLD_LIBS})
+target_link_libraries(bs_satellites      ${WLD_LIBS})
+target_link_libraries(bs_wind            ${WLD_LIBS})
+
+# Model plugins
+target_link_libraries(bs_altimeter       ${MOD_LIBS})
+target_link_libraries(bs_compass         ${MOD_LIBS})
+target_link_libraries(bs_energy          ${MOD_LIBS})
+target_link_libraries(bs_gnss            ${MOD_LIBS})
+target_link_libraries(bs_imu             ${MOD_LIBS})
+target_link_libraries(bs_propulsion      ${MOD_LIBS})
+target_link_libraries(bs_shear           ${MOD_LIBS})
+target_link_libraries(bs_turbulence      ${MOD_LIBS})
 
 #############
 ## Install ##
