@@ -48,7 +48,7 @@ namespace hal
         public:
 
             /// Constructor
-            Velocity(ros::NodeHandle& node, const char* name);
+            Velocity(const char* name);
 
             //! Control update implementations
             /*!

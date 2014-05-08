@@ -9,8 +9,8 @@ bool Land::Receive(
     return Switch();
 }
 
-Land::Land(ros::NodeHandle& node, const char *name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Land::Request, hal_model_quadrotor::Land::Response>(node, name)
+Land::Land(const char *name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+	hal_model_quadrotor::Land::Request, hal_model_quadrotor::Land::Response>(name)
 {
     Reset();
 }

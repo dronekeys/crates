@@ -17,24 +17,24 @@ namespace gazebo
     bool loaded, created, stop;
 
     // Lock access to fields that are used in ROS message callbacks
-    boost::mutex lock;
+    boost::mutex                            lock;
 
     // ROS comm
-    boost::shared_ptr<ros::NodeHandle>    rosNode;
-    boost::shared_ptr<ros::AsyncSpinner>  async;
+    boost::shared_ptr<ros::NodeHandle>      rosNode;
+    boost::shared_ptr<ros::AsyncSpinner>    async;
 
     // Gazebo event handling
-    event::ConnectionPtr  eventSigint;
-    event::ConnectionPtr  eventLoad;
+    event::ConnectionPtr                    eventSigint;
+    event::ConnectionPtr                    eventLoad;
 
     // gazebo world
-    physics::WorldPtr world;
+    physics::WorldPtr                       world;
 
     // For communication on gazebo backbone
-    transport::NodePtr        gazeboNode;
-    transport::PublisherPtr   pubFactory;
-    transport::PublisherPtr   pubRequest;
-    transport::SubscriberPtr  subResponse;
+    transport::NodePtr                      gazeboNode;
+    transport::PublisherPtr                 pubFactory;
+    transport::PublisherPtr                 pubRequest;
+    transport::SubscriberPtr                subResponse;
 
   public:
 
@@ -77,7 +77,7 @@ namespace gazebo
 
       // Start ROS without SIGINT ability
       if (!ros::isInitialized())
-        ros::init(argc,argv,"bs",ros::init_options::NoSigintHandler);
+        ros::init(argc,argv,"sim",ros::init_options::NoSigintHandler);
       else
         ROS_ERROR("Something started ros::init(...) prior to libbsexp Load()");
 

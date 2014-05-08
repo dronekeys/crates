@@ -54,7 +54,7 @@ namespace hal
         public:
 
             /// Constructor
-            AnglesHeight(ros::NodeHandle& node, const char* name);
+            AnglesHeight(const char* name);
 
             //! Control update implementations
             /*!

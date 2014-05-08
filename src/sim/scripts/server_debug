@@ -1,2 +1,2 @@
 #!/bin/sh
-rosrun bs gdbrun gzserver "$@"
+rosrun sim gdbrun gzserver "$@"

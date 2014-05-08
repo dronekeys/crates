@@ -21,9 +21,9 @@
 #include <std_srvs/Empty.h>
 
 // Services
-#include "bs/Insert.h"
-#include "bs/Delete.h"
-#include "bs/Step.h"
+#include "sim/Insert.h"
+#include "sim/Delete.h"
+#include "sim/Step.h"
 
 #define ROS_TIMEOUT_SECONDS 1.0
 
@@ -124,7 +124,7 @@ namespace gazebo
 
 		// Start ROS without SIGINT ability
 		if (!ros::isInitialized())
-			ros::init(argc,argv,"bs",ros::init_options::NoSigintHandler);
+			ros::init(argc,argv,"sim",ros::init_options::NoSigintHandler);
 		else
 			ROS_ERROR("Something started ros::init(...) prior to libbssim Load()");
 
@@ -192,13 +192,13 @@ namespace gazebo
 		topicClock = rosNode->advertise<rosgraph_msgs::Clock>("/clock",10);
 
 	  	// Add a model
-		ros::AdvertiseServiceOptions adInsert = ros::AdvertiseServiceOptions::create<bs::Insert>(
+		ros::AdvertiseServiceOptions adInsert = ros::AdvertiseServiceOptions::create<sim::Insert>(
 			"insert",boost::bind(&Simulation::Insert,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceInsert = rosNode->advertiseService(adInsert);
 
 	  	// Delete a model
-		ros::AdvertiseServiceOptions adDelete = ros::AdvertiseServiceOptions::create<bs::Delete>(
+		ros::AdvertiseServiceOptions adDelete = ros::AdvertiseServiceOptions::create<sim::Delete>(
 			"delete",boost::bind(&Simulation::Delete,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceDelete = rosNode->advertiseService(adDelete);
@@ -222,7 +222,7 @@ namespace gazebo
 		serviceReset = rosNode->advertiseService(adReset);
 
 		// Advertise more services on the custom queue
-		ros::AdvertiseServiceOptions adStep = ros::AdvertiseServiceOptions::create<bs::Step>(
+		ros::AdvertiseServiceOptions adStep = ros::AdvertiseServiceOptions::create<sim::Step>(
 			"step",boost::bind(&Simulation::Step,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceStep = rosNode->advertiseService(adStep);
@@ -256,7 +256,7 @@ namespace gazebo
 
     ////////////////////////////////////////////////////////////////////////////////
 
-	bool Insert(bs::Insert::Request &req, bs::Insert::Response &res)
+	bool Insert(sim::Insert::Request &req, sim::Insert::Response &res)
 	{
 		// Resolve the model file name
   		std::string filename = common::ModelDatabase::Instance()->GetModelFile(req.model_type);
@@ -323,7 +323,7 @@ namespace gazebo
 		return true;
 	}
 
-	bool Delete(bs::Delete::Request &req, bs::Delete::Response &res)
+	bool Delete(sim::Delete::Request &req, sim::Delete::Response &res)
 	{
 	  	// Clear forces, etc for the body in question
 		physics::ModelPtr model = world->GetModel(req.model_name);
@@ -381,7 +381,7 @@ namespace gazebo
 	}
 
 	// Resume physics
-	bool Step(bs::Step::Request &req, bs::Step::Response &res)
+	bool Step(sim::Step::Request &req, sim::Step::Response &res)
 	{
 		// Keep steps to a reasonable length
 		if (req.num_steps > 128)

@@ -19,6 +19,7 @@
 #include "environment.pb.h"
 #include "meteorological.pb.h"
 
+/*
 namespace gazebo
 {
 	class Meteorological : public WorldPlugin
@@ -197,3 +198,4 @@ namespace gazebo
 	// Resgister the plugin
 	GZ_REGISTER_WORLD_PLUGIN(Meteorological);
 }
+*/

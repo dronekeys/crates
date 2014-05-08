@@ -9,8 +9,8 @@ bool Takeoff::Receive(
     return Switch();
 }
 
-Takeoff::Takeoff(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Takeoff::Request, hal_model_quadrotor::Takeoff::Response>(node, name)
+Takeoff::Takeoff(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+	hal_model_quadrotor::Takeoff::Request, hal_model_quadrotor::Takeoff::Response>(name)
 {
     Reset();
 }

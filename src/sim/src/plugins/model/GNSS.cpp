@@ -1,3 +1,45 @@
+// Required for the maths functions
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
+
+// Basic ROS includes
+#include <hal/sensor/GNSS.h>
+
+// Basic ROS stuff
+#include <ros/ros.h>
+
+namespace gazebo
+{
+  class GNSS : public ModelPlugin, private hal::sensor::GNSS
+  {
+  private:
+
+    // Pointer to the current model
+    physics::ModelPtr modPtr;
+
+  public:
+
+    // All sensors must be configured using the current model information and the SDF
+    void Load(physics::ModelPtr model, sdf::ElementPtr root)
+    {
+       hal::HAL::Init((std::string)"/hal/" + model->GetName());
+    }
+
+    // All sensors must be resettable
+    void Reset()
+    {
+
+    }
+
+  };
+
+  // Register the plugin
+  GZ_REGISTER_MODEL_PLUGIN(GNSS);
+}
+
+
+/*
 // STandar dincludes
 #include <vector>
 
@@ -22,6 +64,7 @@
 #include "satellites.pb.h"			// For ephemerides and ionospheric delay
 
 #define DEBUG TRUE
+
 
 namespace gazebo
 {
@@ -301,7 +344,6 @@ namespace gazebo
 			// Get a solution!
 		  	try
 		  	{
-
 				// We want a once-off solution (segfaults if on)
 				solver.hasMemory = false;
 				solver.RMSLimit  = 3e6;
@@ -469,6 +511,7 @@ namespace gazebo
   // Register the plugin
   GZ_REGISTER_MODEL_PLUGIN(GNSS);
 }
+*/
 
 
 /*

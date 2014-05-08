@@ -1,2 +1,2 @@
 #!/bin/sh
-rosrun bs gdbrun gzclient "$@"
+rosrun sim gdbrun gzclient "$@"

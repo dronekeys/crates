@@ -9,8 +9,8 @@ bool Idle::Receive(
    return Switch();
 }
 
-Idle::Idle(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Idle::Request, hal_model_quadrotor::Idle::Response>(node, name)
+Idle::Idle(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+	hal_model_quadrotor::Idle::Request, hal_model_quadrotor::Idle::Response>(name)
 {
     Reset();
 }

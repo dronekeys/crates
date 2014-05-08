@@ -10,8 +10,8 @@ bool Hover::Receive(
     return Switch();
 }
 
-Hover::Hover(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Hover::Request, hal_model_quadrotor::Hover::Response>(node, name)
+Hover::Hover(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+	hal_model_quadrotor::Hover::Request, hal_model_quadrotor::Hover::Response>(name)
 {
     Reset();
 }

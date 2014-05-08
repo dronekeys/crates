@@ -48,7 +48,7 @@ namespace hal
         public:
 
             /// Constructor
-            Waypoint(ros::NodeHandle& node, const char* name);
+            Waypoint(const char* name);
 
             //! Control update implementations
             /*!

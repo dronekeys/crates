@@ -28,17 +28,7 @@ namespace hal
     namespace model
     {
 
-        class Quadrotor : 
-            public hal::model::Model,
-            public hal::controller::Emergency,
-            public hal::controller::Hover,
-            public hal::controller::Idle,
-            public hal::controller::Land,
-            public hal::controller::Takeoff,
-            public hal::controller::AnglesHeight,
-            public hal::controller::Velocity,
-            public hal::controller::VelocityHeight,
-            public hal::controller::Waypoint
+        class Quadrotor : public hal::model::Model
         {       
 
         private:
@@ -79,6 +69,9 @@ namespace hal
             */
             void BroadcastState(const ros::TimerEvent& event);
 
+            // Called by HAL when initialised
+            void OnLoad();
+
         protected:
 
             //! Accept a control message from the HAL
@@ -93,7 +86,7 @@ namespace hal
             /*!
               \param node ROS node tow hich the HAL will bind
             */
-            Quadrotor(ros::NodeHandle& node);
+            Quadrotor();
 
             //! Update the state of the platform
             /*!

@@ -2,7 +2,7 @@
 #define HAL_SENSOR_COMPASS_H
 
 // Header libraries
-#include <hal/sensor/Sensor.h>
+#include <hal/HAL.h>
 
 // Message libraries
 #include <hal_sensor_compass/Data.h>
@@ -11,10 +11,33 @@ namespace hal
 {
     namespace sensor
     {
-        class Compass : public Sensor<hal_sensor_compass::Data>
-        {       
+        class Compass : public hal::HAL
+        {     
+        private:
+
+            /// Templated message type
+            hal_sensor_compass::Data message;
+
+            /// Callback timer for status message updates
+            ros::Timer timer;
+
+            /// Used to broadcast Status message
+            ros::Publisher publisher;
+
+            //! Create a new Platform HAL
+            /*!
+              \param event the Timer event passed from the callback
+            */
+            void Broadcast(const ros::TimerEvent& event);
+
         public:
-        	Compass(ros::NodeHandle& node);
+
+            /// Constructor
+            Compass();
+
+            /// Called when HAL is initialised
+            void OnInit();
+
         };
     }
 }

@@ -50,7 +50,7 @@ namespace hal
         public:
 
             /// Constructor
-            VelocityHeight(ros::NodeHandle& node, const char* name);
+            VelocityHeight(const char* name);
 
             //! Control update implementations
             /*!

@@ -20,6 +20,7 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>rosgraph_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
+  <build_depend>hal</build_depend>
   <build_depend>hal_model_quadrotor</build_depend>
   <build_depend>hal_sensor_altimeter</build_depend>
   <build_depend>hal_sensor_compass</build_depend>
@@ -35,6 +36,7 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>rosgraph_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
+  <run_depend>hal</run_depend>
   <run_depend>hal_model_quadrotor</run_depend>
   <run_depend>hal_sensor_altimeter</run_depend>
   <run_depend>hal_sensor_compass</run_depend>
@@ -43,7 +45,7 @@
   <run_depend>hal_sensor_imu</run_depend>
 
   <export>
-    <sim plugin_path="${prefix}/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/resources/models"/>
+    <sim plugin_path="/home/asymingt/Workspace/Source/crates/devel/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/models"/>
   </export>
 
 </package>

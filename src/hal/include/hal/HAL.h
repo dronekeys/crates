@@ -29,13 +29,19 @@ namespace hal
     private:
 
         /// Data storage for the status message
-        hal::Status message;
+        hal::Status         message;
 
         /// Callback timer for status message updates
-        ros::Timer timer;
+        ros::Timer          timer;
 
         /// Used to broadcast Status message
-        ros::Publisher publisher;
+        ros::Publisher      publisher;
+
+        /// Handle to a ROS node
+        ros::NodeHandle*    rosNode;
+
+        /// Do we get to delete the new node handle?
+        bool                isManaged;    
 
         //! Create a new Platform HAL
         /*!
@@ -45,17 +51,35 @@ namespace hal
 
     protected:
 
-        /// Handle to a ROS node, shared by all children
-        ros::NodeHandle rosNode;
+        //! Obtain a pointer to the ROS node handle
+        /*!
+          \return The current ros node handle
+        */
+        ros::NodeHandle* GetRosNodePtr();
+
+        //! Initialise the HAL with an existing node handle (will not dealloc!)
+        /*!
+          \param nh the node handle
+          \param manage should we dealloc the node handle memeory?
+        */
+        void Init(ros::NodeHandle* nh, bool manage = false);
+
+        //! Create a new Platform HAL
+        /*!
+          \param event the Timer event passed from the callback
+        */
+        void Init(std::string name);
+
+        /// Called by the intermediate class (sensor, controller, model, etc.)
+        virtual void OnInit() = 0;
 
     public:    
 
-        //! Create a new HAL
-        /*!
-          \param node the ROS node to which the entity will be attached
-          \param name the name of the entity
-        */
-        HAL(ros::NodeHandle& node, const char* name);
+        /// Create a new HAL
+        HAL();
+
+        /// Destroy a new HAL
+        ~HAL();
 
         //! Set the state of the sensor
         /*!

@@ -59,12 +59,12 @@ add_message_files(
 
 
 ## Generate services in the 'srv' folder
-## add_service_files(
-##   DIRECTORY
-##     srv
-##   FILES
-##     SetRate.srv
-## )
+add_service_files(
+   DIRECTORY
+    srv
+  FILES
+    SetRate.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -94,7 +94,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    imu
+    hal_sensor_imu
   DEPENDS 
     roscpp
     message_runtime
@@ -111,9 +111,8 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(imu
-  src/IMU.cpp
-)
+add_library(hal_sensor_imu src/IMU.cpp)
+
 ## Declare a cpp executable
 # add_executable(uav_driver 
 #	src/checksum.cpp
@@ -121,12 +120,10 @@ add_library(imu
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(imu hal_sensor_imu_generate_messages_cpp)
+add_dependencies(hal_sensor_imu hal_sensor_imu_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(imu
-	${catkin_LIBRARIES} 
-)
+target_link_libraries(hal_sensor_imu ${catkin_LIBRARIES})
 
 #############
 ## Install ##

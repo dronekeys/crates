@@ -94,7 +94,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    compass
+    hal_sensor_energy
   DEPENDS 
     roscpp
     message_runtime
@@ -106,14 +106,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include 
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(energy
-  src/Energy.cpp
-)
+add_library(hal_sensor_energy src/Energy.cpp)
+
 ## Declare a cpp executable
 # add_executable(uav_driver 
 #	src/checksum.cpp
@@ -121,12 +118,10 @@ add_library(energy
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(energy hal_sensor_energy_generate_messages_cpp)
+add_dependencies(hal_sensor_energy hal_sensor_energy_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(energy
-	${catkin_LIBRARIES} 
-)
+target_link_libraries(hal_sensor_energy ${catkin_LIBRARIES})
 
 #############
 ## Install ##

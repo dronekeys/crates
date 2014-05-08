@@ -37,8 +37,8 @@ bool Velocity::Receive(
     return Switch();
 }
 
-Velocity::Velocity(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-    hal_model_quadrotor::Velocity::Request, hal_model_quadrotor::Velocity::Response>(node, name)
+Velocity::Velocity(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+    hal_model_quadrotor::Velocity::Request, hal_model_quadrotor::Velocity::Response>(name)
 {
     Reset();
 }

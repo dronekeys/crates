@@ -9,8 +9,8 @@ bool Emergency::Receive(
     return Switch();
 }
 
-Emergency::Emergency(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Emergency::Request, hal_model_quadrotor::Emergency::Response>(node, name)
+Emergency::Emergency(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+	hal_model_quadrotor::Emergency::Request, hal_model_quadrotor::Emergency::Response>(name)
 {
 	Reset();
 }

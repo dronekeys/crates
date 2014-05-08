@@ -94,7 +94,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    gnss
+    hal_sensor_gnss
   DEPENDS 
     roscpp
     message_runtime
@@ -106,14 +106,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include 
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(gnss
-  src/GNSS.cpp
-)
+add_library(hal_sensor_gnss src/GNSS.cpp)
+
 ## Declare a cpp executable
 # add_executable(uav_driver 
 #	src/checksum.cpp
@@ -121,12 +118,10 @@ add_library(gnss
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(gnss hal_sensor_gnss_generate_messages_cpp)
+add_dependencies(hal_sensor_gnss hal_sensor_gnss_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(gnss
-	${catkin_LIBRARIES} 
-)
+target_link_libraries(hal_sensor_gnss ${catkin_LIBRARIES})
 
 #############
 ## Install ##

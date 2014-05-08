@@ -43,7 +43,7 @@ namespace hal
         public:
 
             /// Default constructor takes no arguments
-            Emergency(ros::NodeHandle& node, const char* name);
+            Emergency(const char* name);
 
             //! Control update implementations
             /*!

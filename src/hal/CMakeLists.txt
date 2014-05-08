@@ -56,12 +56,12 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   DIRECTORY
-     srv
-   FILES
-     SetRate.srv
-)
+# add_service_files(
+#   DIRECTORY
+#     srv
+#   FILES
+#     SetRate.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -102,26 +102,17 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include 
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(hal
-  src/model/Model.cpp
-  src/sensor/Sensor.cpp
-  src/controller/Controller.cpp
-  src/HAL.cpp
-)
+add_library(hal src/HAL.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(hal hal_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal
-	${catkin_LIBRARIES} 
-)
+target_link_libraries(hal ${catkin_LIBRARIES})
 
 #############
 ## Install ##

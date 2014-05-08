@@ -4,6 +4,48 @@
 #include <gazebo/transport/transport.hh>
 
 // Basic ROS includes
+#include <hal/sensor/Compass.h>
+
+// Basic ROS stuff
+#include <ros/ros.h>
+
+namespace gazebo
+{
+  class Compass : public ModelPlugin, private hal::sensor::Compass
+  {
+  private:
+
+    // Pointer to the current model
+    physics::ModelPtr modPtr;
+
+  public:
+
+    // All sensors must be configured using the current model information and the SDF
+    void Load(physics::ModelPtr model, sdf::ElementPtr root)
+    {
+       hal::HAL::Init((std::string)"/hal/" + model->GetName());
+    }
+
+    // All sensors must be resettable
+    void Reset()
+    {
+
+    }
+
+  };
+
+  // Register the plugin
+  GZ_REGISTER_MODEL_PLUGIN(Compass);
+}
+
+/*
+
+// Required for the maths functions
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
+
+// Basic ROS includes
 #include <ros/ros.h>
 
 // Basic constants 
@@ -76,3 +118,5 @@ namespace gazebo
 	// Register the plugin
 	GZ_REGISTER_MODEL_PLUGIN(Compass);
 }
+
+*/

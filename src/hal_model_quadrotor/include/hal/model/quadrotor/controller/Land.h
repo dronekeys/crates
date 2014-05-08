@@ -43,7 +43,7 @@ namespace hal
         public:
 
             /// Constructor
-            Land(ros::NodeHandle& node, const char* name);
+            Land(const char* name);
 
             //! Control update implementations
             /*!

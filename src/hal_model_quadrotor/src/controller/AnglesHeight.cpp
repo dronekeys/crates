@@ -29,8 +29,8 @@ bool AnglesHeight::Receive(
     return Switch();
 }
 
-AnglesHeight::AnglesHeight(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-    hal_model_quadrotor::AnglesHeight::Request, hal_model_quadrotor::AnglesHeight::Response>(node, name)
+AnglesHeight::AnglesHeight(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+    hal_model_quadrotor::AnglesHeight::Request, hal_model_quadrotor::AnglesHeight::Response>(name)
 {
     Reset();
 }

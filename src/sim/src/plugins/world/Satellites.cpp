@@ -54,6 +54,8 @@
 #define GLONASS_L2OF_OFFSET  1246.0e6
 #define GLONASS_L2OF_SCALE   0.4375e6
 
+/*
+
 namespace gazebo
 {
 	class Satellites : public WorldPlugin
@@ -104,7 +106,7 @@ namespace gazebo
 
 			// TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
-			tropModel.setWeather(temperature - 273.15, pressure, humidity);
+			tropModel.setWeather(te - 273.15, pr, hu);
 
 			// IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
 
@@ -526,3 +528,5 @@ namespace gazebo
 	};
 
 }
+
+*/

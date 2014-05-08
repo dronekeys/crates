@@ -17,6 +17,13 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
 	geometry_msgs
 	message_generation
+  hal
+#  hal_model_quadrotor
+  hal_sensor_altimeter
+  hal_sensor_compass
+  hal_sensor_energy
+  hal_sensor_gnss
+  hal_sensor_imu
 ) 
 
 # Find Gazebo
@@ -150,7 +157,7 @@ catkin_package(
       sim_energy
       sim_gnss
       sim_imu
-      sim_propulsion
+      sim_quadrotor
       sim_shear
       sim_turbulence
     CATKIN_DEPENDS
@@ -162,6 +169,13 @@ catkin_package(
       message_runtime
       rosgraph_msgs
       geometry_msgs
+      hal
+#      hal_model_quadrotor
+      hal_sensor_altimeter
+      hal_sensor_compass
+      hal_sensor_energy
+      hal_sensor_gnss
+      hal_sensor_imu
 )
 
 ###########
@@ -206,7 +220,7 @@ link_directories(
 # Define libraries to be built #
 
 # Compile the message library
-add_library(custom_msgs ${PROTO_SRCS})
+add_library(custom_msgs         ${PROTO_SRCS})
 
 # The base system plugins gzclient and gzserver
 add_library(sim_resources       src/plugins/system/Resources.cpp)
@@ -258,14 +272,14 @@ set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs
 set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
 
 # Link the message library
-target_link_libraries(custom_msgs        ${PROTOBUF_LIBRARY})
+target_link_libraries(custom_msgs         ${SYS_LIBS})
 
 ## System plugins
 target_link_libraries(sim_resources       ${SYS_LIBS})
 target_link_libraries(sim_experiment      ${SYS_LIBS})
 target_link_libraries(sim_simulation      ${SYS_LIBS})
 
-## System plugins
+## World plugins
 target_link_libraries(sim_environment     ${WLD_LIBS})
 target_link_libraries(sim_meteorological  ${WLD_LIBS})
 target_link_libraries(sim_satellites      ${WLD_LIBS})

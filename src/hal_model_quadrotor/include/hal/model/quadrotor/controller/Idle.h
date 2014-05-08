@@ -43,7 +43,7 @@ namespace hal
         public:
 
             /// Constructor
-            Idle(ros::NodeHandle& node, const char* name);
+            Idle(const char* name);
 
             //! Control update implementations
             /*!

@@ -43,7 +43,7 @@ namespace hal
         public:
 
             /// Constructor
-            Takeoff(ros::NodeHandle& node, const char* name);
+            Takeoff(const char* name);
             
             //! Control update implementations
             /*!

@@ -11,7 +11,7 @@
   </group>
 
   <!-- start gazebo server-->
-  <node name="experiment" pkg="sim" type="server" respawn="false" output="screen" args="-s libsim_experiment.so -s libsim_resources.so -r $(arg world)">
+  <node name="experiment" pkg="sim" type="server" respawn="false" output="screen" args="-s libsim_experiment.so -s libsim_resources.so -r -u $(arg world)">
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/resources/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find sim)/resources"/>

@@ -35,8 +35,8 @@ bool Waypoint::Receive(
     return Switch();
 }
 
-Waypoint::Waypoint(ros::NodeHandle& node, const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-    hal_model_quadrotor::Waypoint::Request, hal_model_quadrotor::Waypoint::Response>(node, name)
+Waypoint::Waypoint(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
+    hal_model_quadrotor::Waypoint::Request, hal_model_quadrotor::Waypoint::Response>(name)
 {
     Reset();
 }

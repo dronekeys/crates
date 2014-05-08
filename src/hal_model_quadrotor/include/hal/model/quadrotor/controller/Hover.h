@@ -43,7 +43,7 @@ namespace hal
         public:
 
             /// Constructor
-            Hover(ros::NodeHandle& node, const char* name);
+            Hover(const char* name);
 
             //! Control update implementations
             /*!
