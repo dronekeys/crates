@@ -8,7 +8,7 @@
 #include <gazebo/transport/transport.hh>
 
 // Basic ROS includes
-#include <ros/ros.h>
+#include <hal/model/Quadrotor.h>
 
 // Thrust considered to be too low to animate :)
 #define MOTOR_ANIMATION_THRESHOLD 	0.001
@@ -17,7 +17,7 @@
 
 namespace gazebo
 {
-	class Quadrotor : public ModelPlugin
+	class Quadrotor : public ModelPlugin, public hal::model::Quadrotor
  	{
 
   	private:
@@ -161,6 +161,9 @@ namespace gazebo
 	    // Default constructor
 	    Quadrotor() : 
 
+	    	// Quadrotor HAL
+	    	hal::model::Quadrotor(),
+
 			// Control parameters
 			srs(-2291.83118052329), srl(-0.9), sru(0.9), 
 		    sps(-2291.83118052329), spl(-0.9), spu(0.9), 
@@ -182,7 +185,6 @@ namespace gazebo
 
 			// Are motors animated?
 			motors(false)
-
 	    {
 	      // Do nothing
 	    }
@@ -192,10 +194,14 @@ namespace gazebo
 	    // All sensors must be configured using the current model information and the SDF
 	    void Load(physics::ModelPtr model, sdf::ElementPtr root)
 	    {
+	    	// Initilize the HAL
+	    	hal::HAL::Init((std::string)"/hal/" + model->GetName());
+
 			// save the model pointer
-			modPtr      = model;
+			modPtr = model;
 
 			// Control parameters
+			/*
 			root->GetElement("control")->GetElement("roll")->GetElement("scale")->GetValue()->Get(srs);
 			root->GetElement("control")->GetElement("roll")->GetElement("min")->GetValue()->Get(srl);
 			root->GetElement("control")->GetElement("roll")->GetElement("max")->GetValue()->Get(sru);
@@ -240,7 +246,7 @@ namespace gazebo
 			// How much thrust force is required to hover (simple F = mG)
 			hover = modPtr->GetLink("body")->GetInertial()->GetMass() 
 				  * modPtr->GetWorld()->GetPhysicsEngine()->GetGravity().GetLength();
-
+			*/
 			// Always call a reset 
 			Reset();
 	    }
@@ -257,6 +263,12 @@ namespace gazebo
 			// Animate the motors to 300 rpm if hovering
 			AnimateMotors(pose.pos.z > 0);
 	    }
+
+	    // Do something with the Control provided by the HAL
+		void Control(const hal_model_quadrotor::Control &ctl)
+		{
+
+		}
 
 		// Reset the internal control
 		void SetControl(const double &r,const double &p,const double &y,const double &t,const double &v)

@@ -14,10 +14,10 @@ IMU::IMU() : hal::HAL()
 void IMU::OnInit()
 {
     // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
-    publisher = GetRosNodePtr()->template advertise<hal_sensor_imu::Data>("imu/Data", DEFAULT_QUEUE_LENGTH);
+    publisher = GetRosNodePtr()->template advertise<hal_sensor_imu::Data>("sensor/imu/Data", DEFAULT_QUEUE_LENGTH);
 
     // Advertice the ability to configure the sensor rate
-    service = GetRosNodePtr()->advertiseService("imu/SetRate", &IMU::SetRate, this);
+    service = GetRosNodePtr()->advertiseService("sensor/imu/SetRate", &IMU::SetRate, this);
 
     // Create a timer to broadcast the data
     timer = GetRosNodePtr()->createTimer(

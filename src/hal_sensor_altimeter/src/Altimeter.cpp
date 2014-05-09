@@ -14,7 +14,7 @@ Altimeter::Altimeter() : hal::HAL()
 void Altimeter::OnInit()
 {
     // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
-    publisher = GetRosNodePtr()->template advertise<hal_sensor_altimeter::Data>("altimeter/Data", DEFAULT_QUEUE_LENGTH);
+    publisher = GetRosNodePtr()->template advertise<hal_sensor_altimeter::Data>("sensor/altimeter/Data", DEFAULT_QUEUE_LENGTH);
 
     // Create a timer to broadcast the data
     timer = GetRosNodePtr()->createTimer(

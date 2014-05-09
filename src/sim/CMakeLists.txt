@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 	geometry_msgs
 	message_generation
   hal
-#  hal_model_quadrotor
+  hal_model_quadrotor
   hal_sensor_altimeter
   hal_sensor_compass
   hal_sensor_energy
@@ -170,7 +170,7 @@ catkin_package(
       rosgraph_msgs
       geometry_msgs
       hal
-#      hal_model_quadrotor
+      hal_model_quadrotor
       hal_sensor_altimeter
       hal_sensor_compass
       hal_sensor_energy

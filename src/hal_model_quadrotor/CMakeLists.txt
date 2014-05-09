@@ -106,6 +106,7 @@ catkin_package(
   DEPENDS 
     roscpp
     message_runtime
+    hal
 )
 
 ###########
@@ -118,15 +119,15 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
 add_library(hal_model_quadrotor
-  src/controller/Idle.cpp
-  src/controller/Takeoff.cpp
-  src/controller/Hover.cpp
-  src/controller/Land.cpp
-  src/controller/Emergency.cpp
-  src/controller/AnglesHeight.cpp
-  src/controller/Velocity.cpp
-  src/controller/VelocityHeight.cpp
-  src/controller/Waypoint.cpp
+  #src/controller/Idle.cpp
+  #src/controller/Takeoff.cpp
+  #src/controller/Hover.cpp
+  #src/controller/Land.cpp
+  #src/controller/Emergency.cpp
+  #src/controller/AnglesHeight.cpp
+  #src/controller/Velocity.cpp
+  #src/controller/VelocityHeight.cpp
+  #src/controller/Waypoint.cpp
   src/Quadrotor.cpp
 )
 

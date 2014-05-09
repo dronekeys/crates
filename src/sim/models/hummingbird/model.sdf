@@ -84,6 +84,7 @@
       </axis>
     </joint>
 
+    <plugin name="quadrotor" filename="libsim_quadrotor.so"></plugin>
     <plugin name="altimeter" filename="libsim_altimeter.so"></plugin>
     <plugin name="compass" filename="libsim_compass.so"></plugin>
     <plugin name="energy" filename="libsim_energy.so"></plugin>

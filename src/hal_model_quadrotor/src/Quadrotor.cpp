@@ -1,5 +1,5 @@
 // Standard libraries
-#include <hal/model/quadrotor/Quadrotor.h>
+#include <hal/model/Quadrotor.h>
 
 using namespace hal::model;
 
@@ -19,7 +19,7 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     */
     
     // Update the flight control system
-    ReceiveControl(control);
+    Control(control);
 
     // Save the current time tick
     tick = event.current_real.toSec();
@@ -35,14 +35,88 @@ void Quadrotor::BroadcastState(const ros::TimerEvent& event)
     pubState.publish(state);
 }
 
-Quadrotor::Quadrotor() : hal::model::Model()
+Quadrotor::Quadrotor() : hal::HAL()
 {
     // Do nothing
 }
 
-void Quadrotor::OnLoad()
+bool Quadrotor::RcvAnglesHeight(
+    hal_model_quadrotor::AnglesHeight::Request  &req, 
+    hal_model_quadrotor::AnglesHeight::Response &res)
 {
-    /*
+    return true;
+}
+
+bool Quadrotor::RcvEmergency(
+    hal_model_quadrotor::Emergency::Request  &req, 
+    hal_model_quadrotor::Emergency::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvHover(
+    hal_model_quadrotor::Hover::Request  &req, 
+    hal_model_quadrotor::Hover::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvIdle(
+    hal_model_quadrotor::Idle::Request  &req, 
+    hal_model_quadrotor::Idle::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvLand(
+    hal_model_quadrotor::Land::Request  &req, 
+    hal_model_quadrotor::Land::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvTakeoff(
+    hal_model_quadrotor::Takeoff::Request  &req, 
+    hal_model_quadrotor::Takeoff::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvVelocity(
+    hal_model_quadrotor::Velocity::Request  &req, 
+    hal_model_quadrotor::Velocity::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvVelocityHeight(
+    hal_model_quadrotor::VelocityHeight::Request  &req, 
+    hal_model_quadrotor::VelocityHeight::Response &res)
+{
+    return true;
+}
+
+bool Quadrotor::RcvWaypoint(
+    hal_model_quadrotor::Waypoint::Request  &req, 
+    hal_model_quadrotor::Waypoint::Response &res)
+{
+    return true;
+}
+
+void Quadrotor::OnInit()
+{
+    // Advertise the various controllers on the ROS backbone
+    srvAnglesHeight     = GetRosNodePtr()->advertiseService("controller/AnglesHeight", &Quadrotor::RcvAnglesHeight, this);
+    srvEmergency        = GetRosNodePtr()->advertiseService("controller/Emergency", &Quadrotor::RcvEmergency, this);
+    srvHover            = GetRosNodePtr()->advertiseService("controller/Hover", &Quadrotor::RcvHover, this);
+    srvIdle             = GetRosNodePtr()->advertiseService("controller/Idle", &Quadrotor::RcvIdle, this);
+    srvLand             = GetRosNodePtr()->advertiseService("controller/Land", &Quadrotor::RcvLand, this);
+    srvTakeoff          = GetRosNodePtr()->advertiseService("controller/Takeoff", &Quadrotor::RcvTakeoff, this);
+    srvVelocity         = GetRosNodePtr()->advertiseService("controller/Velocity", &Quadrotor::RcvVelocity, this);
+    srvVelocityHeight   = GetRosNodePtr()->advertiseService("controller/VelocityHeight", &Quadrotor::RcvVelocityHeight, this);
+    srvWaypoint         = GetRosNodePtr()->advertiseService("controller/Waypoint", &Quadrotor::RcvWaypoint, this);
+
+/*
     // 1 argument: any node can transition to these controllers immediately
     hal::controller::ControllerBase<hal_model_quadrotor::State,hal_model_quadrotor::Control>::PermitInstant("Emergency");
     hal::controller::ControllerBase<hal_model_quadrotor::State,hal_model_quadrotor::Control>::PermitInstant("Land");
@@ -66,14 +140,12 @@ void Quadrotor::OnLoad()
 
     // The UAV is always started on the ground
     hal::controller::ControllerBase<hal_model_quadrotor::State,hal_model_quadrotor::Control>::SetController("Idle");
-
+*/
     // CREATE THE DATA BROADCAST TIMERS ///////////////////////////////////////////////////////////////
 
     // Advertise this message on the ROS backbone
-    pubState   = hal::model::Quadrotor::GetRosNodePtr()->template 
-        advertise<hal_model_quadrotor::State>("State", DEFAULT_QUEUE_LENGTH);
-    pubControl = hal::model::Quadrotor::GetRosNodePtr()->template 
-        advertise<hal_model_quadrotor::Control>("Control", DEFAULT_QUEUE_LENGTH);
+    pubState   = hal::model::Quadrotor::GetRosNodePtr()->template advertise<hal_model_quadrotor::State>("State", DEFAULT_QUEUE_LENGTH);
+    pubControl = hal::model::Quadrotor::GetRosNodePtr()->template advertise<hal_model_quadrotor::Control>("Control", DEFAULT_QUEUE_LENGTH);
 
     // Immediately start control loop
     timerUpdate = GetRosNodePtr()->createTimer(
@@ -95,7 +167,7 @@ void Quadrotor::OnLoad()
         &Quadrotor::BroadcastControl, 
         this
     );
-    */
+    
 }
 
 bool Quadrotor::SetState(const hal_model_quadrotor::State &sta)

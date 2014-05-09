@@ -14,7 +14,7 @@ Energy::Energy() : hal::HAL()
 void Energy::OnInit()
 {
     // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
-    publisher = GetRosNodePtr()->template advertise<hal_sensor_energy::Data>("energy/Data", DEFAULT_QUEUE_LENGTH);
+    publisher = GetRosNodePtr()->template advertise<hal_sensor_energy::Data>("sensor/energy/Data", DEFAULT_QUEUE_LENGTH);
 
     // Create a timer to broadcast the data
     timer = GetRosNodePtr()->createTimer(
