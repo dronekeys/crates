@@ -27,6 +27,10 @@ void GNSS::OnInit()
 }
 
 void GNSS::Broadcast(const ros::TimerEvent& event)
-{                  
+{          
+    // Obtain the measure               
+    GetMeasurement(message);
+    
+    // Publish the message
     publisher.publish(message);
 }

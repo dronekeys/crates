@@ -1,10 +1,10 @@
 <model>
-	<name>Royal Veterinary College</name>
+	<name>Royal Veterinary College, Hawkshead Campus</name>
 	<version>1.0</version>
-	<sdf version="1.4">model.sdf</sdf>
+	<sdf version="1.5">model.sdf</sdf>
 	<author>
 		<name>Andrew Symington</name>
 		<email>andrew.c.symington@gmail.com</email>
 	</author>
-	<description>A ground plane for the royal veterinary college.</description>
+	<description>Royal Veterinary College, Hawkshead Campus</description>
 </model>

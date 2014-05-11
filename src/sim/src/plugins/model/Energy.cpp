@@ -16,20 +16,97 @@ namespace gazebo
   private:
 
     // Pointer to the current model
-    physics::ModelPtr modPtr;
+    physics::ModelPtr     modPtr;
+
+    // Pointer to the update event connection
+    event::ConnectionPtr  conPtr;
+
+    // Parameters
+    double energyTotal;
+    double energyRemaining;
+    double energyConsumptionBase;
+    double energyRateFactor;
+    double energyKill;
+    double energyWarn;
+
+    // How much battery remains (amp hours)
+    double tim, remaining, consumption;
+
+    // Called every time tick to work out energy consumption
+    void PrePhysics(const gazebo::common::UpdateInfo &_info)
+    {
+      // Time over which dynamics must be updated (needed for thrust update)
+      double dt = _info.simTime.Double() - tim;
+
+      // If simulation is paused, dont waste CPU cycles calculating a physics update...
+      if (dt > 0) 
+      {
+        // Store current consumption rate
+        consumption = energyConsumptionBase * energyRateFactor * modPtr->GetWorldLinearAccel().z;
+
+        // Calculate th
+        remaining -= dt * consumption;
+      }
+
+      // Update timer
+      tim = _info.simTime.Double();
+    }
+
 
   public:
+
+    // Constructor
+    Energy() : energyTotal(2.2), energyRemaining(2.2), energyConsumptionBase(0.2), 
+      energyRateFactor(6.6), energyKill(0.1), energyWarn(0.2), tim(0)
+    {
+      // Do nothing
+    }
 
     // All sensors must be configured using the current model information and the SDF
     void Load(physics::ModelPtr model, sdf::ElementPtr root)
     {
-       hal::HAL::Init((std::string)"/hal/" + model->GetName());
+      // Initialise the HAL
+      hal::HAL::Init((std::string)"/hal/" + model->GetName());
+
+      // Save the model
+      modPtr = model;
+
+      // Extract parameters
+      root->GetElement("total")->GetValue()->Get(energyTotal);
+      root->GetElement("remaining")->GetValue()->Get(energyRemaining);
+      root->GetElement("consumption")->GetElement("base")->GetValue()->Get(energyConsumptionBase);
+      root->GetElement("consumption")->GetElement("flight")->GetValue()->Get(energyRateFactor);
+      root->GetElement("limits")->GetElement("warn")->GetValue()->Get(energyKill);
+      root->GetElement("limits")->GetElement("kill")->GetValue()->Get(energyWarn);
+
+      // Pre physics - update quadrotor dynamics and wind
+      conPtr = gazebo::event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&Energy::PrePhysics, this, _1));
+
+      // Call RESET on first init
+      Reset();
     }
 
     // All sensors must be resettable
     void Reset()
     {
+      // Reset the timer
+      tim = 0.0;
 
+      // Reset the tally
+      consumption = 0;
+      remaining   = energyRemaining;
+    }
+
+    // SENSOR SPECIFIC STUFF ///////////////////////////////////////
+
+    // Get the current altitude
+    bool GetMeasurement(hal_sensor_energy::Data& msg)
+    {
+      msg.total       = energyTotal;
+      msg.remaining   = remaining;
+      msg.consumption = consumption;
+      return true;
     }
 
   };

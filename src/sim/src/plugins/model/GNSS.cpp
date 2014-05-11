@@ -23,13 +23,28 @@ namespace gazebo
     // All sensors must be configured using the current model information and the SDF
     void Load(physics::ModelPtr model, sdf::ElementPtr root)
     {
-       hal::HAL::Init((std::string)"/hal/" + model->GetName());
+    	// Initialise the HAL
+       	hal::HAL::Init((std::string)"/hal/" + model->GetName());
+
+    	// Save the model
+    	modPtr = model;
+
+    	// Call RESET on first init
+    	Reset();
     }
 
     // All sensors must be resettable
     void Reset()
     {
 
+    }
+
+    // SENSOR SPECIFIC STUFF ///////////////////////////////////////
+
+    // Get the current altitude
+    bool GetMeasurement(hal_sensor_gnss::Data& msg)
+    {
+      return true;
     }
 
   };

@@ -30,6 +30,13 @@ namespace hal
             */
             void Broadcast(const ros::TimerEvent& event);
 
+            //! Called by HAL to obtain a compass measurement
+            /*!
+              \param msg the message to be populated
+              \return whether the measurement was obtained successfully
+            */
+            virtual bool GetMeasurement(hal_sensor_gnss::Data& msg) = 0;
+
         public:
 
             /// Constructor

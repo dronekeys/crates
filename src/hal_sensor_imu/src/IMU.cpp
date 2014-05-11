@@ -45,5 +45,9 @@ bool IMU::SetRate(hal_sensor_imu::SetRate::Request &req, hal_sensor_imu::SetRate
 
 void IMU::Broadcast(const ros::TimerEvent& event)
 {                  
+    // Obtain the measure               
+    GetMeasurement(message);
+    
+    // Publish the message
     publisher.publish(message);
 }

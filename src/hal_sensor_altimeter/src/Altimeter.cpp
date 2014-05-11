@@ -27,6 +27,10 @@ void Altimeter::OnInit()
 }
 
 void Altimeter::Broadcast(const ros::TimerEvent& event)
-{                  
+{   
+    // Obtain the measure               
+    GetMeasurement(message);
+    
+    // Publish the measurement
     publisher.publish(message);
 }

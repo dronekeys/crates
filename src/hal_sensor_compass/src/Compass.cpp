@@ -28,5 +28,9 @@ void Compass::OnInit()
 
 void Compass::Broadcast(const ros::TimerEvent& event)
 {                  
+    // Obtain the measure               
+    GetMeasurement(message);
+
+    // Publish the data    
     publisher.publish(message);
 }

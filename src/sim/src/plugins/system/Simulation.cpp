@@ -47,6 +47,7 @@ namespace gazebo
     // Gazebo event handling
     event::ConnectionPtr  eventSigint;
     event::ConnectionPtr  eventLoad;
+    event::ConnectionPtr  eventClock;
 
     // gazebo world
     physics::WorldPtr world;
@@ -151,6 +152,10 @@ namespace gazebo
 		// On connecting to the world, initialise all services
 		eventLoad = event::Events::ConnectWorldCreated(
 			boost::bind(&Simulation::Init,this,_1)
+		);
+
+		eventClock = event::Events::ConnectWorldUpdateBegin(
+			boost::bind(&Simulation::Tick,this)
 		);
 
 		// Load success

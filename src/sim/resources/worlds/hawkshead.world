@@ -4,23 +4,14 @@
 
   <world name="hawkshead">
 
-    <!-- Set the physics properties -->
+    <!-- Physics -->
     <physics type="ode">
       <max_step_size>0.02</max_step_size>
       <real_time_factor>1.0</real_time_factor>
       <real_time_update_rate>50</real_time_update_rate>
     </physics>
 
-    <!-- Set the geodetic system  -->
-    <spherical_coordinates>
-      <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>51.71190</latitude_deg>
-      <longitude_deg>-0.21052</longitude_deg>
-      <elevation>0</elevation>
-      <heading_deg>0</heading_deg>
-    </spherical_coordinates>
-
-    <!-- Setup a basic scene -->
+    <!-- Setup a basic scene with a sky and clouds -->
     <scene>
       <sky>
         <time>12.00</time>
@@ -30,39 +21,105 @@
           <speed>12</speed>
         </clouds>
       </sky>
-      <shadows>false</shadows>
+      <shadows>true</shadows>
     </scene>
 
+    <!-- Sun -->
     <include>
       <uri>model://sun</uri>
     </include>
     
+    <!-- Terrain -->
     <include>
-      <uri>model://ground_plane</uri>
-    </include>
-
-    <include>
-      <name>UAV1</name>
-      <pose>1.0 0.0 0.05 0 0 0</pose>
-      <uri>model://hummingbird</uri>
+      <uri>model://hawkshead</uri>
     </include>
 
     <!--
-    <include>
-      <uri>model://rvc</uri>
-    </include>
 
-    <include>
-      <uri>model://sun</uri>
-    </include>
+    <plugin name="environment" filename="libsim_environment.so">
+      <origin>
+        <latitude>51.71190</latitude>
+        <longitude>-0.21052</longitude>
+        <elevation>0.0</elevation>
+      </origin>
+      <time>
+        <year>2010</year>
+        <month>1</month>
+        <day>6</day>
+        <hour>10</hour>
+        <minute>0</minute>
+        <second>0</second>
+      </time>
+    </world>
 
-    <include>
-      <name>UAV1</name>
-      <pose>0 0 0 0 0 0</pose>
-      <uri>model://pelican</uri>
-    </include>
+    <plugin name="meteorological" filename="libsim_meteorological.so">
+      <rate>1</rate>
+      <default>
+        <kelvin>273.0</kelvin>
+        <millibars>1000.0</millibars>
+        <relhumidity>95.0</relhumidity>
+      </default>
+      <rinex>
+        <uri>file://gnss/hers0060.10m</uri>
+        <uri>file://gnss/hers0070.10m</uri>
+        <uri>file://gnss/hers0080.10m</uri>
+      </rinex>
+    </plugin>
+
+    <plugin name="wind" filename="libsim_wind.so">
+      <rate>10</rate>
+      <default>
+        <speed>5</speed>
+        <heading>90</heading>
+      </default>
+      <rinex>
+        <uri>file://gnss/hers0060.10m</uri>
+        <uri>file://gnss/hers0070.10m</uri>
+        <uri>file://gnss/hers0080.10m</uri>
+      </rinex>
+    </plugin>
+
+    <plugin name="gps" filename="libsim_gnss_gps.so">
+      <rate>10</rate>
+      <minelevation>15</minelevation>
+      <ionosphere>
+        <uri>file://gnss/igsg0060.10i</uri>
+        <uri>file://gnss/igsg0070.10i</uri>
+        <uri>file://gnss/igsg0080.10i</uri>
+      </ionosphere>
+      <broadcast>
+        <uri>file://gnss/brdc0060.10n</uri>
+        <uri>file://gnss/brdc0070.10n</uri>
+        <uri>file://gnss/brdc0080.10n</uri>
+      </broadcast>
+      <final>
+        <uri>file://gnss/igs15652.sp3</uri>
+        <uri>file://gnss/igs15653.sp3</uri>
+        <uri>file://gnss/igs15654.sp3</uri>
+      </final>
+    </plugin>
+
+    <plugin name="glonass" filename="libsim_gnss_glonass.so">
+      <rate>10</rate>
+      <minelevation>15</minelevation>
+      <ionosphere>
+        <uri>file://gnss/igsg0060.10i</uri>
+        <uri>file://gnss/igsg0070.10i</uri>
+        <uri>file://gnss/igsg0080.10i</uri>
+      </ionosphere>
+      <broadcast>
+        <uri>file://gnss/brdc0060.10g</uri>
+        <uri>file://gnss/brdc0070.10g</uri>
+        <uri>file://gnss/brdc0080.10g</uri>
+      </broadcast>
+      <final>
+        <uri>file://gnss/igl15652.sp3</uri>
+        <uri>file://gnss/igl15653.sp3</uri>
+        <uri>file://gnss/igl15654.sp3</uri>
+      </final>
+    </plugin>
+
     -->
-
 
   </world>
 

@@ -246,9 +246,10 @@ namespace gazebo
 			// How much thrust force is required to hover (simple F = mG)
 			hover = modPtr->GetLink("body")->GetInertial()->GetMass() 
 				  * modPtr->GetWorld()->GetPhysicsEngine()->GetGravity().GetLength();
-			*/
+
 			// Always call a reset 
 			Reset();
+			*/
 	    }
 
 	    // All sensors must be resettable
