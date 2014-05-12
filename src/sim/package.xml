@@ -47,5 +47,4 @@
   <export>
     <sim plugin_path="/home/asymingt/Workspace/Source/crates/devel/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/models"/>
   </export>
-
 </package>
