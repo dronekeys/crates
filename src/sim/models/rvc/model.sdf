@@ -29,8 +29,8 @@
     </geometry>
     <material>
       <script>
-        <uri>file://media/materials/scripts/rvc.material</uri>
-        <name>rvc/Image</name>
+        <uri>file://media/materials/hawkshead.material</uri>
+        <name>hawkshead/Image</name>
       </script>
     </material>
   </visual>
