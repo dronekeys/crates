@@ -267,9 +267,9 @@ add_dependencies(sim_turbulence       custom_msgs)
 ## Set up dynamic linking #
 
 ## Convenience declarations
-set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES})
-set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
-set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs)
+set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
+set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs ${PROTOBUF_LIBRARIES})
+set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs ${PROTOBUF_LIBRARIES})
 
 # Link the message library
 target_link_libraries(custom_msgs         ${SYS_LIBS})
