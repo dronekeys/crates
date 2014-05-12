@@ -20,6 +20,9 @@ find_package(catkin REQUIRED COMPONENTS
   hal
 ) 
 
+# Find protocol buffers
+find_package(Protobuf REQUIRED)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -108,6 +111,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(include 
   ${catkin_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -123,7 +127,7 @@ add_library(hal_sensor_imu src/IMU.cpp)
 add_dependencies(hal_sensor_imu hal_sensor_imu_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_sensor_imu ${catkin_LIBRARIES})
+target_link_libraries(hal_sensor_imu ${catkin_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 #############
 ## Install ##
