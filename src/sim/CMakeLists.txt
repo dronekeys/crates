@@ -150,7 +150,8 @@ catkin_package(
       sim_simulation
       sim_environment
       sim_meteorological
-      sim_satellites
+      sim_gps
+      sim_glonass
       sim_wind
       sim_altimeter
       sim_compass
@@ -230,7 +231,8 @@ add_library(sim_simulation      src/plugins/system/Simulation.cpp)
 # The world plugins
 add_library(sim_environment     src/plugins/world/Environment.cpp)
 add_library(sim_meteorological  src/plugins/world/Meteorological.cpp)
-add_library(sim_satellites      src/plugins/world/Satellites.cpp)
+add_library(sim_glonass         src/plugins/world/Glonass.cpp)
+add_library(sim_gps             src/plugins/world/GPS.cpp)
 add_library(sim_wind            src/plugins/world/Wind.cpp)
 
 # The model plugins
@@ -252,7 +254,8 @@ add_dependencies(sim_simulation       sim_generate_messages_cpp)
 
 add_dependencies(sim_environment      custom_msgs)
 add_dependencies(sim_meteorological   custom_msgs)
-add_dependencies(sim_satellites       custom_msgs)
+add_dependencies(sim_gps              custom_msgs)
+add_dependencies(sim_glonass          custom_msgs)
 add_dependencies(sim_wind             custom_msgs)
 add_dependencies(sim_altimeter        custom_msgs)
 add_dependencies(sim_compass          custom_msgs)
@@ -282,7 +285,8 @@ target_link_libraries(sim_simulation      ${SYS_LIBS})
 ## World plugins
 target_link_libraries(sim_environment     ${WLD_LIBS})
 target_link_libraries(sim_meteorological  ${WLD_LIBS})
-target_link_libraries(sim_satellites      ${WLD_LIBS})
+target_link_libraries(sim_gps             ${WLD_LIBS})
+target_link_libraries(sim_glonass         ${WLD_LIBS})
 target_link_libraries(sim_wind            ${WLD_LIBS})
 
 # Model plugins

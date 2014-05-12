@@ -39,41 +39,43 @@ namespace gazebo
     // All sensors must be resettable
     void Reset()
     {
-    	// Do nothing
+
     }
 
     // SENSOR SPECIFIC STUFF ///////////////////////////////////////
 
     // Get the current altitude
     bool GetMeasurement(hal_sensor_altimeter::Data& msg)
-	{
-		msg.height   = modPtr->GetLink("body")->GetWorldPose().pos.z;
-		msg.velocity = modPtr->GetLink("body")->GetWorldLinearVel().z;
-		return true;
-	}
+    {
+      msg.height   = modPtr->GetLink("body")->GetWorldPose().pos.z;
+      msg.velocity = modPtr->GetLink("body")->GetWorldLinearVel().z;
+      return true;
+    }
 
+    /*
     // Get the atmospheric pressure at the current altitude
     double GetPressure()
     {
-		// Current altitude
-		double h = modPtr->GetLink("body")->GetWorldPose().pos.z;
+  		// Current altitude
+  		double h = modPtr->GetLink("body")->GetWorldPose().pos.z;
 
-		// Gravitational field strength
-		double g = modPtr->GetWorld()->GetPhysicsEngine()->GetGravity().GetLength();
+  		// Gravitational field strength
+  		double g = modPtr->GetWorld()->GetPhysicsEngine()->GetGravity().GetLength();
 
-		// Gas constant
-		double R = 8.314472;
+  		// Gas constant
+  		double R = 8.314472;
 
-		// Standard molar mass of air
-		double M = 0.0289644;
+  		// Standard molar mass of air
+  		double M = 0.0289644;
 
-		// Dry adiabatic or saturated adiabatic lapse rates for air (Kelvin/m)
-		// See: http://en.wikipedia.org/wiki/Troposphere
-		double L = (h0 < 100.0 ? 0.00028295: 0.00027965);
+  		// Dry adiabatic or saturated adiabatic lapse rates for air (Kelvin/m)
+  		// See: http://en.wikipedia.org/wiki/Troposphere
+  		double L = (h0 < 100.0 ? 0.00028295: 0.00027965);
 
-		// Directly from http://en.wikipedia.org/wiki/Atmospheric_pressure
-		return p0 * pow(1.0 - L*h/t0, (g-M) / (R-L));
+  		// Directly from http://en.wikipedia.org/wiki/Atmospheric_pressure
+  		return p0 * pow(1.0 - L*h/t0, (g-M) / (R-L));
     }
+    */
 
   };
 

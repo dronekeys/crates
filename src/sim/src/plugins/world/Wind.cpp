@@ -8,24 +8,28 @@
 
 // ROS communication subsystem (mainly for debugging)
 #include "wind.pb.h"
+#include "meteorological.pb.h"
 
 namespace gazebo
 {
+	typedef const boost::shared_ptr<const msgs::Meteorological> MeteorologicalPtr;
+
 	class Wind : public WorldPlugin
 	{
 
 	private:
 
 	    // Pointer to the simulated world
-	    physics::WorldPtr 		worldPtr;
+	    physics::WorldPtr 			worldPtr;
 		
 	    // For gazebo messaging
-		transport::NodePtr 		nodePtr;
-		transport::PublisherPtr pubPtr;
+		transport::NodePtr 			nodePtr;
+		transport::PublisherPtr 	pubPtr;
+		transport::SubscriberPtr 	subPtr;
 
 		// For ROS timers
-		ros::Timer 				timer;
-		ros::NodeHandle 		rosNode;
+		ros::Timer 					timer;
+		ros::NodeHandle 			rosNode;
 
 		// Wind broadcast rate
 		double rate, speed, direction;
@@ -41,10 +45,16 @@ namespace gazebo
 			pubPtr->Publish(msg);
 		}
 
+		// This will be called whenever a new meteorlogical topic is posted
+		void ReceiveMeteorological(MeteorologicalPtr& meteorological)
+		{
+			// Do nothing
+		}
+
     public:
 
 		// Default constructor
-		Wind() : rate(1.0), speed(0.0), direction(0.0), rosNode(ros::NodeHandle("wind"))
+		Wind() : rate(0.0), speed(0.0), direction(0.0), rosNode(ros::NodeHandle("wind"))
 		{
 		    // Maske sure that ROS actually started, or there will be some issues...
 		    if (!ros::isInitialized())
@@ -59,9 +69,9 @@ namespace gazebo
 
 			// Get the rate and start time
 			root->GetElement("rate")->GetValue()->Get(rate);
-			root->GetElement("speed")->GetValue()->Get(speed);
-			root->GetElement("direction")->GetValue()->Get(direction);
-		
+			root->GetElement("default")->GetElement("speed")->GetValue()->Get(speed);
+			root->GetElement("default")->GetElement("heading")->GetValue()->Get(direction);
+			
 			// Set up advertisements
 			Reset();
 		}
@@ -76,12 +86,19 @@ namespace gazebo
 			// Create a publisher on the ~/wind topic
 			pubPtr = nodePtr->Advertise<msgs::Wind>("~/wind");
 
+			// Subscribe to meteorological updates
+			subPtr = nodePtr->Subscribe("~/meteorological", 
+				&Wind::ReceiveMeteorological, this);
+
 			// ROS timer respects gazebo
-			timer = rosNode.createTimer(
-				ros::Duration(1.0/rate),
-				&Wind::Update,
-				this
-			);               
+			if (rate > 0)
+			{
+				timer = rosNode.createTimer(
+					ros::Duration(1.0/rate),
+					&Wind::Update,
+					this
+				);  
+			}             
 		}
 	};
 

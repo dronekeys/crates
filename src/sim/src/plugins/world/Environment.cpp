@@ -137,11 +137,14 @@ namespace gazebo
 			pubPtr = nodePtr->Advertise<msgs::Environment>("~/environment");
 
 			// ROS timer respects gazebo
-			timer = rosNode.createTimer(
-				ros::Duration(1.0/rate),
-				&Environment::Update,
-				this
-			);               
+			if (rate > 0)
+			{
+				timer = rosNode.createTimer(
+					ros::Duration(1.0/rate),
+					&Environment::Update,
+					this
+				);     
+			}          
 		}
 	};
 

@@ -22,57 +22,64 @@
 /*
 namespace gazebo
 {
+	typedef const boost::shared_ptr<const msgs::Environment> EnvironmentPtr;
+
 	class Meteorological : public WorldPlugin
 	{
 
 	private:
 
 		// Parameters 
+		bool bootstrapped;		// True when UTC start has been received
       	double te, pr, hu;		// Default meteorological
       	double t, h, p;			// Current meteorological
       	double rate;			// Broadcast rate
 
-	    // Required for messaging
-	    physics::WorldPtr 		worldPtr;
-		transport::NodePtr 		nodePtr;
-		transport::PublisherPtr pubPtr;
-		ros::Timer 				timer;
-		ros::NodeHandle 		rosNode;
+	    // Required for gazebo  messaging
+	    physics::WorldPtr 			worldPtr;
+		transport::NodePtr 			nodePtr;
+		transport::PublisherPtr 	pubPtr;
+		transport::SubscriberPtr 	subPtr;
+
+		// Required for ROS interaction
+		ros::Timer 					timer;
+		ros::NodeHandle 			rosNode;
+
+      	// Message containing information
+      	msgs::Meteorological 		msg;
 
 	    // For storing RINEX meteorlogical data
 	    std::list<gpstk::RinexMetData> ml;
 	    std::list<gpstk::RinexMetData>::iterator mi;
 
-      	// Message containing information
-      	msgs::Meteorological msg;
-
-        // Get the current time in a specific format
-        gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
-        {
-            // Get the current time tick, which is the start of the experiment plus simulated time
-            gpstk::CommonTime ret = currentTime;
-
-            // UTC -> GPS
-            if (ts == gpstk::TimeSystem::GPS)
-            {
-                ret.addSeconds(
-                    gpstk::TimeSystem::Correction(
-                        gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,        // Source & Dest
-                        startTime.year, startTime.month, startTime.day         // Rough period
-                    )
-                );
-            }
-
-            // Set the time system
-            ret.setTimeSystem(ts);
-
-            // Return the time
-            return ret;
-        }
-
 		// Send a gazebo meterological message
 		void Update(const ros::TimerEvent& event)
 		{
+			// Determine the current time
+	        // Get the current time in a specific format
+	        gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
+	        {
+	            // Get the current time tick, which is the start of the experiment plus simulated time
+	            gpstk::CommonTime ret = currentTime;
+
+	            // UTC -> GPS
+	            if (ts == gpstk::TimeSystem::GPS)
+	            {
+	                ret.addSeconds(
+	                    gpstk::TimeSystem::Correction(
+	                        gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,        // Source & Dest
+	                        startTime.year, startTime.month, startTime.day         // Rough period
+	                    )
+	                );
+	            }
+
+	            // Set the time system
+	            ret.setTimeSystem(ts);
+
+	            // Return the time
+	            return ret;
+	        }
+
 			// Try to see if we can grab some weather data from the RINEX file
 			try
 			{
@@ -92,17 +99,25 @@ namespace gazebo
 
 			// Assemble the epoch message, with or without RINEX data
 			msg.set_temperature(t);
-			msg.set_pressure(p);
 			msg.set_humidity(h);
+			msg.set_pressure(p);
 
 			// Publish wind information to all subscribers
 			pubPtr->Publish(msg);
 		}
 
+		// This will be called whenever a new meteorlogical topic is posted
+		void ReceiveEnvironment(EnvironmentPtr& environment)
+		{
+			// We are now ready to broadcast
+			boostrapped = true;
+		}
+
 	public:
 
 		// Default constructor
-		Meteorological() : rosNode(ros::NodeHandle("meteorological")), te(273), pr(1000.0), hu(95.0), rate(1.0)
+		Meteorological() : rosNode(ros::NodeHandle("meteorological")), 
+			bootstrapped(false), te(273), pr(1000.0), hu(95.0), rate(1.0)
 		{
 			// Make sure that ROS actually started, or there will be some issues...
 			if (!ros::isInitialized())
@@ -169,6 +184,9 @@ namespace gazebo
 		// All sensors must be resettable
 		void Reset()
 		{
+			// We can only begin transmitting when the UTC start time is known
+			bootstrapped = false;
+
 			// Default meterological values
 			t = te;
 			h = hu;
@@ -177,21 +195,24 @@ namespace gazebo
 			// Reset the RINEX iterator
 			mi = ml.begin();
 
-			// START PUBLISHING DATA //////////////////////////////////////////////////////////
-
 			// Initialize a new Gazebo transport node
 			nodePtr = transport::NodePtr(new transport::Node());
 			nodePtr->Init(worldPtr->GetName());
 			pubPtr = nodePtr->Advertise<msgs::Meteorological>("~/meteorological");
 
-			// CREATE A CALLBACK TIMER ///////////////////////////////////////////////////////
+			// Subscribe to meteorological updates
+			subPtr = nodePtr->Subscribe("~/environment", 
+				&Wind::ReceiveEnvironment, this);
 
 			// ROS timer respects gazebo
-			timer = rosNode.createTimer(
-				ros::Duration(1.0/rate),    	// Duration
-				&Meteorological::Update,   		// Callback
-				this
-			);     
+			if (rate > 0)
+			{
+				timer = rosNode.createTimer(
+					ros::Duration(1.0/rate),    	// Duration
+					&Meteorological::Update,   		// Callback
+					this
+				);
+			}     
 		}
 	};
 
