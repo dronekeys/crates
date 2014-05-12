@@ -1,0 +1,390 @@
+Special Licence - Non-Commercial
+
+PARTIES
+
+ENVIRONMENT AGENCY whose principal office is at Horizon House, Deanery Road, Bristol, BS1 5AH ("The Agency") (1) and 
+University College London whose registered/principal office is at Department of Computer Science, Malet Place Engineering Building
+Gower Street, London, United Kingdom, WC1E 6BT ("the Licensee") (2) 
+
+BACKGROUND
+This licence applies if you are seeking permission for non-commercial re-use (or use by your contractors on your behalf) for of one or more LIDAR tiles.
+
+LICENCE
+We, the Environment Agency ("We"), and you, the recipient of the Information ("You") agree that:
+1. This agreement ("the agreement") which is dated below, when you click to confirm your order, includes these paragraphs, the Schedules below, the Standard Terms and Conditions for Non-Commercial Internal Use of Environment Agency Information in Appendix 1
+2. We will provide you (if you do not already have a copy) with the Information specified in Schedule 3
+3. You will pay us the Licence Fees due under this agreement
+4. If it is not possible to interpret consistently the Special Conditions in Schedule 6 below and the Standard Terms and Conditions in Appendix 1 the Special Conditions will prevail
+5. The term "Information" can include information, data, records, documents and other Content of any kind.
+
+YOUR RIGHT TO CANCEL
+
+If you opt to receive the Information (described in Schedule 3) by CD/DVD, provided the CD/DVD is not damaged and the security seal on the CD/DVD is not opened or tampered with You can cancel this contract within seven days of You receiving the CD/DVD and we will refund the charges (detailed in Schedule 1) that you have paid for it. The seven day period starts on the day after you receive the CD/DVD. To cancel the contract you must write to us by email at ARCHIVED-LIDARDATA@environment-agency.gov.uk and you must pay the cost of returning the CD/DVD to us.
+
+If you opt to receive the Information by download or email attachment, and by your acceptance of these terms and conditions you agree to the service commencing, your right to cancel this contract ends as soon as We start to collate the Information for You
+
+SCHEDULE 1 - Charges
+LICENCE FEES
+£0.00 
+
+SCHEDULE 2 - Additional Approved Uses
+None
+
+SCHEDULE 3 - The Information
+1.NAME
+LIDAR Composite (November 2013)
+ 
+i. Description:
+Light Detection and Ranging (LIDAR) is an airborne mapping technique, which uses a laser to measure the distance between the aircraft and the ground.  Up to 100,000 measurements per second are made of the ground, allowing highly detailed terrain models to be generated at spatial resolutions of between 25cm and 2 metres. The Environment Agency's LIDAR data archive contains digital elevation data derived from surveys carried out since 1998.
+ 
+LIDAR composite data is available in ASCII and JPEG format. The ASCII format data is derived from a combination of all of our data which has been merged and re-sampled to give the best possible coverage. The Digital Surface Models include heights of objects, such as vehicles, buildings and vegetation, as well as the terrain surface. The Digital Terrain Model (DTM) is produced by removing objects from the Digital Surface Model. The JPEG format is a geo-referenced, shaded relief image only, which is colour coded for elevation.
+
+ii. Format:
+The data (ESRI ASCII GRID format)
+TL2303_DSM_1M,TL2302_DSM_1M,TL2303_DTM_1M,TL2302_DTM_1M
+
+
+iii. Is it a set of documents such as technical reports: No 
+iv. Version number (if applicable): LIDAR Composite (November 2013)
+v. Updates included: None
+vi. Licensee Update Frequency: Not applicable 
+vii. Dataset Update Frequency: Not applicable
+viii. Licensee Update Date: Not applicable
+ix. Licensee Update Supply Date: Not applicable
+x. Licensee Update Go Live Date: Not applicable
+xi. Are there any known third party rights: None 
+xii. Full details/attributes: Not applicable
+
+SCHEDULE 4 - Contact Details
+ENVIRONMENT AGENCY
+Geomatics Group
+Rivers House
+Lower Bristol Road
+Bath
+BA29ES
+
+LICENSEE
+University College London
+Department of Computer Science, Malet Place Engineering Building
+Gower Street
+London
+United Kingdom
+WC1E 6BT
+07986 182 270
+
+Andrew Symington
+a.symington@ucl.ac.uk
+12/05/2014
+
+SCHEDULE 5 - Commencement Date
+This agreement is perpetual and commences on 12/05/2014 
+
+SCHEDULE 6 - Special Conditions
+None
+
+SCHEDULE 7 - Information Warning
+None
+
+
+Appendix 1 - Standard terms and conditions for Non-Commercial Use of Environment Agency Information
+ 
+1. Definitions and Interpretation
+
+1.1. In this agreement the following words shall have the following meanings unless the context otherwise requires:
+"Agency Dataset" means the relevant primary Dataset or Content source created and (where applicable) maintained for the statutory functions of the Agency which is national (if such exists) or local (if not national)
+"Collaborative Use" means Use in an arrangement (a Collaborative Arrangement) that involves one partner inputting work (often but not necessarily with related information and financial input) into a project with one or more partners (usually Non-Commercial) who also input work where all outputs are produced for Non-Commercial public task purposes
+"Confidential Information" means any information relating to this agreement disclosed by one party to the other under this agreement or coming to the Licensee's or the Agency's attention directly or indirectly as a result of this agreement whether orally or in writing and whether or not such information is expressly stated to be confidential or marked as such provided that such information is confidential in nature
+"Copy Derived Information" means that the Derived Information includes a copy of the Information as a whole or a substantial part of it or that the Derived Information can be reverse engineered to create a copy of the Information or a substantial part thereof 
+"Commercial" use means use that is not Public Task use that comprises:
+	- Internal Use for any purpose within a Commercial Body
+	- offering a product or service containing Information or Derived Information for direct monetary compensation such as the sale of a book or newsletter with a cover charge even if it does not cover all costs but not including a charge expressly permitted in respect of a Statutory Supply, or
+	- offering a product or service by a Commercial Body, or by any other body where the charge is greater than cost recovery, which does not contain Information or Derived Information but which has used that information, thereby obtaining indirect monetary advantage such as provision of advice based on that information, or charging for advertising space in a product that includes that information, 
+"Commercial Body" means an organisation that is primarily engaged in trade, commerce or a profession (even if it has public task functions).  
+"Content" has the same meaning as in the Re-Use of Public Sector Information Regulations 2005
+"Contractor Use" means passing of Information or Derived Information to a person (Contractor) who is contracted to provide services, when:
+	- use is limited to the purposes of that contract, and
+	- all terms of the original licence are applied, and
+	- the Contractor is paid for the work done under that contract, and
+	- the Contractor does not pass the Information to any person other than the person contracting with them or a subcontractor who complies with these conditions
+"Corrections" means any replacements for existing Information that are made by the Agency to reflect Information quality improvements or the elimination of errors, this expression including either the supply of specific replacement Information or a full replacement set of Information
+"Current Information" means the Information in Schedule 3 including any amendments thereto in its most recent form taking into account Updates as from the relevant Licensee Update Go Live Date
+"Dataset" means a collection of thematically linked data, information, records, documents or other Content in the same format whether or not the collection is all in one place or in a single database or other single system
+"Dataset Update Frequency" means the frequency with which an Agency Dataset is updated for all the Agency's purposes
+"Derived Information" has the meaning indicated in the definition of External Derived Use below
+"End User" means the Licensee (where applicable) and any recipient of Information or Derived Information supplied by the Licensee 
+"External Use" means External As-Is Use and/or External Derived Use
+"External As-is Use" means use that, is not Internal Use, that involves supply or display of all, or a part of, the Information as it is or with minor display changes (font, colour, size, etc) only and does not include incorporation of information into a report, or merging of information with explanatory text or advice or changing format other than between Fixed Format types
+"External Derived Use" means a supply of Information by the Licensee or the giving of rights of access to the Information that does not comprise Internal Use and is the result of processing Information by incorporating, merging, modelling, calculating or transforming it to produce new information ("Derived Information") that is either:
+	- Copy Derived Information, or
+	- Information that requires the physical input of the original Information into a rules-based process whether or not that process is automated
+"Fixed Format" means Information that is formatted in such a way as to be static and unalterable (or not easily alterable without the loading of special software). It will typically include hard copy, pdf format, image format (such as jpeg, gif, tiff and bmp) and video format (such as mpeg, avi and wmv)
+"Information" means the Datasets (including sets of documents) or other Content identified in Schedule 3 (which can include methodologies) and where applicable this term shall include Corrected Information
+"Information Consistency Principle" means the principle whereby End Users of Information receive Information that is the same from whichever person they obtain the Information 
+"Information Transparency Principle" means the principle that End Users should not be misled in any way about matters relating to the Information which affect its potential usefulness or as regards its source
+"Information Warning" means information required by Schedule 7 to be taken into account when creating Approved using Information or creating Derived Information
+"Intellectual Property Rights" means any patent, copyright, database right, registered design, trademark or other industrial or intellectual property together with any applications for any of the foregoing
+"Internal Use" means use of Information or Derived Information that is not supplied externally other than for Contractor Use and to the extent permitted in Schedule 2 Collaborative Use
+"Licence Fees" charges that aim to recover the Agency's costs of reproducing and disseminating information that it licences which comprise:
+	- any charges payable under the Agency's Charging for Access to Information Work Instruction which defines charges made under the Freedom of Information Act or the Environmental Information Regulations in respect of the marginal costs of making the Information available and/or supplying in an alternative format (FOI/EIR Charges), and/or
+	- standard Internal Use charges as published each year by the Agency with any appropriate discounts or cap applied, and/or
+	- external costs incurred by the Agency that directly relate to the licensed use of Information contained in this agreement 
+ as identified in Schedule 1
+"Licensee Update Date" means the date or period identified in Schedule 3 when an Update is made for the Licensee and other Licensees
+"Licensee Update Frequency" means the frequency with which the Licensee is supplied Updates to the Information
+"Licensee Update Go Live Date" means the date identified in Schedule 3 before which the Licensee must not supply externally any Information or Derived Information with Updates 
+"Licensee Update Supply Date" means the latest date identified in Schedule 3 by which the Agency will supply an update to the Licensee 
+"No Detriment Principle" means that any intended use of Information must not represent a risk of:
+	- being misleading to the End User, or
+	- detriment to the Agency's ability to achieve its objectives, or
+	- detriment to the environment, including the risk of reduced future enhancement, or
+	- being prejudicial to the effective management of information held by the Agency, or
+	- damage to the Agency's reputation 
+"Non-Commercial" use means any use not covered by the definition of Commercial Use
+"Notice" means a notice given in accordance with condition 19
+"Principles" means the Information Transparency Principle, the Information Consistency Principle and the No Detriment Principle
+"Public Task Use" means use of Information or Derived Information:
+	- for Internal Use by a public sector body or a body that is subject to the Environmental Information Regulations 2004, or 
+	- by a public sector body in products or services to other parts of EU and UK Government or public sector bodies, or
+	- by a public sector body in products or services to any body outside the UK where the supply is in pursuance of international treaties or conventions
+provided that in each case of Public Task Use:
+	- all use (including that by any permitted recipient body) is for the public task Internal Use of that body, and
+	- any charge reflects only the additional marginal costs incurred in the provision of those products or services, and
+	- the use does not comprise publication in any format (including on the Internet)
+"Regulatory Use" means inclusion of a Fixed Format unaltered extract of Information in any documentation that is required to be supplied to a court, tribunal or regulatory body (but not including a trade association) where the inclusion of such extract is reasonably necessary in connection with a hearing, application or other judicial or regulatory process 
+"Re-use" shall have the same meaning as in Regulation 4 of the Re-use of Public Sector Information Regulations 2005
+"Statutory Supply" means a supply of information by a public sector body required under the Environmental Information Regulations 2004, the Freedom of Information Act 2000, the Data Protection Act 1998 or in other statutory provision requiring information to be supplied where recipients are limited to Internal Use 
+"Terminal Use Restriction" means the limit on the number of terminals permitted, specified in Schedule 1, to gain direct access to (this includes viewing) the Information or any Copy Derived Information and for the purposes of this condition "terminals" means servers, desktop or portable computers, personal digital assistants, mobile phones or any other electronic means of viewing or using information
+"Updates" means updated copies of Information that contain Corrections or additional data or information within the same description, derived from an extract of the relevant Agency Dataset.  An Update collates information from the relevant Agency Dataset, showing Information, into one set of updated Information to be converted into the relevant format for supply to the Licensee
+"Working Day" means Monday to Friday inclusive from 9:00am to 5:30pm excluding UK public holidays
+"written" includes fax and email and any other electronic text
+"Year" means each period of twelve months commencing on the Commencement Date and each anniversary thereof
+
+1.2. Unless the context otherwise requires:
+1.2.1a reference to any statute, statutory provision or statutory instrument includes a reference to that statute, statutory provision or statutory instrument together with all rules and regulations made under it or them as from time to time amended, consolidated or re-enacted
+1.2.2 words importing a gender shall include all genders
+1.2.3 reference to any person includes any legal entity, including without limitation a natural person or incorporated entity
+1.2.4 words importing a singular include the plural and vice versa
+
+2. Background
+
+2.1 The Agency is to the best of its knowledge and belief the owner of the Intellectual Property Rights in the Information, or is licensed to supply that part of the Information in respect of which a third party owns Intellectual Property Rights
+
+2.2 The Agency has agreed to licence the Information to the Licensee 
+
+2.3 The Licensee has agreed to the terms and conditions set out in this agreement
+
+2.4 The Agency and the Licensee acknowledge that Information Consistency Principle and the Information Transparency Principles are in the interests of fairness and improved service to End Users
+
+3. Term
+This agreement shall commence with effect from the Commencement Date and shall continue for a period ("the Term") specified in Schedule 5 when it will expire automatically without notice, subject to earlier termination as set out in condition 11.  The term may be extended by mutual agreement between the parties
+
+4.Supply of Information to the Licensee by the Agency
+
+4.1 The Agency shall use all reasonable endeavours to supply to the Licensee one copy of the Information from the current Agency Dataset held by the Agency (to the extent that the Licensee does not already hold such Information) on the Commencement Date or as soon as practicable thereafter, and Updates where these are specified in Schedule 3 on the Licensee Update Supply Date identified therein
+
+4.2 Where the Information exists in electronic form the Agency shall supply it in that form but shall at its discretion choose the means of supply (which may include supply on disks)
+
+5. Licence and use of Agency Information by the Licensee
+5. 1In consideration for the mutual promises and obligations in this agreements and the payment by the Licensee of the Licence Fees in Schedule 1 the Agency hereby grants to the Licensee a non-transferable, non-exclusive revocable licence subject to the terms of this agreement:
+a. to make Non-Commercial Internal of the Information or any Derived Information
+b. to include Information or Derived Information in a Statutory Supply
+c. to put on the Licensee's website Derived Information that is not Copy Derived Information 
+d. to put on the Licensee's website an insubstantial part of the Information or Copy Derived Information in Fixed Format for view only where this is reasonably necessary in connection with other information on that website and the Agency is acknowledged as the copyright owner 
+e. where such use is permitted in Schedule 2 to supply the Information externally and License it to End Users for Non-Commercial Use provided that the Agency is acknowledged as the copyright owner 
+f. where such use is permitted in Schedule 2 to supply Derived Information  externally and license it to End Users for Non-Commercial use
+g. to hold and, (where permitted in Schedule 2) to permit others to hold, subject in particular to Condition 12, any Derived Information creating during the Term in accordance with this agreement after the expiry of the Term
+
+5.2 This licence is given to the Licensee personally and not to any affiliated company or organisation
+
+6. Obligations of the Parties
+
+6.1 The Licensee shall:
+6.1.1 not use the Information other than as licensed by Condition 5 or under a separate licence from the Agency
+6.1.2 only, use Information that is Current Information subject only to time delays needed to incorporate it into its systems within a reasonable time 
+6.1.3 ensure that once an Update is included in its systems superseded Information is removed from its systems except to the extent needed to meet the obligations identified in condition 12.4 
+6.1.4 comply with any Terminal Use Restriction and any restriction on use of the Information that derive from third party rights in respect of the Information that are identified in Schedule 3 
+6.1.5 take all reasonable technical, contractual and other security measures to protect the integrity and security of Information and to prevent any use of the Information contrary to this agreement and any breach of this sub-condition which has a demonstrable effect shall be capable of being treated as a material breach of this agreement
+6.1.6 take reasonable care when supplying Information or Derived Information externally taking into account any relevant Information Warning
+6.1.7 not supply externally Information containing an Update before the relevant Licensee Update Go Live Date
+6.1.8 ensure that any supply of Information or Copy Derived Information to an End User is on the terms of an End User licence agreement (EULA) which:
+a. prohibits any uses in excess of Non-Commercial Use
+b. permits only Internal Use 
+c. limits the duration of the EULA to one year and requires the Information or Copy Derived Information to be destroyed at the end of the term of the EULA
+6.1.9 to request any assistance relating to the Information or to request other information only through the designated contact points identified in Schedule 4
+6.1.10 do nothing which might contravene the Principles and any breach of this sub-condition which has a demonstrable effect shall be capable of being treated as a material breach of this agreement provided that provision of truthful responses to enquiries put to the Licensee which are purely factual in nature shall not be capable of constituting a breach of this agreement unless they are a breach of condition10
+6.1.11 give Notice to the Agency as soon as reasonably practicable if: 
+a. it becomes aware that it is in breach of this agreement, or
+b. it suspects or discovers any possible infringement of the Agency's Intellectual Property Rights in the Information by a third party, or
+c. that use of the Information under this agreement might be an infringement of any third party's Intellectual Property Right or of any third party's contractual rights derived therefrom or be any other breach of confidentiality or statute, or
+d. it receives any significant complaint or report in connection with this agreement or the Information 
+and shall, subject to any legally binding confidentiality, supply copies of any relevant documentation to the Agency
+
+6.2 The Agency shall:
+6.2.1 where it provides Information directly to the Licensee use all reasonable skill and care in providing the Information on the Commencement Date and in Updates in accordance with the Licensee Update Frequency and in particular ensuring that the Information in the original supply and in Updates as far as reasonably possible (taking into account, where relevant, the need to assemble and quality check) is an accurate and up to date copy of the Information held within the relevant Agency Dataset and will contain all the data fields or other attributes set out in Schedule 3
+6.2.2 supply to the Licensee such information and assistance as the Licensee may reasonably request for the purposes of this agreement in connection with the processes and procedures used to create and supply the Information to the Licensee (to the extent that these are not confidential to the Agency and the Agency is not in breach of any Intellectual Property Rights, contractual restrictions or other confidentiality in disclosing them)
+6.2.3 if the Agency updates its standard conditions for Non-Commercial Use or enters into any formal agreement for Non-Commercial Use of information on different terms and conditions to those in this agreement and the differences are not attributable to different circumstances, publish such new conditions or supply a copy thereof to the Licensee and allow (but not oblige) the Licensee to terminate under condition 11(2) and to enter into new agreement on such new terms and conditions if there is no other change
+
+6.3 Each Party shall deal justly and fairly with the other, implement appropriate quality control procedures to, so far as possible, obviate inconsistency and errors in any permitted external supplies of the Information or Derived Information, carry out its obligations under this agreement using reasonable care and skill and comply with all relevant legislation and regulatory requirements
+
+7. Payment
+7.1 The Licensee shall pay the Licence Fees annually in respect of the period 1st April to 31st March, on 15th May within that period.  The first payment will be made on or before the Commencement Date pro rata a full year's payment in respect of the period from Commencement Date to 31st March
+7.2 VAT is due on all Licence Fees except FOI/EIR Charges
+7.3 If any payment under this condition is not paid or is overdue, interest shall be due at the rate of three per cent (3%) above the base rate from time to time of the Barclays Bank plc from the due date until the date of payment on the amount outstanding.  Interest will accrue from day to day on the basis of a year of 365 days and will be compounded quarterly in arrears from the date when payment should have been made until the date of actual payment
+
+8. Limitation of Liability
+8.1 The Agency does not warrant that the Information will always be accurate, complete or up to date or that the Information will provide any particular facilities or functions or be suitable for any particular purpose.  The Licensee must ensure that the Information meet its needs and is entirely responsible for the consequences of any use of the Information.  
+8.2 If an electronic format has been used, the Agency does not promise that the media on which the Information are provided will always be free from defects, computer viruses, worms, trojan horses, software locks or other similar code of a destructive or unwelcome nature. The Licensee should carry out all necessary checks prior to loading the Information on to its computer system
+8.3 Neither party shall other than in respect of conditions 6.1.11, 9.2 and 10.1 be liable to the other or any other person (whether in contract or in negligence or in other tort or otherwise) for:
+a. any economic losses (including without limitation loss of revenues, profits, contracts, business or anticipated savings) other than Licence Fees, or
+b. any loss of goodwill or reputation or
+c. any special, indirect or consequential losses in any case whether or not such losses were within the contemplation of the parties at the date of this Licence (including loss of business, profit, reputation or goodwill) arising out of or in connection with this agreement or its subject matter
+
+8.4 The Agency's and the Licensee's maximum aggregate liability to the other (including legal costs) in connection with this agreement shall not (apart from payment of Licence Fees) exceed the total sum of Licence Fees due under this agreement 
+
+8.5 Neither party shall be liable for any claim between the parties arising under this agreement unless Notice of the claim is given to the other within six months of becoming aware of the circumstances giving rise to such claim, or of such time as the relevant party ought reasonably to have become aware of such circumstances
+
+8.6 The Agency shall not be liable under this agreement for any defect in its Intellectual Property Rights to the Information if:
+8.6.1 it has used best endeavours to ensure that Information where the defect occurs (being one of those separately identified and numbered sections in Schedule 3 or any addition thereto) is in the generality the property of the Agency or property of a third party who has licensed the Agency to supply its information and
+8.6.2 such defect in Intellectual Property Rights in that part of the Information after the application of condition 9.3 would not require the withdrawal of that part in full or a significant part thereof, it being accepted that less than five percent (5%) (measured either as to value, geographically, or by quantity) would not be significant
+
+8.7 Nothing in this condition 8 shall limit or exclude either party's liability for death or personal injury arising from its negligence
+
+8.8 Except as expressly provided in this agreement, all representations, conditions and warranties whether express or implied (by statute or otherwise) are hereby excluded to the fullest extent permitted by law provided that this shall not exclude statutory or common law rights in respect of negligence
+
+9. Intellectual Property Rights
+
+9.1 No Intellectual Property Rights are transferred or licensed to the Licensee save those which are expressly provided in this agreement
+
+9.2 The Agency warrants that subject to condition 8.6 it has all other powers and rights necessary to grant to the Licensee the licences set out in condition 5
+
+9.3 If any use of any part of the Information in accordance with this agreement infringes any Intellectual Property Rights the Agency shall use all reasonable endeavours to obtain the right (without charge) for the Licensee to continue to use the infringing Information. If however the Agency is unable to do this, without prejudice to condition 9.2 and any other remedy the Licensee may have, the Agency shall use all reasonable endeavours to modify (or replace) the infringing Information so as to be as close to the usefulness of the original Information as reasonably possible or (if this is not possible) remove the infringing Information from Schedule 3
+
+9.4 Neither party shall be entitled to bring an action for specific performance of the other party's obligations under this agreement where the performance of such obligation would be in breach of the Intellectual Property Rights of a third party
+
+10. Confidentiality
+
+10.1 The Licensee and the Agency agree:
+10.1.1 to keep Confidential Information in strict confidence and secrecy
+10.1.2 not to use any Confidential Information other than for the purposes of this agreement
+10.1.3 to restrict the disclosure of any part of Confidential Information to such of their respective employees, agents and contractors who need access to it to enable them to perform their obligations under or in connection with this agreement and to bring to the attention of such persons the duty of confidentiality under this condition before allowing them access to Confidential Information unless they are already bound by alternative equivalent obligations and
+10.1.4 not to disclose any Confidential Information to any other third parties without the prior written consent of the other
+
+10.2 This condition shall survive the expiry of this agreement or its termination howsoever caused
+
+10.3 This condition shall not apply to Confidential Information:
+10.3.1 which when it was disclosed was in the public domain otherwise than because of a breach of an obligation of confidentiality, or
+10.3.2 that a party could be required to disclose by law, or
+10.3.3 that has been disclosed in accordance with the Public Interest Disclosure Act 1998, the Freedom of Information Act 2000, the Environmental Information Regulations 2004 or the Re-use of Public Sector Information Regulations 2005 or
+10.3.4 received by a party from a third party at liberty to disclose it
+
+10.4 Neither party shall be entitled to bring an action for specific performance of the other party's obligations under this agreement where the performance of such obligation would breach a legally binding confidentiality requirement of a third party
+
+11. Termination
+
+11.1 The Agency shall be entitled to terminate this agreement by 60 Working Days' Notice if
+11.1.1 The Licensee is in material breach of any of the terms of this agreement and, in the case of a breach capable of remedy, has failed to remedy that breach within 60 Working Days of receipt of such Notice specifying the breach and requiring its remedy provided that in respect of any breach of condition 6.1.11 the two aforementioned periods shall be 20 Working Days
+11.1.2 the Licensee undergoes a change of ownership or control (other than a change that is within the public sector) to which the Agency reasonably and properly objects within 20 Working Days of Notice by the Licensee of such change, taking into account the Principles, or 
+11.1.3 a resolution is passed or an order is made for the winding up of the Licensee (save for the purpose of a bona fide re-construction or amalgamation) or the Licensee becomes subject to an administration order, or a receiver or administrative receiver is appointed over any of the Licensee's property or assets, or the Licensee is dissolved, or
+
+11.2 The Licensee shall be entitled to terminate this agreement by 20 Working Days' Notice for any reason
+
+11.3 The rights to terminate this agreement given by this condition shall be without prejudice to any other right or remedy of either party in respect of the breach concerned (if any) or any other breach
+
+12. Consequences of Termination
+On expiry of this agreement or its termination for whatever reason:
+
+12.1 the Licensee's entitlement to use the Information under this agreement shall (apart from the licence in condition 5.1(d)) cease and all copies of the Information or any Copy Derived Information in the Licensee's possession (and for the avoidance of doubt this includes persons making Contractor Use or Collaborative Use) shall, subject to condition 13.4 below, be destroyed
+
+12.2 no further Updates shall be supplied by the Agency to the Licensee
+
+12.3 any licences in respect of Information or Derived Information which are granted by the Licensee to End Users, prior to termination shall continue for the remainder of the period licensed by the Licensee.
+
+12.4 the Licensee may retain for archive purposes and not for any other use copies of the Information or any Copy Derived Information to comply with any statutory requirement for a period not exceeding a date six Years after such expiry.
+
+12.5 no refund shall be made in respect of any Licence Fees already paid
+
+13. Force Majeure, National Security and Agency's Operating Requirements
+
+13.1 Neither party shall be liable to the other for any delay in or failure of performance of its obligations under this agreement (other than an obligation to pay money) arising from any cause beyond its reasonable control including, without limitation, any of the following: Act of God; governmental act (including acts of regulatory authorities); statutory obligation; industrial action; any change in the law or the interpretation of the law by the courts; war; fire; flood; explosion or civil commotion ("Force Majeure")
+
+13.2 If a party is affected by Force Majeure it shall forthwith give Notice to the other party of the nature and extent of such Force Majeure 
+
+13.3 If Force Majeure prevails for a continuous period in excess of 20 Working Days the parties shall enter into bona fide discussions with a view to alleviating its effects or to agreeing upon such alternative arrangements as may be fair and reasonable
+
+13.4 If the Agency receives a ministerial certificate under section 24(3) of the Freedom of Information Act 2000 or under Regulation 15 of the Environmental Information Regulations 2004, or a request pending issue of such direction, not to make any part of the Information available to the public as it would adversely affect national security and it is not in the public interest to disclose the information, the Agency's obligation to provide Updates shall not include an obligation to include such information and the Licensee shall if so requested by the Agency by Notice cease to supply such information externally
+
+13.5 The Agency shall not be liable to the Licensee for delay in performing its obligations under this agreement if such delay arises out of the overriding need to comply with its statutory obligations
+
+14 Assignment
+The Licensee may not transfer or in any other way make over to any third party the benefit of this agreement either in whole or in part without the express prior written consent of the Agency such consent not to be unreasonably withheld or delayed
+
+15. Waiver
+Failure by either party to exercise or enforce any rights available to it, or any forbearance, delay or grant of indulgence, will not be construed as a waiver of its rights under this agreement or otherwise
+
+16. Entire agreement
+This agreement constitutes the entire agreement between the parties and supersedes all oral or written agreements, representations, understandings or arrangements relating to its subject matter other than subsequent written alterations to this agreement mutually agreed by the parties.  The parties irrevocably and unconditionally waive any right to rescind this agreement by virtue of any misrepresentation and to claim damages for any misrepresentation save in each case where such misrepresentation was made fraudulently
+
+17. Severance
+If any part of the agreement is found by a court of competent jurisdiction or other competent authority to be unenforceable, then that part will be severed from the remainder of the agreement which will continue to be valid and enforceable to the fullest extent permitted by law
+
+18. Variation
+
+18.1 This agreement may not other than in pursuance of this condition, be amended, modified, varied or supplemented except in writing signed by or on behalf of the Agency and the Licensee
+
+18.2 The Agency may, subject to condition 18.3 vary this agreement so as to:
+a. withdraw any part of the Information from Schedule 3 if (i) it reasonably believes that any of the Principles would be substantially prejudiced or (ii) that it would be in breach of any legislation or a direction by any relevant regulatory body by continuing to licence that part of the Information
+b. amend the Licence Fees
+c. replace this Appendix of Terms and Conditions
+
+18.3 The Agency must when making variations pursuant to condition 18.2:
+a. give at least 20 Working Days' Notice with reasons (12 months in the case of 20.3(a)(i)), and
+b. in respect of variations to Licence Fees not do so before the stated review date in Schedule 1, and
+c. in respect of variations of this Appendix not do so prior to the review date in Schedule 5, and
+d. not make variations without applying the same variations as far as possible to other licensees of similar information for similar purposes
+
+18.4 Any variation made under this condition shall be duly recorded in writing and attached to each copy of the agreement.
+
+19. Notices and Consents
+
+19.1 Notices under this agreement shall be in writing, in English, and shall be sent to the address of the party as set out in this agreement (or such other address in the United Kingdom as either party may notify to the other in accordance with this condition)
+
+19.2 Notices shall be marked, in the case of a notice to the Licensee, for the attention of the Chief Executive, and in the case of the Agency for the attention of the Head of the Enterprise Centre
+
+19.3 Notices may be sent by first class mail, by email or by facsimile transmission 
+
+19.4 Correctly addressed notices sent by first class mail shall be deemed to be delivered 2 Working Days after posting 
+
+19.5 Correctly addressed facsimile transmissions or emails shall be deemed to be delivered when sent provided that a confirmation copy is sent by first class mail within 24 (twenty four) hours
+
+19.6 Nothing in these standard conditions shall prevent the sender of any Notice from choosing a longer period than the minimum required
+
+19.7 Any consent, approval or agreement given pursuant to this agreement shall be in writing and in the case of the Licensee shall be signed on its behalf by its Chief Executive and in the case of the Agency shall be signed on its behalf by the Head of the Enterprise Centre
+
+20. Relationship of Parties
+Nothing in this agreement shall:
+
+20.1 create a partnership or joint venture between the parties, nor shall this agreement constitute one party the agent of the other or give either party authority to act or hold itself out as having authority to act on behalf of the other, or
+
+20.2 confer or purport to confer on any third party any benefit or rights in respect of the terms of this agreement
+
+21. Dispute Resolution
+
+21.1 All disputes under or in connection with this agreement shall be referred first to the parties' respective managers with responsibility for the day to day management of this agreement
+
+21.2 If the parties' respective managers are unable to resolve the dispute within a period of 10 Working Days from its being referred to them, the dispute shall be referred at the instance of either party to the parties' respective Chief Executive Officers 
+
+21.3 If the parties' respective Chief Executive Officers are unable to resolve the dispute within 10 Working Days from it being referred to them, the dispute shall be referred to the Centre for Dispute Resolution who shall appoint a mediator and the parties shall then submit to the mediator's supervision of the resolution of the dispute 
+
+21.4 Recourse to this dispute resolution procedure shall be binding on the parties as to submission to the mediation but not as to its outcome.  Accordingly all negotiations connected with the dispute shall be conducted in strict confidence and without prejudice to the rights of the parties in any future legal proceedings.  Except for any party's right to seek interlocutory relief in the courts, no party may commence other legal proceedings under the jurisdiction of the courts or any other form of arbitration until 20 Working Days after the appointment of the mediator 
+
+21.5 If, with the assistance of the mediator, the parties reach a settlement, such settlement shall be put in writing and, once signed by a duly authorised representative of each of the parties, shall remain binding on the parties 
+
+21.6 The parties shall bear their own legal costs of this dispute resolution procedure, but the costs and expenses of mediation shall be borne by the parties equally 
+
+21.7 Nothing in this condition shall restrict the Parties' rights to seek interim relief
+
+22. Rights Of Third Parties
+No third parties shall have rights to enforce any part of this agreement under the Contracts (Rights of Third Parties) Act 1999 
+
+23. Governing Law
+This agreement shall be governed and construed in accordance with English law 

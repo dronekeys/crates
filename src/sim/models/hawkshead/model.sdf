@@ -1,47 +1,29 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <sdf version="1.5">
   <model name="hawkshead">
     <static>true</static>
     <link name="link">
-      <collision name="collision">
+      <collision name="hawkshead_collision">
         <geometry>
           <heightmap>
-            <uri>model://hakwshead/materials/TL2303_DSM_1M.jpg</uri>
-            <size>129 129 80</size>
-            <pos>0 0 0</pos>
+            <uri>model://hawkshead/materials/rvc-depth-small.tif</uri>
+            <size>450 450 100</size>
+            <pos>0 0 -5</pos>
           </heightmap>
         </geometry>
       </collision>
-      <visual name="visual_abcedf">
+      <visual name="hawkshead_visual">
         <geometry>
           <heightmap>
             <use_terrain_paging>false</use_terrain_paging>
+            <uri>model://hawkshead/materials/rvc-depth-small.tif</uri>
+            <size>450 450 100</size>
+            <pos>0 0 -5</pos>
             <texture>
-              <diffuse>file://media/materials/textures/dirt_diffusespecular.png</diffuse>
+              <diffuse>file://media/materials/textures/rvc-raster-small.tif</diffuse>
               <normal>file://media/materials/textures/flat_normal.png</normal>
-              <size>1</size>
+              <size>450</size>
             </texture>
-            <texture>
-              <diffuse>file://media/materials/textures/grass_diffusespecular.png</diffuse>
-              <normal>file://media/materials/textures/flat_normal.png</normal>
-              <size>1</size>
-            </texture>
-            <texture>
-              <diffuse>file://media/materials/textures/fungus_diffusespecular.png</diffuse>
-              <normal>file://media/materials/textures/flat_normal.png</normal>
-              <size>1</size>
-            </texture>
-            <blend>
-              <min_height>2</min_height>
-              <fade_dist>5</fade_dist>
-            </blend>
-            <blend>
-              <min_height>4</min_height>
-              <fade_dist>5</fade_dist>
-            </blend>
-            <uri>model://hakwshead/materials/TL2303_DSM_1M.jpg</uri>
-            <size>129 129 80</size>
-            <pos>0 0 0</pos>
           </heightmap>
         </geometry>
       </visual>
