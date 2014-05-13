@@ -114,8 +114,8 @@ add_message_files(
   DIRECTORY 
     msg
   FILES
-    Collision.msg
-    Collisions.msg
+    Contact.msg
+    Contacts.msg
 )
 
 ## Generate services in the 'srv' folder

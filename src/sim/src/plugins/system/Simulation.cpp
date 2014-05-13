@@ -6,6 +6,7 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/math/gzmath.hh>
+#include <gazebo/msgs/contacts.pb.h>
 
 // SDF
 #include <sdf/sdf.hh>
@@ -21,6 +22,9 @@
 // For blank requests
 #include <std_srvs/Empty.h>
 
+// ROS topics
+#include "sim/Contacts.h"
+
 // ROS services
 #include "sim/Insert.h"
 #include "sim/Delete.h"
@@ -35,6 +39,8 @@
 
 namespace gazebo
 {
+  typedef const boost::shared_ptr<const msgs::Contacts> ContactsPtr;
+
   class Simulation : public SystemPlugin
   {
 
@@ -42,6 +48,9 @@ namespace gazebo
 
     // Plugin state management
     bool loaded, created, stop;
+
+	// Used to queu incoming requests
+  	boost::shared_ptr<boost::thread> threadQueue;
 
     // Lock access to fields that are used in ROS message callbacks
     boost::mutex lock;
@@ -51,44 +60,34 @@ namespace gazebo
     boost::shared_ptr<ros::AsyncSpinner>  async;
 
     // Gazebo event handling
-    event::ConnectionPtr  eventSigint;
-    event::ConnectionPtr  eventLoad;
-    event::ConnectionPtr  eventClock;
+    event::ConnectionPtr eventSigint, eventLoad, eventClock;
 
     // gazebo world
     physics::WorldPtr world;
 
     // For communication on gazebo backbone
-    transport::NodePtr        gazeboNode;
-    transport::PublisherPtr   pubFactory;
-    transport::PublisherPtr   pubRequest;
-    transport::PublisherPtr   pubNoise;
-    transport::SubscriberPtr  subResponse;
+    transport::NodePtr gazeboNode;
+    transport::PublisherPtr pubFactory, pubRequest, pubNoise;
+    transport::SubscriberPtr subResponse, subContacts;
+
+	// For injecting an ID into model code
+	sdf::SDFPtr sdfPtr;
 
     // Used to buffer callbacks
   	ros::CallbackQueue queue;
 
-  	// Used to queu incoming requests
-  	boost::shared_ptr<boost::thread> threadQueue;
-
   	// The clock will be published by the simulator
-  	ros::Publisher     		topicClock;
+  	ros::Publisher topicClock, topicContacts;
 
   	// Five services we will offer to users of the simulator
-	ros::ServiceServer 		serviceReset;
-	ros::ServiceServer 		serviceResume;
-	ros::ServiceServer 		servicePause;
-	ros::ServiceServer 		serviceInsert;
-	ros::ServiceServer 		serviceDelete;
-	ros::ServiceServer 		serviceStep;
-	ros::ServiceServer 		serviceNoise;
-	ros::ServiceServer 		serviceSeed;
+	ros::ServiceServer serviceReset, serviceResume, servicePause,
+		serviceInsert, serviceDelete,serviceStep, serviceNoise, serviceSeed;
 
 	// Two time representations
-	rosgraph_msgs::Clock 	timeRos;
+	rosgraph_msgs::Clock timeRos;
 
-	// For injecting an ID into model code
-	sdf::SDFPtr				sdfPtr;
+	// For storing collisions
+	sim::Contacts msgContacts;
 
   public:
 
@@ -202,6 +201,7 @@ namespace gazebo
 		pubRequest  = gazeboNode->Advertise<msgs::Request>("~/request");
 		pubNoise    = gazeboNode->Advertise<msgs::Noise>("~/noise");
 		subResponse = gazeboNode->Subscribe("~/response",&Simulation::Response, this);
+		subContacts = gazeboNode->Subscribe("~/physics/contacts",&Simulation::Contacts, this);
 
 	  	// Publish clock for simulated ros time
 		topicClock = rosNode->advertise<rosgraph_msgs::Clock>("/clock",10);
@@ -254,6 +254,9 @@ namespace gazebo
 		);
 		serviceSeed = rosNode->advertiseService(adSeed);
 
+	  	// Publish clock for simulated ros time
+		topicContacts = rosNode->advertise<sim::Contacts>("contacts",10);
+
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time", true);
     }
@@ -275,10 +278,33 @@ namespace gazebo
 		topicClock.publish(timeRos);
 	}
 
-    // Subscribe to messages
-    void Response(ConstResponsePtr &response)
+    // When a response is received from the gazebo server
+    void Response(ConstResponsePtr&response)
     {
       // Do nothing
+    }
+
+    // Subscribe to messages
+    void Contacts(ContactsPtr& msg)
+    {
+    	// Only publish if we actually have some contacts!
+    	if (msg->contact_size() > 0)
+    	{
+	    	// Clear existing contacts
+			msgContacts.contacts.clear();
+
+	  	    // Add the current contacts
+			for (int i = 0; i < msg->contact_size(); i++)
+			{
+				sim::Contact contact;
+				contact.name1 = msg->contact(i).collision1();
+				contact.name2 = msg->contact(i).collision2();
+				msgContacts.contacts.push_back(contact);
+			}
+
+		  	//  publish time to ros
+			topicContacts.publish(msgContacts);
+		}
     }
 
     ////////////////////////////////////////////////////////////////////////////////
