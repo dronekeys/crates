@@ -15,7 +15,7 @@ gdalwarp -ts 512 512 rvc-depth.tif rvc-depth-small.tif
 
 # Crop aerial raster
 gdalwarp -te 523538 202802 523988 203252 SAT/rvc-raster.tif rvc-raster.tif
-gdalwarp -ts 1024 1024 rvc-raster.tif rvc-raster-small.tif
+gdalwarp -ts 512 512 rvc-raster.tif rvc-raster-small.tif
 
 # Copy raster to material directory
 cp rvc-raster-small.tif ../../../resources/media/materials/textures

@@ -1,0 +1,6 @@
+package gazebo.msgs;
+
+message Noise
+{
+	required bool enabled = 1;
+}

@@ -1,30 +1,37 @@
 package gazebo.msgs;
+import "vector3d.proto";
 
-// 3D position
-message Pos3D
+// GNSS Satellite ephemeris
+message GPSEph
 {
-	required double x               = 1;
-	required double y               = 2;
-	required double z               = 3;
+	required int32 	  prn			  = 1;	// Satellite identifier
+	required Vector3d pos_final    	  = 2;	// Satellite truth ECEF position
+	required Vector3d pos_bcast    	  = 3;	// Satellite noisy ECEF position
+	required double   err_clk         = 4;	// Satellite clock error
+	required double   err_rel  		  = 5;	// Relativity error
+	required double   err_ion_L1   	  = 6;	// L1 ionospheric phase delay
+	required double   err_ion_L2      = 7;	// L2 ionospheric phase delay
+	required double   err_ion_L5      = 8;	// L5 ionospheric phase delay
+	required double   err_tro   	  = 9;	// Tropospheric phase delay
 }
 
 // GNSS Satellite ephemeris
-message Ephemeris
+message GLOEph
 {
-	required int32  system			= 1;
-	required int32  prn				= 2;
-	required Pos3D  pos         	= 3;
-	required Pos3D  err         	= 4;
-	required double clkbias         = 5;
-	required double relcorr  		= 6;
-	required double delay_iono_f1   = 7;
-	required double delay_iono_f2   = 8;
-	required double delay_trop      = 9;
+	required int32 	  prn			  = 1;	// Satellite identifier
+	required Vector3d pos_final    	  = 2;	// Satellite truth ECEF position
+	required Vector3d pos_bcast       = 3;	// Satellite noisy ECEF position
+	required double   err_clk         = 4;	// Satellite clock error
+	required double   err_rel  		  = 5;	// Relativity error
+	required double   err_ion_L1  	  = 6;	// L1 ionospheric phase delay
+	required double   err_ion_L2      = 7;	// L2 ionospheric phase delay
+	required double   err_tro         = 8;  // Tropospheric phase delay
 }
 
 // Information broadcast about the environment
 message Satellites
 {
-	required double     epoch       = 1;
-	repeated Ephemeris  gnss        = 2;
+	required double epoch  	= 1;
+	repeated GPSEph gps     = 2;
+	repeated GLOEph glo     = 3;
 }

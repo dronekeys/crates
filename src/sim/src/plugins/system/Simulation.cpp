@@ -5,6 +5,7 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
+#include <gazebo/math/gzmath.hh>
 
 // SDF
 #include <sdf/sdf.hh>
@@ -20,10 +21,15 @@
 // For blank requests
 #include <std_srvs/Empty.h>
 
-// Services
+// ROS services
 #include "sim/Insert.h"
 #include "sim/Delete.h"
 #include "sim/Step.h"
+#include "sim/Noise.h"
+#include "sim/Seed.h"
+
+// Protobuf messages
+#include "noise.pb.h"
 
 #define ROS_TIMEOUT_SECONDS 1.0
 
@@ -56,6 +62,7 @@ namespace gazebo
     transport::NodePtr        gazeboNode;
     transport::PublisherPtr   pubFactory;
     transport::PublisherPtr   pubRequest;
+    transport::PublisherPtr   pubNoise;
     transport::SubscriberPtr  subResponse;
 
     // Used to buffer callbacks
@@ -74,6 +81,8 @@ namespace gazebo
 	ros::ServiceServer 		serviceInsert;
 	ros::ServiceServer 		serviceDelete;
 	ros::ServiceServer 		serviceStep;
+	ros::ServiceServer 		serviceNoise;
+	ros::ServiceServer 		serviceSeed;
 
 	// Two time representations
 	rosgraph_msgs::Clock 	timeRos;
@@ -191,6 +200,7 @@ namespace gazebo
 		// Set up gazebo publishers
 		pubFactory  = gazeboNode->Advertise<msgs::Factory>("~/factory");
 		pubRequest  = gazeboNode->Advertise<msgs::Request>("~/request");
+		pubNoise    = gazeboNode->Advertise<msgs::Noise>("~/noise");
 		subResponse = gazeboNode->Subscribe("~/response",&Simulation::Response, this);
 
 	  	// Publish clock for simulated ros time
@@ -231,6 +241,18 @@ namespace gazebo
 			"step",boost::bind(&Simulation::Step,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceStep = rosNode->advertiseService(adStep);
+
+		// Advertise more services on the custom queue
+		ros::AdvertiseServiceOptions adNoise = ros::AdvertiseServiceOptions::create<sim::Noise>(
+			"noise",boost::bind(&Simulation::Noise,this,_1,_2),ros::VoidPtr(), &queue
+		);
+		serviceNoise = rosNode->advertiseService(adNoise);
+
+		// Advertise more services on the custom queue
+		ros::AdvertiseServiceOptions adSeed = ros::AdvertiseServiceOptions::create<sim::Seed>(
+			"seed",boost::bind(&Simulation::Seed,this,_1,_2),ros::VoidPtr(), &queue
+		);
+		serviceSeed = rosNode->advertiseService(adSeed);
 
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time", true);
@@ -403,6 +425,34 @@ namespace gazebo
 		res.success = true;
 		res.status_message = std::string("Step: successfully stepped the simulaor");
 		return true;
+	}
+
+	// Resume physics
+	bool Noise(sim::Noise::Request &req, sim::Noise::Response &res)
+	{
+		// Create and publish the message
+		msgs::Noise msg;
+		msg.set_enabled(req.enable);
+		pubNoise->Publish(msg);
+
+		// Keep steps to a reasonable length
+		res.success = true;
+		if (req.enable)
+			res.status_message = std::string("Noise enabled");
+		else
+			res.status_message = std::string("Noise disabled");
+		return true;
+	}
+
+	// Resume physics
+	bool Seed(sim::Seed::Request &req, sim::Seed::Response &res)
+	{
+		// Create and publish the message
+		math::Rand::SetSeed(req.seed);
+
+		// Keep steps to a reasonable length
+		res.success = true;
+		res.status_message = std::string("Random generated seeded");
 	}
 
   };

@@ -62,6 +62,7 @@ find_package(GeographicLib REQUIRED)
 ## Declare Gazebo protocol buffer messages ##
 #############################################
 
+# Find all gazebo default messages
 set(PROTOBUF_IMPORT_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
   if(ITR MATCHES ".*gazebo-[0-9.]+$")
@@ -69,13 +70,20 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
   endif()
 endforeach()
 
-# Generate the message source and header files
-PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS 
+# Get a list of messages and dependencies
+set(msgs
   src/msgs/meteorological.proto 
   src/msgs/environment.proto 
   src/msgs/satellites.proto
+  src/msgs/noise.proto
   src/msgs/wind.proto
+  ${PROTOBUF_IMPORT_DIRS}/vector3d.proto
+  ${PROTOBUF_IMPORT_DIRS}/header.proto
+  ${PROTOBUF_IMPORT_DIRS}/time.proto
 )
+
+# Generate the message source and header files
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -118,6 +126,8 @@ add_service_files(
     Insert.srv
     Delete.srv
     Step.srv
+    Noise.srv
+    Seed.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -145,13 +155,13 @@ generate_messages(DEPENDENCIES
 
 catkin_package(
     LIBRARIES
+      sim_core
       sim_resources
       sim_experiment
       sim_simulation
       sim_environment
       sim_meteorological
-      sim_gps
-      sim_glonass
+      sim_satellites
       sim_wind
       sim_altimeter
       sim_compass
@@ -220,42 +230,51 @@ link_directories(
 ################################
 # Define libraries to be built #
 
+# Compile the noise models
+add_library(sim_core               
+  src/noise/models/White.cpp
+  src/noise/models/Wiener.cpp
+  src/noise/models/Uniform.cpp
+  src/noise/models/Ornstein.cpp
+  src/noise/NoiseFactory.cpp
+)
+
 # Compile the message library
-add_library(custom_msgs         ${PROTO_SRCS})
+add_library(custom_msgs               ${PROTO_SRCS})
 
 # The base system plugins gzclient and gzserver
-add_library(sim_resources       src/plugins/system/Resources.cpp)
-add_library(sim_experiment      src/plugins/system/Experiment.cpp)
-add_library(sim_simulation      src/plugins/system/Simulation.cpp)
+add_library(sim_resources             src/plugins/system/Resources.cpp)
+add_library(sim_experiment            src/plugins/system/Experiment.cpp)
+add_library(sim_simulation            src/plugins/system/Simulation.cpp)
 
 # The world plugins
-add_library(sim_environment     src/plugins/world/Environment.cpp)
-add_library(sim_meteorological  src/plugins/world/Meteorological.cpp)
-add_library(sim_glonass         src/plugins/world/Glonass.cpp)
-add_library(sim_gps             src/plugins/world/GPS.cpp)
-add_library(sim_wind            src/plugins/world/Wind.cpp)
+add_library(sim_environment           src/plugins/world/Environment.cpp)
+add_library(sim_meteorological        src/plugins/world/Meteorological.cpp)
+add_library(sim_satellites            src/plugins/world/Satellites.cpp)
+add_library(sim_wind                  src/plugins/world/Wind.cpp)
 
 # The model plugins
-add_library(sim_altimeter       src/plugins/model/Altimeter.cpp)
-add_library(sim_compass         src/plugins/model/Compass.cpp)
-add_library(sim_energy          src/plugins/model/Energy.cpp)
-add_library(sim_gnss            src/plugins/model/GNSS.cpp)
-add_library(sim_imu             src/plugins/model/IMU.cpp)
-add_library(sim_quadrotor       src/plugins/model/Quadrotor.cpp)
-add_library(sim_shear           src/plugins/model/Shear.cpp)
-add_library(sim_turbulence      src/plugins/model/Turbulence.cpp)
+add_library(sim_altimeter             src/plugins/model/Altimeter.cpp)
+add_library(sim_compass               src/plugins/model/Compass.cpp)
+add_library(sim_energy                src/plugins/model/Energy.cpp)
+add_library(sim_gnss                  src/plugins/model/GNSS.cpp)
+add_library(sim_imu                   src/plugins/model/IMU.cpp)
+add_library(sim_quadrotor             src/plugins/model/Quadrotor.cpp)
+add_library(sim_shear                 src/plugins/model/Shear.cpp)
+add_library(sim_turbulence            src/plugins/model/Turbulence.cpp)
 
 ##################################
 ## Add cmake target dependencies #
 
+# ROS message building dependencies
 add_dependencies(sim_resources        sim_generate_messages_cpp)
 add_dependencies(sim_experiment       sim_generate_messages_cpp)
 add_dependencies(sim_simulation       sim_generate_messages_cpp)
 
+# Gazebo message building dependencies
 add_dependencies(sim_environment      custom_msgs)
 add_dependencies(sim_meteorological   custom_msgs)
-add_dependencies(sim_gps              custom_msgs)
-add_dependencies(sim_glonass          custom_msgs)
+add_dependencies(sim_satellites       custom_msgs)
 add_dependencies(sim_wind             custom_msgs)
 add_dependencies(sim_altimeter        custom_msgs)
 add_dependencies(sim_compass          custom_msgs)
@@ -269,13 +288,23 @@ add_dependencies(sim_turbulence       custom_msgs)
 ###########################
 ## Set up dynamic linking #
 
-## Convenience declarations
-set(SYS_LIBS ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${TinyXML_LIBRARIES} ${PROTOBUF_LIBRARIES})
-set(WLD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs ${PROTOBUF_LIBRARIES})
-set(MOD_LIBS ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY} custom_msgs ${PROTOBUF_LIBRARIES})
-
 # Link the message library
-target_link_libraries(custom_msgs         ${SYS_LIBS})
+target_link_libraries(custom_msgs         ${PROTOBUF_LIBRARIES})
+
+## System plugins
+target_link_libraries(sim_core          
+  ${catkin_LIBRARIES} 
+  ${Boost_LIBRARIES} 
+  ${GAZEBO_LIBRARIES} 
+)
+
+## Convenience declarations
+set(SYS_LIBS 
+  ${TinyXML_LIBRARIES}
+  custom_msgs
+  sim_core
+)
+
 
 ## System plugins
 target_link_libraries(sim_resources       ${SYS_LIBS})
@@ -283,21 +312,20 @@ target_link_libraries(sim_experiment      ${SYS_LIBS})
 target_link_libraries(sim_simulation      ${SYS_LIBS})
 
 ## World plugins
-target_link_libraries(sim_environment     ${WLD_LIBS})
-target_link_libraries(sim_meteorological  ${WLD_LIBS})
-target_link_libraries(sim_gps             ${WLD_LIBS})
-target_link_libraries(sim_glonass         ${WLD_LIBS})
-target_link_libraries(sim_wind            ${WLD_LIBS})
+target_link_libraries(sim_environment     ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY})
+target_link_libraries(sim_meteorological  ${SYS_LIBS} ${GPSTK_LIBRARIES})
+target_link_libraries(sim_satellites      ${SYS_LIBS} ${GPSTK_LIBRARIES})
+target_link_libraries(sim_wind            ${SYS_LIBS})
 
 # Model plugins
-target_link_libraries(sim_altimeter       ${MOD_LIBS})
-target_link_libraries(sim_compass         ${MOD_LIBS})
-target_link_libraries(sim_energy          ${MOD_LIBS})
-target_link_libraries(sim_gnss            ${MOD_LIBS})
-target_link_libraries(sim_imu             ${MOD_LIBS})
-target_link_libraries(sim_quadrotor       ${MOD_LIBS})
-target_link_libraries(sim_shear           ${MOD_LIBS})
-target_link_libraries(sim_turbulence      ${MOD_LIBS})
+target_link_libraries(sim_altimeter       ${SYS_LIBS})
+target_link_libraries(sim_compass         ${SYS_LIBS})
+target_link_libraries(sim_energy          ${SYS_LIBS})
+target_link_libraries(sim_gnss            ${SYS_LIBS} ${GPSTK_LIBRARIES})
+target_link_libraries(sim_imu             ${SYS_LIBS})
+target_link_libraries(sim_quadrotor       ${SYS_LIBS})
+target_link_libraries(sim_shear           ${SYS_LIBS})
+target_link_libraries(sim_turbulence      ${SYS_LIBS})
 
 #############
 ## Install ##

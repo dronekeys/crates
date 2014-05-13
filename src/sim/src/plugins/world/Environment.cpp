@@ -47,20 +47,14 @@ namespace gazebo
 	    //  Called to update the world information
 		void Update(const ros::TimerEvent& event)
 		{
-			msg.set_utc(startTime.convertToCommonTime().getDays());
-			msg.mutable_gravity()->set_x(gravity.x);
-			msg.mutable_gravity()->set_y(gravity.y);
-			msg.mutable_gravity()->set_z(gravity.z);
-			msg.mutable_magnetic()->set_x(magnetic.x);
-			msg.mutable_magnetic()->set_y(magnetic.y);
-			msg.mutable_magnetic()->set_z(magnetic.z);
+			// Publish the message immediately
 			pubPtr->Publish(msg);
 		}
 
     public:
 
 		// Default constructor
-		Environment() : rate(1.0), rosNode(ros::NodeHandle("environment"))
+		Environment() : rate(0.0), rosNode(ros::NodeHandle("environment"))
 		{
 		    // Make sure that ROS actually started, or there will be some issues...
 		    if (!ros::isInitialized())
@@ -121,6 +115,15 @@ namespace gazebo
 
 			// Set the gravity in the simulation
 			worldPtr->GetPhysicsEngine()->SetGravity(gravity);
+
+			// Set the mesage data
+			msg.set_utc(startTime.convertToCommonTime().getDays());
+			msg.mutable_gravity()->set_x(gravity.x);
+			msg.mutable_gravity()->set_y(gravity.y);
+			msg.mutable_gravity()->set_z(gravity.z);
+			msg.mutable_magnetic()->set_x(magnetic.x);
+			msg.mutable_magnetic()->set_y(magnetic.y);
+			msg.mutable_magnetic()->set_z(magnetic.z);
 
 			// Set up advertisements
 			Reset();

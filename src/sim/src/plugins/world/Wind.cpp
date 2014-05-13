@@ -8,12 +8,9 @@
 
 // ROS communication subsystem (mainly for debugging)
 #include "wind.pb.h"
-#include "meteorological.pb.h"
 
 namespace gazebo
 {
-	typedef const boost::shared_ptr<const msgs::Meteorological> MeteorologicalPtr;
-
 	class Wind : public WorldPlugin
 	{
 
@@ -45,12 +42,6 @@ namespace gazebo
 			pubPtr->Publish(msg);
 		}
 
-		// This will be called whenever a new meteorlogical topic is posted
-		void ReceiveMeteorological(MeteorologicalPtr& meteorological)
-		{
-			// Do nothing
-		}
-
     public:
 
 		// Default constructor
@@ -74,6 +65,8 @@ namespace gazebo
 			
 			// Set up advertisements
 			Reset();
+
+			ROS_WARN("Wind loaded");
 		}
 
 		// Reset the publishers and subscribers
@@ -85,10 +78,6 @@ namespace gazebo
 
 			// Create a publisher on the ~/wind topic
 			pubPtr = nodePtr->Advertise<msgs::Wind>("~/wind");
-
-			// Subscribe to meteorological updates
-			subPtr = nodePtr->Subscribe("~/meteorological", 
-				&Wind::ReceiveMeteorological, this);
 
 			// ROS timer respects gazebo
 			if (rate > 0)

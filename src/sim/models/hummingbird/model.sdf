@@ -187,6 +187,12 @@
 
     <plugin name="gnss" filename="libbs_gnss.so">
       <rate>1</rate>
+      <minelevation>15</minelevation>
+      <ionosphere>
+        <uri>file://gnss/igsg0060.10i</uri>
+        <uri>file://gnss/igsg0070.10i</uri>
+        <uri>file://gnss/igsg0080.10i</uri>
+      </ionosphere>
       <gps>
         <signal>L1</signal>
         <corrections>   

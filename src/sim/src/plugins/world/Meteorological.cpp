@@ -1,8 +1,11 @@
 // Standard data containers
 #include <list>
 
-// Rinex processing data
+// UTC / GPS time management
 #include <gpstk/CommonTime.hpp>
+#include <gpstk/CivilTime.hpp>
+
+// Rinex processing data
 #include <gpstk/RinexMetData.hpp>
 #include <gpstk/RinexMetHeader.hpp>
 #include <gpstk/RinexMetStream.hpp>
@@ -19,7 +22,6 @@
 #include "environment.pb.h"
 #include "meteorological.pb.h"
 
-/*
 namespace gazebo
 {
 	typedef const boost::shared_ptr<const msgs::Environment> EnvironmentPtr;
@@ -48,6 +50,10 @@ namespace gazebo
       	// Message containing information
       	msgs::Meteorological 		msg;
 
+      	// Time messages
+      	gpstk::CommonTime           currentTime, startTime;
+		gpstk::CivilTime 			civilTime;
+
 	    // For storing RINEX meteorlogical data
 	    std::list<gpstk::RinexMetData> ml;
 	    std::list<gpstk::RinexMetData>::iterator mi;
@@ -55,62 +61,79 @@ namespace gazebo
 		// Send a gazebo meterological message
 		void Update(const ros::TimerEvent& event)
 		{
-			// Determine the current time
-	        // Get the current time in a specific format
-	        gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
-	        {
-	            // Get the current time tick, which is the start of the experiment plus simulated time
-	            gpstk::CommonTime ret = currentTime;
+			// If the library is not bootstrapped, then return immediately
+			if (!bootstrapped)
+				return;
 
-	            // UTC -> GPS
-	            if (ts == gpstk::TimeSystem::GPS)
-	            {
-	                ret.addSeconds(
-	                    gpstk::TimeSystem::Correction(
-	                        gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,        // Source & Dest
-	                        startTime.year, startTime.month, startTime.day         // Rough period
-	                    )
-	                );
-	            }
+			// Try to see if we can grab some weather data from the RINEX file
+			try
+			{
+				// Calculate UTC -> GPS correction
+				double correction = gpstk::TimeSystem::Correction(
+                    gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,
+                    civilTime.year, civilTime.month, civilTime.day
+                );
 
-	            // Set the time system
-	            ret.setTimeSystem(ts);
-
-	            // Return the time
-	            return ret;
-	        }
+    			// Get the current GPS time	
+	            currentTime = startTime;
+				currentTime.addSeconds(worldPtr->GetSimTime().Double()); 		// + simulated time
+	            currentTime.addSeconds(											// + time correction
+	            	gpstk::TimeSystem::Correction(			
+                  	  	gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,
+                   	 	civilTime.year, civilTime.month, civilTime.day
+                   	)
+                );								
+	            currentTime.setTimeSystem(gpstk::TimeSystem::GPS);				// Set to GPS
+			}
+			catch(const std::exception& e)
+			{
+				ROS_ERROR("Problem converting time: %s", e.what());
+			}
 
 			// Try to see if we can grab some weather data from the RINEX file
 			try
 			{
 				// Seek for the data
-				while ((!ml.empty())  && (mi!= ml.end() && (*mi).time < GetTime(gpstk::TimeSystem::UTC))) 
+				while ((!ml.empty())  && (mi!= ml.end() && (*mi).time < currentTime)) 
 				   mi++; 
-
+			
 				// Set the parent class values, so other children can access them!
-				t = (*mi).data[gpstk::RinexMetHeader::TD];
-				h = (*mi).data[gpstk::RinexMetHeader::HR];
-				p = (*mi).data[gpstk::RinexMetHeader::PR];
+				msg.set_temperature((*mi).data[gpstk::RinexMetHeader::TD]);
+				msg.set_humidity((*mi).data[gpstk::RinexMetHeader::HR]);
+				msg.set_pressure((*mi).data[gpstk::RinexMetHeader::PR]);
+
+				// Publish wind information to all subscribers
+				pubPtr->Publish(msg);
 			}
 			catch(const std::exception& e)
 			{
 				ROS_WARN("Problem querying weather data: %s", e.what());
 			}
-
-			// Assemble the epoch message, with or without RINEX data
-			msg.set_temperature(t);
-			msg.set_humidity(h);
-			msg.set_pressure(p);
-
-			// Publish wind information to all subscribers
-			pubPtr->Publish(msg);
+			
 		}
 
 		// This will be called whenever a new meteorlogical topic is posted
 		void ReceiveEnvironment(EnvironmentPtr& environment)
 		{
 			// We are now ready to broadcast
-			boostrapped = true;
+			bootstrapped = true;
+
+			// Try to see if we can grab some weather data from the RINEX file
+			try
+			{
+				// Set the time and time system
+				startTime.set(
+					environment->utc(),
+					(gpstk::TimeSystem) gpstk::TimeSystem::UTC
+				);
+
+				// Convert to a human readable time
+				civilTime = startTime;
+	        }
+			catch(const std::exception& e)
+			{
+				ROS_ERROR("Problem converting time: %s", e.what());
+			}
 		}
 
 	public:
@@ -150,8 +173,7 @@ namespace gazebo
 					el->GetValue()->Get(uri);
 
 					// Open meteorological data file
-					gpstk::RinexMetStream rms(
-						common::SystemPaths::Instance()->FindFileURI(uri).c_str()); 
+					gpstk::RinexMetStream rms(common::SystemPaths::Instance()->FindFileURI(uri).c_str()); 
 					gpstk::RinexMetHeader rmh;
 					gpstk::RinexMetData   rmd;
 
@@ -168,9 +190,6 @@ namespace gazebo
 
 				}
 				while(el = el->GetNextElement());
-
-				// Set the iterator to the beginning of the linked list
-				mi = ml.begin();
 			}
 			catch (const std::exception& e)
 			{
@@ -198,11 +217,12 @@ namespace gazebo
 			// Initialize a new Gazebo transport node
 			nodePtr = transport::NodePtr(new transport::Node());
 			nodePtr->Init(worldPtr->GetName());
+
+			// Advertise meterological messages
 			pubPtr = nodePtr->Advertise<msgs::Meteorological>("~/meteorological");
 
 			// Subscribe to meteorological updates
-			subPtr = nodePtr->Subscribe("~/environment", 
-				&Wind::ReceiveEnvironment, this);
+			subPtr = nodePtr->Subscribe("~/environment",&Meteorological::ReceiveEnvironment, this);
 
 			// ROS timer respects gazebo
 			if (rate > 0)
@@ -219,4 +239,3 @@ namespace gazebo
 	// Resgister the plugin
 	GZ_REGISTER_WORLD_PLUGIN(Meteorological);
 }
-*/
