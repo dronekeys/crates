@@ -65,8 +65,6 @@ namespace gazebo
 			
 			// Set up advertisements
 			Reset();
-
-			ROS_WARN("Wind loaded");
 		}
 
 		// Reset the publishers and subscribers

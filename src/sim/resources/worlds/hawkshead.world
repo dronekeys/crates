@@ -41,6 +41,11 @@
       <uri>model://hawkshead</uri>
     </include>
 
+    <!-- Location -->
+    <include>
+      <uri>model://hummingbird</uri>
+    </include>
+
     <!-- Set the origin and start time (UTC) -->
     <plugin name="environment" filename="libsim_environment.so">
       <rate>1</rate>

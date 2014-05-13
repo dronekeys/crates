@@ -21,7 +21,7 @@ namespace gazebo
       ros::package::getPlugins("sim","gazebo_media_path",gazebo_media_paths);
       for (std::vector<std::string>::iterator iter=gazebo_media_paths.begin(); iter != gazebo_media_paths.end(); iter++)
       {
-        ROS_WARN("med path %s",iter->c_str());
+        ROS_DEBUG("med path %s",iter->c_str());
         common::SystemPaths::Instance()->AddGazeboPaths(iter->c_str());
       }
 
@@ -31,7 +31,7 @@ namespace gazebo
       ros::package::getPlugins("sim","plugin_path",plugin_paths);
       for (std::vector<std::string>::iterator iter=plugin_paths.begin(); iter != plugin_paths.end(); iter++)
       {
-        ROS_WARN("plugin path %s",(*iter).c_str());
+        ROS_DEBUG("plugin path %s",(*iter).c_str());
         common::SystemPaths::Instance()->AddPluginPaths(iter->c_str());
       }
 
@@ -41,7 +41,7 @@ namespace gazebo
       ros::package::getPlugins("sim","gazebo_model_path",model_paths);
       for (std::vector<std::string>::iterator iter=model_paths.begin(); iter != model_paths.end(); iter++)
       {
-        ROS_WARN("model path %s",(*iter).c_str());
+        ROS_DEBUG("model path %s",(*iter).c_str());
         common::SystemPaths::Instance()->AddModelPaths(iter->c_str());
       }
 

@@ -26,7 +26,7 @@ namespace gazebo
 	    physics::ModelPtr  modPtr;
 
 	    // Initial model pose
-	    math::Pose         pose;
+	    math::Pose pose;
 
 	    // Control parameters
 	    double srs, sps, sys, sts, svs;
@@ -37,7 +37,6 @@ namespace gazebo
 	    double _LOW_THROTT, _MAX_ANGVEL, _G,  _MASS_KG;         // Platform config
 	    double _pq0, _pq1, _pq2, _r0, _r1;                      // Rotational params
 	    double _Cth0, _Cth1, _Cth2, _Cvb0, _Cvb1, _tau0, _tau1; // Thrust params
-	    double _kuv, _kw;										// Drag parameters   
 
 	    // Current control parameters
 	    double roll, pitch, yaw, throttle, voltage; 
@@ -46,8 +45,8 @@ namespace gazebo
 
 	    // Used internally in the dynamics update
 	    double dFth, tau;
-	    math::Quaternion    q;
-	    math::Vector3       o, torque, force;
+	    math::Quaternion q;
+	    math::Vector3 o, torque, force;
 
 	    // Are the motors currently animated?
 	    bool motors;
@@ -120,7 +119,7 @@ namespace gazebo
 			// OBTAIN FORCE AND TORQUE INDUCED BY ROTORS ///////////////////////////////
 
 			// Calculate force
-			force = math::Vector3(0.0,0.0,thrust) + drag*(modPtr->GetLink("body")->GetRelativeLinearVel());
+			force = math::Vector3(0.0,0.0,thrust);
 
 			// x = roll
 			torque.x = _pq1*(_pq0*roll  - q.GetAsEuler().x) + _pq2*o.x;    
@@ -178,7 +177,6 @@ namespace gazebo
 			_Cth0(6.63881e-01), _Cth1(7.44649e-04), _Cth2(2.39855e-06),
 			_Cvb0(-18.0007), 	_Cvb1(4.23754),
 			_tau0(3.07321), 	_tau1(46.8004),
-			_kuv(-4.97391e-01),	_kw(-1.35341),
 
 			// Current control
 			roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0), voltage(0.0),
@@ -201,7 +199,6 @@ namespace gazebo
 			modPtr = model;
 
 			// Control parameters
-			/*
 			root->GetElement("control")->GetElement("roll")->GetElement("scale")->GetValue()->Get(srs);
 			root->GetElement("control")->GetElement("roll")->GetElement("min")->GetValue()->Get(srl);
 			root->GetElement("control")->GetElement("roll")->GetElement("max")->GetValue()->Get(sru);
@@ -233,15 +230,9 @@ namespace gazebo
 			root->GetElement("dynamics")->GetElement("Cvb1")->GetValue()->Get(_Cvb1);
 			root->GetElement("dynamics")->GetElement("tau0")->GetValue()->Get(_tau0);
 			root->GetElement("dynamics")->GetElement("tau1")->GetValue()->Get(_tau1);
-			root->GetElement("dynamics")->GetElement("kuv")->GetValue()->Get(_kuv);
-			root->GetElement("dynamics")->GetElement("kw")->GetValue()->Get(_kw);
 
 			// Get the pose of the model (not the link!)
 			pose = modPtr->GetWorldPose();
-
-			// Set the drag constant vector for the platform
-			drag.Set(_kuv, _kuv, _kw);
-			drag *= modPtr->GetLink("body")->GetInertial()->GetMass();
 
 			// How much thrust force is required to hover (simple F = mG)
 			hover = modPtr->GetLink("body")->GetInertial()->GetMass() 
@@ -249,7 +240,6 @@ namespace gazebo
 
 			// Always call a reset 
 			Reset();
-			*/
 	    }
 
 	    // All sensors must be resettable

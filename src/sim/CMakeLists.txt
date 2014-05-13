@@ -165,6 +165,7 @@ catkin_package(
       sim_wind
       sim_altimeter
       sim_compass
+      sim_drag
       sim_energy
       sim_gnss
       sim_imu
@@ -253,13 +254,16 @@ add_library(sim_meteorological        src/plugins/world/Meteorological.cpp)
 add_library(sim_satellites            src/plugins/world/Satellites.cpp)
 add_library(sim_wind                  src/plugins/world/Wind.cpp)
 
-# The model plugins
+# The model plugins (sensors)
 add_library(sim_altimeter             src/plugins/model/Altimeter.cpp)
 add_library(sim_compass               src/plugins/model/Compass.cpp)
 add_library(sim_energy                src/plugins/model/Energy.cpp)
 add_library(sim_gnss                  src/plugins/model/GNSS.cpp)
 add_library(sim_imu                   src/plugins/model/IMU.cpp)
+
+# The model plugins (dynamics)
 add_library(sim_quadrotor             src/plugins/model/Quadrotor.cpp)
+add_library(sim_drag                  src/plugins/model/Drag.cpp)
 add_library(sim_shear                 src/plugins/model/Shear.cpp)
 add_library(sim_turbulence            src/plugins/model/Turbulence.cpp)
 
@@ -276,13 +280,18 @@ add_dependencies(sim_environment      custom_msgs)
 add_dependencies(sim_meteorological   custom_msgs)
 add_dependencies(sim_satellites       custom_msgs)
 add_dependencies(sim_wind             custom_msgs)
+
+# The model plugins (sensors)
 add_dependencies(sim_altimeter        custom_msgs)
 add_dependencies(sim_compass          custom_msgs)
 add_dependencies(sim_energy           custom_msgs)
 add_dependencies(sim_gnss             custom_msgs)
 add_dependencies(sim_imu              custom_msgs)
+
+# The model plugins (dynamics)
 add_dependencies(sim_quadrotor        custom_msgs)
 add_dependencies(sim_shear            custom_msgs)
+add_dependencies(sim_drag             custom_msgs)
 add_dependencies(sim_turbulence       custom_msgs)
 
 ###########################
