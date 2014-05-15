@@ -304,7 +304,7 @@ target_link_libraries(custom_msgs         ${PROTOBUF_LIBRARIES})
 target_link_libraries(sim_core          
   ${catkin_LIBRARIES} 
   ${Boost_LIBRARIES} 
-  ${GAZEBO_LIBRARIES} 
+  ${GAZEBO_LIBRARIES}
 )
 
 ## Convenience declarations
@@ -334,6 +334,7 @@ target_link_libraries(sim_gnss            ${SYS_LIBS} ${GPSTK_LIBRARIES})
 target_link_libraries(sim_imu             ${SYS_LIBS})
 target_link_libraries(sim_quadrotor       ${SYS_LIBS})
 target_link_libraries(sim_shear           ${SYS_LIBS})
+target_link_libraries(sim_drag            ${SYS_LIBS})
 target_link_libraries(sim_turbulence      ${SYS_LIBS})
 
 #############

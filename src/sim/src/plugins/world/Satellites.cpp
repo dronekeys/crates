@@ -20,7 +20,7 @@
 #include <gpstk/SP3EphemerisStore.hpp>		// Class for storing final ephemerides
 #include <gpstk/GPSEphemerisStore.hpp>		// Class for storing GPS broadcast ephemerides
 #include <gpstk/GloEphemerisStore.hpp>		// Class for storing GLO broadcast ephemerides
-#include <gpstk/GloFreqIndex.hpp>			// Class for working out Glonass frequencies
+//#include <gpstk/GloFreqIndex.hpp>			// Class for working out Glonass frequencies
 #include <gpstk/IonexStore.hpp>				// Class for storing ion delay data
 #include <gpstk/TropModel.hpp>				// Class for modelling tropospheric delay
 #include <gpstk/IonoModel.hpp>				// Class for modelling ionospheric delay

@@ -2,6 +2,9 @@
 
 using namespace gazebo;
 
+std::map<std::string,NoiseType> NoiseFactory::types;
+
+std::map<std::string,Noise*> NoiseFactory::processes;
 
 NoiseFactory::NoiseFactory()
 {
