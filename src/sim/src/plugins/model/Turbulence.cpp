@@ -25,12 +25,11 @@ namespace gazebo
 	    // Pointer to the update event connection
 	    event::ConnectionPtr conPtr;
 
-        double tim;
-        int     bsiter;
-        double  bstime, speed, dir, kuv, kw;
+	    // Simulation time, turbulence speed and direction
+        double tim, speed, dir;
 
     	// Used internally to maintain turbulence properties
-        math::Vector3 wind, s, l, drag;
+        math::Vector3 wind, s, l;
         math::Quaternion d20, q;
     	double d, a, h, k;
     	double s20;
@@ -91,9 +90,8 @@ namespace gazebo
 			// Actually, apply the force to the body
 			if (apply)
 			{
-				modPtr->GetLink("body")->AddRelativeForce
-				(
-					-drag*(q.RotateVector(d20.GetInverse().RotateVector(FEET_TO_METERS * wind)))
+				modPtr->GetLink("body")->AddRelativeForce(
+					q.RotateVector(d20.GetInverse().RotateVector(FEET_TO_METERS * wind))
 				);
 			}
 		}
@@ -101,7 +99,7 @@ namespace gazebo
     public:
 
 		// Default constructor
-		Turbulence() : tim(0.0), bsiter(1000), bstime(0.02), speed(0), dir(0), kuv(-4.97391e-01), kw(-1.35341) 
+		Turbulence() : tim(0.0), speed(0), dir(0)
 		{
 		    // Make sure that ROS actually started, or there will be some issues...
 		    if (!ros::isInitialized())
@@ -115,20 +113,8 @@ namespace gazebo
 			modPtr = model;
 
 			// Speed and direction
-			root->GetElement("bsiter")->GetValue()->Get(bsiter);
-			root->GetElement("bstime")->GetValue()->Get(bstime);
-
-			// Speed and direction
 			root->GetElement("speed")->GetValue()->Get(speed);
 			root->GetElement("direction")->GetValue()->Get(dir);
-
-			// Aerodynamic drag (math::Rand::GetDblUniform(-MATH_PI,MATH_PI)))
-			root->GetElement("drag")->GetElement("kuv")->GetValue()->Get(kuv);
-			root->GetElement("drag")->GetElement("k")->GetValue()->Get(kw);
-
-			// Set the drag vector
-			drag.Set(kuv,kuv,kw);
-			drag *= modPtr->GetLink("body")->GetInertial()->GetMass();
 
 			//  Create a pre-physics update call
 			conPtr = event::Events::ConnectWorldUpdateBegin(
@@ -152,8 +138,8 @@ namespace gazebo
 
 			// Bootstrap the gust model, so the wind doesn't start at zero
 			wind = math::Vector3(0,0,0);
-			for (int i = 0; i < bsiter; i++)
-				Update(bstime, false);
+			for (int i = 0; i < 1000; i++)
+				Update(modPtr->GetWorld()->GetPhysicsEngine()->GetMaxStepSize(),false);
 		}
 
 	};

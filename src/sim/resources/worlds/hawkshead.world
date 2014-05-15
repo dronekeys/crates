@@ -5,11 +5,13 @@
   <world name="rvc">
 
     <!-- Camera -->
+    <!--
     <gui>
       <camera name="user_camera">
         <pose>0 0 5 0 0 1.57079632679</pose>
       </camera>
     </gui>
+    -->
 
     <!-- Physics -->
     <physics type="ode">
@@ -37,8 +39,14 @@
     </include>
 
     <!-- Location -->
+    <!--
     <include>
       <uri>model://hawkshead</uri>
+    </include>
+    -->
+  
+    <include>
+      <uri>model://ground_plane</uri>
     </include>
 
     <!-- Location -->

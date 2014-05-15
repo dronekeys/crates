@@ -7,7 +7,7 @@
     <static>false</static>
 
     <!-- Initial pose -->
-    <pose>0 0 1  0 0 0</pose>
+    <pose>0 0 2  0 0 0</pose>
 
     <!-- Frame -->
     <link name="body">
@@ -131,101 +131,41 @@
       </control>
     </plugin>
     
+    <!-- Wind shear  -->
+    <!--
+    <plugin name="shear" filename="libsim_shear.so">
+      <speed>5.0</speed>
+      <direction>90</direction>
+    </plugin>
+    -->
+      
+    <!-- Turbulence -->
+    <!--
+    <plugin name="turbulence" filename="libsim_turbulence.so">
+      <speed>0.0</speed>
+      <direction>90.0</direction>
+    </plugin>
+    -->
+    
     <!-- Aerodynamic drag -->
+    <!--
     <plugin name="drag" filename="libsim_drag.so">
       <kuv>-4.97391e-01</kuv>
       <kw>-1.35341</kw>
     </plugin>
-
-    <!--
-    <plugin name="quadrotor" filename="libsim_quadrotor.so"></plugin>
-    <plugin name="altimeter" filename="libsim_altimeter.so"></plugin>
-    <plugin name="compass" filename="libsim_compass.so"></plugin>
-    <plugin name="energy" filename="libsim_energy.so"></plugin>
-    <plugin name="gnss" filename="libsim_gnss.so"></plugin>
-    <plugin name="imu" filename="libsim_imu.so"></plugin>
     -->
 
     <!--
-    <plugin name="quadrotor" filename="libbs_quadrotor.so">
-      <dynamics>
-        <low_throttle>300</low_throttle>
-        <max_angvel>2.617993877991494</max_angvel>
-        <pq0>-3.25060e-04</pq0>
-        <pq1>1.79797e+02</pq1>
-        <pq2>-24.3536</pq2>
-        <r0>-4.81783e-03</r0>
-        <r1>-5.08944</r1>
-        <Cth0>6.63881e-01</Cth0>
-        <Cth1>7.44649e-04</Cth1>
-        <Cth2>2.39855e-06</Cth2>
-        <Cvb0>-18.0007</Cvb0>
-        <Cvb1>4.23754</Cvb1>
-        <tau0>3.07321</tau0>
-        <tau1>46.8004</tau1>
-        <kuv>-4.97391e-01</kuv>
-        <kw>-1.35341</kw>
-      </dynamics>
-      <control>
-        <pitch>
-          <scale>-2291.83118052329</scale>
-          <min>-0.9</min>
-          <max> 0.9</max>
-        </pitch>
-        <roll>
-          <scale>-2291.83118052329</scale>
-          <min>-0.9</min>
-          <max> 0.9</max>
-        </roll>
-        <throttle>
-          <scale>4097</scale>
-          <min>0.0</min>
-          <max>1.0</max>
-        </throttle>
-        <yaw>
-          <scale>-460.597254433196</scale>
-          <min>-4.5</min>
-          <max> 4.5</max>
-        </yaw>
-        <voltage>
-          <scale>1.0</scale>
-          <min> 9.0</min>
-          <max>12.0</max>
-        </voltage>
-      </control>
-    </plugin>
 
-    <plugin name="shear" filename="libbs_shear.so">
-      <speed>0.0</speed>
-      <direction>90</direction>
-      <drag>
-        <kuv>-4.97391e-01</kuv>
-        <kw>-1.35341</kw>
-      </drag>
-      <floor>0.05</floor>
-      <const>0.15</const>
-    </plugin>
-      
-    <plugin name="turbulence" filename="libbs_turbulence.so">
-      <speed>5.0</speed>
-      <direction>90.0</direction>
-      <drag>
-        <kuv>-4.97391e-01</kuv>
-        <kw>-1.35341</kw>
-      </drag>
-      <bsiter>1000</bsiter>
-      <bstime>0.02</bstime>
-    </plugin>
-
-    <plugin name="altitude" filename="libbs_altitude.so">
+    <plugin name="altitude" filename="libsim_altimeter.so">
       <rate>1</rate>
     </plugin>
 
-    <plugin name="compass" filename="libbs_compass.so">
+    <plugin name="compass" filename="libsim_compass.so">
       <rate>1</rate>
     </plugin>
 
-    <plugin name="energy" filename="libbs_energy.so">
+    <plugin name="energy" filename="libsim_energy.so">
       <rate>1</rate>
       <total>2.2</total>
       <remaining>2.2</remaining>
@@ -240,16 +180,13 @@
       <throttle>0.001</throttle>
     </plugin>
 
-    <plugin name="gnss" filename="libbs_gnss.so">
+    <plugin name="gnss" filename="libsim_gnss.so">
       <rate>1</rate>
       <minelevation>15</minelevation>
-      <ionosphere>
-        <uri>file://gnss/igsg0060.10i</uri>
-        <uri>file://gnss/igsg0070.10i</uri>
-        <uri>file://gnss/igsg0080.10i</uri>
-      </ionosphere>
       <gps>
-        <signal>L1</signal>
+        <l1>CODE</l1>
+        <l2>NONE</l2>
+        <l5>NONE</l5>
         <corrections>   
           <sig>0.0</sig>
           <clk>0.0</clk>
@@ -261,7 +198,8 @@
         </corrections>
       </gps> 
       <glo>
-        <signal>DISABLED</signal>
+        <l1>CODE</l1>
+        <l2>NONE</l2>
         <corrections>   
           <sig>0.0</sig>
           <clk>0.0</clk>
@@ -273,6 +211,11 @@
         </corrections>
       </glo>
     </plugin>
+
+    <plugin name="imu" filename="libsim_imu.so">
+      <rate>1</rate>
+    </plugin>
+
     -->
     
   </model>

@@ -13,10 +13,12 @@
 #include "wind.pb.h"
 
 // Basic constants 
-#define METERS_TO_FEET    3.2808399
-#define FEET_TO_METERS    0.3048000
+#define METERS_TO_FEET      3.2808399
+#define FEET_TO_METERS      0.3048000
 #define DEGREES_TO_RADIANS  0.01745329258399
 #define RADIANS_TO_DEGREES  57.2957795000000
+#define MINIMUM_ALTITUDE    0.05
+#define WIND_CONSTANT       0.15
 
 namespace gazebo
 {
@@ -42,11 +44,11 @@ namespace gazebo
         double tim;
 
         // Input parameters from SDF
-        double speed, dir, mA, z0, kuv, kw;
+        double speed, dir, mA, z0;
 
         // Internal parameters
         math::Quaternion q;
-        math::Vector3 d20, wind, drag;
+        math::Vector3 d20, wind;
         double mass, s20, a;
 
         // Update the model based on the time step (and internal control)
@@ -68,9 +70,12 @@ namespace gazebo
                 else
                     wind.Set(0,0,0);
 
+                //ROS_WARN("%f %f %f", wind.x, wind.y, wind.z);
+                ROS_WARN("Received wind %f %f %f",wind.x,wind.y,wind.x);
+
                 // Add the force to the body
                 modPtr->GetLink("body")->AddRelativeForce(
-                    -drag*(q.RotateVector(wind))
+                    q.RotateVector(wind)
                 );
             }
 
@@ -93,7 +98,7 @@ namespace gazebo
     public:
 
         // Constructor
-        Shear() : mA(0.05), z0(0.15), speed(0), dir(0), kuv(-4.97391e-01), kw(-1.35341) 
+        Shear() : mA(MINIMUM_ALTITUDE), z0(WIND_CONSTANT), speed(0.0), dir(0.0), tim(0.0)
         {
             // Make sure that ROS actually started, or there will be some issues...
             if (!ros::isInitialized())
@@ -113,20 +118,8 @@ namespace gazebo
             modPtr = model;
 
             // Speed and direction
-            root->GetElement("const")->GetValue()->Get(z0);
-            root->GetElement("floor")->GetValue()->Get(mA);
-
-            // Speed and direction
             root->GetElement("speed")->GetValue()->Get(speed);
             root->GetElement("direction")->GetValue()->Get(dir);
-
-            // Aerodynamic drag (math::Rand::GetDblUniform(-MATH_PI,MATH_PI)))
-            root->GetElement("drag")->GetElement("kuv")->GetValue()->Get(kuv);
-            root->GetElement("drag")->GetElement("kw")->GetValue()->Get(kw);
-
-            // Find the drag vector
-            drag.Set(kuv,kuv,kw);
-            drag *= modPtr->GetLink("body")->GetInertial()->GetMass();
 
             // Initialise a node pointer
             nodePtr = transport::NodePtr(new transport::Node());
@@ -146,6 +139,9 @@ namespace gazebo
         // Reset the propulsion engine
         void Reset()
         {
+            // Reset the timer
+            tim = 0.0;
+
             // Wind always blows orthogonal to the down direction
             d20.x = -cos(DEGREES_TO_RADIANS * dir);
             d20.y = -sin(DEGREES_TO_RADIANS * dir);

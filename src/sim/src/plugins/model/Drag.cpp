@@ -44,23 +44,6 @@ namespace gazebo
 			tim = _info.simTime.Double();
 		}
 
-		// Update the system dynamics
-		void Update(const double &dt)
-		{
-		  	// set force and torque in gazebo
-		  	modPtr->GetLink("body")->AddRelativeForce(
-		  		drag*(modPtr->GetLink("body")->GetRelativeLinearVel())
-	  		);
-		}
-
-		// Clamp a value to a given range
-		static double Clamp(const double& val, const double& minval, const double& maxval)
-		{
-		    if (val < minval) return minval;
-		    if (val > maxval) return maxval;
-		    return val;
-		}
-
   	public:
 
 	    // Default constructor
@@ -83,6 +66,10 @@ namespace gazebo
 			drag.Set(_kuv, _kuv, _kw);
 			drag *= modPtr->GetLink("body")->GetInertial()->GetMass();
 
+			//  Create a pre-physics update call
+			conPtr = event::Events::ConnectWorldUpdateBegin(
+				boost::bind(&Drag::PrePhysics, this, _1));
+
 			// Always call a reset 
 			Reset();
 	    }
@@ -92,10 +79,6 @@ namespace gazebo
 	    {
 	    	// Reset the timer
 	    	tim = 0.0;
-
-			//  Create a pre-physics update call
-			conPtr = event::Events::ConnectWorldUpdateBegin(
-				boost::bind(&Drag::PrePhysics, this, _1));
 	    }
 	};
 

@@ -23,10 +23,13 @@ namespace gazebo
   	private:
 
 	    // Pointer to the model object
-	    physics::ModelPtr  modPtr;
+	    physics::ModelPtr modPtr;
 
-	    // Initial model pose
-	    math::Pose pose;
+	    // Pointer to the update event connection
+	    event::ConnectionPtr conPtr;
+
+	    // Last time tick
+	    double tim;
 
 	    // Control parameters
 	    double srs, sps, sys, sts, svs;
@@ -38,18 +41,14 @@ namespace gazebo
 	    double _pq0, _pq1, _pq2, _r0, _r1;                      // Rotational params
 	    double _Cth0, _Cth1, _Cth2, _Cvb0, _Cvb1, _tau0, _tau1; // Thrust params
 
+	    // Thrust force required to hover
+		double hover;		
+	    
 	    // Current control parameters
-	    double roll, pitch, yaw, throttle, voltage; 
-	    double mass, hover, thrust;
-	    math::Vector3 drag;
-
-	    // Used internally in the dynamics update
-	    double dFth, tau;
-	    math::Quaternion q;
-	    math::Vector3 o, torque, force;
-
-	    // Are the motors currently animated?
-	    bool motors;
+	    double roll, pitch, yaw, throttle, voltage, thrust;
+	  
+	  	// Motor animations
+	  	std::map<std::string,common::NumericAnimationPtr> anim;
 
 		// Animate a motor without any dynamics
 		void AnimateMotors(bool enabled)
@@ -61,90 +60,94 @@ namespace gazebo
 				std::string motor = (std::string) "motor" + boost::lexical_cast<std::string>(i);
 				std::string name  = (std::string) "rpm"   + boost::lexical_cast<std::string>(i);
 
+				/*
 				// Select a random offset, so that the quads dont all align
 				double offset = math::Rand::GetDblUniform(-MATH_PI,MATH_PI);
 
+				// Clear the animation
+				anim.empty();
+
 				// Create the animation
-				std::map<std::string,common::NumericAnimationPtr> anim;
-				anim[motor].reset(new common::NumericAnimation(name, 60.0/MOTOR_ANIMATION_ON_RPM, true));
+				anim[motor].reset(new common::NumericAnimation(name,4,true));
 				if (enabled)
 				{
 					common::NumericKeyFrame *key;
 					for (int i = 0; i <= 4; i++)
 					{ 
-						key = anim[motor]->CreateKeyFrame((double)i*15.0/MOTOR_ANIMATION_ON_RPM);
-						key->SetValue((double)i*1.57079632679+offset);
+						key = anim[motor]->CreateKeyFrame((double)i*4.0);
+						key->SetValue((double)i*MATH_PI/2.0);
 					}
 				}
+				*/
+
 
 				// Attache the animatin to the the model
-				modPtr->SetJointAnimation(anim);
+				//modPtr->SetJointAnimation(anim);
 			}
-
-			// Store whther the motors are on or off
-			motors = enabled;
 		}
 
-
-		// Update the system dynamics
-		void Update(const double &dt)
+    	// Callback for physics timer
+		void PrePhysics(const common::UpdateInfo &_info)
 		{
-			// GET ORIENTATION AND ANGULAR VELOCITY //////////////////////////////////
+			// Time over which dynamics must be updated (needed for thrust update)
+			double dt = _info.simTime.Double() - tim;
 
-			q = modPtr->GetLink("body")->GetWorldPose().rot;
-			o = modPtr->GetLink("body")->GetRelativeAngularVel();
-
-			// Update thrust force ////////////////////////////////////////////////////
-
-			dFth = (_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust;
-			if (throttle < _LOW_THROTT)
-				dFth = _tau0 * dFth;
-			else
+			// If simulation is paused, dont waste CPU cycles calculating a physics update...
+			if (dt > 0) 
 			{
-				tau  = 0.0;
-				if (abs(dFth) < (_tau1*dt))
-				  tau = dFth / dt;
-				else
-				  tau = (dFth > 0 ? _tau1 : -_tau1);
+				// Get the orientation
+				math::Quaternion q = modPtr->GetLink("body")->GetWorldPose().rot;
+				math::Vector3 o = modPtr->GetLink("body")->GetRelativeAngularVel();
 
-				if ((thrust + tau*dt) > (_Cvb0 + _Cvb1*voltage))
-				  dFth = (_Cvb0 + _Cvb1*voltage - thrust) / dt;
+				// Update thrust force
+				double dFth = (_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust;
+				if (throttle < _LOW_THROTT)
+					dFth = _tau0 * dFth;
 				else
-				  dFth = tau;
+				{
+					double tau  = 0.0;
+					if (abs(dFth) < (_tau1*dt))
+					  tau = dFth / dt;
+					else
+					  tau = (dFth > 0 ? _tau1 : -_tau1);
+
+					if ((thrust + tau*dt) > (_Cvb0 + _Cvb1*voltage))
+					  dFth = (_Cvb0 + _Cvb1*voltage - thrust) / dt;
+					else
+					  dFth = tau;
+				}
+
+				// Update thrust
+				thrust += dFth * dt;
+
+				// Calculate body-frame thrust force
+				math::Vector3 force = math::Vector3(0.0,0.0,thrust);
+				math::Vector3 torque;
+
+				// x = roll
+				torque.x = _pq1*(_pq0*roll  - q.GetAsEuler().x) + _pq2*o.x;    
+				if ((o.x > _MAX_ANGVEL && (torque.x > 0)) || (o.x < -_MAX_ANGVEL && (torque.x < 0)))
+				  torque.x = 0;
+
+				// y = pitch
+				torque.y = _pq1*(_pq0*pitch - q.GetAsEuler().y) + _pq2*o.y;    
+				if ((o.y > _MAX_ANGVEL && (torque.y > 0)) || (o.y < -_MAX_ANGVEL && (torque.y < 0)))
+				  torque.y = 0;
+
+				// Yaw
+				torque.z = _r0*yaw + _r1*o.z;
+
+			  	// set force and torque in gazebo
+			  	modPtr->GetLink("body")->AddRelativeForce(force);
+			  	modPtr->GetLink("body")->AddRelativeTorque(torque);
+
+			  	// Only update the on-off action of motors
+			  	//if ((!motors && thrust > MOTOR_ANIMATION_THRESHOLD) || (motors && thrust < MOTOR_ANIMATION_THRESHOLD)) 
+				//	AnimateMotors(thrust > MOTOR_ANIMATION_THRESHOLD);
 			}
 
-			// Update thrust
-			thrust += dFth*dt;
-
-			// OBTAIN FORCE AND TORQUE INDUCED BY ROTORS ///////////////////////////////
-
-			// Calculate force
-			force = math::Vector3(0.0,0.0,thrust);
-
-			// x = roll
-			torque.x = _pq1*(_pq0*roll  - q.GetAsEuler().x) + _pq2*o.x;    
-			if ((o.x > _MAX_ANGVEL && (torque.x > 0)) || (o.x < -_MAX_ANGVEL && (torque.x < 0)))
-			  torque.x = 0;
-
-			// y = pitch
-			torque.y = _pq1*(_pq0*pitch - q.GetAsEuler().y) + _pq2*o.y;    
-			if ((o.y > _MAX_ANGVEL && (torque.y > 0)) || (o.y < -_MAX_ANGVEL && (torque.y < 0)))
-			  torque.y = 0;
-
-			// Yaw
-			torque.z = _r0*yaw + _r1*o.z;
-
-			// UPDATE PHYSICS ///////////////////////////////////////////////////////////
-
-		  	// set force and torque in gazebo
-		  	modPtr->GetLink("body")->AddRelativeForce(force);
-		  	modPtr->GetLink("body")->AddRelativeTorque(torque);
-
-			// UPDATE MOTOR ANIMATION ///////////////////////////////////////////////////
-
-		  	// Only update the on-off action of motors
-		  	if ((!motors && thrust > MOTOR_ANIMATION_THRESHOLD) || (motors && thrust < MOTOR_ANIMATION_THRESHOLD)) 
-				AnimateMotors(thrust > MOTOR_ANIMATION_THRESHOLD);
+			// Update timer
+			tim = _info.simTime.Double();
 		}
 
 		// Clamp a value to a given range
@@ -163,12 +166,15 @@ namespace gazebo
 	    	// Quadrotor HAL
 	    	hal::model::Quadrotor(),
 
+	    	// Last time tick
+	    	tim(0.0),
+
 			// Control parameters
-			srs(-2291.83118052329), srl(-0.9), sru(0.9), 
-		    sps(-2291.83118052329), spl(-0.9), spu(0.9), 
-			sys(-460.597254433196), syl(-4.5), syu(4.5), 
-			sts( 4097.0), 			stl(0.0), stu(1.0),
-			svs( 1.0), 				svl(9.0), svu(12.0),
+			srs(-2291.83118052329), srl(-0.9), 	sru(0.9), 
+		    sps(-2291.83118052329), spl(-0.9), 	spu(0.9), 
+			sys(-460.597254433196), syl(-4.5), 	syu(4.5), 
+			sts( 4097.0), 			stl(0.0), 	stu(1.0),
+			svs( 1.0), 				svl(9.0), 	svu(12.0),
 
 			// Dynamics parameters
 			_LOW_THROTT(300.0), _MAX_ANGVEL(2.617993877991494),
@@ -179,10 +185,7 @@ namespace gazebo
 			_tau0(3.07321), 	_tau1(46.8004),
 
 			// Current control
-			roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0), voltage(0.0),
-
-			// Are motors animated?
-			motors(false)
+			roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0), voltage(12.0)
 	    {
 	      // Do nothing
 	    }
@@ -231,50 +234,71 @@ namespace gazebo
 			root->GetElement("dynamics")->GetElement("tau0")->GetValue()->Get(_tau0);
 			root->GetElement("dynamics")->GetElement("tau1")->GetValue()->Get(_tau1);
 
-			// Get the pose of the model (not the link!)
-			pose = modPtr->GetWorldPose();
-
 			// How much thrust force is required to hover (simple F = mG)
 			hover = modPtr->GetLink("body")->GetInertial()->GetMass() 
 				  * modPtr->GetWorld()->GetPhysicsEngine()->GetGravity().GetLength();
 
-			// Always call a reset 
+			//  Create a pre-physics update call
+			conPtr = event::Events::ConnectWorldUpdateBegin(boost::bind(&Quadrotor::PrePhysics, this, _1));
+
+			// Aways issue a reset on load
 			Reset();
 	    }
 
 	    // All sensors must be resettable
 	    void Reset()
 	    {
-			// Reset the pose of the model (not the link!)
-			modPtr->SetWorldPose(pose);
 
-			// If the platform has taken off, the initial thrust should be set to hover
-			thrust = (pose.pos.z > 0 ? hover : 0);
-
-			// Animate the motors to 300 rpm if hovering
-			AnimateMotors(pose.pos.z > 0);
 	    }
 
-	    // Do something with the Control provided by the HAL
-		void Control(const hal_model_quadrotor::Control &ctl)
+    	// The HAL gets the simulated state through this function
+		void GetState(hal_model_quadrotor::State& state)
 		{
+			// Get the state
+			math::Pose pose = modPtr->GetWorldPose();
+			math::Vector3 vel = modPtr->GetWorldLinearVel();
+			math::Vector3 ang = modPtr->GetWorldAngularVel();
 
+			// Update the state
+			state.x = pose.pos.x;
+			state.y = pose.pos.y;
+			state.z = pose.pos.z;
+			state.roll = pose.rot.x;
+			state.pitch = pose.rot.y;
+			state.yaw = pose.rot.z;
+			state.u = vel.x;
+			state.v = vel.y;
+			state.w = vel.z;
+			state.thrust = thrust;
+			state.voltage = voltage;
 		}
 
-		// Reset the internal control
-		void SetControl(const double &r,const double &p,const double &y,const double &t,const double &v)
+	    // The HAL sets the simulated state through this function
+		void SetState(const hal_model_quadrotor::State& state)
 		{
-			roll 		= srs * Clamp(r,srl,sru);
-			pitch 		= sps * Clamp(p,spl,spu);
-			yaw 		= sys * Clamp(y,syl,syu);
-			throttle 	= sts * Clamp(t,stl,stu);
-			voltage 	= svs * Clamp(v,svl,svu);
+			// Get the state
+			math::Pose pose(
+				state.x,    state.y,     state.z,		// Position
+				state.roll, state.pitch, state.yaw 		// Orientation
+			);
+			math::Vector3 vel(state.u,state.v,state.w);
+			math::Vector3 ang(state.p,state.q,state.r);
+
+			// Set the state
+			modPtr->SetWorldPose(pose);
+			modPtr->SetWorldTwist(vel, ang);
+			thrust = state.thrust;
+			voltage = state.voltage;
 		}
 
-		// Get the current thurst force
-		double GetThrust()
+	    // The HAL sets the control through this function
+		void SetControl(const hal_model_quadrotor::Control &control)
 		{
-			return thrust;
+			roll 		= srs * Clamp(control.roll,		srl,sru);
+			pitch 		= sps * Clamp(control.pitch,	spl,spu);
+			yaw 		= sys * Clamp(control.yaw,		syl,syu);
+			throttle 	= sts * Clamp(control.throttle,	stl,stu);
+			voltage 	= svs * Clamp(control.voltage,	svl,svu);
 		}
 	};
 

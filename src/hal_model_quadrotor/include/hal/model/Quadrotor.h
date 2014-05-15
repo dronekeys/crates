@@ -19,6 +19,10 @@
 #include <hal_model_quadrotor/VelocityHeight.h>
 #include <hal_model_quadrotor/Waypoint.h>
 
+// Simulation-specific commands
+#include <hal_model_quadrotor/SetState.h>
+#include <hal_model_quadrotor/SetControl.h>
+
 // State and control messages
 #include <hal_model_quadrotor/State.h>
 #include <hal_model_quadrotor/Control.h>
@@ -56,6 +60,8 @@ namespace hal
             ros::ServiceServer  srvVelocity;
             ros::ServiceServer  srvVelocityHeight;
             ros::ServiceServer  srvWaypoint;
+            ros::ServiceServer  srvSetState;
+            ros::ServiceServer  srvSetControl;
 
             /// Timers
             ros::Timer timerUpdate;                 /*!< Update loop timer       */
@@ -161,7 +167,8 @@ namespace hal
                 hal_model_quadrotor::Velocity::Request  &req, 
                 hal_model_quadrotor::Velocity::Response &res
             );
-                        //! Timer callback for state broadcast loop
+            
+            //! Timer callback for state broadcast loop
             /*!
               \param req service request
               \param res service response
@@ -172,7 +179,7 @@ namespace hal
                 hal_model_quadrotor::VelocityHeight::Response &res
             );
 
-            //! Timer callback for state broadcast loop
+            //! Service callback for state broadcast loop
             /*!
               \param req service request
               \param res service response
@@ -183,13 +190,49 @@ namespace hal
                 hal_model_quadrotor::Waypoint::Response &res
             );
 
+            // SIMULATION ONLY /////////////////////////////////////
+
+            //! Service callback for setting the state
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvState(
+                hal_model_quadrotor::SetState::Request  &req, 
+                hal_model_quadrotor::SetState::Response &res
+            );
+
+            //! Service callback for setting the control
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvControl(
+                hal_model_quadrotor::SetControl::Request  &req, 
+                hal_model_quadrotor::SetControl::Response &res
+            );
+
         protected:
+
+            //! Get the state of the quadrotor from the FCS
+            /*!
+              \param state the state of the quadrotor
+            */
+            virtual void GetState(hal_model_quadrotor::State &state) = 0;
+
+            //! Accept a state update message from the HAL
+            /*!
+              \param state the state of the quadrotor
+            */
+            virtual void SetState(const hal_model_quadrotor::State &state) = 0;
 
             //! Accept a control message from the HAL
             /*!
-              \param ctl
+              \param control the control to apply
             */
-            virtual void Control(const hal_model_quadrotor::Control &ctl) = 0;
+            virtual void SetControl(const hal_model_quadrotor::Control &control) = 0;
 
         public:
 
@@ -198,13 +241,6 @@ namespace hal
               \param node ROS node tow hich the HAL will bind
             */
             Quadrotor();
-
-            //! Update the state of the platform
-            /*!
-              \param state the new quadrotor state
-              \return Whether the state was accepted
-            */
-            bool SetState(const hal_model_quadrotor::State &sta);
 
             //! Switch flight controller
             /*!

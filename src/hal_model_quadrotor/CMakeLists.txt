@@ -72,6 +72,8 @@ add_service_files(
     Velocity.srv
     VelocityHeight.srv
     Waypoint.srv
+    SetState.srv
+    SetControl.srv
 )
 
 ## Generate actions in the 'action' folder

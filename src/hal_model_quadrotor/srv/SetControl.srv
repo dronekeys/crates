@@ -1,0 +1,5 @@
+hal_model_quadrotor/Control control
+---
+# RESULT
+bool    success
+string  status

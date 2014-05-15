@@ -19,7 +19,7 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     */
     
     // Update the flight control system
-    Control(control);
+    // Control(control);
 
     // Save the current time tick
     tick = event.current_real.toSec();
@@ -103,6 +103,35 @@ bool Quadrotor::RcvWaypoint(
     return true;
 }
 
+bool Quadrotor::RcvState(
+    hal_model_quadrotor::SetState::Request  &req, 
+    hal_model_quadrotor::SetState::Response &res)
+{
+    // Pass the control down to the HAL
+    SetState(req.state);
+
+    // Notify the user
+    res.success = true;
+    res.status  = "State received. Updating simulated UAV.";
+    return true;
+}
+
+bool Quadrotor::RcvControl(
+    hal_model_quadrotor::SetControl::Request  &req, 
+    hal_model_quadrotor::SetControl::Response &res)
+{
+    // Pass the control down to the HAL
+    SetControl(req.control);
+    
+    // Disable the active controller
+    //Controller::SetController(CONTROLLER_DISABLED);
+
+    // Notify the user
+    res.success = true;
+    res.status  = "Control received. Disabled current position controller.";
+    return true;
+}
+
 void Quadrotor::OnInit()
 {
     // Advertise the various controllers on the ROS backbone
@@ -115,6 +144,15 @@ void Quadrotor::OnInit()
     srvVelocity         = GetRosNodePtr()->advertiseService("controller/Velocity", &Quadrotor::RcvVelocity, this);
     srvVelocityHeight   = GetRosNodePtr()->advertiseService("controller/VelocityHeight", &Quadrotor::RcvVelocityHeight, this);
     srvWaypoint         = GetRosNodePtr()->advertiseService("controller/Waypoint", &Quadrotor::RcvWaypoint, this);
+
+    // If we are using simulation time, then we are in simulation mode, so
+    // allow the UAV to present two additional services
+    bool isSimulated = false;
+    if (GetRosNodePtr()->getParam("/use_sim_time",isSimulated) && isSimulated)
+    {
+        srvSetState = GetRosNodePtr()->advertiseService("SetState", &Quadrotor::RcvState, this);
+        srvSetControl = GetRosNodePtr()->advertiseService("SetControl", &Quadrotor::RcvControl, this);
+    }
 
 /*
     // 1 argument: any node can transition to these controllers immediately
@@ -168,9 +206,4 @@ void Quadrotor::OnInit()
         this
     );
     
-}
-
-bool Quadrotor::SetState(const hal_model_quadrotor::State &sta)
-{
-    state = sta;
 }
