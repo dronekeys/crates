@@ -32,9 +32,6 @@
 #include "sim/Noise.h"
 #include "sim/Seed.h"
 
-// Protobuf messages
-#include "noise.pb.h"
-
 #define ROS_TIMEOUT_SECONDS 1.0
 
 namespace gazebo
@@ -199,7 +196,6 @@ namespace gazebo
 		// Set up gazebo publishers
 		pubFactory  = gazeboNode->Advertise<msgs::Factory>("~/factory");
 		pubRequest  = gazeboNode->Advertise<msgs::Request>("~/request");
-		pubNoise    = gazeboNode->Advertise<msgs::Noise>("~/noise");
 		subResponse = gazeboNode->Subscribe("~/response",&Simulation::Response, this);
 		subContacts = gazeboNode->Subscribe("~/physics/contacts",&Simulation::Contacts, this);
 
@@ -208,49 +204,49 @@ namespace gazebo
 
 	  	// Add a model
 		ros::AdvertiseServiceOptions adInsert = ros::AdvertiseServiceOptions::create<sim::Insert>(
-			"insert",boost::bind(&Simulation::Insert,this,_1,_2),ros::VoidPtr(), &queue
+			"Insert",boost::bind(&Simulation::Insert,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceInsert = rosNode->advertiseService(adInsert);
 
 	  	// Delete a model
 		ros::AdvertiseServiceOptions adDelete = ros::AdvertiseServiceOptions::create<sim::Delete>(
-			"delete",boost::bind(&Simulation::Delete,this,_1,_2),ros::VoidPtr(), &queue
+			"Delete",boost::bind(&Simulation::Delete,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceDelete = rosNode->advertiseService(adDelete);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adPause = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-			"pause",boost::bind(&Simulation::Pause,this,_1,_2),ros::VoidPtr(), &queue
+			"Pause",boost::bind(&Simulation::Pause,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		servicePause = rosNode->advertiseService(adPause);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adResume = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-			"resume",boost::bind(&Simulation::Resume,this,_1,_2),ros::VoidPtr(), &queue
+			"Resume",boost::bind(&Simulation::Resume,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceResume = rosNode->advertiseService(adResume);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adReset = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
-			"reset",boost::bind(&Simulation::Reset,this,_1,_2),ros::VoidPtr(), &queue
+			"Reset",boost::bind(&Simulation::Reset,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceReset = rosNode->advertiseService(adReset);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adStep = ros::AdvertiseServiceOptions::create<sim::Step>(
-			"step",boost::bind(&Simulation::Step,this,_1,_2),ros::VoidPtr(), &queue
+			"Step",boost::bind(&Simulation::Step,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceStep = rosNode->advertiseService(adStep);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adNoise = ros::AdvertiseServiceOptions::create<sim::Noise>(
-			"noise",boost::bind(&Simulation::Noise,this,_1,_2),ros::VoidPtr(), &queue
+			"Noise",boost::bind(&Simulation::Noise,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceNoise = rosNode->advertiseService(adNoise);
 
 		// Advertise more services on the custom queue
 		ros::AdvertiseServiceOptions adSeed = ros::AdvertiseServiceOptions::create<sim::Seed>(
-			"seed",boost::bind(&Simulation::Seed,this,_1,_2),ros::VoidPtr(), &queue
+			"Seed",boost::bind(&Simulation::Seed,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceSeed = rosNode->advertiseService(adSeed);
 
@@ -258,7 +254,8 @@ namespace gazebo
 		topicContacts = rosNode->advertise<sim::Contacts>("contacts",10);
 
 		// Set param for use_sim_time if not set by user already
-		rosNode->setParam("/use_sim_time", true);
+		rosNode->setParam("/use_sim_time",  true);
+		rosNode->setParam("/use_sim_noise", true);
     }
 
     // Setup the thread queue
@@ -457,9 +454,7 @@ namespace gazebo
 	bool Noise(sim::Noise::Request &req, sim::Noise::Response &res)
 	{
 		// Create and publish the message
-		msgs::Noise msg;
-		msg.set_enabled(req.enable);
-		pubNoise->Publish(msg);
+		rosNode->setParam("/use_sim_noise", req.enable);
 
 		// Keep steps to a reasonable length
 		res.success = true;

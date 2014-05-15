@@ -1,26 +1,23 @@
-#include <hal/model/quadrotor/controller/Emergency.h>
+#include <hal/model/controller/Emergency.h>
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool Emergency::Receive(
+bool Emergency::SetGoal(
     hal_model_quadrotor::Emergency::Request  &req, 
     hal_model_quadrotor::Emergency::Response &res
 ) {
-    return Switch();
+    return true;
 }
 
-Emergency::Emergency(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Emergency::Request, hal_model_quadrotor::Emergency::Response>(name)
+Emergency::Emergency() : Controller()
 {
 	Reset();
 }
 
-hal_model_quadrotor::Control Emergency::Update(
-	const hal_model_quadrotor::State &state, 
-	const double &dt
-) {
-	hal_model_quadrotor::Control control;
-    return control;
+bool Emergency::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
+    return true;
 }
 
 // Goal reach implementations

@@ -75,7 +75,6 @@ set(msgs
   src/msgs/meteorological.proto 
   src/msgs/environment.proto 
   src/msgs/satellites.proto
-  src/msgs/noise.proto
   src/msgs/wind.proto
   ${PROTOBUF_IMPORT_DIRS}/vector3d.proto
   ${PROTOBUF_IMPORT_DIRS}/header.proto

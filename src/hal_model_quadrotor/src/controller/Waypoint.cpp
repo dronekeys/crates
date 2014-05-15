@@ -1,4 +1,4 @@
-#include <hal/model/quadrotor/controller/Waypoint.h>
+#include <hal/model/controller/Waypoint.h>
 
 // COntroller constants
 #define _X          0
@@ -16,9 +16,9 @@
 #define _maxyawrate 4.4         /* max allowed yaw rate           */
 #define _maxv       5.0         /* max allowed xy velocity        */
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool Waypoint::Receive(
+bool Waypoint::SetGoal(
     hal_model_quadrotor::Waypoint::Request  &req, 
     hal_model_quadrotor::Waypoint::Response &res
 ) {
@@ -32,19 +32,17 @@ bool Waypoint::Receive(
     sp[_YAW] = req.yaw;
     
     // Try and switch control
-    return Switch();
+    return true;
 }
 
-Waypoint::Waypoint(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-    hal_model_quadrotor::Waypoint::Request, hal_model_quadrotor::Waypoint::Response>(name)
+Waypoint::Waypoint() : Controller()
 {
     Reset();
 }
 
-hal_model_quadrotor::Control Waypoint::Update(
-    const hal_model_quadrotor::State &state, 
-    const double &dt
-) {
+bool Waypoint::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
     /******************************************************************
     %  Computes the quadtotor control signals given the current state 
     %  and a desired waypoint. The desired attitude is enforced by a
@@ -55,30 +53,30 @@ hal_model_quadrotor::Control Waypoint::Update(
     ******************************************************************/
     
     // Obtain a b-frame (u,v) velocities
-    double d = sqrt((sp[_X]-state.position.x)*(sp[_X]-state.position.x)
-                   +(sp[_Y]-state.position.y)*(sp[_Y]-state.position.y));
-    double a = atan2(sp[_Y]-state.position.y , sp[_X]-state.position.x) - state.orientation.z;
+    double d = sqrt((sp[_X]-state.x)*(sp[_X]-state.x)
+                   +(sp[_Y]-state.y)*(sp[_Y]-state.y));
+    double a = atan2(sp[_Y]-state.y , sp[_X]-state.x) - state.yaw;
     double bx = d * cos(a);
     double by = d * sin(a); 
     
     ////////////////////// P ROLL CONTROLLER ////////////////////////
 
     double desu = limit(_Kxy*bx,-_maxv,_maxv);
-    double desP = limit( _Kv*(desu - state.linvelocity.x), -_maxtilt, _maxtilt);
+    double desP = limit( _Kv*(desu - state.u), -_maxtilt, _maxtilt);
     
     ////////////////////// P PITCH CONTROLLER ////////////////////////
 
     double desv = limit(_Kxy*by,-_maxv,_maxv);
-    double desR = limit(-_Kv*(desv - state.linvelocity.y), -_maxtilt, _maxtilt);
+    double desR = limit(-_Kv*(desv - state.v), -_maxtilt, _maxtilt);
     
     //////////////////////// P YAW CONTROLLER ////////////////////////
 
-    double desY = limit(_Kya * (sp[_YAW] - state.orientation.z), -_maxyawrate, _maxyawrate);
+    double desY = limit(_Kya * (sp[_YAW] - state.yaw), -_maxyawrate, _maxyawrate);
     
     /////////////////// PID THROTTLE CONTROLLER //////////////////////
 
     // Get the (P)roportional component (Changed by Andrew)
-    double ez_ = sp[_Z] - state.position.z;
+    double ez_ = sp[_Z] - state.z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;
@@ -100,12 +98,11 @@ hal_model_quadrotor::Control Waypoint::Update(
     first = false;
 
     // This will be returned
-    hal_model_quadrotor::Control control;
     control.roll     = desR;
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
-    return control;
+    return true;
 }
 
 // Goal reach implementations

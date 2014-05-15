@@ -2,23 +2,20 @@
 #define HAL_MODEL_QUADROTOR_VELOCITYHEIGHT_H
 
 // Base controller type
-#include <hal/controller/Controller.h>
+#include <hal/model/controller/Controller.h>
 
 // Messages used by this controller
-#include <hal_model_quadrotor/State.h>
-#include <hal_model_quadrotor/Control.h>
 #include <hal_model_quadrotor/VelocityHeight.h>
 
 namespace hal
 {
-    namespace controller
+    namespace model
     {
         //! A quadrotor Emergency controller
         /*!
           A more elaborate class description.
         */
-        class VelocityHeight : public Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-            hal_model_quadrotor::VelocityHeight::Request, hal_model_quadrotor::VelocityHeight::Response>
+        class VelocityHeight : public Controller
         {
 
         private:
@@ -36,32 +33,31 @@ namespace hal
             double ep[2];
             double sp[4];
 
+        public:
+
             //! Callback for goal update
             /*!
               \param req the goal request
               \param res the goal response
               \return whether the control was accepted
             */
-            bool Receive(
+            bool SetGoal(
                 hal_model_quadrotor::VelocityHeight::Request& req, 
                 hal_model_quadrotor::VelocityHeight::Response& res
             );
 
-        public:
-
             /// Constructor
-            VelocityHeight(const char* name);
+            VelocityHeight();
 
-            //! Control update implementations
+            //! Obtain control from state and timestep
             /*!
               \param state the current platform state
-              \param dt the discrete time tick
-              \return the control required to move from the current state to the goal 
+              \param dt the discrete time step
+              \param control the output control from the controller
+              \return if the state could be updated
             */
-            hal_model_quadrotor::Control Update(
-                const hal_model_quadrotor::State &state, 
-                const double &dt
-            );
+            bool Update(const hal_model_quadrotor::State &state, 
+                double dt, hal_model_quadrotor::Control &control);
 
             //! Goal reach implementations
             /*!

@@ -1,4 +1,4 @@
-#include <hal/model/quadrotor/controller/AnglesHeight.h>
+#include <hal/model/controller/AnglesHeight.h>
 
 // Constant parameters
 #define _Kv         0.09     /* xy velocity proportional constant  */
@@ -10,35 +10,35 @@
 #define _Kdz        0.04     /* altitude derivative constant       */
 #define _th_hover   0.59     /* throttle hover offset              */
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool AnglesHeight::Receive(
+bool AnglesHeight::SetGoal(
     hal_model_quadrotor::AnglesHeight::Request  &req, 
     hal_model_quadrotor::AnglesHeight::Response &res
 ) {
-    // Rest the controller
+    // Rest the controller to clear all intermediate variables
     Reset();
 
-    // Set the new goal
+    // Set the new goal state from the message
     sp[_ROLL]   = req.roll;
     sp[_PITCH]  = req.pitch;
     sp[_YAW]    = req.yaw;
     sp[_HEIGHT] = req.z;
 
     // Eveything OK
-    return Switch();
+    return true;
 }
 
-AnglesHeight::AnglesHeight(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-    hal_model_quadrotor::AnglesHeight::Request, hal_model_quadrotor::AnglesHeight::Response>(name)
+AnglesHeight::AnglesHeight() : Controller()
 {
+    // Reset the controller
     Reset();
 }
 
-hal_model_quadrotor::Control AnglesHeight::Update(
-    const hal_model_quadrotor::State &state, 
-    const double &dt
-) {
+bool AnglesHeight::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
+
     /******************************************************************
     %  Computes the quadrotor control signals given the current state, 
     %  desired angles, heading and altitude
@@ -54,12 +54,12 @@ hal_model_quadrotor::Control AnglesHeight::Update(
 
     ////////////////////////// YAW CONTROLLER /////////////////////////
 
-    double ya = limit(_Kya*(sp[_YAW] - state.orientation.z),-_maxyawrate,_maxyawrate);
+    double ya = limit(_Kya*(sp[_YAW] - state.yaw),-_maxyawrate,_maxyawrate);
 
     //////////////////////// THROTTLE CONTROLLER ////////////////////////
 
     // Get the (P)roportional component (sign change by Andrew)
-    double ez_ = sp[_HEIGHT] - state.position.z;
+    double ez_ = sp[_HEIGHT] - state.z;
 
     // Get the (I)ntegral component
     iz = iz + ez_ * dt;
@@ -81,12 +81,11 @@ hal_model_quadrotor::Control AnglesHeight::Update(
     first = false;
     
     // This will be returned
-    hal_model_quadrotor::Control control;
     control.roll     = sp[_ROLL];
     control.pitch    = sp[_PITCH];
     control.yaw      = ya;
     control.throttle = th;
-    return control;
+    return true;
 }
 
 // Goal reach implementations

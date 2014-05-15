@@ -1,26 +1,23 @@
-#include <hal/model/quadrotor/controller/Land.h>
+#include <hal/model/controller/Land.h>
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool Land::Receive(
+bool Land::SetGoal(
     hal_model_quadrotor::Land::Request  &req, 
     hal_model_quadrotor::Land::Response &res
 ) {
-    return Switch();
+    return true;
 }
 
-Land::Land(const char *name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Land::Request, hal_model_quadrotor::Land::Response>(name)
+Land::Land() : Controller()
 {
     Reset();
 }
 
-hal_model_quadrotor::Control Land::Update(
-	const hal_model_quadrotor::State &state, 
-	const double &dt
-) {
-	hal_model_quadrotor::Control control;
-    return control;
+bool Land::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
+    return true;
 }
 
 // Goal reach implementations

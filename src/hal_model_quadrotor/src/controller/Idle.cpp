@@ -1,26 +1,23 @@
-#include <hal/model/quadrotor/controller/Idle.h>
+#include <hal/model/controller/Idle.h>
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool Idle::Receive(
+bool Idle::SetGoal(
     hal_model_quadrotor::Idle::Request  &req, 
     hal_model_quadrotor::Idle::Response &res
 ) {
-   return Switch();
+   return true;
 }
 
-Idle::Idle(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Idle::Request, hal_model_quadrotor::Idle::Response>(name)
+Idle::Idle() : Controller()
 {
     Reset();
 }
 
-hal_model_quadrotor::Control Idle::Update(
-	const hal_model_quadrotor::State &state, 
-	const double &dt
-) {
-	hal_model_quadrotor::Control control;
-    return control;
+bool Idle::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
+    return true;
 }
 
 // Goal reach implementations

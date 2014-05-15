@@ -1,26 +1,23 @@
-#include <hal/model/quadrotor/controller/Takeoff.h>
+#include <hal/model/controller/Takeoff.h>
 
-using namespace hal::controller;
+using namespace hal::model;
 
-bool Takeoff::Receive(
+bool Takeoff::SetGoal(
     hal_model_quadrotor::Takeoff::Request  &req, 
     hal_model_quadrotor::Takeoff::Response &res
 ) {
-    return Switch();
+    return true;
 }
 
-Takeoff::Takeoff(const char* name) : Controller<hal_model_quadrotor::State, hal_model_quadrotor::Control,
-	hal_model_quadrotor::Takeoff::Request, hal_model_quadrotor::Takeoff::Response>(name)
+Takeoff::Takeoff() : Controller()
 {
     Reset();
 }
 
-hal_model_quadrotor::Control Takeoff::Update(
-	const hal_model_quadrotor::State &state, 
-	const double &dt
-) {
-	hal_model_quadrotor::Control control;
-    return control;
+bool Takeoff::Update(const hal_model_quadrotor::State &state, 
+    double dt, hal_model_quadrotor::Control &control)
+{
+    return true;
 }
 
 // Goal reach implementations
