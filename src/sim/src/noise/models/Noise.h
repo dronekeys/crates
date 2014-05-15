@@ -24,6 +24,11 @@ namespace gazebo
         */
         virtual double Sample(double dt = 0) = 0;
 
+        virtual ~Noise()
+          {
+          }
+        
+
     };
 }
 
