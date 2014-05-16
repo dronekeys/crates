@@ -23,23 +23,28 @@ bool VelocityHeight::SetGoal(
     hal_model_quadrotor::VelocityHeight::Request  &req, 
     hal_model_quadrotor::VelocityHeight::Response &res
 ) {
-
-    // Rest the controller
-    Reset();
-
     // Horizontal velocity 
     sp[_U]      = req.u;
     sp[_V]      = req.v;
     sp[_YAW]    = req.yaw;
     sp[_HEIGHT] = req.z;
 
-    // Try and switch control
-    return true;
-}
+    // PID carries
+    for (int i = 0; i < 2; i++)
+    {
+        ei[i] = 0.0;
+        ep[i] = 0.0;
+    }
+    ez = 0.0;
+    iz = 0.0;
 
-VelocityHeight::VelocityHeight()
-{
-    Reset();
+    // Reset
+    first = true;
+
+    // Try and switch control
+    res.success = true;
+    res.status  = "Successfully switched to VelocityHeight controller";
+    return true;
 }
 
 bool VelocityHeight::Update(const hal_model_quadrotor::State &state, 
@@ -130,34 +135,15 @@ bool VelocityHeight::Update(const hal_model_quadrotor::State &state,
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
+
+    //////////////////////// CHECK IF GOAL REACHED //////////////////////
+
+    // Success!    
     return true;
 }
 
 // Goal reach implementations
 bool VelocityHeight::HasGoalBeenReached()
 {
-    return reach;
-}
-
-// Reset the current state
-void VelocityHeight::Reset()
-{
-    // Horizontal velocity 
-    sp[_U]      = 0.0;
-    sp[_V]      = 0.0;
-    sp[_YAW]    = 0.0;
-    sp[_HEIGHT] = 0.0;
-
-    // PID carries
-    for (int i = 0; i < 2; i++)
-    {
-        ei[i] = 0.0;
-        ep[i] = 0.0;
-    }
-    ez = 0.0;
-    iz = 0.0;
-
-    // Reset
-    first = true;
-    reach = false;
+    return false;
 }

@@ -23,23 +23,24 @@ bool Velocity::SetGoal(
     hal_model_quadrotor::Velocity::Request  &req, 
     hal_model_quadrotor::Velocity::Response &res
 ) {
-
-    // Rest the controller
-    Reset();
-
     // Set the velocity
     sp[_X]   = req.u;
     sp[_Y]   = req.v;
     sp[_Z]   = req.w;
     sp[_YAW] = req.yaw;
 
-    // Try and switch control
-    return true;
-}
+    for (int i = 0; i < 3; i++)
+    {
+        ei[i] = 0.0;
+        ep[i] = 0.0;
+    }
 
-Velocity::Velocity()
-{
-    Reset();
+    // Reset
+    first = true;
+
+    res.success = true;
+    res.status  = "Successfully switched to Velocity controller";
+    return true;
 }
 
 bool Velocity::Update(const hal_model_quadrotor::State &state, 
@@ -115,32 +116,14 @@ bool Velocity::Update(const hal_model_quadrotor::State &state,
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = desT;
+
+    //////////////////////// CHECK IF GOAL REACHED //////////////////////
+
     return true;
 }
 
 // Goal reach implementations
 bool Velocity::HasGoalBeenReached()
 {
-    return reach;
-}
-
-// Reset the current state
-void Velocity::Reset()
-{
-    // Set the velocity
-    sp[_X]   = 0.0;
-    sp[_Y]   = 0.0;
-    sp[_Z]   = 0.0;
-    sp[_YAW] = 0.0;
-
-    // For 
-    for (int i = 0; i < 3; i++)
-    {
-        ei[i] = 0.0;
-        ep[i] = 0.0;
-    }
-
-    // Reset
-    first = true;
-    reach = false;
+    return false;
 }

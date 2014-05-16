@@ -18,14 +18,6 @@ namespace hal
         class Emergency : public Controller
         {
 
-        private:
-
-            /// If this is the first iteration since reset
-            bool first; 
-            
-            /// If we have reached the goal
-            bool reach;
-
         public:
 
             //! Callback for goal update
@@ -38,9 +30,6 @@ namespace hal
                 hal_model_quadrotor::Emergency::Request& req, 
                 hal_model_quadrotor::Emergency::Response& res
             );
-
-            /// Constructor
-            Emergency();
 
             //! Obtain control from state and timestep
             /*!
@@ -57,10 +46,6 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
-            /// Reset the current state
-            void Reset();
-
         };
     }
 }

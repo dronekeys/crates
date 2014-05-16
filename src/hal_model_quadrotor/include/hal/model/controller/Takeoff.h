@@ -26,6 +26,11 @@ namespace hal
             /// If we have reached the goal
             bool reach;
 
+            // PID parameters
+            double iz;
+            double ez;
+            double sp[4];
+            
         public:
 
             //! Callback for goal update
@@ -38,9 +43,6 @@ namespace hal
                 hal_model_quadrotor::Takeoff::Request& req, 
                 hal_model_quadrotor::Takeoff::Response& res
             );
-
-            /// Constructor
-            Takeoff();
 
             //! Obtain control from state and timestep
             /*!
@@ -57,9 +59,6 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
-            /// Reset the current state
-            void Reset();
         };
     }
 }

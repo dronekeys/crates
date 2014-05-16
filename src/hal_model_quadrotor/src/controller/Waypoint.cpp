@@ -22,22 +22,24 @@ bool Waypoint::SetGoal(
     hal_model_quadrotor::Waypoint::Request  &req, 
     hal_model_quadrotor::Waypoint::Response &res
 ) {
-    // Rest the controller
-    Reset();
-
     // Set the new goal
     sp[_X]   = req.x;
     sp[_Y]   = req.y;
     sp[_Z]   = req.z;
     sp[_YAW] = req.yaw;
     
-    // Try and switch control
-    return true;
-}
+    // Carries for altitude PID
+    iz = 0.0;
+    ez = 0.0;
 
-Waypoint::Waypoint()
-{
-    Reset();
+    // Reset
+    first = true;
+    reach = false;
+
+    // Success!
+    res.success = true;
+    res.status  = "Successfully switched to Waypoint controller";
+    return true;
 }
 
 bool Waypoint::Update(const hal_model_quadrotor::State &state, 
@@ -102,29 +104,25 @@ bool Waypoint::Update(const hal_model_quadrotor::State &state,
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
+
+    //////////////////////// CHECK IF GOAL REACHED //////////////////////
+
+    double dist = sqrt(
+            (sp[_X]-state.x)*(sp[_X]-state.x) 
+        +   (sp[_Y]-state.y)*(sp[_Y]-state.y)
+        +   (sp[_Z]-state.z)*(sp[_Z]-state.z)
+    );
+    if (!reach && dist < 1.0)
+        reach = true;
+
+    /////////////////////////////////////////////////////////////////////
+
+    // Success!    
     return true;
 }
 
 // Goal reach implementations
 bool Waypoint::HasGoalBeenReached()
 {
-    return reach;
-}
-
-// Reset the current state
-void Waypoint::Reset()
-{
-    // Set the new goal
-    sp[_X]   = 0.0;
-    sp[_Y]   = 0.0;
-    sp[_Z]   = 0.0;
-    sp[_YAW] = 0.0;
-
-    // Carries for altitude PID
-    iz = 0.0;
-    ez = 0.0;
-
-    // Reset
-    first = true;
-    reach = false;
+    return false;
 }

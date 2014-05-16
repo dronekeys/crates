@@ -23,9 +23,6 @@ namespace hal
             /// If this is the first iteration since reset
             bool first; 
             
-            /// If we have reached the goal
-            bool reach;
-
             // PID parameters
             double ei[3];
             double ep[3];
@@ -44,9 +41,6 @@ namespace hal
                 hal_model_quadrotor::Velocity::Response& res
             );
 
-            /// Constructor
-            Velocity();
-
             //! Obtain control from state and timestep
             /*!
               \param state the current platform state
@@ -62,9 +56,6 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
-            /// Reset the current state
-            void Reset();
         };
     }
 }

@@ -38,15 +38,7 @@ namespace hal
               \return Whether the goal has been reached
             */
             virtual bool HasGoalBeenReached() = 0;
-
-            /// Reset the current state
-            virtual void Reset() = 0;
-
         };
-
-        // For dlopen()
-        typedef Controller* create_t();
-        typedef void destroy_t(Controller*);
     }
 }
 

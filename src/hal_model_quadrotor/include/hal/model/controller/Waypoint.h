@@ -19,7 +19,7 @@ namespace hal
             /// If this is the first iteration since reset
             bool first; 
             
-            /// If we have reached the goal
+            /// Have we reached the waypoint
             bool reach;
 
             // PID parameters
@@ -40,9 +40,6 @@ namespace hal
                 hal_model_quadrotor::Waypoint::Response& res
             );
 
-            /// Constructor
-            Waypoint();
-
             //! Obtain control from state and timestep
             /*!
               \param state the current platform state
@@ -58,9 +55,6 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
-            /// Reset the current state
-            void Reset();
         };
     }
 }

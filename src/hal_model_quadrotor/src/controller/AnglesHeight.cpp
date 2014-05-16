@@ -16,23 +16,23 @@ bool AnglesHeight::SetGoal(
     hal_model_quadrotor::AnglesHeight::Request  &req, 
     hal_model_quadrotor::AnglesHeight::Response &res
 ) {
-    // Rest the controller to clear all intermediate variables
-    Reset();
-
     // Set the new goal state from the message
     sp[_ROLL]   = req.roll;
     sp[_PITCH]  = req.pitch;
     sp[_YAW]    = req.yaw;
     sp[_HEIGHT] = req.z;
 
-    // Eveything OK
-    return true;
-}
+    // Carry for altitude PID
+    iz = 0.0;
+    ez = 0.0;
 
-AnglesHeight::AnglesHeight()
-{
-    // Reset the controller
-    Reset();
+    // Reset
+    first = true;
+
+    // Eveything OK
+    res.success = true;
+    res.status  = "Successfully switched to AnglesHeight controller";
+    return true;
 }
 
 bool AnglesHeight::Update(const hal_model_quadrotor::State &state, 
@@ -85,29 +85,15 @@ bool AnglesHeight::Update(const hal_model_quadrotor::State &state,
     control.pitch    = sp[_PITCH];
     control.yaw      = ya;
     control.throttle = th;
+    
+    //////////////////////// CHECK IF GOAL REACHED //////////////////////
+
+    // Success!    
     return true;
 }
 
 // Goal reach implementations
 bool AnglesHeight::HasGoalBeenReached()
 {
-    return reach;
-}
-
-// Reset the current state
-void AnglesHeight::Reset()
-{
-    // Reset goal
-    sp[_ROLL]   = 0.0;
-    sp[_PITCH]  = 0.0;
-    sp[_YAW]    = 0.0;
-    sp[_HEIGHT] = 0.0;
-
-    // Carry for altitude PID
-    iz = 0.0;
-    ez = 0.0;
-
-    // Reset
-    first = true;
-    reach = false;
+    return false;
 }

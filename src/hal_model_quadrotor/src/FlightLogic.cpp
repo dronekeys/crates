@@ -49,15 +49,10 @@ bool FlightLogic::Update(const hal_model_quadrotor::State &state,
 		switch (current)
 		{
 		case TAKEOFF:
-		case ANGLES_HEIGHT: 
-		case VELOCITY_HEIGHT: 
-		case VELOCITY: 
-		case WAYPOINT:
 			current = HOVER;
-			ptr = (Controller*) &cHover;
+			ptr = (Controller*) &cIdle;
 			break;
 
-		// At the end of landing, switch to idle
 		case LAND:
 			current = IDLE;
 			ptr = (Controller*) &cIdle;
@@ -83,7 +78,10 @@ bool FlightLogic::RcvAnglesHeight(
 		cAnglesHeight.SetGoal(req, res);
 		if (res.success)
 			Switch(ANGLES_HEIGHT);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -111,7 +109,10 @@ bool FlightLogic::RcvHover(
 		cHover.SetGoal(req, res);
 		if (res.success)
 			Switch(HOVER);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -129,7 +130,10 @@ bool FlightLogic::RcvLand(
 		cLand.SetGoal(req, res);
 		if (res.success)
 			Switch(LAND);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -143,7 +147,10 @@ bool FlightLogic::RcvTakeoff(
 		cTakeoff.SetGoal(req, res);
 		if (res.success)
 			Switch(TAKEOFF);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -161,7 +168,10 @@ bool FlightLogic::RcvVelocity(
 		cVelocity.SetGoal(req, res);
 		if (res.success)
 			Switch(VELOCITY);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -179,7 +189,10 @@ bool FlightLogic::RcvVelocityHeight(
 		cVelocityHeight.SetGoal(req, res);
 		if (res.success)
 			Switch(VELOCITY_HEIGHT);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }
 
@@ -197,6 +210,9 @@ bool FlightLogic::RcvWaypoint(
 		cWaypoint.SetGoal(req, res);
 		if (res.success)
 			Switch(WAYPOINT);
+		return true;
 	}
+    res.success = false;
+    res.status  = "Controller switch denied from current state";
 	return true;
 }

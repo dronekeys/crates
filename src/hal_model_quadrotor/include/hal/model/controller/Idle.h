@@ -14,19 +14,7 @@ namespace hal
         */
         class Idle : public Controller
         {
-
-        private:
-
-            /// If this is the first iteration since reset
-            bool first; 
-            
-            /// If we have reached the goal
-            bool reach;
-        
         public:
-
-            /// Constructor
-            Idle();
 
             //! Obtain control from state and timestep
             /*!
@@ -43,9 +31,6 @@ namespace hal
               \return Whether the goal has been reached
             */
             bool HasGoalBeenReached();
-
-            /// Reset the current state
-            void Reset();
         };
     }
 }
