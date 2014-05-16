@@ -240,7 +240,7 @@ namespace gazebo
 
 			//  Create a pre-physics update call
 			conPtr = event::Events::ConnectWorldUpdateBegin(boost::bind(&Quadrotor::PrePhysics, this, _1));
-
+			
 			// Aways issue a reset on load
 			Reset();
 	    }
@@ -269,6 +269,9 @@ namespace gazebo
 			state.u = vel.x;
 			state.v = vel.y;
 			state.w = vel.z;
+			state.p = ang.x;
+			state.q = ang.y;
+			state.r = ang.z;
 			state.thrust = thrust;
 			state.voltage = voltage;
 		}

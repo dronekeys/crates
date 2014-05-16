@@ -70,9 +70,6 @@ namespace gazebo
                 else
                     wind.Set(0,0,0);
 
-                //ROS_WARN("%f %f %f", wind.x, wind.y, wind.z);
-                ROS_WARN("Received wind %f %f %f",wind.x,wind.y,wind.x);
-
                 // Add the force to the body
                 modPtr->GetLink("body")->AddRelativeForce(
                     q.RotateVector(wind)

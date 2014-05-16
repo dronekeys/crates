@@ -73,6 +73,8 @@ add_service_files(
     Waypoint.srv
     SetState.srv
     SetControl.srv
+    GetState.srv
+    GetControl.srv
 )
 
 ## Generate actions in the 'action' folder

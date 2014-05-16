@@ -7,7 +7,7 @@
     <static>false</static>
 
     <!-- Initial pose -->
-    <pose>0 0 2  0 0 0</pose>
+    <pose>0 0 1  0 0 0</pose>
 
     <!-- Frame -->
     <link name="body">
@@ -130,14 +130,18 @@
         </voltage>
       </control>
     </plugin>
-    
+
+    <!-- Aerodynamic drag -->
+    <plugin name="drag" filename="libsim_drag.so">
+      <kuv>-4.97391e-01</kuv>
+      <kw>-1.35341</kw>
+    </plugin>
+
     <!-- Wind shear  -->
-    <!--
     <plugin name="shear" filename="libsim_shear.so">
-      <speed>5.0</speed>
+      <speed>1.0</speed>
       <direction>90</direction>
     </plugin>
-    -->
       
     <!-- Turbulence -->
     <!--
@@ -146,14 +150,7 @@
       <direction>90.0</direction>
     </plugin>
     -->
-    
-    <!-- Aerodynamic drag -->
-    <!--
-    <plugin name="drag" filename="libsim_drag.so">
-      <kuv>-4.97391e-01</kuv>
-      <kw>-1.35341</kw>
-    </plugin>
-    -->
+
 
     <!--
 

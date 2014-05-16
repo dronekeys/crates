@@ -37,14 +37,15 @@
     </include>
 
     <!-- Location -->
+    <!--
     <include>
       <uri>model://hawkshead</uri>
     </include>
-    <!--  
+    -->
+    
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    -->
 
     <!-- Location -->
     <include>

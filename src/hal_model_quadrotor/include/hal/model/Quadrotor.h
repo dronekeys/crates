@@ -14,6 +14,8 @@
 // Services
 #include <hal_model_quadrotor/SetState.h>
 #include <hal_model_quadrotor/SetControl.h>
+#include <hal_model_quadrotor/GetState.h>
+#include <hal_model_quadrotor/GetControl.h>
 
 namespace hal
 {
@@ -41,6 +43,8 @@ namespace hal
             /// Timers
             ros::ServiceServer srvSetState;         /*!< Update loop timer       */
             ros::ServiceServer srvSetControl;       /*!< State broadcast timer   */
+            ros::ServiceServer srvGetState;         /*!< Update loop timer       */
+            ros::ServiceServer srvGetControl;       /*!< State broadcast timer   */
 
             /// Timers
             ros::Timer timerUpdate;                 /*!< Update loop timer       */
@@ -81,7 +85,7 @@ namespace hal
               \param res service response
               \return whether the packet was process successfully
             */
-            bool RcvState(
+            bool RcvSetState(
                 hal_model_quadrotor::SetState::Request  &req, 
                 hal_model_quadrotor::SetState::Response &res
             );
@@ -92,11 +96,32 @@ namespace hal
               \param res service response
               \return whether the packet was process successfully
             */
-            bool RcvControl(
+            bool RcvSetControl(
                 hal_model_quadrotor::SetControl::Request  &req, 
                 hal_model_quadrotor::SetControl::Response &res
             );
 
+            //! Service callback for getting the state
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvGetState(
+                hal_model_quadrotor::GetState::Request  &req, 
+                hal_model_quadrotor::GetState::Response &res
+            );
+
+            //! Service callback for getting the control
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvGetControl(
+                hal_model_quadrotor::GetControl::Request  &req, 
+                hal_model_quadrotor::GetControl::Response &res
+            );
         protected:
 
             //! Get the state of the quadrotor from the FCS

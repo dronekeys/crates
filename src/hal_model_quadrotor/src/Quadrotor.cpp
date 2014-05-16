@@ -39,7 +39,7 @@ Quadrotor::Quadrotor() : hal::HAL()
     // Do nothing
 }
 
-bool Quadrotor::RcvState(
+bool Quadrotor::RcvSetState(
     hal_model_quadrotor::SetState::Request  &req, 
     hal_model_quadrotor::SetState::Response &res)
 {
@@ -52,7 +52,7 @@ bool Quadrotor::RcvState(
     return true;
 }
 
-bool Quadrotor::RcvControl(
+bool Quadrotor::RcvSetControl(
     hal_model_quadrotor::SetControl::Request  &req, 
     hal_model_quadrotor::SetControl::Response &res)
 {
@@ -71,15 +71,35 @@ bool Quadrotor::RcvControl(
     return true;
 }
 
+bool Quadrotor::RcvGetState(
+    hal_model_quadrotor::GetState::Request  &req, 
+    hal_model_quadrotor::GetState::Response &res)
+{
+    res.state = state;
+    return true;
+}
+
+bool Quadrotor::RcvGetControl(
+    hal_model_quadrotor::GetControl::Request  &req, 
+    hal_model_quadrotor::GetControl::Response &res)
+{
+    res.control = control;
+    return true;
+}
+
 void Quadrotor::OnInit()
 {
+    // Additional ROS services to manually set the control and state
+    srvGetState   = GetRosNodePtr()->advertiseService("GetState",   &Quadrotor::RcvGetState, this);
+    srvGetControl = GetRosNodePtr()->advertiseService("GetControl", &Quadrotor::RcvGetControl, this);
+
     // If we are using simulation time, then we are in simulation mode
     bool isSimulated = false;
     if (GetRosNodePtr()->getParam("/use_sim_time",isSimulated) && isSimulated)
     {
         // Additional ROS services to manually set the control and state
-        srvSetState   = GetRosNodePtr()->advertiseService("SetState",   &Quadrotor::RcvState, this);
-        srvSetControl = GetRosNodePtr()->advertiseService("SetControl", &Quadrotor::RcvControl, this);
+        srvSetState   = GetRosNodePtr()->advertiseService("SetState",   &Quadrotor::RcvSetState, this);
+        srvSetControl = GetRosNodePtr()->advertiseService("SetControl", &Quadrotor::RcvSetControl, this);
     }
 
     // Advertise this message on the ROS backbone
