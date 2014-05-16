@@ -35,7 +35,7 @@ bool Waypoint::SetGoal(
     return true;
 }
 
-Waypoint::Waypoint() : Controller()
+Waypoint::Waypoint()
 {
     Reset();
 }

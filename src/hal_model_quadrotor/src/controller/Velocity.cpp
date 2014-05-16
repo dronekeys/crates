@@ -37,7 +37,7 @@ bool Velocity::SetGoal(
     return true;
 }
 
-Velocity::Velocity() : Controller()
+Velocity::Velocity()
 {
     Reset();
 }

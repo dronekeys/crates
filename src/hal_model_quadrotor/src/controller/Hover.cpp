@@ -6,11 +6,10 @@ bool Hover::SetGoal(
     hal_model_quadrotor::Hover::Request  &req, 
     hal_model_quadrotor::Hover::Response &res
 ) {
-    // Try and switch control
     return true;
 }
 
-Hover::Hover() : Controller()
+Hover::Hover()
 {
     Reset();
 }

@@ -1,9 +1,6 @@
 #ifndef HAL_MODEL_QUADROTOR_FLIGHTLOGIC_H
 #define HAL_MODEL_QUADROTOR_FLIGHTLOGIC_H
 
-// System includes
-#include <map>
-
 // Project includes
 #include <hal/model/controller/Emergency.h>
 #include <hal/model/controller/Hover.h>
@@ -44,6 +41,16 @@ namespace hal
 
     private:
 
+      // Create services
+      ros::ServiceServer srvAnglesHeight;
+      ros::ServiceServer srvEmergency;
+      ros::ServiceServer srvHover;
+      ros::ServiceServer srvLand;
+      ros::ServiceServer srvTakeoff;
+      ros::ServiceServer srvVelocity;
+      ros::ServiceServer srvVelocityHeight;
+      ros::ServiceServer srvWaypoint;
+
       // One of each controller
       AnglesHeight    cAnglesHeight;
       Emergency       cEmergency;
@@ -58,16 +65,7 @@ namespace hal
       /// The current controller
       ControllerType  current;
 
-      /// List of services
-      std::map<ControllerType,ros::ServiceServer> services;
-
     public:    
-
-      /// Constructor
-      FlightLogic();
-
-      /// Destructor
-      ~FlightLogic();
 
       //! Initialise the controller factory
       /*!
@@ -125,17 +123,6 @@ namespace hal
       bool RcvHover(
           hal_model_quadrotor::Hover::Request  &req, 
           hal_model_quadrotor::Hover::Response &res
-      );
-                  
-      //! Callback for new Idle request
-      /*!
-        \param req service request
-        \param res service response
-        \return whether the packet was process successfully
-      */
-      bool RcvIdle(
-          hal_model_quadrotor::Idle::Request  &req, 
-          hal_model_quadrotor::Idle::Response &res
       );
                   
       //! Callback for new Land request

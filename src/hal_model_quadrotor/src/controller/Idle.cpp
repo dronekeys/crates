@@ -2,14 +2,7 @@
 
 using namespace hal::model;
 
-bool Idle::SetGoal(
-    hal_model_quadrotor::Idle::Request  &req, 
-    hal_model_quadrotor::Idle::Response &res
-) {
-   return true;
-}
-
-Idle::Idle() : Controller()
+Idle::Idle()
 {
     Reset();
 }

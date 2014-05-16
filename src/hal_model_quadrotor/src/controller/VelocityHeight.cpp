@@ -37,7 +37,7 @@ bool VelocityHeight::SetGoal(
     return true;
 }
 
-VelocityHeight::VelocityHeight() : Controller()
+VelocityHeight::VelocityHeight()
 {
     Reset();
 }

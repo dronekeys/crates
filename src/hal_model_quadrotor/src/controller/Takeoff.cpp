@@ -9,7 +9,7 @@ bool Takeoff::SetGoal(
     return true;
 }
 
-Takeoff::Takeoff() : Controller()
+Takeoff::Takeoff()
 {
     Reset();
 }

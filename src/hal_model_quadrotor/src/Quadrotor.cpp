@@ -73,9 +73,6 @@ bool Quadrotor::RcvControl(
 
 void Quadrotor::OnInit()
 {
-    // Create all controllers and set the default one to IDLE (on the ground, motors off)
-    flightLogic.Init(GetRosNodePtr(), IDLE);
-
     // If we are using simulation time, then we are in simulation mode
     bool isSimulated = false;
     if (GetRosNodePtr()->getParam("/use_sim_time",isSimulated) && isSimulated)
@@ -111,5 +108,7 @@ void Quadrotor::OnInit()
         &Quadrotor::BroadcastControl, 
         this
     );
-    
+
+    // Create all controllers and set the default one to IDLE (on the ground, motors off)
+    flightLogic.Init(GetRosNodePtr(), IDLE);
 }

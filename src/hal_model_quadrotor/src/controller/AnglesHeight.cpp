@@ -29,7 +29,7 @@ bool AnglesHeight::SetGoal(
     return true;
 }
 
-AnglesHeight::AnglesHeight() : Controller()
+AnglesHeight::AnglesHeight()
 {
     // Reset the controller
     Reset();

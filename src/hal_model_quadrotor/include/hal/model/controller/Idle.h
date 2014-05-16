@@ -4,9 +4,6 @@
 // Base controller type
 #include <hal/model/controller/Controller.h>
 
-// Messages used by this controller
-#include <hal_model_quadrotor/Idle.h>
-
 namespace hal
 {
     namespace model
@@ -27,17 +24,6 @@ namespace hal
             bool reach;
         
         public:
-
-            //! Callback for goal update
-            /*!
-              \param req the goal request
-              \param res the goal response
-              \return whether the control was accepted
-            */
-            bool SetGoal(
-                hal_model_quadrotor::Idle::Request& req, 
-                hal_model_quadrotor::Idle::Response& res
-            );
 
             /// Constructor
             Idle();

@@ -16,35 +16,12 @@ namespace hal
         protected:
 
             // Clamp a value to a given range
-            static double limit(const double& val, const double& minval, const double& maxval)
-            {
-                if (val < minval) return minval;
-                if (val > maxval) return maxval;
-                return val;
-            }
+            static double limit(const double& val, const double& minval, const double& maxval);
 
             // Rotation from body to navigation frame
-            static void n2b(double rot[3], double vec[3])
-            {
-                double t[3], c[3], s[3];
-                for (int i = 0; i < 3; i++)
-                {
-                    t[i] = vec[i];
-                    c[i] = cos(rot[i]);
-                    s[i] = sin(rot[i]);
-                }
-                vec[0] =                (c[1]*c[2])*t[0] +                (c[1]*s[2])*t[1] -      s[1]*t[2];
-                vec[1] = (s[1]*s[0]*c[2]-s[2]*c[0])*t[0] + (s[1]*s[0]*s[2]+c[2]*c[0])*t[1] + c[1]*s[0]*t[2];
-                vec[2] = (s[1]*c[0]*c[2]-s[2]*s[0])*t[0] + (s[1]*c[0]*s[2]+c[2]*s[0])*t[1] + c[1]*c[0]*t[2];
-            }
+            static void n2b(double rot[3], double vec[3]);
 
         public:
-
-            /// Constructor
-            Controller();
-
-            /// Destructor
-            ~Controller();
 
             //! Each controller must provide the ability to generate control
             /*!
@@ -66,6 +43,10 @@ namespace hal
             virtual void Reset() = 0;
 
         };
+
+        // For dlopen()
+        typedef Controller* create_t();
+        typedef void destroy_t(Controller*);
     }
 }
 

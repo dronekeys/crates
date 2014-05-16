@@ -9,7 +9,7 @@ bool Emergency::SetGoal(
     return true;
 }
 
-Emergency::Emergency() : Controller()
+Emergency::Emergency()
 {
 	Reset();
 }

@@ -313,7 +313,6 @@ set(SYS_LIBS
   sim_core
 )
 
-
 ## System plugins
 target_link_libraries(sim_resources       ${SYS_LIBS})
 target_link_libraries(sim_experiment      ${SYS_LIBS})
@@ -376,11 +375,9 @@ target_link_libraries(sim_turbulence      ${SYS_LIBS})
 ## Testing ##
 #############
 
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uav_msgs.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+## Noise tests
+catkin_add_gtest(${PROJECT_NAME}_noise-test tests/TEST_${PROJECT_NAME}_noise.cpp)
+target_link_libraries(${PROJECT_NAME}_noise-test sim_core)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

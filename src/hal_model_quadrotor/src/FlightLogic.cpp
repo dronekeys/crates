@@ -2,39 +2,17 @@
 
 using namespace hal::model;
 
-FlightLogic::FlightLogic()
-{
-	// Do nothing
-}
-
-
-FlightLogic::~FlightLogic()
-{
-	// Do nothing
-}
-
 void FlightLogic::Init(ros::NodeHandle* nh, ControllerType controller)
-
 {
 	// Create services
-	services[ANGLES_HEIGHT] = nh->advertiseService(
-		"controller/AnglesHeight", &FlightLogic::RcvAnglesHeight, this);
-    services[EMERGENCY] = nh->advertiseService(
-    	"controller/Emergency", &FlightLogic::RcvEmergency, this);
-    services[HOVER] = nh->advertiseService(
-    	"controller/Hover", &FlightLogic::RcvHover, this);
-   	services[IDLE] = nh->advertiseService(
-   		"controller/Idle", &FlightLogic::RcvIdle, this);                
-    services[LAND] = nh->advertiseService(
-    	"controller/Land", &FlightLogic::RcvLand, this);                 
-    services[TAKEOFF] = nh->advertiseService(
-    	"controller/Takeoff", &FlightLogic::RcvTakeoff, this);
-    services[VELOCITY] = nh->advertiseService(
-    	"controller/Velocity", &FlightLogic::RcvVelocity, this);
-    services[VELOCITY_HEIGHT] = nh->advertiseService(
-    	"controller/VelocityHeight", &FlightLogic::RcvVelocityHeight, this);
-    services[WAYPOINT] = nh->advertiseService(
-    	"controller/Waypoint", &FlightLogic::RcvWaypoint, this);
+	srvAnglesHeight 	= nh->advertiseService("controller/AnglesHeight", &FlightLogic::RcvAnglesHeight, this);
+    srvEmergency 		= nh->advertiseService("controller/Emergency", &FlightLogic::RcvEmergency, this);
+    srvHover 			= nh->advertiseService("controller/Hover", &FlightLogic::RcvHover, this);
+    srvLand 			= nh->advertiseService("controller/Land", &FlightLogic::RcvLand, this);                 
+    srvTakeoff 			= nh->advertiseService("controller/Takeoff", &FlightLogic::RcvTakeoff, this);
+    srvVelocity 		= nh->advertiseService("controller/Velocity", &FlightLogic::RcvVelocity, this);
+    srvVelocityHeight 	= nh->advertiseService("controller/VelocityHeight", &FlightLogic::RcvVelocityHeight, this);
+    srvWaypoint 		= nh->advertiseService("controller/Waypoint", &FlightLogic::RcvWaypoint, this);
 
     // Set the starting controller
     Switch(controller);
@@ -60,7 +38,7 @@ bool FlightLogic::Update(const hal_model_quadrotor::State &state,
 		case VELOCITY_HEIGHT: 	ptr = (Controller*) &cVelocityHeight;	break;
 		case VELOCITY: 			ptr = (Controller*) &cVelocity;			break;
 		case WAYPOINT: 			ptr = (Controller*) &cWaypoint;			break;
-		default: 			
+		default:		
 			return false;
 	}
 

@@ -251,7 +251,7 @@ namespace gazebo
 		serviceSeed = rosNode->advertiseService(adSeed);
 
 	  	// Publish clock for simulated ros time
-		topicContacts = rosNode->advertise<sim::Contacts>("contacts",10);
+		topicContacts = rosNode->advertise<sim::Contacts>("Contacts",10);
 
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time",  true);

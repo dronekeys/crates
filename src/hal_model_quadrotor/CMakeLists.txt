@@ -64,7 +64,6 @@ add_service_files(
     srv
   FILES
     Emergency.srv
-    Idle.srv
     Takeoff.srv
     Hover.srv
     Land.srv
@@ -121,6 +120,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
 add_library(hal_model_quadrotor
+  src/controller/Controller.cpp
   src/controller/Idle.cpp
   src/controller/Takeoff.cpp
   src/controller/Hover.cpp
@@ -186,10 +186,8 @@ target_link_libraries(hal_model_quadrotor ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uav_msgs.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
+target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_model_quadrotor)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

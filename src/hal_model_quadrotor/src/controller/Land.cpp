@@ -9,7 +9,7 @@ bool Land::SetGoal(
     return true;
 }
 
-Land::Land() : Controller()
+Land::Land()
 {
     Reset();
 }
