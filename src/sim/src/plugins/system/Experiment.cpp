@@ -36,6 +36,12 @@ namespace gazebo
     transport::PublisherPtr                 pubRequest;
     transport::SubscriberPtr                subResponse;
 
+    /// Timers
+    ros::Timer                              timerSearch;
+    ros::master::V_TopicInfo                topics;
+    ros::V_string                           nodes;
+
+
   public:
 
     // Constructor
@@ -136,6 +142,13 @@ namespace gazebo
       pubRequest  = gazeboNode->Advertise<msgs::Request>("~/request");
       subResponse = gazeboNode->Subscribe("~/response",&Experiment::Response, this);
 
+      // Advertise more services on the custom queue
+      timerSearch = rosNode->createTimer(
+          ros::Duration(1.0), 
+          &Experiment::Search, 
+          this
+      );
+
       // Set param for use_sim_time if not set by user already
       rosNode->setParam("/use_sim_time", false);
     }
@@ -144,6 +157,22 @@ namespace gazebo
     void Response(ConstResponsePtr &response)
     {
       // Do nothing
+    }
+
+    // Search for known types
+    void Search(const ros::TimerEvent& event)
+    {
+      // Try and get a list of topics currently being braodcast
+      if (ros::master::getTopics(topics))
+      { 
+        // Iiterate over the topics
+        for (ros::master::V_TopicInfo::iterator i = topics.begin(); i != topics.end(); i++)
+        {
+          // Debug
+          ROS_DEBUG("%s -> %s", i->name.c_str(), i->datatype.c_str());
+
+        }
+      }
     }
 
   };

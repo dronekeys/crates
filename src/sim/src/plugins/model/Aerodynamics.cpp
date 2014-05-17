@@ -71,13 +71,7 @@ namespace gazebo
                     if (useTurbulence)
                         CalculateTurbulence(dt, a);
                 }
-/*
-                ROS_ERROR("%f | %f %f %f | %f %f %f", 
-                    a,
-                    shear.x, shear.y, shear.z,
-                    turbulence.x, turbulence.y, turbulence.z
-                );
-*/
+
                 // Add the force to the body
                 modPtr->GetLink("body")->AddRelativeForce(
                     drag
