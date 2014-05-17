@@ -131,18 +131,23 @@
       </control>
     </plugin>
 
-    <!-- Aerodynamic drag -->
-    <plugin name="drag" filename="libsim_drag.so">
-      <kuv>-4.97391e-01</kuv>
-      <kw>-1.35341</kw>
+    <!-- Aerodynamics -->
+    <plugin name="aerodynamics" filename="libsim_aerodynamics.so">
+      <drag>
+        <kuv>-4.97391e-01</kuv>
+        <kw>-1.35341</kw>
+      </drag>
+      <shear>true</shear>
+      <turbulence>true</turbulence>
     </plugin>
 
     <!-- Wind shear  -->
+    <!--
     <plugin name="shear" filename="libsim_shear.so">
       <speed>1.0</speed>
       <direction>90</direction>
     </plugin>
-      
+    -->
     <!-- Turbulence -->
     <!--
     <plugin name="turbulence" filename="libsim_turbulence.so">

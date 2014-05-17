@@ -69,7 +69,7 @@
     <plugin name="wind" filename="libsim_wind.so">
       <rate>1</rate>
       <default>
-        <speed>5</speed>
+        <speed>1</speed>
         <heading>90</heading>
       </default>
     </plugin>

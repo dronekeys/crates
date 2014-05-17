@@ -164,13 +164,11 @@ catkin_package(
       sim_wind
       sim_altimeter
       sim_compass
-      sim_drag
       sim_energy
       sim_gnss
       sim_imu
       sim_quadrotor
-      sim_shear
-      sim_turbulence
+      sim_aerodynamics
     CATKIN_DEPENDS
       roslib
       roscpp
@@ -262,9 +260,7 @@ add_library(sim_imu                   src/plugins/model/IMU.cpp)
 
 # The model plugins (dynamics)
 add_library(sim_quadrotor             src/plugins/model/Quadrotor.cpp)
-add_library(sim_drag                  src/plugins/model/Drag.cpp)
-add_library(sim_shear                 src/plugins/model/Shear.cpp)
-add_library(sim_turbulence            src/plugins/model/Turbulence.cpp)
+add_library(sim_aerodynamics          src/plugins/model/Aerodynamics.cpp)
 
 ##################################
 ## Add cmake target dependencies #
@@ -289,9 +285,7 @@ add_dependencies(sim_imu              custom_msgs)
 
 # The model plugins (dynamics)
 add_dependencies(sim_quadrotor        custom_msgs)
-add_dependencies(sim_shear            custom_msgs)
-add_dependencies(sim_drag             custom_msgs)
-add_dependencies(sim_turbulence       custom_msgs)
+add_dependencies(sim_aerodynamics     custom_msgs)
 
 ###########################
 ## Set up dynamic linking #
@@ -331,9 +325,7 @@ target_link_libraries(sim_energy          ${SYS_LIBS})
 target_link_libraries(sim_gnss            ${SYS_LIBS} ${GPSTK_LIBRARIES})
 target_link_libraries(sim_imu             ${SYS_LIBS})
 target_link_libraries(sim_quadrotor       ${SYS_LIBS})
-target_link_libraries(sim_shear           ${SYS_LIBS})
-target_link_libraries(sim_drag            ${SYS_LIBS})
-target_link_libraries(sim_turbulence      ${SYS_LIBS})
+target_link_libraries(sim_aerodynamics    ${SYS_LIBS})
 
 #############
 ## Install ##

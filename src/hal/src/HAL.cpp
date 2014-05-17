@@ -56,8 +56,15 @@ HAL::HAL() : isManaged(false)
 // Destructor
 HAL::~HAL()
 {
+    // If we alloc'd the ROS node, clean up
     if (rosNode && isManaged)
+    {
+        // Shut down
+        rosNode->shutdown();
+
+        // Delete
         delete rosNode;
+    }
 }
 
 // Set the status of this HAL

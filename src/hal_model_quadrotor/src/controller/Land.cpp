@@ -121,7 +121,7 @@ bool Land::Update(const hal_model_quadrotor::State &state,
     	+	(sp[_Y]-state.y)*(sp[_Y]-state.y)
     	+	(sp[_Z]-state.z)*(sp[_Z]-state.z)
     );
-    if (!reach && dist < 1.0)
+    if (!reach && dist < 0.1)
     	reach = true;
 
     /////////////////////////////////////////////////////////////////////

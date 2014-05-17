@@ -139,7 +139,8 @@ namespace gazebo
 
 			  	// set force and torque in gazebo
 			  	modPtr->GetLink("body")->AddRelativeForce(force);
-			  	modPtr->GetLink("body")->AddRelativeTorque(torque);
+			  	modPtr->GetLink("body")->AddRelativeTorque(torque
+			  		+ modPtr->GetLink("body")->GetInertial()->GetCoG().Cross(force));
 
 			  	// Only update the on-off action of motors
 			  	//if ((!motors && thrust > MOTOR_ANIMATION_THRESHOLD) || (motors && thrust < MOTOR_ANIMATION_THRESHOLD)) 
@@ -188,6 +189,13 @@ namespace gazebo
 			roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0), voltage(12.0)
 	    {
 	      // Do nothing
+	    }
+
+	    /// Destructor
+	    ~Quadrotor() 
+	    {
+	    	// Make sure we clean up the connection
+    		event::Events::DisconnectWorldUpdateBegin(conPtr);
 	    }
 
 	    // REQUIRED METHODS
