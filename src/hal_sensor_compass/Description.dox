@@ -1,0 +1,6 @@
+/**
+
+\defgroup hal_sensor_compass hal_sensor_compass
+\brief A HAL for a triaxial magnetometer.
+
+*/

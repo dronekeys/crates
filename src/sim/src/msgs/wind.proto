@@ -1,0 +1,8 @@
+package gazebo.msgs;
+
+// Information broadcast about the environment
+message Wind
+{
+	required double speed       = 1;
+	required double direction   = 2;
+}

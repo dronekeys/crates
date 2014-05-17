@@ -1,0 +1,8 @@
+package gazebo.msgs;
+
+message Meteorological
+{
+	required double temperature		= 1;
+	required double humidity		= 2;
+	required double pressure		= 3;
+}

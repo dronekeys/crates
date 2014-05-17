@@ -1,0 +1,195 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+
+  <world name="rvc">
+
+    <!-- Camera -->
+    <gui>
+      <camera name="user_camera">
+        <pose>-7 0 3 0 0.27079632679 0</pose>
+      </camera>
+    </gui>
+
+    <!-- Physics -->
+    <physics type="ode">
+      <max_step_size>0.02</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>50</real_time_update_rate>
+    </physics>
+
+    <!-- Setup a basic scene with a sky and clouds -->
+    <scene>
+      <sky>
+        <time>12.00</time>
+        <sunrise>06.23</sunrise>
+        <sunset>17.59</sunset>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>false</shadows>
+    </scene>
+
+    <!-- Sun -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Location -->
+    <!--
+    <include>
+      <uri>model://hawkshead</uri>
+    </include>
+    -->
+    
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Location -->
+    <include>
+      <uri>model://hummingbird</uri>
+    </include>
+
+    <!-- Set the origin and start time (UTC) -->
+    <plugin name="environment" filename="libsim_environment.so">
+      <rate>1</rate>
+      <time>
+        <year>2010</year>
+        <month>1</month>
+        <day>7</day>
+        <hour>10</hour>
+        <minute>0</minute>
+        <second>0</second>
+      </time>
+    </plugin>
+
+    <!-- Wind conditions -->
+    <plugin name="wind" filename="libsim_wind.so">
+      <rate>1</rate>
+      <default>
+        <speed>1</speed>
+        <heading>90</heading>
+      </default>
+    </plugin>
+
+    <!-- Meteorological conditions -->
+    <plugin name="meteorological" filename="libsim_meteorological.so">
+      <rate>1</rate>
+      <default>
+        <kelvin>273.0</kelvin>
+        <millibars>1000.0</millibars>
+        <relhumidity>95.0</relhumidity>
+      </default>
+      <rinex>
+        <uri>file://gnss/hers0060.10m</uri>
+        <uri>file://gnss/hers0070.10m</uri>
+        <uri>file://gnss/hers0080.10m</uri>
+      </rinex>
+    </plugin>
+    
+    <!-- GNSS satellites for very short baselines -->
+    <plugin name="satellites" filename="libsim_satellites.so">
+      
+      <!-- RATE at which all GNSS sensors will be updated -->
+      <rate>10</rate>
+      
+      <!-- GPS ~2.5 cm final ephemerides (must match time period in environment) -->
+      <ephemerides>
+        <gps>
+          <uri>file://gnss/igs15652.sp3</uri>
+          <uri>file://gnss/igs15653.sp3</uri>
+          <uri>file://gnss/igs15654.sp3</uri>
+        </gps>
+        <glonass>
+          <uri>file://gnss/igl15652.sp3</uri>
+          <uri>file://gnss/igl15653.sp3</uri>
+          <uri>file://gnss/igl15654.sp3</uri>
+        </glonass>
+      </ephemerides>
+
+      <!-- Error models -->
+      <errors>
+
+        <!-- GPS Ephemeride errors -->
+        <gps>
+          <default>trace</default>
+          <model>
+            <orbits>
+              <ou>
+                <mean>1.005</mean>
+                <sdev>0.003</sdev>
+              </ou>
+            </orbits>
+            <clocks>
+              <ou>
+                <mean>1.005</mean>
+                <sdev>0.003</sdev>
+              </ou>
+            </clocks>
+          </model>
+          <trace>
+            <uri>file://gnss/brdc0060.10n</uri>
+            <uri>file://gnss/brdc0070.10n</uri>
+            <uri>file://gnss/brdc0080.10n</uri>
+          </trace>
+        </gps>
+
+        <!-- Glonass Ephemeride errors -->
+        <glonass>
+          <default>trace</default>
+          <model>
+            <orbits>
+              <ou>
+                <mean>1.005</mean>
+                <sdev>0.003</sdev>
+              </ou>
+            </orbits>
+            <clocks>
+              <ou>
+                <mean>1.005</mean>
+                <sdev>0.003</sdev>
+              </ou>
+            </clocks>
+          </model>
+          <trace>
+            <uri>file://gnss/brdc0060.10n</uri>
+            <uri>file://gnss/brdc0070.10n</uri>
+            <uri>file://gnss/brdc0080.10n</uri>
+          </trace>
+        </glonass>
+
+        <!-- Ionosphere errors -->
+        <ionosphere>
+          <default>trace</default>
+          <model>
+            <ou>
+              <mean>1.005</mean>
+              <sdev>0.003</sdev>
+            </ou>
+          </model>
+          <trace>
+            <uri>file://gnss/igsg0060.10i</uri>
+            <uri>file://gnss/igsg0070.10i</uri>
+            <uri>file://gnss/igsg0080.10i</uri>
+          </trace>
+        </ionosphere>
+      
+        <!-- Troposphere errors -->
+        <troposphere>
+          <default>trace</default>
+          <model>
+            <ou> 
+              <mean>1.005</mean>
+              <sdev>0.003</sdev>
+            </ou>
+          </model>
+        </troposphere>
+
+      </errors>
+
+    </plugin>
+
+  </world>
+</sdf>

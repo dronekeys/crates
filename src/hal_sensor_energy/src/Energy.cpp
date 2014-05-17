@@ -1,0 +1,36 @@
+// Library headers
+#include <hal/sensor/Energy.h>
+
+#define DEFAULT_SENSOR_RATE   1.0
+
+using namespace hal::sensor;
+
+Energy::Energy() : hal::HAL()
+{
+	// Do nothign
+}        
+
+// Called when HAL loads
+void Energy::OnInit()
+{
+    // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
+    publisher = GetRosNodePtr()->template advertise<hal_sensor_energy::Data>("sensor/energy/Data", DEFAULT_QUEUE_LENGTH);
+
+    // Create a timer to broadcast the data
+    timer = GetRosNodePtr()->createTimer(
+        ros::Duration(1.0/DEFAULT_SENSOR_RATE),     // Callback rate
+        &Energy::Broadcast,                         // Callback
+        this,                                       // Callee
+        false,                                      // Oneshot
+        true                                        // Autostart
+    );
+}
+
+void Energy::Broadcast(const ros::TimerEvent& event)
+{         
+    // Obtain the measure               
+    GetMeasurement(message);
+    
+    // Publish the message
+    publisher.publish(message);
+}

@@ -1,3 +1,7 @@
 /build/
 /devel/
+/docs/html/
+/docs/latex/
 /thirdparty/
+/src/CMakeLists.txt
+/.catkin_workspace

@@ -1,0 +1,607 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass report
+\begin_preamble
+\usepackage{xspace}
+\usepackage{listings}
+
+\newcommand{\fname}{CRANES\xspace}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\series bold
+RATES
+\series default
+: Robotics Architecture for Tightly-coupled Experiments and Simulation
+\end_layout
+
+\begin_layout Author
+Andrew Symington
+\end_layout
+
+\begin_layout Abstract
+This document describes the open source 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+fname
+\end_layout
+
+\end_inset
+
+ framework.
+ This framework provides an environment for efficiently prototyping application-
+level controllers for multi-platform robotic experiments, by improving the
+ process by which simulations are translated to hardware experiments.
+ This is achieved by nesting simulated and actual platform code within a
+ single framework.
+ Both implementations inherit common, core functionality from a hardware
+ abstraction layer (HAL).
+ The HAL exposes the underlying device -- be it simulated or actual hardware
+ -- as a generic class of robot that can be interacted with over a messaging
+ infrastructure.
+ This loose coupling allows the complexity of the underlying platform to
+ be hidden from the cognitive controller, keeping the research focus on
+ the design of the application-level controller rather than low-level implementa
+tion details.
+ The framework makes use of the open source Robotics Operating System (ROS)
+ and Gazebo simulator, both of which have received significant commercial
+ and community support over the last few years.
+ Although we envision it having a broader impact in the robotics community,
+ in the first instance the framework is geared towards controlling swarms
+ of quadrotors.
+ It is therefore distributed with a quadrotor HAL and drivers for the Ascending
+ Technologies flight control system.
+ In addition, the distribution includes simulator plugins for environmental
+ conditions (meteorological, wind turbulence, satellite vehicle orbits)
+ and sensors (inertial, magnetic, barometric altitude, satellite navigation
+ receiver).
+ The contribution being a complete toolkit for high-fidelity, outdoor, multi-pla
+tform quadrotor simulation and experimentation.
+ By releasing this framework to the robotics community as an open source
+ project, we hope that others will share in our vision and contribute to
+ the project.
+ The ultimate goal being to develop a rich tool set, which lowers the barrier
+ to running application-level algorithms on multi-robot systems.
+\end_layout
+
+\begin_layout Address
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Overview
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:overview"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This document describes a robotics framework that emerged within the EU-funded
+ CompLACS research project as a means for transferring machine learning
+ theory to practical hardware experiments.
+ The quadrotor platform is one of three experimental platforms, and we encourage
+ the reader to visit complacs.org for more information about the other two
+ platforms.
+\end_layout
+
+\begin_layout Standard
+Quadrotor experiments are particularly challenging, as there are significant
+ safety, cost and practical considerations that must be taken into account.
+ These challenges were identified early in the project, and the decision
+ was made to develop a high-fidelity quadrotor simulation framework in which
+ to prototype machine learning algorithms.
+ By the end of the second year of the project a Matlab simulator had been
+ developed, along with four key scenarios.
+\end_layout
+
+\begin_layout Standard
+It was realized that significant work would still need to be taken to transfer
+ the resulting application code from simulation to the experimental platforms.
+ This, along with other subtle architectural and performance issues, provided
+ a motivation to shift to a new architecture.
+ The revised framework was built upon the Robotic Operating System (ROS)
+ and Gazebo simulator, and makes use of a hardware abstraction layer to
+ decouple the high-level application code from the underlying device, be
+ it a simulated or real entity.
+ A decision was made to disseminate the framework as an open source project,
+ with the aim of lowering the barrier to entry for outdoor, multi-platform
+ robotic experiments.
+\end_layout
+
+\begin_layout Standard
+The objective of this document is to provide an accessible description of
+ the framework as it currently stands.
+ It is strongly advised that Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:overview"
+
+\end_inset
+
+ be read in entirety, as it contains fundamental information about the framework.
+ Chapter 2 is targeted primarily at users of the simulator, and covers basic
+ installation, the common tools that it offers and typical usage patterns.
+ Chapter 3 is geared towards those who wish to extend the simulator by adding
+ new components.
+ Chapter 4 contains the technical about the current components offered in
+ the simulator, considered too detailed for earlier chapters.
+\end_layout
+
+\begin_layout Section
+Key features
+\end_layout
+
+\begin_layout Standard
+The architecture of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+fname
+\end_layout
+
+\end_inset
+
+ is motivated by the layered control that emerges naturally in multi-robot
+ problems.
+ Consider the follow three levels at which a robotic platform may be controlled:
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Application-level
+\series default
+ - The control process that transforms general application-level goals,
+ such as 
+\begin_inset Quotes eld
+\end_inset
+
+find the missing person
+\begin_inset Quotes erd
+\end_inset
+
+, into platform motion goals, such as 
+\begin_inset Quotes eld
+\end_inset
+
+UAV0 move to waypoint X
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This type of control can be issued from a base station (remotely operated)
+ or a navigation co-processor (autonomous) at a low rate (5Hz) with high
+ delay tolerance.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Platform-level 
+\series default
+- The control process that transforms platform motion goals, such as 
+\begin_inset Quotes eld
+\end_inset
+
+UAV0 move to waypoint X
+\begin_inset Quotes erd
+\end_inset
+
+ into a hardware-level goal, such as 
+\begin_inset Quotes eld
+\end_inset
+
+Roll=A, Pitch=B, Yaw=C, Throttle=D
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Typically, this control is implemented in a co-processor on board the quadrotor
+, and operates at a medium frequency (50Hz) with a medium delay tolerance.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Hardware-level
+\series default
+ - The process that transforms flight-level control instructions, such as
+ roll, pitch, yaw and throttle, into forces and torques on the body.
+ Typically, this control is implemented in device firmware, and has a high
+ frequency (500Hz) and low delay-tolerance.
+ 
+\end_layout
+
+\begin_layout Standard
+General cognitiva ar 
+\end_layout
+
+\begin_layout Standard
+The key things to note is that, while the platform and hardware level control
+ needs to be tightly coupled, the application and platform level control
+ need not be.
+ With this in mind, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+fname
+\end_layout
+
+\end_inset
+
+ exposes platform-level control to the application-level though a hardware
+ abstraction layer (HAL).
+ This is reflective of an object-oriented paradigm, where the HAL can be
+ thought of as a platform type, such as a 
+\begin_inset Quotes eld
+\end_inset
+
+UAV
+\begin_inset Quotes erd
+\end_inset
+
+, which is inherited by specific flight controller.
+ The benefit of this abstraction is that it masks whether the entity itself
+ is simulated or actual hardware,
+\end_layout
+
+\begin_layout Section
+Architecture
+\end_layout
+
+\begin_layout Section
+Conventions
+\end_layout
+
+\begin_layout Standard
+It is impossible to discuss the system without first specifying the units
+ and coordinate frame conventions that are used.
+ Importantly, some of these conventions are different from those that are
+ typically used in aviation.We have adopted the conventions used in the Gazebo
+ simulator, which are extensions to those typically used in 3D modelling.
+ 
+\end_layout
+
+\begin_layout Subsection
+Units
+\end_layout
+
+\begin_layout Standard
+For consistency, The entire framework adopts SI conventions in order to
+ be as.
+ Distance is measured in meters and angles are measured in radians.
+ Temperature, pressure and relative humidity are measured in degrees Kelvin,
+ millibars and percentages respectively.
+ 
+\end_layout
+
+\begin_layout Subsection
+Coordinate frames
+\end_layout
+
+\begin_layout Standard
+For modelling convenience we have chosen to represent the quadrotor as a
+ rigid body with six degrees of freedom in three dimensional space.
+ Describing its motion requires a minimum of two coordinate frames -- a
+ body frame and navigation frame.
+ The underlying reason for this is that rotation can only be described as
+ the orientation of one frame with respect to another.
+ Where integration with a GNSS system is required, a third navigation frame
+ is used.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Body frame
+\end_layout
+
+\begin_layout Standard
+This is a right-hand, cartesian coordinate frame that is fixed with respect
+ to the rigid body of the quadrotor.
+ The origin of this coordinate frame is illustrated by red, green and blue
+ arrows, which correspond to X, Y and Z.
+ Since they are obtained from a strapdown navigation system, inertial and
+ magnetic measurements are obtained in this coordinate frame.
+\end_layout
+
+\begin_layout Subsubsection
+Navigation frame
+\end_layout
+
+\begin_layout Standard
+Similar to the body frame, the navigation frame is described by a right-hand
+ cartesian coordinate system.
+ The key difference is that the origin is described by a fixed point on
+ the earth's surface, with +X corresponding to East, +Y to North and +Z
+ upwards toward the sky.
+\end_layout
+
+\begin_layout Subsubsection
+Resolving frame
+\end_layout
+
+\begin_layout Standard
+In order for a quadrotor to close the loop of its position controller, it
+ requires absolute measurements of its position.
+ Indoor quadrotor experiments typically use motion capture systems to achieve
+ position updates with millimeter accuracy within the navigation frame.
+ However, outdoors one must rely on navigation solutions from a Global navigatio
+n satellite system (GNSS) such as GPS.
+ Since these systems operate on a global scale, a spherical coordinate is
+ needed.
+\end_layout
+
+\begin_layout Standard
+Inside a GNSS receiver a position solution is first obtained in a geocentric,
+ cartesian coordinate frame.
+ The origin of this coordinate system is the centre of the earth, with its
+ axes defined by the equator, Greenwich meridian and north-south polar line.
+ Importantly, this coordinate frame is fixed with respect to the earth.
+ Since the satellite vehicles are not geosynchronous (orbital peiod of 12
+ hours) they have a position that changes with time.
+ 
+\end_layout
+
+\begin_layout Standard
+The GNSS receiver ultimately projects its internal geocentric solution into
+ a geodetic, spherical coordinate frame, where position is described by
+ a latitude, longitude and altitude.
+ Importantly, altitude is described relative to sea-level and not the centre
+ of the earth.
+ The WGS84 model provides a standard definition of the centre of the earth
+ and its sea level, allowing GNSS receivers to obtain consistent projections
+ between geocentric and geodetic coordinate frames.
+\end_layout
+
+\begin_layout Subsection
+Rotations
+\end_layout
+
+\begin_layout Standard
+Quadrotors are rotationally symmetric, and hence there is ambiguity as to
+ which is the forward direction of motion.
+ In our system an orange band is used to represent the 
+\begin_inset Quotes eld
+\end_inset
+
+forward
+\begin_inset Quotes erd
+\end_inset
+
+ direction of motion.
+ With this information one can easily see that Fig X graphically depicts
+ a rotational alignment of the body and navigation frames.
+ We define 
+\begin_inset Quotes eld
+\end_inset
+
+roll
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+pitch
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+yaw
+\begin_inset Quotes erd
+\end_inset
+
+ as Euler rotations about the X, Y and Z body-frame axes respectively.
+\end_layout
+
+\begin_layout Standard
+One of the drawbacks of describing rotations by Euler angles is that it
+ introduces rotational ambiguity: the order in which the angles are applied
+ matters.
+ Although superior representation exist, they are less intuitive to work
+ with.
+ Rather than project a representation on users of the system, we have chosen
+ to adopt a X-Y-Z angle application ordering.
+ In o
+\end_layout
+
+\begin_layout Section
+Challenges
+\end_layout
+
+\begin_layout Subsection
+Time synchronisation
+\end_layout
+
+\begin_layout Standard
+The ROS / Gazebo toolchain resolves this issue by binding the ROS system
+ clock to the simulated time published by Gazebo.
+ The advantage that this brings is that any timers in the ROS environment
+ behave according to simulated time.
+ It is strongly suggested that users of the framework take this into considerati
+on when writing application-level controller code, and avoid using timers
+ bound to a different clock.
+\end_layout
+
+\begin_layout Subsection
+Physics simulation
+\end_layout
+
+\begin_layout Subsection
+Delay-tolerant message passing
+\end_layout
+
+\begin_layout Section
+Acknowledgements
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+fname
+\end_layout
+
+\end_inset
+
+ would not be possible without the contributions from many individuals inside
+ and outside the CompLACS project.
+ In particular, Renzo De Nardi developed the Matlab simulator, which included
+ environment models, quadrotor dynamics and sensor models.
+ Along the way significant contributions were made by Stephen Hailes, Simon
+ Julier and Luke Teacy.
+\end_layout
+
+\begin_layout Chapter
+Usage guide
+\end_layout
+
+\begin_layout Section
+Installation
+\end_layout
+
+\begin_layout Standard
+The easiest method of installing 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+fname
+\end_layout
+
+\end_inset
+
+ is to work of an installation of Ubuntu 14.04, as it is distributed with
+ the correct third party libraries.
+\end_layout
+
+\begin_layout Chapter
+Developer guide
+\end_layout
+
+\begin_layout Standard
+A
+\end_layout
+
+\begin_layout Chapter
+Modelling details
+\end_layout
+
+\begin_layout Section
+Quadrotors
+\end_layout
+
+\begin_layout Standard
+Quadrotors have proven themselves as favourable flight platforms for UAV
+ research, since they are inexpensive, agile and relatively safe to operate.
+ Four propellers are located on the corners of a square, and generate downward
+ thrust along the body of the platform.
+ However, two of these propellers counter-rotate in order to balance torque.
+ If the power to all of the motors is increased or decreased, then the platform'
+s altitude increases or decreases respectively.
+ Heading is controlled by evenly-shifting a proportion of the force from
+ one pair of opposing motors to the other pair.
+ Pitch and roll are controlled by shifting the relative force of opposing
+ motors.
+ This action also changes the thrust direction, causing the quadrotor to
+ translate by an amount related to the tilt angle.
+\end_layout
+
+\end_body
+\end_document
