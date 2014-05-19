@@ -11,13 +11,16 @@ using namespace hal::model;
 // This is called on every platform-level controller clock tick
 void Quadrotor::Update(const ros::TimerEvent& event)
 {
-    // Update the state
-    GetState(state);
+    // Get the truthful state
+    GetTruth(truth);
+
+    // TODO: introduce fusion within the HAL
+    GetEstimate(estimate);
 
     // Update control, given a state and discrete time step
-    flightLogic.Update(state, event.current_real.toSec() - tick, control);
+    flightLogic.Update(estimate, event.current_real.toSec() - tick, control);
 
-    // Update the flight control system
+    // Pass the control to the HAL
     SetControl(control);
 
     // Save the current time tick
@@ -29,9 +32,14 @@ void Quadrotor::BroadcastControl(const ros::TimerEvent& event)
     pubControl.publish(control);
 }
 
-void Quadrotor::BroadcastState(const ros::TimerEvent& event)
+void Quadrotor::BroadcastEstimate(const ros::TimerEvent& event)
 {                  
-    pubState.publish(state);
+    pubEstimate.publish(estimate);
+}
+
+void Quadrotor::BroadcastTruth(const ros::TimerEvent& event)
+{                  
+    pubTruth.publish(truth);
 }
 
 Quadrotor::Quadrotor() : hal::HAL()
@@ -39,43 +47,21 @@ Quadrotor::Quadrotor() : hal::HAL()
     // Do nothing
 }
 
-bool Quadrotor::RcvSetState(
-    hal_model_quadrotor::SetState::Request  &req, 
-    hal_model_quadrotor::SetState::Response &res)
-{
-    // Pass the control down to the HAL
-    SetState(req.state);
 
-    // Notify the user
-    res.success = true;
-    res.status  = "State received. Updating simulated UAV.";
+bool Quadrotor::RcvGetTruth(
+    hal_model_quadrotor::GetTruth::Request  &req, 
+    hal_model_quadrotor::GetTruth::Response &res)
+{
+    // Obtain the truthful state
+    res.state = truth;
     return true;
 }
 
-bool Quadrotor::RcvSetControl(
-    hal_model_quadrotor::SetControl::Request  &req, 
-    hal_model_quadrotor::SetControl::Response &res)
+bool Quadrotor::RcvGetEstimate(
+    hal_model_quadrotor::GetEstimate::Request  &req, 
+    hal_model_quadrotor::GetEstimate::Response &res)
 {
-    // Save the control
-    control = req.control;
-
-    // Disable the active controller
-    flightLogic.Switch(DISABLED);
-
-    // Pass the control down to the HAL
-    SetControl(control);  
-
-    // Notify the user
-    res.success = true;
-    res.status  = "Control received. Disabled current position controller.";
-    return true;
-}
-
-bool Quadrotor::RcvGetState(
-    hal_model_quadrotor::GetState::Request  &req, 
-    hal_model_quadrotor::GetState::Response &res)
-{
-    res.state = state;
+    res.state = estimate;
     return true;
 }
 
@@ -87,24 +73,82 @@ bool Quadrotor::RcvGetControl(
     return true;
 }
 
+bool Quadrotor::RcvSetTruth(
+    hal_model_quadrotor::SetTruth::Request  &req, 
+    hal_model_quadrotor::SetTruth::Response &res)
+{
+    // Pass the control down to the HAL
+    SetTruth(req.state);
+
+    // Save the estimate locally
+    truth = req.state;
+
+    // Notify the user
+    res.success = true;
+    res.status  = "Truthful state set";
+    return true;
+}
+
+
+bool Quadrotor::RcvSetEstimate(
+    hal_model_quadrotor::SetEstimate::Request  &req, 
+    hal_model_quadrotor::SetEstimate::Response &res)
+{
+    // Save the estimate locally
+    estimate = req.state;
+
+    // Notify the user
+    res.success = true;
+    res.status  = "State received. Updating simulated UAV.";
+    return true;
+}
+
+bool Quadrotor::RcvSetControl(
+    hal_model_quadrotor::SetControl::Request  &req, 
+    hal_model_quadrotor::SetControl::Response &res)
+{
+    // Pass the control down to the HAL
+    SetControl(control);  
+
+    // Save the control locally
+    control = req.control;
+
+    // Notify the user
+    res.success = true;
+    res.status  = "Control received. Disabled current position controller.";
+    return true;
+}
+
 void Quadrotor::OnInit()
 {
-    // Additional ROS services to manually set the control and state
-    srvGetState   = GetRosNodePtr()->advertiseService("GetState",   &Quadrotor::RcvGetState, this);
-    srvGetControl = GetRosNodePtr()->advertiseService("GetControl", &Quadrotor::RcvGetControl, this);
+    // In both experiments and simulation the state and LL control can be queried
+    srvGetEstimate = GetRosNodePtr()->advertiseService("GetEstimate", &Quadrotor::RcvGetEstimate, this);
+    srvGetControl  = GetRosNodePtr()->advertiseService("GetControl", &Quadrotor::RcvGetControl, this);
 
-    // If we are using simulation time, then we are in simulation mode
+    // If we are in a simulation, additional services are avilable
     bool isSimulated = false;
     if (GetRosNodePtr()->getParam("/use_sim_time",isSimulated) && isSimulated)
     {
-        // Additional ROS services to manually set the control and state
-        srvSetState   = GetRosNodePtr()->advertiseService("SetState",   &Quadrotor::RcvSetState, this);
+        // Allow the true state to be mutable (hidden state in experiments)
+        srvGetTruth = GetRosNodePtr()->advertiseService("GetTruth", &Quadrotor::RcvGetTruth, this);
+        srvSetTruth = GetRosNodePtr()->advertiseService("SetTruth", &Quadrotor::RcvSetTruth, this);
+        
+        // Allow the low-level control to be set manually (too dangerous in experiments)
         srvSetControl = GetRosNodePtr()->advertiseService("SetControl", &Quadrotor::RcvSetControl, this);
+        
+        // Allow the internal state exstimate to be changed (too dangerous in experiments)
+        srvSetEstimate = GetRosNodePtr()->advertiseService("SetEstimate", &Quadrotor::RcvSetEstimate, this);
     }
 
-    // Advertise this message on the ROS backbone
-    pubState   = hal::model::Quadrotor::GetRosNodePtr()->template 
-        advertise<hal_model_quadrotor::State>("State", DEFAULT_QUEUE_LENGTH);
+    // Publish the estimated state. For noiseless simulations, this is equal to the Truth.
+    pubTruth = hal::model::Quadrotor::GetRosNodePtr()->template 
+        advertise<hal_model_quadrotor::State>("Truth", DEFAULT_QUEUE_LENGTH);
+
+    // Publish the estimated state. For noiseless simulations, this is equal to the Truth.
+    pubEstimate = hal::model::Quadrotor::GetRosNodePtr()->template 
+        advertise<hal_model_quadrotor::State>("Estimate", DEFAULT_QUEUE_LENGTH);
+
+    // Publish the control (roll, pitch, yaw, throttle) from the low-level position controller.
     pubControl = hal::model::Quadrotor::GetRosNodePtr()->template 
         advertise<hal_model_quadrotor::Control>("Control", DEFAULT_QUEUE_LENGTH);
 
@@ -116,9 +160,16 @@ void Quadrotor::OnInit()
     );
 
     // Immediately start control loop
-    timerState = GetRosNodePtr()->createTimer(
+    timerTruth = GetRosNodePtr()->createTimer(
         ros::Duration(1.0/DEFAULT_STATE_RATE), 
-        &Quadrotor::BroadcastState, 
+        &Quadrotor::BroadcastTruth, 
+        this
+    );
+
+    // Immediately start control loop
+    timerEstimate = GetRosNodePtr()->createTimer(
+        ros::Duration(1.0/DEFAULT_STATE_RATE), 
+        &Quadrotor::BroadcastEstimate, 
         this
     );
 

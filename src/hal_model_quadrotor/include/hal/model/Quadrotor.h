@@ -12,9 +12,11 @@
 #include <hal/model/FlightLogic.h>
 
 // Services
-#include <hal_model_quadrotor/SetState.h>
+#include <hal_model_quadrotor/SetTruth.h>
+#include <hal_model_quadrotor/SetEstimate.h>
 #include <hal_model_quadrotor/SetControl.h>
-#include <hal_model_quadrotor/GetState.h>
+#include <hal_model_quadrotor/GetTruth.h>
+#include <hal_model_quadrotor/GetEstimate.h>
 #include <hal_model_quadrotor/GetControl.h>
 
 namespace hal
@@ -28,7 +30,7 @@ namespace hal
         private:
 
             /// Current state of the quadrotor
-            hal_model_quadrotor::State state;
+            hal_model_quadrotor::State estimate, truth;
 
             /// Current control vector
             hal_model_quadrotor::Control control;
@@ -37,22 +39,26 @@ namespace hal
             double tick;
 
             /// Publishers
-            ros::Publisher pubControl;              /*!< Control publisher      */
-            ros::Publisher pubState;                /*!< State publisher         */
+            ros::Publisher      pubControl;          /*!< Control publisher      */
+            ros::Publisher      pubEstimate;         /*!< State publisher        */
+            ros::Publisher      pubTruth;            /*!< State publisher        */
             
             /// Timers
-            ros::ServiceServer srvSetState;         /*!< Update loop timer       */
-            ros::ServiceServer srvSetControl;       /*!< State broadcast timer   */
-            ros::ServiceServer srvGetState;         /*!< Update loop timer       */
-            ros::ServiceServer srvGetControl;       /*!< State broadcast timer   */
+            ros::ServiceServer  srvSetTruth;         /*!< Update loop timer       */
+            ros::ServiceServer  srvSetEstimate;      /*!< Update loop timer       */
+            ros::ServiceServer  srvSetControl;       /*!< State broadcast timer   */
+            ros::ServiceServer  srvGetTruth;         /*!< Update loop timer       */
+            ros::ServiceServer  srvGetEstimate;      /*!< Update loop timer       */
+            ros::ServiceServer  srvGetControl;       /*!< State broadcast timer   */
 
             /// Timers
-            ros::Timer timerUpdate;                 /*!< Update loop timer       */
-            ros::Timer timerState;                  /*!< State broadcast timer   */
-            ros::Timer timerControl;                /*!< Control broadcast timer */
+            ros::Timer          timerUpdate;          /*!< Update loop timer       */
+            ros::Timer          timerTruth;           /*!< State broadcast timer   */
+            ros::Timer          timerEstimate;        /*!< State broadcast timer   */
+            ros::Timer          timerControl;         /*!< Control broadcast timer */
 
             /// Manages all the controllers
-            FlightLogic flightLogic;
+            FlightLogic         flightLogic;
 
             // Called by HAL when ROS is ready!            
             void OnInit();
@@ -65,19 +71,36 @@ namespace hal
 
             // TOPIC CALLBACKS //////////////////////////////////////////////////
 
+            //! Timer callback for state broadcast loop
+            /*!
+              \param event Timer event
+            */
+            void BroadcastTruth(const ros::TimerEvent& event);
+
+            //! Timer callback for state broadcast loop
+            /*!
+              \param event Timer event
+            */
+            void BroadcastEstimate(const ros::TimerEvent& event);
+
             //! Timer callback for control broadcast loop
             /*!
               \param event Timer event
             */
             void BroadcastControl(const ros::TimerEvent& event);
 
-            //! Timer callback for state broadcast loop
-            /*!
-              \param event Timer event
-            */
-            void BroadcastState(const ros::TimerEvent& event);
-
             // SERVICE CALLBACKS ////////////////////////////////////////////////
+
+            //! Service callback for getting the state
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvGetTruth(
+                hal_model_quadrotor::GetTruth::Request  &req, 
+                hal_model_quadrotor::GetTruth::Response &res
+            );
 
             //! Service callback for setting the state
             /*!
@@ -85,9 +108,42 @@ namespace hal
               \param res service response
               \return whether the packet was process successfully
             */
-            bool RcvSetState(
-                hal_model_quadrotor::SetState::Request  &req, 
-                hal_model_quadrotor::SetState::Response &res
+            bool RcvSetTruth(
+                hal_model_quadrotor::SetTruth::Request  &req, 
+                hal_model_quadrotor::SetTruth::Response &res
+            );
+
+            //! Service callback for getting the state
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvGetEstimate(
+                hal_model_quadrotor::GetEstimate::Request  &req, 
+                hal_model_quadrotor::GetEstimate::Response &res
+            );
+
+            //! Service callback for setting the state
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvSetEstimate(
+                hal_model_quadrotor::SetEstimate::Request  &req, 
+                hal_model_quadrotor::SetEstimate::Response &res
+            );
+
+            //! Service callback for getting the control
+            /*!
+              \param req service request
+              \param res service response
+              \return whether the packet was process successfully
+            */
+            bool RcvGetControl(
+                hal_model_quadrotor::GetControl::Request  &req, 
+                hal_model_quadrotor::GetControl::Response &res
             );
 
             //! Service callback for setting the control
@@ -101,42 +157,27 @@ namespace hal
                 hal_model_quadrotor::SetControl::Response &res
             );
 
-            //! Service callback for getting the state
-            /*!
-              \param req service request
-              \param res service response
-              \return whether the packet was process successfully
-            */
-            bool RcvGetState(
-                hal_model_quadrotor::GetState::Request  &req, 
-                hal_model_quadrotor::GetState::Response &res
-            );
-
-            //! Service callback for getting the control
-            /*!
-              \param req service request
-              \param res service response
-              \return whether the packet was process successfully
-            */
-            bool RcvGetControl(
-                hal_model_quadrotor::GetControl::Request  &req, 
-                hal_model_quadrotor::GetControl::Response &res
-            );
         protected:
 
-            //! Get the state of the quadrotor from the FCS
+            //! Get the true quadrotor state
             /*!
               \param state the state of the quadrotor
             */
-            virtual void GetState(hal_model_quadrotor::State &state) = 0;
+            virtual void GetTruth(hal_model_quadrotor::State &state) = 0;
 
-            //! Accept a state update message from the HAL
+            //! Get the estimated quadrotor state
             /*!
               \param state the state of the quadrotor
             */
-            virtual void SetState(const hal_model_quadrotor::State &state) = 0;
+            virtual void GetEstimate(hal_model_quadrotor::State &state) = 0;
 
-            //! Accept a control message from the HAL
+            //! Set the true quadrotor state
+            /*!
+              \param state the state of the quadrotor
+            */
+            virtual void SetTruth(const hal_model_quadrotor::State &state) = 0;
+
+            //! Set the quadrotor control
             /*!
               \param control the control to apply
             */

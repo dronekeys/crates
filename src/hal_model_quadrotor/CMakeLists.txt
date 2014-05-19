@@ -71,9 +71,11 @@ add_service_files(
     Velocity.srv
     VelocityHeight.srv
     Waypoint.srv
-    SetState.srv
+    SetEstimate.srv
+    SetTruth.srv
     SetControl.srv
-    GetState.srv
+    GetEstimate.srv
+    GetTruth.srv
     GetControl.srv
 )
 

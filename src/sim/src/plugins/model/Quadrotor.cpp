@@ -260,32 +260,40 @@ namespace gazebo
 	    }
 
     	// The HAL gets the simulated state through this function
-		void GetState(hal_model_quadrotor::State& state)
+		void GetEstimate(hal_model_quadrotor::State& state)
+		{
+			// For now...
+			GetTruth(state);
+		}
+
+    	// The HAL gets the simulated state through this function
+		void GetTruth(hal_model_quadrotor::State& state)
 		{
 			// Get the state
-			math::Pose pose = modPtr->GetWorldPose();
+			math::Vector3 pos = modPtr->GetWorldPose().pos;
+			math::Vector3 rot = modPtr->GetWorldPose().rot.GetAsEuler();
 			math::Vector3 vel = modPtr->GetWorldLinearVel();
 			math::Vector3 ang = modPtr->GetWorldAngularVel();
 
 			// Update the state
-			state.x = pose.pos.x;
-			state.y = pose.pos.y;
-			state.z = pose.pos.z;
-			state.roll = pose.rot.x;
-			state.pitch = pose.rot.y;
-			state.yaw = pose.rot.z;
-			state.u = vel.x;
-			state.v = vel.y;
-			state.w = vel.z;
-			state.p = ang.x;
-			state.q = ang.y;
-			state.r = ang.z;
-			state.thrust = thrust;
-			state.voltage = voltage;
+			state.x 		= pos.x;
+			state.y 		= pos.y;
+			state.z 		= pos.z;
+			state.roll 		= rot.x;
+			state.pitch 	= rot.y;
+			state.yaw 		= rot.z;
+			state.u 		= vel.x;
+			state.v 		= vel.y;
+			state.w 		= vel.z;
+			state.p 		= ang.x;
+			state.q 		= ang.y;
+			state.r 		= ang.z;
+			state.thrust 	= thrust;
+			state.voltage 	= voltage;
 		}
 
 	    // The HAL sets the simulated state through this function
-		void SetState(const hal_model_quadrotor::State& state)
+		void SetTruth(const hal_model_quadrotor::State& state)
 		{
 			// Get the state
 			math::Pose pose(
@@ -298,7 +306,7 @@ namespace gazebo
 			// Set the state
 			modPtr->SetWorldPose(pose);
 			modPtr->SetWorldTwist(vel, ang);
-			thrust = state.thrust;
+			thrust  = state.thrust;
 			voltage = state.voltage;
 		}
 

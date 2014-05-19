@@ -8,6 +8,7 @@
           <heightmap>
             <uri>model://hawkshead/materials/rvc-depth-small.tif</uri>
             <size>450 450 100</size>
+            <pos>0 0 -5</pos>
           </heightmap>
         </geometry>
       </collision>
@@ -17,6 +18,7 @@
             <use_terrain_paging>false</use_terrain_paging>
             <uri>model://hawkshead/materials/rvc-depth-small.tif</uri>
             <size>450 450 100</size>
+            <pos>0 0 -5</pos>
             <texture>
               <diffuse>file://media/materials/textures/rvc-raster-small.tif</diffuse>
               <normal>file://media/materials/textures/flat_normal.png</normal>

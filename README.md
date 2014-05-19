@@ -145,13 +145,15 @@ Now, add a single 'hummingbird' quadrotor model to the simulation:
 
 You should see a model appear in simulation. In addition to apparing in the simulation, the HAL inherited by the simulator has also presented itself on the messaging backbone. Use the rosservice tool to see what services it offers.
 
-In addition to offering request-response services, the simulated entity also offers some broadcast-style messages on topics. To see what the platform offers, use the rostopic tool. For example, 
+In addition to offering request-response services, the simulated entity also offers some broadcast-style messages on topics. To see what the platform offers, use the rostopic tool. 
 
-	rostopic eacho /hal/hummingbird/UAV1/State
+For example, each platform has a truthful state (Truth) and an estimated version of this state (Estimate). Since we are currently in simulated mode, both of these states are observable. For example, to see the estimated state, use the following command.
 
-If nothing appears, its likely that you have the simulation paused. Remember that clocks are bound to simulated time, and if you have time paused then no callbacks will be triggered.
+	rostopic echo /hal/hummingbird/UAV1/Estimate
 
-Finally, it is possible to launch a hardware version of an epxeriment using the hw.launch file using the collowing command
+If nothing appears, its likely that you have the simulation paused. Remember that clocks are bound to simulated time, and if you have time paused then no callbacks will be triggered. In the very special case where you have no wind, dynamic or sensor noise, then the Estimate equals the Truth.
+
+Finally, it is possible to launch a hardware version of an experiment using the hw.launch file using the collowing command
 
 	roslaunch sim hw.launch world:=worlds/hawkshead.world
 
