@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_66f59f53a1a86747f7865dbeeb40894b" kind="dir">
+    <compoundname>PosSol</compoundname>
+    <innerfile refid="Combinations_8hpp">Combinations.hpp</innerfile>
+    <innerfile refid="PRSolution_8cpp">PRSolution.cpp</innerfile>
+    <innerfile refid="PRSolution_8hpp">PRSolution.hpp</innerfile>
+    <innerfile refid="PRSolution2_8cpp">PRSolution2.cpp</innerfile>
+    <innerfile refid="PRSolution2_8hpp">PRSolution2.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/lib/PosSol/"/>
+  </compounddef>
+</doxygen>

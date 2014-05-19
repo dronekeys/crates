@@ -2,6 +2,7 @@
 /devel/
 /docs/html/
 /docs/latex/
-/thirdparty/
 /src/CMakeLists.txt
+/thirdparty/gpstk/build
+/thirdparty/sdformat/build
 /.catkin_workspace

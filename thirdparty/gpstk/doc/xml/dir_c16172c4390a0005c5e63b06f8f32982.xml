@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_c16172c4390a0005c5e63b06f8f32982" kind="dir">
+    <compoundname>CMakeFiles</compoundname>
+    <innerdir refid="dir_d39970800f272f938a307035555d5a5d">2.8.11.2</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/build/CMakeFiles/"/>
+  </compounddef>
+</doxygen>

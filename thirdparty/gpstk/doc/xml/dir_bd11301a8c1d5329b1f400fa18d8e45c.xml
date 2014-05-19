@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_bd11301a8c1d5329b1f400fa18d8e45c" kind="dir">
+    <compoundname>FileHandling</compoundname>
+    <innerdir refid="dir_1712aea3b29763139be7eaec7ae9c8e5">Binex</innerdir>
+    <innerdir refid="dir_af314a479cd18013646ff3d2e594d46f">FIC</innerdir>
+    <innerdir refid="dir_245357b898299b3a800404bb9b233006">Ionex</innerdir>
+    <innerdir refid="dir_e882d77642f200a8aeb2407050d8cb3e">MSC</innerdir>
+    <innerdir refid="dir_78bc532260dbe4b2078bfe9272b9881d">RINEX</innerdir>
+    <innerdir refid="dir_d46efeae743d4c5280265be3a81e16b0">RINEX3</innerdir>
+    <innerdir refid="dir_e800f3536ed24914fc52bf5fac38a431">SEM</innerdir>
+    <innerdir refid="dir_2b62e2f8edb20fe911aef4af64d5177d">SP3</innerdir>
+    <innerdir refid="dir_0a384494a2ae857c99ef4bd6c5b0f05a">Yuma</innerdir>
+    <innerfile refid="BLQDataReader_8cpp">BLQDataReader.cpp</innerfile>
+    <innerfile refid="BLQDataReader_8hpp">BLQDataReader.hpp</innerfile>
+    <innerfile refid="ConfDataReader_8cpp">ConfDataReader.cpp</innerfile>
+    <innerfile refid="ConfDataReader_8hpp">ConfDataReader.hpp</innerfile>
+    <innerfile refid="ConfDataWriter_8cpp">ConfDataWriter.cpp</innerfile>
+    <innerfile refid="ConfDataWriter_8hpp">ConfDataWriter.hpp</innerfile>
+    <innerfile refid="DCBDataReader_8cpp">DCBDataReader.cpp</innerfile>
+    <innerfile refid="DCBDataReader_8hpp">DCBDataReader.hpp</innerfile>
+    <innerfile refid="FFBinaryStream_8hpp">FFBinaryStream.hpp</innerfile>
+    <innerfile refid="FFData_8cpp">FFData.cpp</innerfile>
+    <innerfile refid="FFData_8hpp">FFData.hpp</innerfile>
+    <innerfile refid="FFStream_8cpp">FFStream.cpp</innerfile>
+    <innerfile refid="FFStream_8hpp">FFStream.hpp</innerfile>
+    <innerfile refid="FFStreamError_8hpp">FFStreamError.hpp</innerfile>
+    <innerfile refid="FFTextStream_8hpp">FFTextStream.hpp</innerfile>
+    <innerfile refid="SatDataReader_8cpp">SatDataReader.cpp</innerfile>
+    <innerfile refid="SatDataReader_8hpp">SatDataReader.hpp</innerfile>
+    <innerfile refid="SMODFData_8cpp">SMODFData.cpp</innerfile>
+    <innerfile refid="SMODFData_8hpp">SMODFData.hpp</innerfile>
+    <innerfile refid="SMODFStream_8hpp">SMODFStream.hpp</innerfile>
+    <innerfile refid="StreamBuf_8hpp">StreamBuf.hpp</innerfile>
+    <innerfile refid="TimeNamedFileStream_8hpp">TimeNamedFileStream.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/lib/FileHandling/"/>
+  </compounddef>
+</doxygen>

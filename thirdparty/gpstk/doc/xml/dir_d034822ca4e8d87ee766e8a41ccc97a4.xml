@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_d034822ca4e8d87ee766e8a41ccc97a4" kind="dir">
+    <compoundname>FileDirProc</compoundname>
+    <innerfile refid="FileFilter_8hpp">FileFilter.hpp</innerfile>
+    <innerfile refid="FileFilterFrame_8hpp">FileFilterFrame.hpp</innerfile>
+    <innerfile refid="FileFilterFrameWithHeader_8hpp">FileFilterFrameWithHeader.hpp</innerfile>
+    <innerfile refid="FileHunter_8cpp">FileHunter.cpp</innerfile>
+    <innerfile refid="FileHunter_8hpp">FileHunter.hpp</innerfile>
+    <innerfile refid="FileSpec_8cpp">FileSpec.cpp</innerfile>
+    <innerfile refid="FileSpec_8hpp">FileSpec.hpp</innerfile>
+    <innerfile refid="FileStore_8hpp">FileStore.hpp</innerfile>
+    <innerfile refid="FileUtils_8hpp">FileUtils.hpp</innerfile>
+    <innerfile refid="RTFileFrame_8hpp">RTFileFrame.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/lib/FileDirProc/"/>
+  </compounddef>
+</doxygen>

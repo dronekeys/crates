@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_5a43c1fd23758741efa97f4dab2c6c21" kind="dir">
+    <compoundname>RefTime</compoundname>
+    <innerfile refid="HelmertTransform_8cpp">HelmertTransform.cpp</innerfile>
+    <innerfile refid="HelmertTransform_8hpp">HelmertTransform.hpp</innerfile>
+    <innerfile refid="ReferenceFrame_8cpp">ReferenceFrame.cpp</innerfile>
+    <innerfile refid="ReferenceFrame_8hpp">ReferenceFrame.hpp</innerfile>
+    <innerfile refid="TimeSystem_8cpp">TimeSystem.cpp</innerfile>
+    <innerfile refid="TimeSystem_8hpp">TimeSystem.hpp</innerfile>
+    <innerfile refid="TimeSystemCorr_8hpp">TimeSystemCorr.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/lib/RefTime/"/>
+  </compounddef>
+</doxygen>

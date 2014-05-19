@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_0a384494a2ae857c99ef4bd6c5b0f05a" kind="dir">
+    <compoundname>Yuma</compoundname>
+    <innerfile refid="YumaBase_8hpp">YumaBase.hpp</innerfile>
+    <innerfile refid="YumaData_8cpp">YumaData.cpp</innerfile>
+    <innerfile refid="YumaData_8hpp">YumaData.hpp</innerfile>
+    <innerfile refid="YumaHeader_8hpp">YumaHeader.hpp</innerfile>
+    <innerfile refid="YumaStream_8hpp">YumaStream.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/lib/FileHandling/Yuma/"/>
+  </compounddef>
+</doxygen>

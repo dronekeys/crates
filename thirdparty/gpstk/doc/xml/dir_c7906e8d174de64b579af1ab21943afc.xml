@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_c7906e8d174de64b579af1ab21943afc" kind="dir">
+    <compoundname>build</compoundname>
+    <innerdir refid="dir_c16172c4390a0005c5e63b06f8f32982">CMakeFiles</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/build/"/>
+  </compounddef>
+</doxygen>

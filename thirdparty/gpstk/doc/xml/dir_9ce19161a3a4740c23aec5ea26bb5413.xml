@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.4">
+  <compounddef id="dir_9ce19161a3a4740c23aec5ea26bb5413" kind="dir">
+    <compoundname>ObsArrayEvaluator</compoundname>
+    <innerfile refid="oae_8cpp">oae.cpp</innerfile>
+    <innerfile refid="ObsArray_8cpp">ObsArray.cpp</innerfile>
+    <innerfile refid="ObsArray_8hpp">ObsArray.hpp</innerfile>
+    <innerfile refid="SparseBinnedStats_8hpp">SparseBinnedStats.hpp</innerfile>
+    <innerfile refid="ValarrayUtils_8hpp">ValarrayUtils.hpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/asymingt/Dropbox/Documents/UCL/Research/Simulator/uas_framework/thirdparty/gpstk/removed/apps/ObsArrayEvaluator/"/>
+  </compounddef>
+</doxygen>

@@ -9,6 +9,91 @@ In addition to offering this abstraction service, the HAL may also include type-
 
 CRATES is based upon several open source and actively-developed libraries. ROS is used for the entire messaging backbone, while Gazebo is used for simulation and visualisation. In addition, the GPS toolkit is used to simulate global navigation satellite systems, while GeographicLib is used to to project between coordinate frames and calculate gravitational and magnetic fields.
 
+Installation instructions
+=========================
+
+Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine (not recommended -- for performance reasons)
+
+	Visit http://releases.ubuntu.com/14.04/
+
+Add the ROS PPA to your Ubuntu Sources
+
+	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' 
+	wget http://packages.ros.org/ros.key -O - | sudo apt-key add - 
+
+Add the Gazebo PPA to your Ubuntu Sources
+
+	sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu trusty main" > /etc/apt/sources.list.d/gazebo-latest.list'
+	wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+
+Update the system packages list
+
+	sudo apt-get update
+
+Follow the instructions to build Gazebo 3.0 from source using ODE only. If you disable building the test suite, Gazbo builds much quicker!
+
+	http://gazebosim.org/wiki/3.0/install
+
+Follow the instructions to build Gazebo 3.0 models
+
+	http://gazebosim.org/wiki/3.0/install
+
+Make sure you create this link, or gazebo wont see your models
+
+	ln -s ~/.gazebo/models /usr/share/models
+
+Take note that you may need need to update your OS's library search path. For example, add the following to /etc/ld.so.conf.d/gazebo.config
+
+	/usr/local/lib/x86_64-linux-gnu
+	/usr/local/lib
+
+Then run
+
+	sudo ldconfig
+
+Install ROS Indigo
+
+	sudo apt-get install ros-indigo-roscpp ros-indigo-roslaunch ros-indigo-rosbash ros-indigo-geometry-msgs ros-indigo-std-msgs ros-indigo-std-srvs ros-indigo-rostopic ros-indigo-std-rosservice
+
+Source the new ROS installation
+
+	source /opt/ros/indigo/setup.bash
+
+Initialise and update ROS
+
+	sudo rosdep init 
+	rosdep update 
+
+Checkout the CRATES framework
+
+	cd ~/workspace
+	git clone https://bitbucket.org/asymingt/crates.git
+
+Build and install the two libraries in the ./thirdparty directory, eg. for each library 'xyz' do
+
+	cd  ~/workspace/crates/thirdparty/xyz
+	mkdir build
+	cd build
+	cmake ..
+	make
+	sudo make install
+
+Source the new workspace ~/.bashrc 
+
+	cd  ~/workspace/crates/src
+	catkin_init_workspace
+
+Build the CRATES framework
+
+	cd ~/workspace/crates
+	catkin_make
+
+Source the new CRATES installation 
+
+	source ~/crates/devel/setup.bash
+
+You can now follow the basic usage instructions below.
+
 Example usage instructions
 ==========================
 
@@ -71,77 +156,3 @@ Finally, it is possible to launch a hardware version of an epxeriment using the 
 	roslaunch sim hw.launch world:=worlds/hawkshead.world
 
 This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
-
-Installation instructions
-=========================
-
-Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine (not recommended -- for performance reasons)
-
-	Visit http://releases.ubuntu.com/14.04/
-
-Add the ROS PPA to your Ubuntu Sources
-
-	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' 
-	wget http://packages.ros.org/ros.key -O - | sudo apt-key add - 
-
-Add the Gazebo PPA to your Ubuntu Sources
-
-	sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu trusty main" > /etc/apt/sources.list.d/gazebo-latest.list'
-	wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-
-Update the system packages list
-
-	sudo apt-get update
-
-Follow the instructions to build Gazebo 3.0 from source using ODE only:
-
-	http://gazebosim.org/wiki/3.0/install
-
-Follow the instructions to build Gazebo 3.0 models
-
-	http://gazebosim.org/wiki/3.0/install
-
-Follow the instructions to build Gazebo 3.0 from source:
-
-	ln -s ~/.gazebo/models /usr/share/models
-
-Take note that you may need need to update your OS's library search path. For example, add the following to /etc/ld.so.conf.d/gazebo.config
-
-	/usr/local/lib/x86_64-linux-gnu
-	/usr/local/lib
-
-Then run
-
-	sudo ldconfig
-
-Install basic ROS Indigo
-
-	sudo apt-get install ros-indigo-roscpp ros-indigo-roslaunch ros-indigo-rosbash ros-indigo-geometry-msgs ros-indigo-std-msgs ros-indigo-std-srvs ros-indigo-rostopic ros-indigo-std-rosservice
-
-Source the new ROS installation
-
-	source /opt/ros/indigo/setup.bash
-
-Initialise and update ROS
-
-	sudo rosdep init 
-	rosdep update 
-
-Checkout the CRATES framework
-
-	cd ~/workspace
-	git clone https://bitbucket.org/asymingt/crates.git
-
-Source the new workspace ~/.bashrc 
-
-	cd  ~/workspace/crates/src
-	catkin_init_workspace
-
-Source the new workspace ~/.bashrc 
-
-	cd ~/workspace/crates
-	catkin_make
-
-Source the new CRATES installation 
-
-	source ~/crates/devel/setup.bash
