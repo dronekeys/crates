@@ -1,0 +1,6 @@
+/**
+
+\defgroup hal_sensor_orientation hal_sensor_orientation
+\brief A HAL for an orientation sensor
+
+*/

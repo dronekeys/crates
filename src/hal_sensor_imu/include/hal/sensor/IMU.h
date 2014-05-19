@@ -8,7 +8,7 @@
 #include <hal_sensor_imu/Data.h>
 
 // For blank requests
-#include <hal_sensor_imu/SetRate.h>
+#include <hal_sensor_imu/Configure.h>
 
 namespace hal
 {
@@ -19,16 +19,16 @@ namespace hal
         private:
 
             /// Templated message type
-            hal_sensor_imu::Data message;
-
+            hal_sensor_imu::Data            message;
+            
             /// Callback timer for status message updates
-            ros::Timer timer;
+            ros::Timer                      timer;
 
             /// Used to broadcast Status message
-            ros::Publisher publisher;
+            ros::Publisher                  publisher;
             
             /// Ued to receive sensor rate update requests
-            ros::ServiceServer  service;
+            ros::ServiceServer              service;
 
             //! Create a new Platform HAL
             /*!
@@ -49,7 +49,9 @@ namespace hal
               \param res the rate response message
               \return whether the rate updated was accepted
             */
-            bool SetRate(hal_sensor_imu::SetRate::Request &req, hal_sensor_imu::SetRate::Response &res);
+            bool Configure(
+                hal_sensor_imu::Configure::Request &req, 
+                hal_sensor_imu::Configure::Response &res);
 
         public:
 

@@ -57,13 +57,12 @@ add_message_files(
     Data.msg
 )
 
-
 ## Generate services in the 'srv' folder
 add_service_files(
    DIRECTORY
     srv
   FILES
-    SetRate.srv
+    Configure.srv
 )
 
 ## Generate actions in the 'action' folder

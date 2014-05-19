@@ -1,2 +1,4 @@
-Header  header  
-geometry_msgs/Vector3 fieldstrength   # body-frame magnetic field strength
+time    t     # Time at which measurement was taken
+float64 x     # Body frame magnetic field strength X
+float64 y     # Body frame magnetic field strength Y
+float64 z     # Body frame magnetic field strength Z

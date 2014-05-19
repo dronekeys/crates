@@ -1,3 +1,2 @@
-Header  header  
-float64 height       # Absolute atmosphereic pressure in millibar
-float64 velocity     # Differential atmosphereic pressure in millibar
+time    t     # Time at which measurement was taken
+float64 z     # Barometric altitude

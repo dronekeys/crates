@@ -1,5 +1,0 @@
-hal_model_quadrotor/State state
----
-# RESULT
-bool    success
-string  status

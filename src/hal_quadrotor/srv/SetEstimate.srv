@@ -1,0 +1,5 @@
+hal_quadrotor/State state
+---
+# RESULT
+bool    success
+string  status

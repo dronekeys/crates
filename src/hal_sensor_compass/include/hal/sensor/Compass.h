@@ -7,6 +7,9 @@
 // Message libraries
 #include <hal_sensor_compass/Data.h>
 
+// For blank requests
+#include <hal_sensor_compass/Configure.h>
+
 namespace hal
 {
     namespace sensor
@@ -16,13 +19,16 @@ namespace hal
         private:
 
             /// Templated message type
-            hal_sensor_compass::Data message;
+            hal_sensor_compass::Data        message;
 
             /// Callback timer for status message updates
-            ros::Timer timer;
+            ros::Timer                      timer;
 
             /// Used to broadcast Status message
-            ros::Publisher publisher;
+            ros::Publisher                  publisher;
+            
+            /// Ued to receive sensor rate update requests
+            ros::ServiceServer              service;
 
             //! Create a new Platform HAL
             /*!
@@ -36,6 +42,16 @@ namespace hal
               \return whether the measurement was obtained successfully
             */
             virtual bool GetMeasurement(hal_sensor_compass::Data& msg) = 0;
+
+            //! Set the data rate of the sensor
+            /*!
+              \param req the rate request message
+              \param res the rate response message
+              \return whether the rate updated was accepted
+            */
+            bool Configure(
+                hal_sensor_compass::Configure::Request  &req, 
+                hal_sensor_compass::Configure::Response &res);
 
         public:
 

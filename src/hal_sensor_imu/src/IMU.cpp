@@ -17,7 +17,7 @@ void IMU::OnInit()
     publisher = GetRosNodePtr()->template advertise<hal_sensor_imu::Data>("sensor/imu/Data", DEFAULT_QUEUE_LENGTH);
 
     // Advertice the ability to configure the sensor rate
-    service = GetRosNodePtr()->advertiseService("sensor/imu/SetRate", &IMU::SetRate, this);
+    service = GetRosNodePtr()->advertiseService("sensor/imu/Configure", &IMU::Configure, this);
 
     // Create a timer to broadcast the data
     timer = GetRosNodePtr()->createTimer(
@@ -29,7 +29,7 @@ void IMU::OnInit()
     );
 }
 
-bool IMU::SetRate(hal_sensor_imu::SetRate::Request &req, hal_sensor_imu::SetRate::Response &res)
+bool IMU::Configure(hal_sensor_imu::Configure::Request &req, hal_sensor_imu::Configure::Response &res)
 {
     timer.stop();
     if (req.rate > 0)

@@ -1,0 +1,6 @@
+# INSTRUCTION
+float64 rate
+---
+# RESULT
+bool    success
+string  status
