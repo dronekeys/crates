@@ -18,12 +18,12 @@ find_package(catkin REQUIRED COMPONENTS
 	geometry_msgs
 	message_generation
   hal
-  hal_model_quadrotor
+  hal_quadrotor
   hal_sensor_altimeter
   hal_sensor_compass
-  hal_sensor_energy
   hal_sensor_gnss
   hal_sensor_imu
+  hal_sensor_orientation
 ) 
 
 # Find Gazebo
@@ -164,11 +164,11 @@ catkin_package(
       sim_wind
       sim_altimeter
       sim_compass
-      sim_energy
       sim_gnss
       sim_imu
       sim_quadrotor
       sim_aerodynamics
+      sim_orientation
     CATKIN_DEPENDS
       roslib
       roscpp
@@ -179,12 +179,12 @@ catkin_package(
       rosgraph_msgs
       geometry_msgs
       hal
-      hal_model_quadrotor
+      hal_quadrotor
       hal_sensor_altimeter
       hal_sensor_compass
-      hal_sensor_energy
-      hal_sensor_gnss
       hal_sensor_imu
+      hal_sensor_gnss
+      hal_sensor_orientation
 )
 
 ###########
@@ -254,9 +254,9 @@ add_library(sim_wind                  src/plugins/world/Wind.cpp)
 # The model plugins (sensors)
 add_library(sim_altimeter             src/plugins/model/Altimeter.cpp)
 add_library(sim_compass               src/plugins/model/Compass.cpp)
-add_library(sim_energy                src/plugins/model/Energy.cpp)
 add_library(sim_gnss                  src/plugins/model/GNSS.cpp)
 add_library(sim_imu                   src/plugins/model/IMU.cpp)
+add_library(sim_orientation           src/plugins/model/Orientation.cpp)
 
 # The model plugins (dynamics)
 add_library(sim_quadrotor             src/plugins/model/Quadrotor.cpp)
@@ -279,9 +279,9 @@ add_dependencies(sim_wind             custom_msgs)
 # The model plugins (sensors)
 add_dependencies(sim_altimeter        custom_msgs)
 add_dependencies(sim_compass          custom_msgs)
-add_dependencies(sim_energy           custom_msgs)
 add_dependencies(sim_gnss             custom_msgs)
 add_dependencies(sim_imu              custom_msgs)
+add_dependencies(sim_orientation      custom_msgs)
 
 # The model plugins (dynamics)
 add_dependencies(sim_quadrotor        custom_msgs)
@@ -321,9 +321,9 @@ target_link_libraries(sim_wind            ${SYS_LIBS})
 # Model plugins
 target_link_libraries(sim_altimeter       ${SYS_LIBS})
 target_link_libraries(sim_compass         ${SYS_LIBS})
-target_link_libraries(sim_energy          ${SYS_LIBS})
 target_link_libraries(sim_gnss            ${SYS_LIBS} ${GPSTK_LIBRARIES})
 target_link_libraries(sim_imu             ${SYS_LIBS})
+target_link_libraries(sim_orientation     ${SYS_LIBS})
 target_link_libraries(sim_quadrotor       ${SYS_LIBS})
 target_link_libraries(sim_aerodynamics    ${SYS_LIBS})
 

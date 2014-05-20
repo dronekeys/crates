@@ -1,4 +1,4 @@
-#include <hal/model/Actuation.h>
+#include <hal/quadrotor/Actuation.h>
 
 using namespace hal::quadrotor;
 
@@ -23,8 +23,8 @@ void Actuation::Switch(ControllerType controller)
 	current = controller;
 }
 
-bool Actuation::GetControl(const hal_model_quadrotor::State &state, 
-	double dt, hal_model_quadrotor::Control &control)
+bool Actuation::GetControl(const hal_quadrotor::State &state, 
+	double dt, hal_quadrotor::Control &control)
 {
 	Controller* ptr;
 	switch (current)
@@ -65,8 +65,8 @@ bool Actuation::GetControl(const hal_model_quadrotor::State &state,
 }
 
 bool Actuation::RcvAnglesHeight(
-    hal_model_quadrotor::AnglesHeight::Request  &req, 
-    hal_model_quadrotor::AnglesHeight::Response &res)
+    hal_quadrotor::AnglesHeight::Request  &req, 
+    hal_quadrotor::AnglesHeight::Response &res)
 {
 	switch (current)
 	{
@@ -86,8 +86,8 @@ bool Actuation::RcvAnglesHeight(
 }
 
 bool Actuation::RcvEmergency(
-    hal_model_quadrotor::Emergency::Request  &req, 
-    hal_model_quadrotor::Emergency::Response &res)
+    hal_quadrotor::Emergency::Request  &req, 
+    hal_quadrotor::Emergency::Response &res)
 {
 	cEmergency.SetGoal(req, res);
 	if (res.success)
@@ -96,8 +96,8 @@ bool Actuation::RcvEmergency(
 }
 
 bool Actuation::RcvHover(
-    hal_model_quadrotor::Hover::Request  &req, 
-    hal_model_quadrotor::Hover::Response &res)
+    hal_quadrotor::Hover::Request  &req, 
+    hal_quadrotor::Hover::Response &res)
 {
 	switch (current)
 	{
@@ -117,8 +117,8 @@ bool Actuation::RcvHover(
 }
 
 bool Actuation::RcvLand(
-    hal_model_quadrotor::Land::Request  &req, 
-    hal_model_quadrotor::Land::Response &res)
+    hal_quadrotor::Land::Request  &req, 
+    hal_quadrotor::Land::Response &res)
 {
 	switch (current)
 	{
@@ -138,8 +138,8 @@ bool Actuation::RcvLand(
 }
 
 bool Actuation::RcvTakeoff(
-    hal_model_quadrotor::Takeoff::Request  &req, 
-    hal_model_quadrotor::Takeoff::Response &res)
+    hal_quadrotor::Takeoff::Request  &req, 
+    hal_quadrotor::Takeoff::Response &res)
 {
 	switch (current)
 	{
@@ -155,8 +155,8 @@ bool Actuation::RcvTakeoff(
 }
 
 bool Actuation::RcvVelocity(
-    hal_model_quadrotor::Velocity::Request  &req, 
-    hal_model_quadrotor::Velocity::Response &res)
+    hal_quadrotor::Velocity::Request  &req, 
+    hal_quadrotor::Velocity::Response &res)
 {
 	switch (current)
 	{
@@ -176,8 +176,8 @@ bool Actuation::RcvVelocity(
 }
 
 bool Actuation::RcvVelocityHeight(
-    hal_model_quadrotor::VelocityHeight::Request  &req, 
-    hal_model_quadrotor::VelocityHeight::Response &res)
+    hal_quadrotor::VelocityHeight::Request  &req, 
+    hal_quadrotor::VelocityHeight::Response &res)
 {
 	switch (current)
 	{
@@ -197,8 +197,8 @@ bool Actuation::RcvVelocityHeight(
 }
 
 bool Actuation::RcvWaypoint(
-    hal_model_quadrotor::Waypoint::Request  &req, 
-    hal_model_quadrotor::Waypoint::Response &res)
+    hal_quadrotor::Waypoint::Request  &req, 
+    hal_quadrotor::Waypoint::Response &res)
 {
 	switch (current)
 	{

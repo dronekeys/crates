@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
 
-  <name>hal_model_quadrotor</name>
+  <name>hal_quadrotor</name>
   
   <version>0.0.1</version>
   
@@ -22,12 +22,22 @@
   <build_depend>message_generation</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>hal</build_depend>#
+  <build_depend>hal</build_depend>
+  <build_depend>hal_sensor_altimeter</build_depend>
+  <build_depend>hal_sensor_compass</build_depend>
+  <build_depend>hal_sensor_imu</build_depend>
+  <build_depend>hal_sensor_gnss</build_depend>
+  <build_depend>hal_sensor_orientation</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>hal</run_depend>
+  <run_depend>hal_sensor_altimeter</run_depend>
+  <run_depend>hal_sensor_compass</run_depend>
+  <run_depend>hal_sensor_imu</run_depend>
+  <run_depend>hal_sensor_gnss</run_depend>
+  <run_depend>hal_sensor_orientation</run_depend>
 
 </package>

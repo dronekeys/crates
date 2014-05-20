@@ -1,4 +1,4 @@
-#include <hal/model/control/Takeoff.h>
+#include <hal/quadrotor/control/Takeoff.h>
 
 // COntroller constants
 #define _X          0
@@ -16,11 +16,11 @@
 #define _maxyawrate 4.4         /* max allowed yaw rate           */
 #define _maxv       5.0         /* max allowed xy velocity        */
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 bool Takeoff::SetGoal(
-    hal_model_quadrotor::Takeoff::Request  &req, 
-    hal_model_quadrotor::Takeoff::Response &res
+    hal_quadrotor::Takeoff::Request  &req, 
+    hal_quadrotor::Takeoff::Response &res
 ) {
     // Set the new goal
     sp[_Z] = req.altitude;
@@ -41,8 +41,8 @@ bool Takeoff::SetGoal(
     return true;
 }
 
-bool Takeoff::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool Takeoff::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
     %  Computes the quadtotor control signals given the current state 

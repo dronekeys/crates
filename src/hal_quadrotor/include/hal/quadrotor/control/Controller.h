@@ -1,13 +1,13 @@
-#ifndef HAL_MODEL_QUADROTOR_CONTROLLER_H
-#define HAL_MODEL_QUADROTOR_CONTROLLER_H
+#ifndef HAL_QUADROTOR_CONTROLLER_H
+#define HAL_QUADROTOR_CONTROLLER_H
 
 // State and control messages
-#include <hal_model_quadrotor/State.h>
-#include <hal_model_quadrotor/Control.h>
+#include <hal_quadrotor/State.h>
+#include <hal_quadrotor/Control.h>
 
 namespace hal
 {
-    namespace model
+    namespace quadrotor
     {
         // An abstract class for modelling noise
         class Controller
@@ -23,6 +23,9 @@ namespace hal
 
         public:
 
+            // Ensures actual object destructor is invoked
+            virtual ~Controller() {};
+
             //! Each controller must provide the ability to generate control
             /*!
                 \param state the current platform state
@@ -30,8 +33,8 @@ namespace hal
                 \param control the output control from the controller
                 \return if the state could be updated
             */
-            virtual bool Update(const hal_model_quadrotor::State &state, 
-                double dt, hal_model_quadrotor::Control &control) = 0;
+            virtual bool Update(const hal_quadrotor::State &state, 
+                double dt, hal_quadrotor::Control &control) = 0;
 
             //! Goal reach implementations
             /*!

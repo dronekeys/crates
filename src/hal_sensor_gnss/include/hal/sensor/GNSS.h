@@ -22,7 +22,7 @@ namespace hal
             hal_sensor_gnss::Data           message;
 
             /// Callback timer for status message updates
-            ros::Timer                      timer;
+            ros::Timer                      timerSamp, timerSend;
 
             /// Used to broadcast Status message
             ros::Publisher                  publisher;
@@ -30,18 +30,17 @@ namespace hal
             /// Ued to receive sensor rate update requests
             ros::ServiceServer              service;
 
-            //! Create a new Platform HAL
+            //! Send the sensor data over the messagng system
             /*!
               \param event the Timer event passed from the callback
             */
             void Broadcast(const ros::TimerEvent& event);
 
-            //! Called by HAL to obtain a compass measurement
+            //! Sample message data from the flight control system
             /*!
-              \param msg the message to be populated
-              \return whether the measurement was obtained successfully
+              \param event the Timer event passed from the callback
             */
-            virtual bool GetMeasurement(hal_sensor_gnss::Data& msg) = 0;
+            void Sample(const ros::TimerEvent& event);
 
             //! Set the data rate of the sensor
             /*!
@@ -52,6 +51,14 @@ namespace hal
             bool Configure(
                 hal_sensor_gnss::Configure::Request  &req, 
                 hal_sensor_gnss::Configure::Response &res);
+
+        protected:
+
+            //! Called by HAL to obtain measurement from the FCS
+            /*!
+              \param msg the message to be populated
+            */
+            virtual bool GetMeasurement(hal_sensor_gnss::Data& msg) = 0;
 
         public:
 

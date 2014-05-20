@@ -1,4 +1,4 @@
-#include <hal/model/control/VelocityHeight.h>
+#include <hal/quadrotor/control/VelocityHeight.h>
 
 // Controller constants
 #define _U          0       
@@ -17,11 +17,11 @@
 #define _maxyawrate 4.4      /* max allowed yaw rate                       */
 #define _maxv       3.0      /* max allowed xy velocity                    */
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 bool VelocityHeight::SetGoal(
-    hal_model_quadrotor::VelocityHeight::Request  &req, 
-    hal_model_quadrotor::VelocityHeight::Response &res
+    hal_quadrotor::VelocityHeight::Request  &req, 
+    hal_quadrotor::VelocityHeight::Response &res
 ) {
     // Horizontal velocity 
     sp[_U]      = req.u;
@@ -47,8 +47,8 @@ bool VelocityHeight::SetGoal(
     return true;
 }
 
-bool VelocityHeight::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool VelocityHeight::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
     %  Computes the quadrotor control signals given the current state,

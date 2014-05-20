@@ -1,15 +1,15 @@
-#ifndef HAL_MODEL_QUADROTOR_TAKEOFF_H
-#define HAL_MODEL_QUADROTOR_TAKEOFF_H
+#ifndef HAL_QUADROTOR_TAKEOFF_H
+#define HAL_QUADROTOR_TAKEOFF_H
 
 // Base controller type
 #include <hal/quadrotor/control/Controller.h>
 
 // Messages used by this controller
-#include <hal_model_quadrotor/Takeoff.h>
+#include <hal_quadrotor/Takeoff.h>
 
 namespace hal
 {
-    namespace model
+    namespace quadrotor
     {
         //! A quadrotor Emergency controller
         /*!
@@ -40,8 +40,8 @@ namespace hal
               \return whether the control was accepted
             */
             bool SetGoal(
-                hal_model_quadrotor::Takeoff::Request& req, 
-                hal_model_quadrotor::Takeoff::Response& res
+                hal_quadrotor::Takeoff::Request& req, 
+                hal_quadrotor::Takeoff::Response& res
             );
 
             //! Obtain control from state and timestep
@@ -51,8 +51,8 @@ namespace hal
               \param control the output control from the controller
               \return if the state could be updated
             */
-            bool Update(const hal_model_quadrotor::State &state, 
-                double dt, hal_model_quadrotor::Control &control);
+            bool Update(const hal_quadrotor::State &state, 
+                double dt, hal_quadrotor::Control &control);
 
             //! Goal reach implementations
             /*!

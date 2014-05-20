@@ -1,9 +1,9 @@
-#include <hal/model/control/Idle.h>
+#include <hal/quadrotor/control/Idle.h>
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
-bool Idle::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool Idle::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
     control.roll     = 0.0;
     control.pitch    = 0.0;

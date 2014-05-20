@@ -1,7 +1,8 @@
 // Library headers
 #include <hal/sensor/Altimeter.h>
 
-#define DEFAULT_SENSOR_RATE   1.0
+#define DEFAULT_SAMP_RATE 50
+#define DEFAULT_SEND_RATE  1
 
 using namespace hal::sensor;
 
@@ -20,9 +21,18 @@ void Altimeter::OnInit()
     service = GetRosNodePtr()->advertiseService("sensor/altimeter/Configure", &Altimeter::Configure, this);
 
     // Create a timer to broadcast the data
-    timer = GetRosNodePtr()->createTimer(
-        ros::Duration(1.0/DEFAULT_SENSOR_RATE),     // Callback rate
-        &Altimeter::Broadcast,                         // Callback
+    timerSamp = GetRosNodePtr()->createTimer(
+        ros::Duration(1.0/DEFAULT_SAMP_RATE),       // Callback rate
+        &Altimeter::Sample,                         // Callback
+        this,                                       // Callee
+        false,                                      // Oneshot
+        true                                        // Autostart
+    );
+
+    // Create a timer to broadcast the data
+    timerSend = GetRosNodePtr()->createTimer(
+        ros::Duration(1.0/DEFAULT_SEND_RATE),       // Callback rate
+        &Altimeter::Broadcast,                      // Callback
         this,                                       // Callee
         false,                                      // Oneshot
         true                                        // Autostart
@@ -31,23 +41,29 @@ void Altimeter::OnInit()
 
 bool Altimeter::Configure(hal_sensor_altimeter::Configure::Request &req, hal_sensor_altimeter::Configure::Response &res)
 {
-    timer.stop();
-    if (req.rate > 0)
+    timerSamp.stop();
+    if (req.samprate > 0)
     {
-        timer.setPeriod(ros::Duration(1.0/req.rate));
-        timer.start();
-        return true;
+        timerSamp.setPeriod(ros::Duration(1.0/req.samprate));
+        timerSamp.start();
     }
-    res.success = false;
-    res.status  = "Could not change sensor rate, because of invalid rate request value";
-    return false;
+    timerSend.stop();
+    if (req.sendrate > 0)
+    {
+        timerSend.setPeriod(ros::Duration(1.0/req.sendrate));
+        timerSend.start();
+    }
+    res.success = true;
+    res.status  = "Sensor update rate changed";
+    return true;
 }
 
 void Altimeter::Broadcast(const ros::TimerEvent& event)
-{   
-    // Obtain the measure               
-    GetMeasurement(message);
-    
-    // Publish the measurement
+{                  
     publisher.publish(message);
+}
+
+void Altimeter::Sample(const ros::TimerEvent& event)
+{                  
+    GetMeasurement(message);
 }

@@ -1,6 +1,6 @@
 /**
 
-\defgroup hal_model_quadrotor hal_model_quadrotor
+\defgroup hal_quadrotor hal_quadrotor
 \brief A HAL for a quadrotor flight platform
 
 */

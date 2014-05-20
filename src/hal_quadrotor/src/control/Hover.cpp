@@ -1,4 +1,4 @@
-#include <hal/model/control/Hover.h>
+#include <hal/quadrotor/control/Hover.h>
 
 // COntroller constants
 #define _X          0
@@ -16,11 +16,11 @@
 #define _maxyawrate 4.4         /* max allowed yaw rate           */
 #define _maxv       5.0         /* max allowed xy velocity        */
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 bool Hover::SetGoal(
-    hal_model_quadrotor::Hover::Request  &req, 
-    hal_model_quadrotor::Hover::Response &res
+    hal_quadrotor::Hover::Request  &req, 
+    hal_quadrotor::Hover::Response &res
 ) {
 
     // Carries for altitude PID
@@ -36,8 +36,8 @@ bool Hover::SetGoal(
     return true;
 }
 
-bool Hover::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool Hover::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
     %  Computes the quadrotor control signals given the current state 

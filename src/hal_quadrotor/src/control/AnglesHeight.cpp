@@ -1,4 +1,4 @@
-#include <hal/model/control/AnglesHeight.h>
+#include <hal/quadrotor/control/AnglesHeight.h>
 
 // Constant parameters
 #define _Kv         0.09     /* xy velocity proportional constant  */
@@ -10,11 +10,11 @@
 #define _Kdz        0.04     /* altitude derivative constant       */
 #define _th_hover   0.59     /* throttle hover offset              */
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 bool AnglesHeight::SetGoal(
-    hal_model_quadrotor::AnglesHeight::Request  &req, 
-    hal_model_quadrotor::AnglesHeight::Response &res
+    hal_quadrotor::AnglesHeight::Request  &req, 
+    hal_quadrotor::AnglesHeight::Response &res
 ) {
     // Set the new goal state from the message
     sp[_ROLL]   = req.roll;
@@ -35,8 +35,8 @@ bool AnglesHeight::SetGoal(
     return true;
 }
 
-bool AnglesHeight::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool AnglesHeight::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
 
     /******************************************************************

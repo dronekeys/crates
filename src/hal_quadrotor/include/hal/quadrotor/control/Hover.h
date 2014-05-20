@@ -1,15 +1,15 @@
-#ifndef HAL_MODEL_QUADROTOR_HOVER_H
-#define HAL_MODEL_QUADROTOR_HOVER_H
+#ifndef HAL_QUADROTOR_HOVER_H
+#define HAL_QUADROTOR_HOVER_H
 
 // Base controller type
 #include <hal/quadrotor/control/Controller.h>
 
 // Messages used by this controller
-#include <hal_model_quadrotor/Hover.h>
+#include <hal_quadrotor/Hover.h>
 
 namespace hal
 {
-    namespace model
+    namespace quadrotor
     {
         //! A quadrotor Emergency controller
         /*!
@@ -37,8 +37,8 @@ namespace hal
               \return whether the control was accepted
             */
             bool SetGoal(
-                hal_model_quadrotor::Hover::Request& req, 
-                hal_model_quadrotor::Hover::Response& res
+                hal_quadrotor::Hover::Request& req, 
+                hal_quadrotor::Hover::Response& res
             );
 
             //! Obtain control from state and timestep
@@ -48,8 +48,8 @@ namespace hal
               \param control the output control from the controller
               \return if the state could be updated
             */
-            bool Update(const hal_model_quadrotor::State &state, 
-                double dt, hal_model_quadrotor::Control &control);
+            bool Update(const hal_quadrotor::State &state, 
+                double dt, hal_quadrotor::Control &control);
 
             //! Goal reach implementations
             /*!

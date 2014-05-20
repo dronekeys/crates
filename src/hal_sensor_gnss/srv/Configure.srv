@@ -1,6 +1,5 @@
-# INSTRUCTION
-float64 rate
+float64 samprate
+float64 sendrate
 ---
-# RESULT
 bool    success
 string  status

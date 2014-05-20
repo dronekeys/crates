@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_model_quadrotor)
+project(hal_quadrotor)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -18,6 +18,11 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
 	message_generation
   hal
+  hal_sensor_altimeter
+  hal_sensor_compass
+  hal_sensor_gnss
+  hal_sensor_imu
+  hal_sensor_orientation
 ) 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -107,11 +112,16 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    hal_model_quadrotor
+    hal_quadrotor
   DEPENDS 
     roscpp
     message_runtime
     hal
+    hal_sensor_altimeter
+    hal_sensor_compass
+    hal_sensor_gnss
+    hal_sensor_imu
+    hal_sensor_orientation
 )
 
 ###########
@@ -123,20 +133,18 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(hal_model_quadrotor
-  src/controller/Controller.cpp
-  src/controller/Idle.cpp
-  src/controller/Takeoff.cpp
-  src/controller/Hover.cpp
-  src/controller/Land.cpp
-  src/controller/Emergency.cpp
-  src/controller/AnglesHeight.cpp
-  src/controller/Velocity.cpp
-  src/controller/VelocityHeight.cpp
-  src/controller/Waypoint.cpp
-  src/navigation/Filter.cpp
-  src/navigation/NaiveFusion.cpp
-  src/Control.cpp
+add_library(hal_quadrotor
+  src/control/Controller.cpp
+  src/control/Idle.cpp
+  src/control/Takeoff.cpp
+  src/control/Hover.cpp
+  src/control/Land.cpp
+  src/control/Emergency.cpp
+  src/control/AnglesHeight.cpp
+  src/control/Velocity.cpp
+  src/control/VelocityHeight.cpp
+  src/control/Waypoint.cpp
+  src/Actuation.cpp
   src/Navigation.cpp
   src/Quadrotor.cpp
 )
@@ -148,10 +156,10 @@ add_library(hal_model_quadrotor
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal_model_quadrotor hal_model_quadrotor_generate_messages_cpp)
+add_dependencies(hal_quadrotor hal_quadrotor_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_model_quadrotor ${catkin_LIBRARIES})
+target_link_libraries(hal_quadrotor ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -194,7 +202,7 @@ target_link_libraries(hal_model_quadrotor ${catkin_LIBRARIES})
 
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
-target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_model_quadrotor)
+target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_quadrotor)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

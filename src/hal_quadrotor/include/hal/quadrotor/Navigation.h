@@ -1,64 +1,35 @@
-#ifndef HAL_MODEL_QUADROTOR_NAVIGATION_H
-#define HAL_MODEL_QUADROTOR_NAVIGATION_H
+#ifndef HAL_QUADROTOR_NAVIGATION_H
+#define HAL_QUADROTOR_NAVIGATION_H
 
 // Sensors
 #include <hal/sensor/Altimeter.h>
 #include <hal/sensor/Compass.h>
 #include <hal/sensor/IMU.h>
 #include <hal/sensor/GNSS.h>
+#include <hal/sensor/Orientation.h>
 
 // Platform state
-#include <hal_model_quadrotor/State.h>
+#include <hal_quadrotor/State.h>
 
 // ROS
 #include <ros/ros.h>
 
 namespace hal
 {
-  namespace model
+  namespace quadrotor
   {
-    // Define the gaussian types
-    typedef enum 
-    {
-      NAVIGATION_NAIVE,
-      NAVIGATION_DISABLED
-    } 
-    NavigationType;
-
-    // A 6DoF kinematic model for quadrotor navigation. Uses inertial
-    // measurements to update the pose of the quadrotor. Periodically
-    // corrects the pose with measurements from a compass, GNSS and
-    // altimeter. Source code adapted from the OpenPilot project.
-    class Navigation :
-      public hal::sensor::Altimeter,
-      public hal::sensor::Compass,
-      public hal::sensor::IMU,
-      public hal::sensor::GNSS,
-      public hal::sensor::Orientation
+    // A really simple filter for fusing data
+    class Navigation
     {     
 
     private:
       
-      /// Whether a measurement has been received
-      bool bootstrapped;
-
       /// The estimated state
-      hal_model_quadrotor state;
+      hal_quadrotor::State state;
 
     public:    
 
-      //! Initialise the navigation engine
-      /*!
-          \param nh the ROS node handle
-          \param navigation the default navigation engine
-      */
-      void Init(ros::NodeHandle* nh, NavigationType navigation);
-      
-      //! Switch to a new navigation engine
-      /*!
-          \param navigation the new navigation engine
-      */
-      void Switch(NavigationType navigation);
+      /// INITIALIZE AND RESET THE NAVIGATION ENGINE //////////////////
 
       //! Get the current state
       /*!
@@ -66,35 +37,51 @@ namespace hal
       */
       void Reset();
 
+      /// GET AND SET THE QUADROTOR STATE //////////////////////////////
+
+      //! Get the state estimate
+      /*!
+          \param state the current platform state
+      */
+      void GetState(hal_quadrotor::State &msg);
+
+      //! Set the state estimate
+      /*!
+          \param state the current platform state
+      */
+      void SetState(const hal_quadrotor::State &msg);
+
+      /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////
+
       //! Called when new altimeter data arrives
       /*!
         \param msg the sensor data
       */
-      void RcvAltimeter(const hal_sensor_altimeter::Data& msg);
+      void Process(const hal_sensor_altimeter::Data& msg);
 
       //! Called when new compass data arrives
       /*!
         \param msg the sensor data
       */
-      void RcvCompass(const hal_sensor_compass::Data& msg);
+      void Process(const hal_sensor_compass::Data& msg);
 
       //! Called when new IMU data arrives
       /*!
         \param msg the sensor data
       */
-      void RcvIMU(const hal_sensor_imu::Data& msg);
+      void Process(const hal_sensor_imu::Data& msg);
 
       //! Called when new GNSS data arrives
       /*!
         \param msg the sensor data
       */
-      void RcvGNSS(const hal_sensor_gnss::Data& msg);
+      void Process(const hal_sensor_gnss::Data& msg);
 
-      //! Get the current state
+      //! Called when new orientation data arrives
       /*!
-        \param msg state structure to be written
+        \param msg the sensor data
       */
-      void GetState(hal_model_quadrotor::State& msg);
+      void Process(const hal_sensor_orientation::Data& msg);
 
     };
   }

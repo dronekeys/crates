@@ -1,7 +1,7 @@
 // State and control messages
-#include <hal/model/control/Controller.h>
+#include <hal/quadrotor/control/Controller.h>
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 double Controller::limit(const double& val, const double& minval, const double& maxval)
 {

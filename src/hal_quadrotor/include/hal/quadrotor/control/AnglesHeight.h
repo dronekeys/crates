@@ -1,11 +1,11 @@
-#ifndef HAL_MODEL_QUADROTOR_ANGLESHEIGHT_H
-#define HAL_MODEL_QUADROTOR_ANGLESHEIGHT_H
+#ifndef HAL_QUADROTOR_ANGLESHEIGHT_H
+#define HAL_QUADROTOR_ANGLESHEIGHT_H
 
 // Base controller type
 #include <hal/quadrotor/control/Controller.h>
 
 // Messages used by this controller
-#include <hal_model_quadrotor/AnglesHeight.h>
+#include <hal_quadrotor/AnglesHeight.h>
 
 // Convenience declarations
 #define _ROLL   0 
@@ -15,7 +15,7 @@
 
 namespace hal
 {
-    namespace model
+    namespace quadrotor
     {
         //! A quadrotor Emergency controller
         /*!
@@ -43,8 +43,8 @@ namespace hal
               \return whether the control was accepted
             */
             bool SetGoal(
-                hal_model_quadrotor::AnglesHeight::Request& req, 
-                hal_model_quadrotor::AnglesHeight::Response& res
+                hal_quadrotor::AnglesHeight::Request& req, 
+                hal_quadrotor::AnglesHeight::Response& res
             );
 
             //! Obtain control from state and timestep
@@ -54,8 +54,8 @@ namespace hal
               \param control the output control from the controller
               \return if the state could be updated
             */
-            bool Update(const hal_model_quadrotor::State &state, 
-                double dt, hal_model_quadrotor::Control &control);
+            bool Update(const hal_quadrotor::State &state, 
+                double dt, hal_quadrotor::Control &control);
 
             //! Goal reach implementations
             /*!

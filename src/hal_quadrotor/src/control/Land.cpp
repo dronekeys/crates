@@ -1,4 +1,4 @@
-#include <hal/model/control/Land.h>
+#include <hal/quadrotor/control/Land.h>
 
 // COntroller constants
 #define _X          0
@@ -16,11 +16,11 @@
 #define _maxyawrate 4.4         /* max allowed yaw rate           */
 #define _maxv       5.0         /* max allowed xy velocity        */
 
-using namespace hal::model;
+using namespace hal::quadrotor;
 
 bool Land::SetGoal(
-    hal_model_quadrotor::Land::Request  &req, 
-    hal_model_quadrotor::Land::Response &res
+    hal_quadrotor::Land::Request  &req, 
+    hal_quadrotor::Land::Response &res
 ) {
     // Set the new goal
     sp[_Z] = 0.0;
@@ -41,8 +41,8 @@ bool Land::SetGoal(
     return true;
 }
 
-bool Land::Update(const hal_model_quadrotor::State &state, 
-    double dt, hal_model_quadrotor::Control &control)
+bool Land::Update(const hal_quadrotor::State &state, 
+    double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
     %  Computes the quadtotor control signals given the current state 

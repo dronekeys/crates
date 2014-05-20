@@ -7,8 +7,13 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 
-// Basic ROS includes
+// Integration with the CRATES HAL
 #include <hal/model/Quadrotor.h>
+#include <hal/sensor/Altimeter.h>
+#include <hal/sensor/Compass.h>
+#include <hal/sensor/GNSS.h>
+#include <hal/sensor/IMU.h>
+#include <hal/sensor/Orientation.h>
 
 // Thrust considered to be too low to animate :)
 #define MOTOR_ANIMATION_THRESHOLD 	0.001
@@ -17,7 +22,13 @@
 
 namespace gazebo
 {
-	class Quadrotor : public ModelPlugin, public hal::model::Quadrotor
+	class Quadrotor : 
+		public ModelPlugin, 				/* Needed for Gazebo integration */
+		public hal::model::Altimeter,		/* Exposes Altimeter sensor      */
+		public hal::model::Compass,			/* Exposes Compass sensor      	 */
+		public hal::model::GNSS,			/* Exposes GNSS sensor      	 */
+		public hal::model::IMU,				/* Exposes IMU sensor      		 */
+		public hal::model::Orientation 		/* Exposes Orientation sensor    */
  	{
 
   	private:
@@ -209,6 +220,17 @@ namespace gazebo
 			// save the model pointer
 			modPtr = model;
 
+			// Configure the dynamics using the model SDF
+			altimeter.Configure(root->GetElement("altimeter"));	
+
+			// Configure the sensors using the model SDF
+			altimeter.Configure(root->GetElement("altimeter"));		
+			compass.Configure(root->GetElement("compass"));
+			gnss.Configure(root->GetElement("gnss"));			
+			imu.Configure(root->GetElement("imu"));
+			orientation.Configure(root->GetElement("orientation"));
+			
+
 			// Control parameters
 			root->GetElement("control")->GetElement("roll")->GetElement("scale")->GetValue()->Get(srs);
 			root->GetElement("control")->GetElement("roll")->GetElement("min")->GetValue()->Get(srl);
@@ -259,15 +281,67 @@ namespace gazebo
 
 	    }
 
-    	// The HAL gets the simulated state through this function
-		void GetEstimate(hal_model_quadrotor::State& state)
-		{
-			// For now...
-			GetTruth(state);
-		}
+	    /////////////////////////////////////////////////////////////////////////////////////
+	    // HAL CALLBACKS ////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////
 
-    	// The HAL gets the simulated state through this function
-		void GetTruth(hal_model_quadrotor::State& state)
+	    // Called when the HAL wants an altimeter reading
+	    bool GetMeasurement(hal_sensor_altimeter::Data& msg)
+	    {
+	    	if (altimeter.Sample(msg))
+	    	{
+		    	Feed(msg);
+		    	return true;
+		    }
+	    	return false;
+	    }
+
+		// Called when the HAL wants a compass reading
+	    bool GetMeasurement(hal_sensor_compass::Data& msg)
+	    {
+	    	if (compass.Sample(msg))
+	    	{
+		    	Feed(msg);
+		    	return true;
+		    }
+	    	return false;
+	    }
+	    
+	    // Called when the HAL wants an imu reading
+	    bool GetMeasurement(hal_sensor_imu::Data& msg)
+	    {
+	    	if (imu.Sample(msg))
+	    	{
+		    	Feed(msg);
+		    	return true;
+		    }
+	    	return false;
+	    }
+	    
+	    // Called when the HAL wants a gnss reading
+	    bool GetMeasurement(hal_sensor_gnss::Data& msg)
+	    {
+	    	if (gnss.Sample(msg))
+	    	{
+		    	Feed(msg);
+		    	return true;
+		    }
+	    	return false;
+	    }
+	    
+	    // Called when the HAL wants an orientation reading
+	    bool GetMeasurement(hal_sensor_orientation::Data& msg)
+	    {
+	    	if (orientation.Sample(msg))
+	    	{
+		    	Feed(msg);
+		    	return true;
+		    }
+	    	return false;
+	    }
+
+    	// Called when the HAL wants the truthful state of the platform
+		void GetTruth(hal_quadrotor::State& state)
 		{
 			// Get the state
 			math::Vector3 pos = modPtr->GetWorldPose().pos;
@@ -292,8 +366,8 @@ namespace gazebo
 			state.voltage 	= voltage;
 		}
 
-	    // The HAL sets the simulated state through this function
-		void SetTruth(const hal_model_quadrotor::State& state)
+	    // Called when the HAL wants to set the truthful state of the platform
+		void SetTruth(const hal_quadrotor::State& state)
 		{
 			// Get the state
 			math::Pose pose(
@@ -310,8 +384,8 @@ namespace gazebo
 			voltage = state.voltage;
 		}
 
-	    // The HAL sets the control through this function
-		void SetControl(const hal_model_quadrotor::Control &control)
+	    // Called when the HAL wants to pass down some control to the platform
+		void SetControl(const hal_quadrotor::Control &control)
 		{
 			roll 		= srs * Clamp(control.roll,		srl,sru);
 			pitch 		= sps * Clamp(control.pitch,	spl,spu);
