@@ -1,1 +1,7 @@
-The files in this directory are meant to help speed up the install process. The GPSTK source installs to $prefix/include by default, thereby polluting the OS file structure. A small modification was made to the CMakeLists.txt to put hte source into the $prefix/include/gpstk folder in stead. In addition, support for uninstallation was added, as well as the option to avoid building the examples. Otherwise, the source remains as distributed in Version 2.4.
+The files in this directory are meant to help speed up the install process. The GPSTK source installs to $prefix/include by default, thereby polluting the OS file structure. A small modification was made to the CMakeLists.txt to put the source into the $prefix/include/gpstk folder rather. In addition, support for uninstallation was added, as well as the option to avoid building the examples. Otherwise, the source remains as distributed in Version 2.4. These will only work on Ubuntu 14.04.
+
+Basic operation
+./install_sysdeps.sh
+./install_ros.sh
+./install_gazebo.sh
+./install_gpstk.sh

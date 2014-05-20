@@ -3,16 +3,11 @@
 # Save the base directory
 BASEDIR=${PWD}
 
-# Basic libraries
-sudo apt-get install build-essential libtinyxml-dev libboost-all-dev cmake mercurial pkg-config \
- 	libprotoc-dev libprotobuf-dev protobuf-compiler libqt4-dev libtar-dev \
- 	libcurl4-openssl-dev libcegui-mk2-dev libopenal-dev libtbb-dev \
- 	libswscale-dev libavformat-dev libavcodec-dev libogre-1.8-dev libgts-dev libltdl3-dev \
- 	playerc++ libxml2-dev libfreeimage-dev freeglut3-dev
-
 # Install sdformat
 cd $BASEDIR
-hg clone https://bitbucket.org/osrf/sdformat
+if [[ ! -d $BASEDIR/sdformat ]]; then
+	hg clone https://bitbucket.org/osrf/sdformat
+fi
 cd sdformat
 hg up sdf_2.0
 mkdir build
@@ -23,7 +18,9 @@ sudo make install
 
 # Install gazebo
 cd $BASEDIR
-hg clone https://bitbucket.org/osrf/gazebo
+if [[ ! -d $BASEDIR/gazebo ]]; then
+	hg clone https://bitbucket.org/osrf/gazebo
+fi
 cd gazebo
 hg up gazebo_3.0
 mkdir build
@@ -34,7 +31,9 @@ sudo make install
 
 # Install gazebo models
 cd $BASEDIR
-hg clone https://bitbucket.org/osrf/gazebo_models
+if [[ ! -d $BASEDIR/gazebo_models ]]; then
+	hg clone https://bitbucket.org/osrf/gazebo_models
+fi
 cd gazebo_models
 mkdir build
 cd build
@@ -43,6 +42,6 @@ make -j4
 sudo make install
 
 # Post-installation configuration
-ln -s ~/.gazebo/models /usr/share/models
+ln -s /usr/share/models ~/.gazebo/models
 sudo sh -c 'echo "/usr/local/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/gazebo.config' 
 sudo ldconfig
