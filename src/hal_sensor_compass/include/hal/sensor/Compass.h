@@ -60,7 +60,6 @@ namespace hal
             */
             virtual bool GetMeasurement(hal_sensor_compass::Data& msg) = 0;
 
-
         public:
 
             /// Constructor

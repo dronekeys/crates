@@ -25,10 +25,7 @@ namespace gazebo
         virtual double Sample(double dt = 0) = 0;
 
         /// Destructor
-        virtual ~Noise()
-        {
-        }
-        
+        virtual ~Noise() {}
 
     };
 }

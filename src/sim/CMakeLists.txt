@@ -162,13 +162,7 @@ catkin_package(
       sim_meteorological
       sim_satellites
       sim_wind
-      sim_altimeter
-      sim_compass
-      sim_gnss
-      sim_imu
       sim_quadrotor
-      sim_aerodynamics
-      sim_orientation
     CATKIN_DEPENDS
       roslib
       roscpp
@@ -251,16 +245,15 @@ add_library(sim_meteorological        src/plugins/world/Meteorological.cpp)
 add_library(sim_satellites            src/plugins/world/Satellites.cpp)
 add_library(sim_wind                  src/plugins/world/Wind.cpp)
 
-# The model plugins (sensors)
-add_library(sim_altimeter             src/plugins/model/Altimeter.cpp)
-add_library(sim_compass               src/plugins/model/Compass.cpp)
-add_library(sim_gnss                  src/plugins/model/GNSS.cpp)
-add_library(sim_imu                   src/plugins/model/IMU.cpp)
-add_library(sim_orientation           src/plugins/model/Orientation.cpp)
-
-# The model plugins (dynamics)
-add_library(sim_quadrotor             src/plugins/model/Quadrotor.cpp)
-add_library(sim_aerodynamics          src/plugins/model/Aerodynamics.cpp)
+# The model plugins
+add_library(sim_quadrotor             
+  src/plugins/model/sensors/Altimeter.cpp
+  src/plugins/model/sensors/Compass.cpp
+  src/plugins/model/sensors/GNSS.cpp
+  src/plugins/model/sensors/IMU.cpp
+  src/plugins/model/sensors/Orientation.cpp
+  src/plugins/model/Quadrotor.cpp
+)
 
 ##################################
 ## Add cmake target dependencies #
@@ -276,16 +269,8 @@ add_dependencies(sim_meteorological   custom_msgs)
 add_dependencies(sim_satellites       custom_msgs)
 add_dependencies(sim_wind             custom_msgs)
 
-# The model plugins (sensors)
-add_dependencies(sim_altimeter        custom_msgs)
-add_dependencies(sim_compass          custom_msgs)
-add_dependencies(sim_gnss             custom_msgs)
-add_dependencies(sim_imu              custom_msgs)
-add_dependencies(sim_orientation      custom_msgs)
-
-# The model plugins (dynamics)
+# The model plugin
 add_dependencies(sim_quadrotor        custom_msgs)
-add_dependencies(sim_aerodynamics     custom_msgs)
 
 ###########################
 ## Set up dynamic linking #
@@ -303,6 +288,8 @@ target_link_libraries(sim_core
 ## Convenience declarations
 set(SYS_LIBS 
   ${TinyXML_LIBRARIES}
+  ${GPSTK_LIBRARIES}
+  ${GEOGRAPHICLIB_LIBRARY}
   custom_msgs
   sim_core
 )
@@ -313,19 +300,14 @@ target_link_libraries(sim_experiment      ${SYS_LIBS})
 target_link_libraries(sim_simulation      ${SYS_LIBS})
 
 ## World plugins
-target_link_libraries(sim_environment     ${SYS_LIBS} ${GPSTK_LIBRARIES} ${GEOGRAPHICLIB_LIBRARY})
-target_link_libraries(sim_meteorological  ${SYS_LIBS} ${GPSTK_LIBRARIES})
-target_link_libraries(sim_satellites      ${SYS_LIBS} ${GPSTK_LIBRARIES})
+target_link_libraries(sim_environment     ${SYS_LIBS})
+target_link_libraries(sim_meteorological  ${SYS_LIBS})
+target_link_libraries(sim_satellites      ${SYS_LIBS})
 target_link_libraries(sim_wind            ${SYS_LIBS})
 
-# Model plugins
-target_link_libraries(sim_altimeter       ${SYS_LIBS})
-target_link_libraries(sim_compass         ${SYS_LIBS})
-target_link_libraries(sim_gnss            ${SYS_LIBS} ${GPSTK_LIBRARIES})
-target_link_libraries(sim_imu             ${SYS_LIBS})
-target_link_libraries(sim_orientation     ${SYS_LIBS})
+# Model plugin
 target_link_libraries(sim_quadrotor       ${SYS_LIBS})
-target_link_libraries(sim_aerodynamics    ${SYS_LIBS})
+
 
 #############
 ## Install ##
@@ -368,8 +350,8 @@ target_link_libraries(sim_aerodynamics    ${SYS_LIBS})
 #############
 
 ## Noise tests
-catkin_add_gtest(${PROJECT_NAME}_noise-test tests/TEST_${PROJECT_NAME}_noise.cpp)
-target_link_libraries(${PROJECT_NAME}_noise-test sim_core)
+##catkin_add_gtest(${PROJECT_NAME}_noise-test tests/TEST_${PROJECT_NAME}_noise.cpp)
+##target_link_libraries(${PROJECT_NAME}_noise-test sim_core)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

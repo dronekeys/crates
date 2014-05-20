@@ -87,6 +87,10 @@
     <!-- Quadrotor dynamics and control -->
     <plugin name="quadrotor" filename="libsim_quadrotor.so">
       
+      <!-- Everything will be applied to this link -->
+      <link>body</link>
+
+      <!-- Dynamics parameters -->
       <dynamics>
         <low_throttle>300</low_throttle>
         <max_angvel>2.617993877991494</max_angvel>
@@ -102,8 +106,13 @@
         <Cvb1>4.23754</Cvb1>
         <tau0>3.07321</tau0>
         <tau1>46.8004</tau1>
+        <errors>
+          <linacc><white>0.2 0.2 0.2</white></linacc>
+          <angacc><white>0.2 0.2 0.2</white></angacc>
+        </errors>
       </dynamics>
       
+      <!-- Control parameters -->
       <control>
         <roll>
           <scale>-2291.83118052329</scale>
@@ -132,97 +141,160 @@
         </voltage>
       </control>
 
-    </plugin>
+      <!-- Energy parameters -->
+      <energy>
+        <mah>6000</mah>
+        <amps>
+          <base>0.1</base>
+          <flight>6.6</flight>
+        </amps>
+        <limits>
+          <warn>1000</warn>
+          <land>100</land>
+        </limits>
+      </energy>
 
-    <!-- Aerodynamics -->
-    <plugin name="aerodynamics" filename="libsim_aerodynamics.so">
+      <!-- Drag parameters -->
       <drag>
         <kuv>-4.97391e-01</kuv>
         <kw>-1.35341</kw>
       </drag>
-      <shear>true</shear>
-      <turbulence>true</turbulence>
+
+      <!-- Shear parameters (uses globally broadcast mean wind field) -->
+      <wind>
+        <enabled>true</enabled>
+        <errors>
+          <wind>
+            <dryden>0</dryden>
+          </wind>
+        </errors>
+      </wind>
+      
+      <!-- Altimeter parameters -->
+      <altimeter>
+        <enabled>true</enabled>
+        <errors>
+          <z>
+            <trace>0</trace>
+          </z>
+          <w>
+            <trace>0</trace>
+          </w>
+        </errors>
+      </altimeter>
+
+      <!-- Compass parameters -->
+      <compass>
+        <enabled>true</enabled>
+        <errors>
+          <x>
+            <white>0.2</white>
+          </x>
+          <y>
+            <white>0.2</white>
+          </y>
+          <z>
+            <white>0.2</white>
+          </z>
+        </errors>
+      </compass>
+
+      <!-- GNSS parameters -->
+      <gnss>
+        <enabled>true</enabled>
+        <minelevation>15</minelevation>
+        <gps>
+          <carriers>
+            <l1>CODE</l1>
+            <l2>NONE</l2>
+            <l5>NONE</l5>
+          </carriers>
+          <errors>   
+            <sig>
+              <trace>0</trace>
+            </sig>
+            <clk>
+              <trace>0</trace>
+            </clk>
+            <eph>
+              <trace>0</trace>
+            </eph>
+            <tro>
+              <trace>0</trace>
+            </tro>
+            <ion>
+              <trace>0</trace>
+            </ion>
+          </errors>
+        </gps> 
+        <glo>
+          <carriers>
+            <l1>CODE</l1>
+            <l2>NONE</l2>
+          </carriers>
+          <errors>   
+            <sig>
+              <trace>0</trace>
+            </sig>
+            <clk>
+              <trace>0</trace>
+            </clk>
+            <eph>
+              <trace>0</trace>
+            </eph>
+            <tro>
+              <trace>0</trace>
+            </tro>
+            <ion>
+              <trace>0</trace>
+            </ion>
+          </errors>
+        </glo>
+      </gnss>
+
+      <!-- IMU parameters -->
+      <imu>
+        <enabled>true</enabled>
+        <errors>
+          <p>
+            <ou>0.2</ou>
+          </p>
+          <q>
+            <ou>0.2</ou>
+          </q>
+          <r>
+            <ou>0.2</ou>
+          </r>
+          <du>
+            <ou>0.2</ou>
+          </du>
+          <dv>
+            <ou>0.2</ou>
+          </dv>
+          <dw>
+            <ou>0.2</ou>
+          </dw>
+        </errors>
+      </imu>
+
+      <!-- Orientation parameters -->
+      <orientation>
+        <enabled>true</enabled>
+        <errors>
+          <roll>
+            <ou>0.2</ou>
+          </roll>
+          <pitch>
+            <ou>0.2</ou>
+          </pitch>
+          <yaw>
+            <ou>0.2</ou>
+          </yaw>
+        </errors>
+      </orientation>
+
     </plugin>
-
-    <!-- Wind shear  -->
-    <!--
-    <plugin name="shear" filename="libsim_shear.so">
-      <speed>1.0</speed>
-      <direction>90</direction>
-    </plugin>
-    -->
-    <!-- Turbulence -->
-    <!--
-    <plugin name="turbulence" filename="libsim_turbulence.so">
-      <speed>0.0</speed>
-      <direction>90.0</direction>
-    </plugin>
-    -->
-
-
-    <!--
-
-    <plugin name="altitude" filename="libsim_altimeter.so">
-      <rate>1</rate>
-    </plugin>
-
-    <plugin name="compass" filename="libsim_compass.so">
-      <rate>1</rate>
-    </plugin>
-
-    <plugin name="energy" filename="libsim_energy.so">
-      <rate>1</rate>
-      <total>2.2</total>
-      <remaining>2.2</remaining>
-      <consumption>
-        <base>0.2</base>
-        <flight>6.6</flight>
-      </consumption>
-      <limits>
-        <kill>0.1</kill>
-        <warn>0.2</warn>
-      </limits>
-      <throttle>0.001</throttle>
-    </plugin>
-
-    <plugin name="gnss" filename="libsim_gnss.so">
-      <rate>1</rate>
-      <minelevation>15</minelevation>
-      <gps>
-        <l1>CODE</l1>
-        <l2>NONE</l2>
-        <l5>NONE</l5>
-        <corrections>   
-          <sig>0.0</sig>
-          <clk>0.0</clk>
-          <rel>0.0</rel>
-          <rot>0.0</rot>
-          <eph>0.0</eph>
-          <tro>0.0</tro>
-          <ion>0.0</ion>
-        </corrections>
-      </gps> 
-      <glo>
-        <l1>CODE</l1>
-        <l2>NONE</l2>
-        <corrections>   
-          <sig>0.0</sig>
-          <clk>0.0</clk>
-          <rel>0.0</rel>
-          <rot>0.0</rot>
-          <eph>0.0</eph>
-          <tro>0.0</tro>
-          <ion>0.0</ion>
-        </corrections>
-      </glo>
-    </plugin>
-
-    <plugin name="imu" filename="libsim_imu.so">
-      <rate>1</rate>
-    </plugin>
-
-    -->
-    
+  
   </model>
 
 </sdf>

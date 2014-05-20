@@ -23,7 +23,7 @@ namespace hal
 
         public:
 
-            // Ensures actual object destructor is invoked
+            // Ensures the derived class destructor is called
             virtual ~Controller() {};
 
             //! Each controller must provide the ability to generate control

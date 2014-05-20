@@ -4,5 +4,4 @@
 /docs/latex/
 /src/CMakeLists.txt
 /thirdparty/gpstk/build
-/thirdparty/sdformat/build
 /.catkin_workspace
