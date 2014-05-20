@@ -25,14 +25,12 @@ void Navigation::Process(const hal_sensor_altimeter::Data &msg)
 
 void Navigation::Process(const hal_sensor_compass::Data &msg)
 {
-  // Do nothing
+  // Ignore
 }
 
 void Navigation::Process(const hal_sensor_imu::Data &msg)
 {
-  state.p = msg.p;
-  state.q = msg.q;
-  state.r = msg.r;
+  // Ignore
 }
 
 void Navigation::Process(const hal_sensor_gnss::Data &msg)
@@ -48,4 +46,7 @@ void Navigation::Process(const hal_sensor_orientation::Data &msg)
   state.roll  = msg.roll;
   state.pitch = msg.pitch;
   state.yaw   = msg.yaw;
+  state.p     = msg.p;
+  state.q     = msg.q;
+  state.r     = msg.r;
 }

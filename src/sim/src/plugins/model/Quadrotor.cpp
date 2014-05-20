@@ -15,16 +15,13 @@
 #include <hal/sensor/IMU.h>
 #include <hal/sensor/Orientation.h>
 
-/*
 // Dynamics
 #include "dynamics/Propulsion.h"
 #include "dynamics/Aerodynamics.h"
 #include "dynamics/Energy.h"
-#include "dynamics/Control.h"
 
 // Rendering
 #include "rendering/Motors.h"
-*/
 
 // Sensors
 #include "sensors/Altimeter.h"
@@ -54,27 +51,22 @@ namespace gazebo
 	    event::ConnectionPtr 	conPtrBeg, conPtrEnd;
 
 	    // Dynamics
-	    /*
-	    Turbulence 	dTurbulence;
-	    Shear 		dShear;
-	    Propulsion	dPropulsion;
-	    Drag 		dDrag;
-	    Energy 		dEnergy;
-	    Control 	dControl;
+	    Aerodynamics 	dAerodynamics;
+	    Propulsion		dPropulsion;
+	    Energy 			dEnergy;
 	    
 	    // Rendering
-	    Motors		rMotors;
-		*/
+	    Motors			rMotors;
 
 	    // Sensors
-	    Altimeter   sAltimeter;
-	    Compass    	sCompass;
-	    GNSS    	sGNSS;
-	    IMU    		sIMU;
-	    Orientation sOrientation;
+	    Altimeter   	sAltimeter;
+	    Compass    		sCompass;
+	    GNSS    		sGNSS;
+	    IMU    			sIMU;
+	    Orientation 	sOrientation;
 
 	    // Last time tick
-	    double 		tim;
+	    double 			tim;
 
     	// Callback for physics timer
 		void PrePhysics(const common::UpdateInfo &_info)
@@ -82,7 +74,7 @@ namespace gazebo
 			// Time over which dynamics must be updated (needed for thrust update)
 			double dt = _info.simTime.Double() - tim;
 
-			// If simulation is paused, dont waste CPU cycles calculating a physics update...
+			// If simulation is paused, dont waste CPU calculating physics
 			if (dt > 0) 
 			{
 				// Do something
@@ -130,7 +122,19 @@ namespace gazebo
 
 			// DYNAMICS CONFIGURATION /////////////////////////////////////////////
 
+			// Configure the propulsion dynamics
+			dPropulsion.Configure(root->GetElement("propulsion"));	
+
+			// Configure the aerodynamics
+			dAerodynamics.Configure(root->GetElement("aerodynamics"));	
+
+			// Configure the aerodynamics
+			dEnergy.Configure(root->GetElement("energy"));	
+
 			// AMIMATION CONFIGURATION ////////////////////////////////////////////
+
+			// Configure the motor animation
+			rMotors.Configure(root->GetElement("motors"));	
 
 			// SENSOR CONFIGURATION ///////////////////////////////////////////////
 

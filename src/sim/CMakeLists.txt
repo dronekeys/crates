@@ -247,6 +247,10 @@ add_library(sim_wind                  src/plugins/world/Wind.cpp)
 
 # The model plugins
 add_library(sim_quadrotor             
+  src/plugins/model/dynamics/Propulsion.cpp
+  src/plugins/model/dynamics/Aerodynamics.cpp
+  src/plugins/model/dynamics/Energy.cpp
+  src/plugins/model/dynamics/Motors.cpp
   src/plugins/model/sensors/Altimeter.cpp
   src/plugins/model/sensors/Compass.cpp
   src/plugins/model/sensors/GNSS.cpp
