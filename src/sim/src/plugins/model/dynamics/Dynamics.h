@@ -1,34 +1,37 @@
-#ifndef SIM_SENSOR_H
-#define SIM_SENSOR_H
+#ifndef SIM_DYNAMICS_H
+#define SIM_DYNAMICS_H
 
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 
-// Required for noise distributions
-#include "noise/NoiseFactory.h"
-
 // Basic ROS stuff
 #include <ros/ros.h>
 
 namespace gazebo
 {
-    class Sensor
+    class Dynamics
     {     
     public:
 
-        //! Configure a sensor
+        //! Configure dynamics
         /*!
           \param msg the message to be populated
         */
         virtual bool Configure(sdf::ElementPtr root) = 0;
 
-        //! Reset a sensor
+        //! Reset dynamics
         /*!
           \param msg the message to be populated
         */
         virtual void Reset() = 0;
+
+        //! Update dynamics
+        /*!
+          \param msg the message to be populated
+        */
+        virtual void Update(physics::LinkPtr linkPtr, double dt) = 0;
 
     };
 }

@@ -20,9 +20,6 @@
 #include "dynamics/Aerodynamics.h"
 #include "dynamics/Energy.h"
 
-// Rendering
-#include "rendering/Motors.h"
-
 // Sensors
 #include "sensors/Altimeter.h"
 #include "sensors/Compass.h"
@@ -54,9 +51,6 @@ namespace gazebo
 	    Aerodynamics 	dAerodynamics;
 	    Propulsion		dPropulsion;
 	    Energy 			dEnergy;
-	    
-	    // Rendering
-	    Motors			rMotors;
 
 	    // Sensors
 	    Altimeter   	sAltimeter;
@@ -77,17 +71,18 @@ namespace gazebo
 			// If simulation is paused, dont waste CPU calculating physics
 			if (dt > 0) 
 			{
-				// Do something
+				// Propulsive forces
+				dPropulsion.Update(linkPtr, dt);
+
+				// Shear, turbulence and drag forces
+				dAerodynamics.Update(linkPtr, dt);
+
+				// Energy consumption
+				dEnergy.Update(linkPtr, dt);
 			}
 
 			// Update timer
 			tim = _info.simTime.Double();
-		}
-
-    	// Callback for physics timer
-		void PostPhysics(const common::UpdateInfo &_info)
-		{
-			// Do something
 		}
 
   	public:
@@ -131,11 +126,6 @@ namespace gazebo
 			// Configure the aerodynamics
 			dEnergy.Configure(root->GetElement("energy"));	
 
-			// AMIMATION CONFIGURATION ////////////////////////////////////////////
-
-			// Configure the motor animation
-			rMotors.Configure(root->GetElement("motors"));	
-
 			// SENSOR CONFIGURATION ///////////////////////////////////////////////
 
 			// Configure the altitude sensor
@@ -170,7 +160,29 @@ namespace gazebo
 	    // All sensors must be resettable
 	    void Reset()
 	    {
-	    	// Do nothing
+			// Reset the propulsion dynamics
+			dPropulsion.Reset();	
+
+			// Reset the aerodynamics
+			dAerodynamics.Reset();	
+
+			// Reset the aerodynamics
+			dEnergy.Reset();	
+
+			// Reset the altitude sensor
+			sAltimeter.Reset();
+
+			// Reset the compass sensor
+			sCompass.Reset();
+			
+			// Reset the GNSS sensor
+			sGNSS.Reset();
+			
+			// Reset the IMU sensor
+			sIMU.Reset();
+			
+			// Reset the orientation sensor
+			sOrientation.Reset();		
 	    }
 
 	    /////////////////////////////////////////////////////////////////////////////////////
@@ -236,10 +248,10 @@ namespace gazebo
 		void GetTruth(hal_quadrotor::State& state)
 		{
 			// Get the state
-			math::Vector3 pos = modPtr->GetWorldPose().pos;
-			math::Vector3 rot = modPtr->GetWorldPose().rot.GetAsEuler();
-			math::Vector3 vel = modPtr->GetWorldLinearVel();
-			math::Vector3 ang = modPtr->GetWorldAngularVel();
+			math::Vector3 pos = linkPtr->GetWorldPose().pos;
+			math::Vector3 rot = linkPtr->GetWorldPose().rot.GetAsEuler();
+			math::Vector3 vel = linkPtr->GetRelativeLinearVel();
+			math::Vector3 ang = linkPtr->GetRelativeAngularVel();
 
 			// Update the state
 			state.x 		= pos.x;
@@ -254,8 +266,8 @@ namespace gazebo
 			state.p 		= ang.x;
 			state.q 		= ang.y;
 			state.r 		= ang.z;
-			state.thrust 	= thrust;
-			state.voltage 	= voltage;
+			state.thrust 	= dPropulsion.GetThrust();
+			state.remaining	= dEnergy.GetRemaining();
 		}
 
 	    // Called when the HAL wants to set the truthful state of the platform
@@ -266,24 +278,30 @@ namespace gazebo
 				state.x,    state.y,     state.z,		// Position
 				state.roll, state.pitch, state.yaw 		// Orientation
 			);
-			math::Vector3 vel(state.u,state.v,state.w);
-			math::Vector3 ang(state.p,state.q,state.r);
+			math::Vector3 vel(state.u, state.v, state.w);
+			math::Vector3 ang(state.p, state.q, state.r);
 
-			// Set the state
-			modPtr->SetWorldPose(pose);
-			modPtr->SetWorldTwist(vel, ang);
-			thrust  = state.thrust;
-			voltage = state.voltage;
+			// Set the kinematic quantities
+			linkPtr->SetWorldPose(pose);
+			linkPtr->SetAngularVel(
+				pose.rot.RotateVector(ang)
+			);
+			linkPtr->SetLineaVel(
+				pose.rot.RotateVector(vel)
+			);
+
+			// Set the thrust force
+			dPropulsion.SetThrust(state.thrust);
+
+			// Set the remaining energy
+			dEnergy.SetRemaining(state.remaining);
 		}
 
 	    // Called when the HAL wants to pass down some control to the platform
 		void SetControl(const hal_quadrotor::Control &control)
 		{
-			roll 		= srs * Clamp(control.roll,		srl,sru);
-			pitch 		= sps * Clamp(control.pitch,	spl,spu);
-			yaw 		= sys * Clamp(control.yaw,		syl,syu);
-			throttle 	= sts * Clamp(control.throttle,	stl,stu);
-			voltage 	= svs * Clamp(control.voltage,	svl,svu);
+			// Pass control to the propulsion module
+			dPropulsion.SetControl(control);
 		}
 	};
 

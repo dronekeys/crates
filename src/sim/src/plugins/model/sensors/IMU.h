@@ -11,8 +11,16 @@ namespace gazebo
 {
   class IMU : public Sensor
   {
+  private:
+
+    // Noise streams
+    Noise* nLinAccX, nLinAccY, nLinAccZ;
+    Noise* nAngVelX, nAngVelY, nAngVelZ;
 
   public:
+
+    // Constructor
+    IMU();
 
     // All sensors must be configured using the current model information and the SDF
     bool Configure(sdf::ElementPtr root);

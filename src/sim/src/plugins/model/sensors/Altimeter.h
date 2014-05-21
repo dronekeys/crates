@@ -11,8 +11,18 @@ namespace gazebo
 {
   class Altimeter : public Sensor
   {
+  private:
+
+    // Current and old altitude readings
+    double altNew, altOld;
+
+    // Noise distributions
+    Noise* nAlt;
 
   public:
+
+    // Constructor
+    Altimeter();
 
     // All sensors must be configured using the current model information and the SDF
     bool Configure(sdf::ElementPtr root);

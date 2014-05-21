@@ -33,16 +33,6 @@ NoiseType NoiseFactory::Lookup(std::string &name)
 
 bool NoiseFactory::Create(sdf::ElementPtr root)
 {
-	/* 
-		This is what will be passed in as 'root'...
-	    <variable>
-	      <gaussian>
-	        <mean>1.005</mean>
-	        <sdev>0.003</sdev>
-	      </gaussian>
-	    </orbits>
-	*/
-
 	// Get the name and type
 	std::string name = root->GetName();
 	std::string type = root->GetFirstElement()->GetName();

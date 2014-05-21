@@ -1,3 +1,106 @@
+#include "Aerodynamics.h"
+
+using namespace gazebo;
+
+// Basic constants 
+#define METERS_TO_FEET      3.2808399
+#define FEET_TO_METERS      0.3048000
+#define DEGREES_TO_RADIANS  0.01745329258399
+#define RADIANS_TO_DEGREES  57.2957795000000
+
+// All sensors must be configured using the current model information and the SDF
+bool Aerodynamics::Configure(sdf::ElementPtr root)
+{
+    // Get drag parameters
+    root->GetElement("shear")->GetElement("ma")->GetValue()->Get(_ma);
+    root->GetElement("shear")->GetElement("z0")->GetValue()->Get(_z0);
+
+    // Get drag parameters
+    root->GetElement("drag")->GetElement("kuv")->GetValue()->Get(_kuv);
+    root->GetElement("drag")->GetElement("kw")->GetValue()->Get(_kw);
+
+    // Initialise a node pointer
+    nodePtr = transport::NodePtr(new transport::Node());
+    nodePtr->Init(modPtr->GetWorld()->GetName());
+
+    // Subscribe to messages about wind conditions
+    subPtr = nodePtr->Subscribe("~/wind", &Aerodynamics::ReceiveWind, this);
+
+    //  Create a pre-physics update call
+    conPtr = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&Aerodynamics::PrePhysics, this, _1));
+
+    // Reset
+    Reset();
+
+    // Success
+    return true;
+}
+
+// All sensors must be resettable
+void Aerodynamics::Reset()
+{
+    ready = false;
+}
+
+// Get the current altitude
+void Aerodynamics::Update(physics::LinkPtr linkPtr, double dt)
+{
+    // Extract the altitude and orientation from the state
+    double a = linkPtr->GetWorldPose().pos.z;
+
+    // Calculate wind shear (in the navigation frame)
+    math::Vector3 wind(0.0, 0.0, 0.0);
+    if (a > MINIMUM_ALTITUDE && ready)
+    {
+        // Calculate wind shear
+        double k = global->speed() * log(METERS_TO_FEET*a/z0) / log(20.0/z0);
+        wind.x  = -k * cos(DEGREES_TO_RADIANS * global->direction());
+        wind.y  = -k * sin(DEGREES_TO_RADIANS * global->direction());
+        wind.z  = 0.0;
+
+        // Add wind turbulence
+        wind += nTurbulence.Sample(linkPtr, dt);
+    }
+
+    // Body-frame airspeed
+    math::Vector3 airspeed = linkPtr->GetRelativeLinearVel() 
+        - linkPtr->GetWorldPose().rot.RotateVector(wind));
+
+    // Rotate to bodyframe,a nd 
+    math::Vector3 force(
+        _kuv * linkPtr->GetInertial()->GetMass() * airspeed.x,
+        _kuv * linkPtr->GetInertial()->GetMass() * airspeed.y,
+         _kw * linkPtr->GetInertial()->GetMass() * airspeed.z
+    );
+
+    // Apply force and torque
+    linkPtr->AddRelativeForce(force);
+    linkPtr->AddRelativeTorque(
+        linkPtr->GetInertial()->GetCoG().Cross(force));
+}
+
+// Update the shear
+void Aerodynamics::CalculateShear(const double &dt, const double &a)
+{
+    if (a > MINIMUM_ALTITUDE)
+        shear = FEET_TO_METERS * s20 * (log(METERS_TO_FEET*a/WIND_CONSTANT)/log(20.0/WIND_CONSTANT)) * d20;
+    else
+        shear.Set(0,0,0);
+}
+
+// Periodically the simulation produces a wind message
+void Aerodynamics::ReceiveWind(WindPtr& msg)
+{
+    // Save the wind data
+    global = msg;
+
+    // We now have wind data
+    ready = true;
+}
+
+/*
+
 // Standar dlibraries
 #include <boost/shared_ptr.hpp>
 
@@ -259,4 +362,4 @@ namespace gazebo
 }
 
 
-
+*/

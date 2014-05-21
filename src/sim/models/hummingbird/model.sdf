@@ -155,20 +155,21 @@
       </energy>
 
       <!-- Drag parameters -->
-      <drag>
-        <kuv>-4.97391e-01</kuv>
-        <kw>-1.35341</kw>
-      </drag>
-
-      <!-- Shear parameters (uses globally broadcast mean wind field) -->
-      <wind>
-        <enabled>true</enabled>
+      <aerodynamics>
+        <wind>
+          <ma>0.05</ma>
+          <z0>0.15</z0>
+        </wind>
+        <drag>
+          <kuv>-4.97391e-01</kuv>
+          <kw>-1.35341</kw>
+        </drag>
         <errors>
           <wind>
-            <dryden>0</dryden>
+            <dryden></dryden>
           </wind>
         </errors>
-      </wind>
+      </aerodynamics>
       
       <!-- Altimeter parameters -->
       <altimeter>

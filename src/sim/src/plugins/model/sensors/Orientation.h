@@ -11,8 +11,16 @@ namespace gazebo
 {
   class Orientation : public Sensor
   {
+  private:
+
+    // Noise streams
+    Noise* nRotX, nRotY, nRotZ;
+    Noise* nAngX, nAngY, nAngZ;
 
   public:
+
+    // Constructor
+    Orientation();
 
     // All sensors must be configured using the current model information and the SDF
     bool Configure(sdf::ElementPtr root);

@@ -24,6 +24,9 @@ namespace gazebo
 	} 
 	NoiseType;
 
+    // Environment messages
+    typedef const boost::shared_ptr<const msgs::Noise> NoisePtr;
+
     // An abstract class for modelling noise
     class NoiseFactory
     {     
