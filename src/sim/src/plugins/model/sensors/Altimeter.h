@@ -13,11 +13,14 @@ namespace gazebo
   {
   private:
 
+    // Link onto which sensor is attached
+    physics::LinkPtr  link;
+
     // Current and old altitude readings
-    double altNew, altOld;
+    double            altNew, altOld, timNew, timOld;
 
     // Noise distributions
-    Noise* nAlt;
+    Noise*            nAlt;
 
   public:
 
@@ -25,13 +28,13 @@ namespace gazebo
     Altimeter();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    bool GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_altimeter::Data& msg);
+    bool GetMeasurement(double t, hal_sensor_altimeter::Data& msg);
 
   };
 

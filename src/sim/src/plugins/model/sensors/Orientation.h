@@ -13,9 +13,12 @@ namespace gazebo
   {
   private:
 
+    // Link onto which sensor is attached
+    physics::LinkPtr    link;
+    
     // Noise streams
-    Noise* nRotX, nRotY, nRotZ;
-    Noise* nAngX, nAngY, nAngZ;
+    Noise*              nRotX, nRotY, nRotZ;
+    Noise*              nAngX, nAngY, nAngZ;
 
   public:
 
@@ -23,13 +26,13 @@ namespace gazebo
     Orientation();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    bool GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_orientation::Data& msg);
+    bool GetMeasurement(double t, hal_sensor_orientation::Data& msg);
 
   };
 

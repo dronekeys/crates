@@ -6,8 +6,11 @@ using namespace gazebo;
 Orientation::Orientation() {}
 
 // All sensors must be configured using the current model information and the SDF
-bool Orientation::Configure(sdf::ElementPtr root)
+bool Orientation::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 {
+	// Backup the link
+	link = linkPtr;
+
 	// Initialise the noise distribution
 	nRotX = NoiseFactory::Create(root->GetElement("errors")->GetElement("roll"));
 	nRotY = NoiseFactory::Create(root->GetElement("errors")->GetElement("pitch"));
@@ -33,18 +36,17 @@ void Orientation::Reset()
 }
 
 // Get the current altitude
-bool Orientation::GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_orientation::Data& msg)
+bool Orientation::GetMeasurement(double t, hal_sensor_orientation::Data& msg)
 {
 	// Get the quantities we want
 	math::Vector3 rot = linkPtr->GetWorldPose().rot.GetAsEuler();
 	math::Vector3 ang = linkPtr->GetRelativeAngularVel();
 
-	// Perturb orientation
+	// Package up message
+	msg.t     = t;
 	msg.roll  = rot.x + nRotX.Sample(linkPtr, dt);
 	msg.pitch = rot.y + nRotY.Sample(linkPtr, dt);
 	msg.yaw   = rot.z + nRotZ.Sample(linkPtr, dt);
-
-	// Perturb angular velocity
 	msg.p     = ang.x + nAngX.Sample(linkPtr, dt);
 	msg.q     = ang.y + nAngY.Sample(linkPtr, dt);
 	msg.r     = ang.z + nAngZ.Sample(linkPtr, dt);

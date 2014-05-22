@@ -38,7 +38,7 @@
 #include <gpstk/SP3Header.hpp>
 #include <gpstk/SP3Stream.hpp>
 
-// ROS
+// ROS includes
 #include <ros/ros.h>
 
 // Custom messages
@@ -46,18 +46,20 @@
 #include "meteorological.pb.h"
 #include "satellites.pb.h"
 
-// Frequencies constants used for ionospheric correction
-#define GPS_L1               1575.42e6
-#define GPS_L2               1227.60e6
-#define GLONASS_L1OF_OFFSET  1602.0e6
-#define GLONASS_L1OF_SCALE   0.5625e6
-#define GLONASS_L2OF_OFFSET  1246.0e6
-#define GLONASS_L2OF_SCALE   0.4375e6
+// Required for noise distributions
+#include "noise/NoiseFactory.h"
 
-/*
+// Approx frequencies used to claculate ionospheric perturbation
+#define GPS_L1 			1575.42e6
+#define GLO_L1 			1602.00e6
+#define SPEED_OF_LIGHT 	299792458.0
 
 namespace gazebo
 {
+	// Convenience declarations
+	typedef const boost::shared_ptr<const msgs::Meteorological> 	MeteorologicalPtr;
+	typedef const boost::shared_ptr<const msgs::Environment> 		EnvironmentPtr;
+
 	class Satellites : public WorldPlugin
 	{
 
@@ -83,21 +85,33 @@ namespace gazebo
 		gpstk::Position 					originECEF;
 
 	    // Locally store temperature, pressure and humidity (troposhperic model)
-	    double 								te, pr, hu;
+	    std::vector<Noise*> 				nGPSeph;
+	    std::vector<Noise*> 				nGPSclk;
+	    std::vector<Noise*> 				nGPStro;
+	    std::vector<Noise*> 				nGPSion;
+	    std::vector<Noise*> 				nGLOeph;
+	    std::vector<Noise*> 				nGLOclk;
+	    std::vector<Noise*> 				nGLOtro;
+	    std::vector<Noise*> 				nGLOion;
 
 	    // Required for messaging
 	    physics::WorldPtr 					worldPtr;
 		transport::NodePtr 					nodePtr;
 		transport::PublisherPtr 			pubPtr;
-		transport::SubscriberPtr 			subPtr;
+		transport::SubscriberPtr 			subPtrMet, subPtrEnv;
 		ros::Timer 							timer;
 
       	// Message containing information
       	msgs::Satellites 					msg;
+      	msgs::Meteorological                met;
 
 	    //  Called to update the world information
 	    void Update(const ros::TimerEvent& event)
 	    {
+	    	// We can onyl proceed if we know the UTC time and current weather
+	    	if (!rcvMet || !rcvEnv)
+	    		return;
+
 			// TIME CACHING /////////////////////////////////////////////////////////////////////
 	
 			gpstk::CommonTime currentTimeUTC = GetTime(gpstk::TimeSystem::UTC);
@@ -106,7 +120,7 @@ namespace gazebo
 
 			// TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
-			tropModel.setWeather(te - 273.15, pr, hu);
+			tropModel.setWeather(met.temperature() - 273.15, met.pressure(), met.relhumidity());
 
 			// IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
 
@@ -126,14 +140,12 @@ namespace gazebo
 			double epoch;
 			currentTimeUTC.get(epoch);
 
-			// Set the epoch
+			// Set the epoch and clea rany existing satellites
 			msg.set_epoch(epoch);
+			msg.clear_svs();
 
 			// GPS EPHEMERIDES /////////////////////////////////////////////////////////////////
-
-			// Clear any existing glonass
-			msg.clear_gnss();
-
+			
 			// Iterate over possible satellite identifiers
 			for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
 			{
@@ -148,77 +160,74 @@ namespace gazebo
 						// Elevation of the current satellite with respect to HOME position
 						gpstk::Triple satellitePos = eph.getPos();
 
-						// Get the elevation
-						double elv = originECEF.elvAngle(satellitePos);
+						// Save to the message
+						msgs::Vehicle* gps = msg.add_svs();
+						gps->set_system(gpstk::SatID::systemGPS);
+						gps->set_prn(prn);
 
-						// Only count satellites above a minnimum elevation
-						if (elv > minElevation)
-						{          
-						  // Save to the message
-						  msgs::Ephemeris* gps = msg.add_gnss();
-						  gps->set_system(gpstk::SatID::systemGPS);
-						  gps->set_prn(prn);
+						// Write the position
+						gps->mutable_pos()->set_x(satellitePos[0]);
+						gps->mutable_pos()->set_y(satellitePos[1]);
+						gps->mutable_pos()->set_z(satellitePos[2]);
 
-						  // Write the position
-						  gps->mutable_pos()->set_x(satellitePos[0]);
-						  gps->mutable_pos()->set_y(satellitePos[1]);
-						  gps->mutable_pos()->set_z(satellitePos[2]);
+						// Try and get the broadcast ephemeride
+						try
+						{
+							// Get the broadcast ephemeris
+							gpstk::Xvt ephb = gpsEphemerides.getXvt(
+								gpstk::SatID(prn,gpstk::SatID::systemGPS),
+								currentTimeGPS
+							);
 
-						  // Try and get the broadcast ephemeride
-						  try
-						  {
-						    // Get the broadcast ephemeris
-						    gpstk::Xvt ephb = gpsEphemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGPS),currentTimeGPS);
+							// Elevation of the current satellite with respect to HOME position
+							gpstk::Triple err = ephb.getPos() - satellitePos;
 
-						    // Elevation of the current satellite with respect to HOME position
-						    gpstk::Triple err = ephb.getPos() - satellitePos;
+							// Set the ephemeris error
+							gps->mutable_err_pos()->set_x(err[0]);
+							gps->mutable_err_pos()->set_y(err[1]);
+							gps->mutable_err_pos()->set_z(err[2]);
 
-						    // Set the ephemeris error
-						    gps->mutable_err()->set_x(err[0]);
-						    gps->mutable_err()->set_y(err[1]);
-						    gps->mutable_err()->set_z(err[2]);
+							// Write the clock bias and relativity correction
+							gps->set_err_clk(
+								SPEED_OF_LIGHT * (ephb.getClockBias()-eph.getClockBias())
+							);
 
-						    // Write the clock bias and relativity correction
-						    gps->set_clkbias(ephb.getClockBias()-eph.getClockBias());
-						    gps->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
+							// Set the tropospheic delay, based on the simulation location
+							gps->set_err_tro(
+								SPEED_OF_LIGHT *
+								tropModel.correction(
+									originECEF,                      	 // Current receiver position
+									satellitePos,                        // Current satellite position
+									currentTimeGPS                       // Time of observation
+								)
+							);
 
-						  }
-						  catch (const std::exception& e)
-						  { 
-						    // Set the ephemeris error (zero = problem)
-						    gps->mutable_err()->set_x(0);
-						    gps->mutable_err()->set_y(0);
-						    gps->mutable_err()->set_z(0);
-						  }
+							// GET L1 ionosphere delay
+							gps->set_err_ion(
+								SPEED_OF_LIGHT *
+								tecStore.getIono(
+									originECEF.elvAngle(satellitePos),    // Elevation of the satellite
+									tec[0],                               // Total electron count
+									GPS_L1,                               // L1 GPS frequency
+									"NONE"                                // Mapping function
+								) 
+							);
+						}
+						catch (const std::exception& e)
+						{ 
+							// Draw a new ephemeride error
+							math::vector err_pos = nGPSeph[prn]->DrawVector(t);
+							double       err_clk = nGPSclk[prn]->DrawVector(t);
+							double       err_ion = nGPSion[prn]->DrawVector(t);
+							double       err_tro = nGPStro[prn]->DrawVector(t);
 
-						  // Set the tropospheic delay, based on the simulation location
-						  gps->set_delay_trop(
-						    tropModel.correction(
-						      originECEF,                       // Current receiver position
-						      satellitePos,                        // Current satellite position
-						      currentTimeGPS                       // Time of observation
-						    )
-						  );
-
-						  // GET L1 ionosphere delay
-						  gps->set_delay_iono_f1(
-						    tecStore.getIono(
-						      elv,                                  // Elevation of the satellite
-						      tec[0],                               // Total electron count
-						      GPS_L1,                               // L1 GPS frequency
-						      "NONE"                                // Mapping function
-						    ) 
-						  );
-
-						  // GET L2 ionosphere delay
-						  gps->set_delay_iono_f2(
-						    tecStore.getIono(
-						      elv,                                  // Elevation of the satellite
-						      tec[0],                               // Total electron count
-						      GPS_L2,                               // L1 GPS frequency
-						      "NONE"                                // Mapping function
-						    ) 
-						  );
+							// Set the ephemeris error
+							gps->mutable_err_pos()->set_x(err_pos.x);
+							gps->mutable_err_pos()->set_y(err_pos.y);
+							gps->mutable_err_pos()->set_z(err_pos.z);
+							gps->set_err_clk(err_clk);
+							gps->set_err_tro(err_tro);
+							gps->set_err_ion(err_iom);
 						}
 					}
 				}
@@ -228,7 +237,8 @@ namespace gazebo
 				}
 			}
 
-			// Iterate over possible satellite identifiers
+			// GLO EPHEMERIDES /////////////////////////////////////////////////////////////////
+
 			for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
 			{
 				try
@@ -241,91 +251,80 @@ namespace gazebo
 
 				    // Elevation of the current satellite with respect to HOME position
 				    gpstk::Triple satellitePos = eph.getPos();
+				
+					// Save to the message
+					msgs::Vehicle* glo = msg.add_svs();
+					glo->set_system(gpstk::SatID::systemGPS);
+					glo->set_prn(prn);
 
-				    // Get the elevation
-				    double elv = originECEF.elvAngle(satellitePos);
+					// Write the position
+					glo->mutable_pos()->set_x(satellitePos[0]);
+					glo->mutable_pos()->set_y(satellitePos[1]);
+					glo->mutable_pos()->set_z(satellitePos[2]);
 
-				    // Only count satellites above a minnimum elevation
-				    if (elv > minElevation)
-				    {          
-				      // Save to the message
-				      msgs::Ephemeris* glonass = msg.add_gnss();
-				      glonass->set_system(gpstk::SatID::systemGlonass);
-				      glonass->set_prn(prn);
+					// Try and get the broadcast ephemeride
+					try
+					{
+						// Get the broadcast ephemeris
+						gpstk::Xvt ephb = gpsEphemerides.getXvt(
+							gpstk::SatID(prn,gpstk::SatID::systemGlonass),
+							currentTimeGPS
+						);
 
-				      // Write the position
-				      glonass->mutable_pos()->set_x(satellitePos[0]);
-				      glonass->mutable_pos()->set_y(satellitePos[1]);
-				      glonass->mutable_pos()->set_z(satellitePos[2]);
+						// Elevation of the current satellite with respect to HOME position
+						gpstk::Triple err = ephb.getPos() - satellitePos;
 
-				      // Default frequency approximation
-				      double f = (double) prn;
+						// Set the ephemeris error
+						glo->mutable_err_pos()->set_x(err[0]);
+						glo->mutable_err_pos()->set_y(err[1]);
+						glo->mutable_err_pos()->set_z(err[2]);
 
-				      // Try and get the broadcast ephemeride
-				      try
-				      {
-				        // Get the broadcast ephemeris
-				        gpstk::Xvt ephb = gloEphemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGLO);
+						// Write the clock bias and relativity correction
+						glo->set_err_clk(
+							SPEED_OF_LIGHT * (ephb.getClockBias()-eph.getClockBias())
+						);
 
-				       	// Elevation of the current satellite with respect to HOME position
-				        gpstk::Triple err = ephb.getPos() - satellitePos;
+						// Set the tropospheic delay, based on the simulation location
+						glo->set_err_tro(
+							SPEED_OF_LIGHT *
+							tropModel.correction(
+								originECEF,                      	 // Current receiver position
+								satellitePos,                        // Current satellite position
+								currentTimeGPS                       // Time of observation
+							)
+						);
 
-				        // Set the ephemeris error
-				        glonass->mutable_err()->set_x(err[0]);
-				        glonass->mutable_err()->set_y(err[1]);
-				        glonass->mutable_err()->set_z(err[2]);
+						// GET L1 ionosphere delay
+						glo->set_err_ion(
+							SPEED_OF_LIGHT *
+							tecStore.getIono(
+								originECEF.elvAngle(satellitePos),    // Elevation of the satellite
+								tec[0],                               // Total electron count
+								GLO_L1,                               // L1 GPS frequency
+								"NONE"                                // Mapping function
+							) 
+						);
+					}
+					catch (const std::exception& e)
+					{ 
+						// Draw a new ephemeride error
+						math::vector err_pos = nGLOeph[prn]->DrawVector(t);
+						double       err_clk = nGLOclk[prn]->DrawVector(t);
+						double       err_ion = nGLOion[prn]->DrawVector(t);
+						double       err_tro = nGLOtro[prn]->DrawVector(t);
 
-				        // Write the clock bias and relativity correction
-				        glonass->set_clkbias(ephb.getClockBias()-eph.getClockBias());
-				        glonass->set_relcorr(ephb.getRelativityCorr()-eph.getRelativityCorr());
-
-				        // Set the frequency
-				        f = (double) gloEphemerides.findEphemeris(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGLO).getfreqNum();
-				      }
-				      catch (const std::exception& e)
-				      { 
-				        ROS_WARN("Problem with satellite: %s", e.what());
-
-				        // Set the ephemeris error (zero = problem)
-				        glonass->mutable_err()->set_x(0);
-				        glonass->mutable_err()->set_y(0);
-				        glonass->mutable_err()->set_z(0);
-				      }
-
-				      // GET L1 ionosphere delay bsed on PRN
-				      glonass->set_delay_iono_f1(
-				        tecStore.getIono(
-				          elv,                                       // Elevation of the satellite
-				          tec[0],                                    // Total electron count
-				          GLONASS_L1OF_OFFSET+f*GLONASS_L1OF_SCALE,  // L1 GPS frequency
-				          "NONE"                                     // Mapping function
-				        ) 
-				      );
-
-				      // GET L2 ionosphere delay bsed on PRN
-				      glonass->set_delay_iono_f2(
-				        tecStore.getIono(
-				          elv,                                        // Elevation of the satellite
-				          tec[0],                                     // Total electron count
-				          GLONASS_L2OF_OFFSET+f*GLONASS_L2OF_SCALE, // L1 GPS frequency
-				          "NONE"                                      // Mapping function
-				        ) 
-				      );
-
-				      // Set the tropospheic delay, based on the simulation location
-				      glonass->set_delay_trop(
-				        tropModel.correction(
-				          originECEF,                       // Current receiver position
-				          satellitePos,                        // Current satellite position
-				          currentTimeGPS                       // Time of observation
-				        )
-				      );
-				    }
-				  }
+						// Set the ephemeris error
+						glo->mutable_err_pos()->set_x(err_pos.x);
+						glo->mutable_err_pos()->set_y(err_pos.y);
+						glo->mutable_err_pos()->set_z(err_pos.z);
+						glo->set_err_clk(err_clk);
+						glo->set_err_tro(err_tro);
+						glo->set_err_ion(err_iom);
+					}			  
 				}
 				catch(const std::exception& e)
 				{ 
-				  ROS_DEBUG("Problem with Glonass satellite: %s", e.what());
+				  ROS_DEBUG("Problem with GLO satellite: %s", e.what());
 				}
 			}
 
@@ -333,18 +332,32 @@ namespace gazebo
 			pubPtr->Publish(msg);
 	    }
 
+	    // CALLBACKS FOR MESSAGES //////////////////////////////////////////////////
+
 		// This will be called whenever a new meteorlogical topic is posted
-		void ReceiveMeteorological(MeteorologicalPtr& meteorological)
+		void ReceiveEnvironment(EnvironmentPtr& inmsg)
 		{
-			te = meteorological->temperature();
-			pr = meteorological->pressure();
-			hu = meteorological->humidity();
+			// Use copy constructor to indicate
+			env = *inmsg;
+
+			// Received an environment update message
+			rcvEnv = true;
+		}
+
+		// This will be called whenever a new meteorlogical topic is posted
+		void ReceiveMeteorological(MeteorologicalPtr& inmsg)
+		{
+			// Use copy constructor to indicate
+			met = *inmsg;
+
+			// Received an environment update message
+			rcvMet = true;
 		}
 
 	public:
 
 		// Constructor
-		Satellites() : te(273), pr(1000.0), hu(95.0), minElevation(15.0), rate(1.0)
+		Satellites() : rate(1.0), rcvMet(false), rcvEnv(false)
 		{
 			// Do nothing
 		}
@@ -355,9 +368,30 @@ namespace gazebo
 			// Save the world pointer
 			worldPtr = world;
 
+			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR ////////////////////////
+
+	    	// Initialize the random number generator
+	    	NoiseFactory::Init();
+
+			// PROCESS CONFIGURATION FILE /////////////////////////////////////////
+
 			// Basic parameters
 			root->GetElement("rate")->GetValue()->Get(rate);
-			root->GetElement("minelevation")->GetValue()->Get(minElevation);
+
+		    // Create a noise distribution for each satellite
+		    for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
+		    {
+				nGPSeph[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
+				nGPSclk[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
+				nGPStro[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
+				nGPSion[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
+				nGLOeph[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
+				nGLOclk[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
+				nGLOtro[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
+				nGLOion[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
+			}
+
+			// PROCESS THE RINEX AND SP3 FILES FOR DATA ///////////////////////////
 
 			// Will be useful for parsing the sdf
 			sdf::ElementPtr el;
@@ -369,7 +403,7 @@ namespace gazebo
 			// Extract any
 			try
 			{
-				el = root->GetElement("gps")->GetElement("final")->GetFirstElement();
+				el = root->GetElement("ephemerides")->GetElement("final")->GetElement("gps")->GetFirstElement();
 				do
 				{
 					// Obtain the URI
@@ -389,7 +423,7 @@ namespace gazebo
 
 			try
 			{
-				el = root->GetElement("glonass")->GetElement("final")->GetFirstElement();
+				el = root->GetElement("ephemerides")->GetElement("final")->GetElement("glo")->GetFirstElement();
 				do
 				{
 					// Obtain the URI
@@ -412,7 +446,7 @@ namespace gazebo
 			try
 			{
 				// This is not how I would have chosen to setup the API...
-				el = root->GetElement("gps")->GetElement("broadcast")->GetFirstElement();
+				el = root->GetElement("ephemerides")->GetElement("broadcast")->GetElement("gps")->GetFirstElement();
 				do
 				{
 					// Obtain the URI
@@ -443,7 +477,7 @@ namespace gazebo
 			try
 			{
 				// This is not how I would have chosen to setup the API...
-				el = root->GetElement("glonass")->GetElement("broadcast")->GetFirstElement();
+				el = root->GetElement("ephemerides")->GetElement("broadcast")->GetElement("glo")->GetFirstElement();
 				do
 				{
 					// Obtain the URI
@@ -501,18 +535,11 @@ namespace gazebo
 			}
 			catch (const std::exception& e)
 			{
-				ROS_DEBUG("Could not obtain any broadcast Glonass ephemerides: %s",e.what());
+				ROS_DEBUG("Could not obtain ionex data: %s",e.what());
 			}
 
-			// RESET THIS MODULE //////////////////////////////////////////////////////////////////
+			// SETUP MESSAGING //////////////////////////////////////////////////////////////////
 
-			// Issue a reset
-			Reset();
-        }
-
-        // All sensors must be resettable
-        void Reset()
-        {
 			// Create and initialize a new Gazebo transport node
 			nodePtr = transport::NodePtr(new transport::Node());
 			nodePtr->Init(worldPtr->GetName());
@@ -521,12 +548,24 @@ namespace gazebo
 			pubPtr = nodePtr->Advertise<msgs::Satellites>("~/satellites");
 
 			// Subscribe to meteorological updates
-			subPtr = nodePtr->Subscribe("~/meteorological", 
+			subPtrMet = nodePtr->Subscribe("~/meteorological", 
 				&Satellites::ReceiveMeteorological, this);
+
+			// Subscribe to meteorological updates
+			subPtrEnv = nodePtr->Subscribe("~/environment", 
+				&Satellites::ReceiveEnvironment, this);
+
+			// Reset module
+			Reset();
+        }
+
+        // All sensors must be resettable
+        void Reset()
+        {
+			rcvMet = false;
+			rcvEnv = false;
         }
 
 	};
 
 }
-
-*/

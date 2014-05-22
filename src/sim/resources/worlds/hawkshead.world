@@ -90,98 +90,53 @@
       <!-- RATE at which all GNSS sensors will be updated -->
       <rate>10</rate>
       
-      <!-- GPS ~2.5 cm final ephemerides (must match time period in environment) -->
+      <!-- Ephemerides (must match time period in environment) -->
       <ephemerides>
-        <gps>
-          <uri>file://gnss/igs15652.sp3</uri>
-          <uri>file://gnss/igs15653.sp3</uri>
-          <uri>file://gnss/igs15654.sp3</uri>
-        </gps>
-        <glonass>
-          <uri>file://gnss/igl15652.sp3</uri>
-          <uri>file://gnss/igl15653.sp3</uri>
-          <uri>file://gnss/igl15654.sp3</uri>
-        </glonass>
+        <final>
+          <gps>
+            <uri>file://gnss/igs15652.sp3</uri>
+            <uri>file://gnss/igs15653.sp3</uri>
+            <uri>file://gnss/igs15654.sp3</uri>
+          </gps>
+          <glonass>
+            <uri>file://gnss/igl15652.sp3</uri>
+            <uri>file://gnss/igl15653.sp3</uri>
+            <uri>file://gnss/igl15654.sp3</uri>
+          </glonass>
+        </final>
+        <broadcast>
+          <gps>
+            <uri>file://gnss/brdc0060.10n</uri>
+            <uri>file://gnss/brdc0070.10n</uri>
+            <uri>file://gnss/brdc0080.10n</uri>
+          </gps>
+          <glonass>
+            <uri>file://gnss/brdc0060.10g</uri>
+            <uri>file://gnss/brdc0070.10g</uri>
+            <uri>file://gnss/brdc0080.10g</uri>
+          </glonass>
+        </broadcast>
       </ephemerides>
 
-      <!-- Error models -->
+      <!-- Ionosphere data -->
+      <ionosphere>
+        <trace>
+          <uri>file://gnss/igsg0060.10i</uri>
+          <uri>file://gnss/igsg0070.10i</uri>
+          <uri>file://gnss/igsg0080.10i</uri>
+        </trace>
+      </ionosphere>
+
+      <!-- Error models (used when weather/ephemerides are not available) -->
       <errors>
-
-        <!-- GPS Ephemeride errors -->
-        <gps>
-          <default>trace</default>
-          <model>
-            <orbits>
-              <ou>
-                <mean>1.005</mean>
-                <sdev>0.003</sdev>
-              </ou>
-            </orbits>
-            <clocks>
-              <ou>
-                <mean>1.005</mean>
-                <sdev>0.003</sdev>
-              </ou>
-            </clocks>
-          </model>
-          <trace>
-            <uri>file://gnss/brdc0060.10n</uri>
-            <uri>file://gnss/brdc0070.10n</uri>
-            <uri>file://gnss/brdc0080.10n</uri>
-          </trace>
-        </gps>
-
-        <!-- Glonass Ephemeride errors -->
-        <glonass>
-          <default>trace</default>
-          <model>
-            <orbits>
-              <ou>
-                <mean>1.005</mean>
-                <sdev>0.003</sdev>
-              </ou>
-            </orbits>
-            <clocks>
-              <ou>
-                <mean>1.005</mean>
-                <sdev>0.003</sdev>
-              </ou>
-            </clocks>
-          </model>
-          <trace>
-            <uri>file://gnss/brdc0060.10n</uri>
-            <uri>file://gnss/brdc0070.10n</uri>
-            <uri>file://gnss/brdc0080.10n</uri>
-          </trace>
-        </glonass>
-
-        <!-- Ionosphere errors -->
-        <ionosphere>
-          <default>trace</default>
-          <model>
-            <ou>
-              <mean>1.005</mean>
-              <sdev>0.003</sdev>
-            </ou>
-          </model>
-          <trace>
-            <uri>file://gnss/igsg0060.10i</uri>
-            <uri>file://gnss/igsg0070.10i</uri>
-            <uri>file://gnss/igsg0080.10i</uri>
-          </trace>
-        </ionosphere>
-      
-        <!-- Troposphere errors -->
-        <troposphere>
-          <default>trace</default>
-          <model>
-            <ou> 
-              <mean>1.005</mean>
-              <sdev>0.003</sdev>
-            </ou>
-          </model>
-        </troposphere>
-
+        <gpseph><ou>0.2</ou></gpseph>
+        <gpsclk><ou>0.2</ou></gpsclk>
+        <gpsion><ou>0.2</ou></gpsion>
+        <gpstro><ou>0.2</ou></gpstro>
+        <gloeph><ou>0.2</ou></gloeph>
+        <gloclk><ou>0.2</ou></gloclk>
+        <gloion><ou>0.2</ou></gloion>
+        <glotro><ou>0.2</ou></glotro>
       </errors>
 
     </plugin>

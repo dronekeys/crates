@@ -15,6 +15,9 @@
 #include <hal/sensor/IMU.h>
 #include <hal/sensor/Orientation.h>
 
+// Noise distributions
+#include "../../noise/NoiseFactory.h"
+
 // Dynamics
 #include "dynamics/Propulsion.h"
 #include "dynamics/Aerodynamics.h"
@@ -41,26 +44,26 @@ namespace gazebo
 
   	private:
 
+	    // Pointer to the update event connection
+	    event::ConnectionPtr 	conPtrBeg;
+
 	    // Pointer to the model object
 	    physics::LinkPtr 		linkPtr;
 
-	    // Pointer to the update event connection
-	    event::ConnectionPtr 	conPtrBeg, conPtrEnd;
-
 	    // Dynamics
-	    Aerodynamics 	dAerodynamics;
-	    Propulsion		dPropulsion;
-	    Energy 			dEnergy;
+	    Aerodynamics 			dA;
+	    Propulsion				dP;
+	    Energy 					dE;
 
 	    // Sensors
-	    Altimeter   	sAltimeter;
-	    Compass    		sCompass;
-	    GNSS    		sGNSS;
-	    IMU    			sIMU;
-	    Orientation 	sOrientation;
+	    Altimeter   			sA;
+	    Compass    				sC;
+	    GNSS    				sG;
+	    IMU    					sI;
+	    Orientation 			sO;
 
 	    // Last time tick
-	    double 			tim;
+	    double 					tim;
 
     	// Callback for physics timer
 		void PrePhysics(const common::UpdateInfo &_info)
@@ -72,13 +75,13 @@ namespace gazebo
 			if (dt > 0) 
 			{
 				// Propulsive forces
-				dPropulsion.Update(linkPtr, dt);
+				dP.Update(dt);
 
 				// Shear, turbulence and drag forces
-				dAerodynamics.Update(linkPtr, dt);
+				dA.Update(dt);
 
 				// Energy consumption
-				dEnergy.Update(linkPtr, dt);
+				dE.Update(dt);
 			}
 
 			// Update timer
@@ -98,6 +101,9 @@ namespace gazebo
 	    {
 	    	// Make sure we clean up the connection
     		event::Events::DisconnectWorldUpdateBegin(conPtr);
+
+    		// Kill all random number streams
+	    	NoiseFactory::Destroy();
 	    }
 
 	    // REQUIRED METHODS
@@ -105,85 +111,79 @@ namespace gazebo
 	    // All sensors must be configured using the current model information and the SDF
 	    void Load(physics::ModelPtr model, sdf::ElementPtr root)
 	    {
-	    	// Initialize the random number generator
-	    	NoiseFactory::Init(model);
-
-	    	// Initilize the HAL
-	    	hal::HAL::Init((std::string)"/hal/" + model->GetName());
-
-			// Get a pointer to the rigid body against which all forces are applied
+			// FIND LINK AGAINST WHICH ALL FORCES AND SENSING IS DONE /////////////
+	    	
 	    	std::string linkName;
 			root->GetElement("link")->GetValue()->Get(linkName)
 			linkPtr = model->GetLink(linkName);
 
-			// DYNAMICS CONFIGURATION /////////////////////////////////////////////
+			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR AND HAL ////////////////
+
+	    	// Initialize the random number generator
+	    	NoiseFactory::Init();
+
+	    	// Initilize the HAL
+	    	hal::HAL::Init((std::string)"/hal/" + model->GetName());
+
+			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 
 			// Configure the propulsion dynamics
-			dPropulsion.Configure(root->GetElement("propulsion"));	
+			dP.Configure(linkPtr, root->GetElement("propulsion"));	
 
 			// Configure the aerodynamics
-			dAerodynamics.Configure(root->GetElement("aerodynamics"));	
+			dA.Configure(linkPtr, root->GetElement("aerodynamics"));	
 
 			// Configure the aerodynamics
-			dEnergy.Configure(root->GetElement("energy"));	
-
-			// SENSOR CONFIGURATION ///////////////////////////////////////////////
+			dE.Configure(linkPtr, root->GetElement("energy"));	
 
 			// Configure the altitude sensor
-			sAltimeter.Configure(root->GetElement("altimeter"));	
+			sA.Configure(linkPtr, root->GetElement("altimeter"));	
 
 			// Configure the compass sensor
-			sCompass.Configure(root->GetElement("compass"));
+			sC.Configure(linkPtr, root->GetElement("compass"));
 			
 			// Configure the GNSS sensor
-			sGNSS.Configure(root->GetElement("gnss"));			
+			sG.Configure(linkPtr, root->GetElement("gnss"));			
 			
 			// Configure the IMU sensor
-			sIMU.Configure(root->GetElement("imu"));
+			sI.Configure(linkPtr, root->GetElement("imu"));
 			
 			// Configure the orientation sensor
-			sOrientation.Configure(root->GetElement("orientation"));
+			sO.Configure(linkPtr, root->GetElement("orientation"));
 			
 			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
 
 			// Create a pre-physics update call (before any physics)
 			conPtrBeg = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Quadrotor::PrePhysics, this, _1));
-			
-			// Create a post-physics update call (after any physics)
-			conPtrEnd = event::Events::ConnectWorldUpdateEnd(
-				boost::bind(&Quadrotor::PostPhysics, this, _1));
-
-			// Aways issue a reset on load
-			Reset();
 	    }
 
 	    // All sensors must be resettable
 	    void Reset()
 	    {
 			// Reset the propulsion dynamics
-			dPropulsion.Reset();	
+			dP.Reset();	
 
 			// Reset the aerodynamics
-			dAerodynamics.Reset();	
+			dA.Reset();	
 
 			// Reset the aerodynamics
-			dEnergy.Reset();	
+			dE.Reset();	
 
 			// Reset the altitude sensor
-			sAltimeter.Reset();
+			sA.Reset();
 
 			// Reset the compass sensor
-			sCompass.Reset();
+			sC.Reset();
 			
 			// Reset the GNSS sensor
-			sGNSS.Reset();
+			sG.Reset();
 			
 			// Reset the IMU sensor
-			sIMU.Reset();
+			sI.Reset();
 			
 			// Reset the orientation sensor
-			sOrientation.Reset();		
+			sO.Reset();		
 	    }
 
 	    /////////////////////////////////////////////////////////////////////////////////////
@@ -193,9 +193,9 @@ namespace gazebo
 	    // Called when the HAL wants an altimeter reading
 	    bool GetMeasurement(hal_sensor_altimeter::Data& msg)
 	    {
-	    	if (sAltimeter.Sample(msg))
+	    	if (sA.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);
+		    	Feed(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -204,9 +204,9 @@ namespace gazebo
 		// Called when the HAL wants a compass reading
 	    bool GetMeasurement(hal_sensor_compass::Data& msg)
 	    {
-	    	if (sCompass.Sample(msg))
+	    	if (sCs.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);
+		    	Feed(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -215,9 +215,9 @@ namespace gazebo
 	    // Called when the HAL wants an imu reading
 	    bool GetMeasurement(hal_sensor_imu::Data& msg)
 	    {
-	    	if (sIMU.Sample(msg))
+	    	if (sI.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);
+		    	Feed(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -226,9 +226,9 @@ namespace gazebo
 	    // Called when the HAL wants a gnss reading
 	    bool GetMeasurement(hal_sensor_gnss::Data& msg)
 	    {
-	    	if (sGNSS.Sample(msg))
+	    	if (sG.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);
+		    	Feed(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -237,9 +237,9 @@ namespace gazebo
 	    // Called when the HAL wants an orientation reading
 	    bool GetMeasurement(hal_sensor_orientation::Data& msg)
 	    {
-	    	if (sOrientation.Sample(msg))
+	    	if (sO.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);
+		    	Feed(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;

@@ -20,42 +20,48 @@
 namespace gazebo
 {
   // Convenience declarations
-  typedef const boost::shared_ptr<const msgs::Satellites> SatellitesPtr;
-  typedef const boost::shared_ptr<const msgs::Meterological> MeteorlogicalPtr;
+  typedef const boost::shared_ptr<const msgs::Satellites>     SatellitesPtr;
+  typedef std::vector<gpstk::SatID::SatelliteSystem>          SatelliteSystemVec;
 
   class GNSS : public Sensor
   {
   private:
 
-    // Have we received the magnetic field?
-    bool ready;
+    // Link onto which sensor is attached
+    physics::LinkPtr                link;
 
-    // Satellite systems
-    std::vector<gpstk::SatID::SatelliteSystem>  systems;
+    // Have we received satellite data
+    bool                            ready, enabled;
 
     // Requirements for listening for Gazbeo messages
     event::ConnectionPtr            conPtr;
     transport::NodePtr              nodePtr;
     transport::SubscriberPtr        subPtr;
-
-    // Buffers the satellite positions locally
     msgs::Satellites                msg;
 
-    // Used to convert from gazebo local to spherical
+    // Solver parameters
+    int                             _maxIterations;
+    double                          _minError;
+    double                          _minElevation;
+    bool                            _gpsUse _gpsEph. _gpsIon, _gpsClk,_gpsTro;
+    bool                            _gloUse _gloEph. _gloIon, _gloClk,_gloTro;
+
+    // Internal variables used for navigation
+    SatelliteSystemVec              systems;
     gpstk::WGS84Ellipsoid           wgs84;
-
-    // An ellipsoid for the earth
     gpstk::GPSEllipsoid             ellip;
-
-    // RAIM solver without rotation correction (NB)
     gpstk::PRSolution               solver;
-
-    // Tropospheric correction model
     gpstk::ZeroTropModel            tropModelZero;
     gpstk::TropModel*               tropModel;
 
-    // Store the position and avelocity
+    // Receiver noise
+    Noise*                          nReceiver;
+
+    // Store the position and velocity
     math::Vector3                   posNew, posOld, velNew;
+
+    // For storing time (needed to calcualte velocity)
+    double                          timOld, timNew;
 
     // When new environment data arrives
     void Receive(SatellitesPtr msg);
@@ -69,13 +75,13 @@ namespace gazebo
     GNSS();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    bool GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_gnss::Data& msg);
+    bool GetMeasurement(double t, hal_sensor_gnss::Data& msg);
 
   };
 

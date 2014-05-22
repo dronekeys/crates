@@ -18,8 +18,11 @@ void Compass::Receive(EnvironmentPtr msg)
 }
 
 // All sensors must be configured using the current model information and the SDF
-bool Compass::Configure(sdf::ElementPtr root)
+bool Compass::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 {
+	// Backup the link
+	link = linkPtr;
+	
 	// Initialise the noise distribution
 	nMagX = NoiseFactory::Create(root->GetElement("errors")->GetElement("m_x"));
 	nMagY = NoiseFactory::Create(root->GetElement("errors")->GetElement("m_y"));
@@ -52,12 +55,13 @@ void Compass::Reset()
 }
 
 // Get the current altitude
-bool Compass::GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_compass::Data& msg)
+bool Compass::GetMeasurement(double t, physics::LinkPtr linkPtr, hal_sensor_compass::Data& msg)
 {
 	// Get the quantities we want
 	math::Vector3 magB = linkPtr->GetWorldPose().rot.GetInverse().RotateVector(mag);
 
 	// Perturb angular velocity
+	msg.t    = t;
 	msg.m_x  = magB.x + nMagX.Sample(linkPtr, dt);
 	msg.m_y  = magB.y + nMagY.Sample(linkPtr, dt);
 	msg.m_z  = magB.z + nMagZ.Sample(linkPtr, dt);

@@ -19,19 +19,22 @@ namespace gazebo
   {
   private:
 
+    // Link onto which sensor is attached
+    physics::LinkPtr              link;
+
     // Requirements for listening for Gazbeo messages
     event::ConnectionPtr          conPtr;
     transport::NodePtr            nodePtr;
     transport::SubscriberPtr      subPtr;
 
     // Have we received the magnetic field?
-    bool ready;
+    bool                          ready;
 
     // The magnetic field
-    math::Vector3 mag;
+    math::Vector3                 mag;
 
     // Noise streams
-    Noise* nMagX, nMagY, nMagZ;
+    Noise*                        nMagX, nMagY, nMagZ;
 
     // When new environment data arrives
     void Receive(EnvironmentPtr msg);
@@ -42,13 +45,13 @@ namespace gazebo
     Compass();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    bool GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_compass::Data& msg);
+    bool GetMeasurement(double t, hal_sensor_compass::Data& msg);
 
   };
 

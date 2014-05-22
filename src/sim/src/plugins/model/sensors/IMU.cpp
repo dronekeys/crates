@@ -6,8 +6,11 @@ using namespace gazebo;
 IMU::IMU() {}
 
 // All sensors must be configured using the current model information and the SDF
-bool IMU::Configure(sdf::ElementPtr root)
+bool IMU::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 {
+	// Backup the link
+	link = linkPtr;
+
 	// Initialise the noise distribution
 	nLinAccX = NoiseFactory::Create(root->GetElement("errors")->GetElement("a_x"));
 	nLinAccY = NoiseFactory::Create(root->GetElement("errors")->GetElement("a_y"));
@@ -33,18 +36,17 @@ void IMU::Reset()
 }
 
 // Get the current altitude
-bool IMU::GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_imu::Data& msg)
+bool IMU::GetMeasurement(double t, hal_sensor_imu::Data& msg)
 {
 	// Get the quantities we want
 	math::Vector3 linAcc = linkPtr->GetRelativeLinearAcc();
 	math::Vector3 angVel = linkPtr->GetRelativeAngularVel();
 
 	// Perturb acceleration
+	msg.t  = t;
 	msg.du = linAcc.x + nLinAccX.Sample(linkPtr, dt);
 	msg.dv = linAcc.y + nLinAccY.Sample(linkPtr, dt);
 	msg.dw = linAcc.z + nLinAccZ.Sample(linkPtr, dt);
-
-	// Perturb angular velocity
 	msg.p  = angVel.x + nAngVelX.Sample(linkPtr, dt);
 	msg.q  = angVel.y + nAngVelY.Sample(linkPtr, dt);
 	msg.r  = angVel.z + nAngVelZ.Sample(linkPtr, dt);

@@ -45,6 +45,11 @@ void NoiseFactory::Receive(NoisePtr msg)
 // Initialise the noise factory
 void NoiseFactory::Init(physics::ModelPtr model)
 {
+	// Add the various types
+	types["dryden"] 	= DRYDEN;
+	types["white"] 		= WHITE;
+	types["ou"] 		= ORNSTEIN;
+
     // Initialise a node pointer
     nodePtr = transport::NodePtr(new transport::Node());
     nodePtr->Init(model->GetWorld()->GetName());
@@ -53,7 +58,15 @@ void NoiseFactory::Init(physics::ModelPtr model)
     subPtr = nodePtr->Subscribe("~/noise", &NoiseFactory::Receive);
 }
 
-bool NoiseFactory::Create(sdf::ElementPtr root)
+// Initialise the noise factory
+void NoiseFactory::Destroy()
+{
+	// Delete all factory-created processes
+	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
+		delete i->second;
+}
+
+Noise* NoiseFactory::Create(sdf::ElementPtr root)
 {
 	// Get the name and type
 	std::string name = root->GetName();
@@ -92,11 +105,11 @@ bool NoiseFactory::Create(sdf::ElementPtr root)
 			break;
 
         case UNKNOWN:
-        	return false;
+        	return NULL;
 	}
 
 	// Success!
-	return true;
+	return processes[name];
 }
 
 double NoiseFactory::Sample(std::string& name, double dt)

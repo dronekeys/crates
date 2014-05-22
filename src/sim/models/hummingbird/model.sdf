@@ -136,8 +136,8 @@
           </voltage>
         </control>
         <errors>
-          <linacc><white>0.2 0.2 0.2</white></linacc>
-          <angacc><white>0.2 0.2 0.2</white></angacc>
+          <for><white>0.2 0.2 0.2</white></for>
+          <tor><white>0.2 0.2 0.2</white></tor>
         </errors>
       </propulsion>
 
@@ -175,12 +175,7 @@
       <altimeter>
         <enabled>true</enabled>
         <errors>
-          <z>
-            <trace>0</trace>
-          </z>
-          <w>
-            <trace>0</trace>
-          </w>
+          <altpos><ou>0.2</ou></altpos>
         </errors>
       </altimeter>
 
@@ -188,93 +183,43 @@
       <compass>
         <enabled>true</enabled>
         <errors>
-          <x>
-            <white>0.2</white>
-          </x>
-          <y>
-            <white>0.2</white>
-          </y>
-          <z>
-            <white>0.2</white>
-          </z>
+          <magvec><white>0.2 0.2 0.2</white></magvec>
         </errors>
       </compass>
 
       <!-- GNSS parameters -->
       <gnss>
         <enabled>true</enabled>
-        <minelevation>15</minelevation>
-        <gps>
-          <carriers>
-            <l1>CODE</l1>
-            <l2>NONE</l2>
-            <l5>NONE</l5>
-          </carriers>
-          <errors>   
-            <sig>
-              <trace>0</trace>
-            </sig>
-            <clk>
-              <trace>0</trace>
-            </clk>
-            <eph>
-              <trace>0</trace>
-            </eph>
-            <tro>
-              <trace>0</trace>
-            </tro>
-            <ion>
-              <trace>0</trace>
-            </ion>
-          </errors>
-        </gps> 
-        <glo>
-          <carriers>
-            <l1>CODE</l1>
-            <l2>NONE</l2>
-          </carriers>
-          <errors>   
-            <sig>
-              <trace>0</trace>
-            </sig>
-            <clk>
-              <trace>0</trace>
-            </clk>
-            <eph>
-              <trace>0</trace>
-            </eph>
-            <tro>
-              <trace>0</trace>
-            </tro>
-            <ion>
-              <trace>0</trace>
-            </ion>
-          </errors>
-        </glo>
+        <solver>
+          <minelevation>15</minelevation>
+          <nsiterations>10</nsiterations>
+          <errtolerance>3.e-7</errtolerance>
+          <gps>
+            <use>true</use>
+            <ion>true</ion>
+            <tro>true</tro>
+            <eph>true</eph>
+            <clk>true</clk>
+          </gps>
+          <glo>
+            <use>true</use>
+            <ion>true</ion>
+            <tro>true</tro>
+            <eph>true</eph>
+            <clk>true</clk>
+          </glo>
+        </solver>
+        <errors>
+          <rcvclk><white>0.1</white></rcvclk>
+        </errors>
       </gnss>
 
       <!-- IMU parameters -->
       <imu>
         <enabled>true</enabled>
         <errors>
-          <p>
-            <ou>0.2</ou>
-          </p>
-          <q>
-            <ou>0.2</ou>
-          </q>
-          <r>
-            <ou>0.2</ou>
-          </r>
-          <du>
-            <ou>0.2</ou>
-          </du>
-          <dv>
-            <ou>0.2</ou>
-          </dv>
-          <dw>
-            <ou>0.2</ou>
-          </dw>
+          <angvel><ou>0.2 0.2 0.2</ou></angvel>
+          <linacc><ou>0.2 0.2 0.2</ou></linacc>
         </errors>
       </imu>
 
@@ -282,15 +227,8 @@
       <orientation>
         <enabled>true</enabled>
         <errors>
-          <roll>
-            <ou>0.2</ou>
-          </roll>
-          <pitch>
-            <ou>0.2</ou>
-          </pitch>
-          <yaw>
-            <ou>0.2</ou>
-          </yaw>
+          <angpos><ou>0.2 0.2 0.2</ou></angpos>
+          <angvel><ou>0.2 0.2 0.2</ou></angvel>
         </errors>
       </orientation>
 

@@ -22,7 +22,7 @@ namespace gazebo
         /*!
           \param root the sdf sensor configuration
         */
-        virtual bool Configure(sdf::ElementPtr root) = 0;
+        virtual bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root) = 0;
 
         //! Reset a sensor
         virtual void Reset() = 0;

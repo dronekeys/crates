@@ -6,10 +6,9 @@
 #include <string>
 
 // Gazebo includes
+#include "models/Dryden.h"
 #include "models/Ornstein.h"
-#include "models/Uniform.h"
 #include "models/White.h"
-#include "models/Wiener.h"
 
 namespace gazebo
 {
@@ -42,10 +41,10 @@ namespace gazebo
         static transport::SubscriberPtr subPtr;
 
         /// A list of noise processes
-        static TypeVec      types;
+        static TypeVec                  types;
 
         /// A list of noise processes
-        static ProcessVec   processes;
+        static ProcessVec               processes;
 
     public:    
 

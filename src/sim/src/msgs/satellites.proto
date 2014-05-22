@@ -2,36 +2,21 @@ package gazebo.msgs;
 import "vector3d.proto";
 
 // GNSS Satellite ephemeris
-message GPSEph
+message Vehicle
 {
-	required int32 	  prn			  = 1;	// Satellite identifier
-	required Vector3d pos        	  = 2;	// Satellite truth ECEF position
-	required Vector3d err_pos    	  = 3;	// Satellite noisy ECEF position
-	required double   err_clk         = 4;	// Satellite clock error
-	required double   err_rel  		  = 5;	// Relativity error
-	required double   err_ion_L1   	  = 6;	// L1 ionospheric phase delay
-	required double   err_ion_L2      = 7;	// L2 ionospheric phase delay
-	required double   err_ion_L5      = 8;	// L5 ionospheric phase delay
-	required double   err_tro   	  = 9;	// Tropospheric phase delay
-}
-
-// GNSS Satellite ephemeris
-message GLOEph
-{
-	required int32 	  prn			  = 1;	// Satellite identifier
-	required Vector3d pos        	  = 2;	// Satellite truth ECEF position
-	required Vector3d err_pos         = 3;	// Satellite noisy ECEF position
-	required double   err_clk         = 4;	// Satellite clock error
-	required double   err_rel  		  = 5;	// Relativity error
-	required double   err_ion_L1  	  = 6;	// L1 ionospheric phase delay
-	required double   err_ion_L2      = 7;	// L2 ionospheric phase delay
-	required double   err_tro         = 8;  // Tropospheric phase delay
+	required int32 	  sys	    	  = 1;	// Satellite system
+	required int32 	  prn			  = 2;	// Satellite identifier
+	required Vector3d pos        	  = 3;	// Satellite truth ECEF position
+	required Vector3d err_pos    	  = 4;	// Satellite noisy ECEF position
+	required double   err_clk         = 5;	// Satellite clock error
+	required double   err_rel  		  = 6;	// Relativity error
+	required double   err_ion   	  = 7;	// L1 ionospheric phase delay
+	required double   err_tro   	  = 8;	// Tropospheric phase delay
 }
 
 // Information broadcast about the environment
 message Satellites
 {
-	required double epoch  	= 1;
-	repeated GPSEph gps     = 2;
-	repeated GLOEph glo     = 3;
+	required double  epoch  		  = 1;	// Time stamp
+	repeated Vehicle svs              = 2;	// Satellites 
 }

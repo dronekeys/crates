@@ -3,12 +3,15 @@
 using namespace gazebo;
 
 // Consutrcutor
-Altimeter::Altimeter() : ready(false), last {}
+Altimeter::Altimeter() : altOld(0), timOld(0) {}
 
 // All sensors must be configured using the current model information and the SDF
-bool Altimeter::Configure(sdf::ElementPtr root)
+bool Altimeter::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 {
-	// Creat the noise distribution
+	// Backup the link
+	link = linkPtr;
+
+	// Create the noise distribution
 	nAlt = NoiseFactory::Create(root->GetElement("errors")->GetElement("z"));
 
 	// Success!
@@ -21,29 +24,32 @@ void Altimeter::Reset()
 	// Reset the noise distribution
 	nAlt.Reset();
 
-	// Reset readiness
-	ready = false;
+	// Reset the integrator
+	altOld = 0.0;
+	timOld = 0.0;
 }
 
 
 // Get the current altitude
-bool Altimeter::GetMeasurement(physics::LinkPtr linkPtr, hal_sensor_altimeter::Data& msg)
+bool Altimeter::GetMeasurement(double t, hal_sensor_altimeter::Data& msg)
 {
 	// Get the quantities we want
 	altNew = linkPtr->GetWorldPose().pos.z;
+	timNew = t;
 
-	// Perturb 
-	msg.z = altNew + nAlt.Sample(linkPtr, dt);		// Velocity
-	msg.w = (altNew - altOld) / dt;					// Vertical speed
+	// Calculat the time since last measurement was taken
+	double dt = timNew - timOld;
+
+	// Calculate height and vertical velocity
+	msg.t = timNew;
+	msg.z = altNew + nAlt.DrawDouble(linkPtr, dt);			
+	if (dt > 0)
+		msg.w = (altNew - altOld) / dt;
 
 	// Backup the altitude
 	altOld = altNew;
+	timOld = timNew;
 
 	// On iteration 2+ things are fine
-	if (ready) 
-		return true;
-
-	// Indicate this is the first iteration
-	ready = true;
-	return false;
+	return true;
 }
