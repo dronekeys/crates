@@ -196,6 +196,7 @@ namespace gazebo
 		// Set up gazebo publishers
 		pubFactory  = gazeboNode->Advertise<msgs::Factory>("~/factory");
 		pubRequest  = gazeboNode->Advertise<msgs::Request>("~/request");
+		pubNoise    = gazeboNode->Advertise<msgs::Noise>("~/noise");
 		subResponse = gazeboNode->Subscribe("~/response",&Simulation::Response, this);
 		subContacts = gazeboNode->Subscribe("~/physics/contacts",&Simulation::Contacts, this);
 
@@ -255,7 +256,6 @@ namespace gazebo
 
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time",  true);
-		rosNode->setParam("/use_sim_noise", true);
     }
 
     // Setup the thread queue
@@ -453,15 +453,16 @@ namespace gazebo
 	// Resume physics
 	bool Noise(sim::Noise::Request &req, sim::Noise::Response &res)
 	{
-		// Create and publish the message
-		rosNode->setParam("/use_sim_noise", req.enable);
+		// Create and publish the message to gazebo
+		msgs::Noise msg;
+		msg.set_model(req.model);
+		msg.set_process(req.process);
+		msg.set_enabled(req.enabled);
+		pubNoise->Publish(msg);
 
 		// Keep steps to a reasonable length
 		res.success = true;
-		if (req.enable)
-			res.status_message = std::string("Noise enabled");
-		else
-			res.status_message = std::string("Noise disabled");
+		res.status_message = std::string("Noise message sent");	
 		return true;
 	}
 

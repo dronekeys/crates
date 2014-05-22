@@ -4,6 +4,7 @@
 // System includes
 #include <map>
 #include <string>
+#include <cstdarg>
 
 // Gazebo includes
 #include <gazebo/gazebo.hh>
@@ -22,19 +23,10 @@ namespace gazebo
         // This flag willdecide whether random numbers are enabled
         bool enabled;
 
-        // Requirements for listening for Gazbeo messages
-        event::ConnectionPtr            conPtr;
-        transport::NodePtr              nodePtr;
-        transport::SubscriberPtr        subPtr;
-
-        // Incoming noise message
-        void Receive(NosiePtr noise)
-        {
-            // Enable or disable the noise
-            enabled = noise->enabled();
-        }
-
     protected:
+
+        // A vector of distribution parameters
+        std::vector<double> params;
 
         // Child must implement a 3D vector stats function
         virtual gazebo::Vector3 Sample(physics::linkPtr link, double dt) = 0;
@@ -50,16 +42,11 @@ namespace gazebo
         /// Destructor
         virtual ~Noise() {}
 
-        /// Constructor
-        Noise() 
-        {
-            // Initialise a node pointer
-            nodePtr = transport::NodePtr(new transport::Node());
-            nodePtr->Init(modPtr->GetWorld()->GetName());
-
-            // Subscribe to messages about wind conditions
-            subPtr = nodePtr->Subscribe("~/noise", &Noise::Receive, this);
-        };
+        //! Configure the distribution
+        /*!
+            \param num number of arguments
+        */
+        void Configure(int num, ...);
 
         //! Sample a 3D vector from the random distribution
         /*!
@@ -67,12 +54,7 @@ namespace gazebo
             \param dt the discrete time step
             \return the sampled variable
         */
-        gazebo::Vector3 DrawVector(physics::linkPtr link, double dt = 0)
-        {
-            if (enabled)
-                return Sample(linkPtr, dt);
-            return gazebo::Vector3(0,0,0);
-        }
+        gazebo::Vector3 DrawVector(physics::linkPtr link, double dt = 0);
 
         //! Sample a scalar from the random distribution
         /*!
@@ -80,12 +62,7 @@ namespace gazebo
             \param dt the discrete time step
             \return the sampled variable
         */
-        double DrawScalar(physics::linkPtr link, double dt = 0)
-        {
-            if (enabled)
-                return Sample(linkPtr, dt);
-            return 0;
-        }
+        double DrawScalar(physics::linkPtr link, double dt = 0);
     };
 }
 

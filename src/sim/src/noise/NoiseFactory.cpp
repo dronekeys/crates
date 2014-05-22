@@ -2,16 +2,14 @@
 
 using namespace gazebo;
 
-std::map<std::string,NoiseType> NoiseFactory::types;
-
+// A list of all noise processes
 std::map<std::string,Noise*> NoiseFactory::processes;
 
 NoiseFactory::NoiseFactory()
 {
+	types["dryden"] 	= DRYDEN;
 	types["white"] 		= WHITE;
-	types["wiener"] 	= WIENER;
 	types["ou"] 		= ORNSTEIN;
-	types["uniform"] 	= UNIFORM;
 }
 
 NoiseFactory::~NoiseFactory()
@@ -29,6 +27,30 @@ NoiseType NoiseFactory::Lookup(std::string &name)
 
 	// Check to
 	return types[name];
+}
+
+// Initialise the noise factory
+void NoiseFactory::Receive(NoisePtr msg)
+{
+	// If the model is empty and doesn't match, don't do anything
+	if (msg->model().compare(model->GetName()) !=0 && !msg->model().empty())
+		return;
+
+	// Configure the noise processes
+	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
+		if (msg->process().compare(i->first)==0 || msg->process().empty())
+			i->second->Toggle(msg->enabled());
+}
+
+// Initialise the noise factory
+void NoiseFactory::Init(physics::ModelPtr model)
+{
+    // Initialise a node pointer
+    nodePtr = transport::NodePtr(new transport::Node());
+    nodePtr->Init(model->GetWorld()->GetName());
+
+    // Subscribe to messages about wind conditions
+    subPtr = nodePtr->Subscribe("~/noise", &NoiseFactory::Receive);
 }
 
 bool NoiseFactory::Create(sdf::ElementPtr root)
@@ -50,17 +72,17 @@ bool NoiseFactory::Create(sdf::ElementPtr root)
 			processes[name] = (Noise*) new White(p1);
 			break;
 
-		case WIENER:
-			root->GetFirstElement()->GetElement("bias")->GetValue()->Get(p1);
-			root->GetFirstElement()->GetElement("white")->GetValue()->Get(p2);
-			processes[name] = (Noise*) new Wiener(p1, p2);
-			break;
-
 		case ORNSTEIN:
 			root->GetFirstElement()->GetElement("lambda")->GetValue()->Get(p1);
 			root->GetFirstElement()->GetElement("bias")->GetValue()->Get(p2);
 			root->GetFirstElement()->GetElement("white")->GetValue()->Get(p3);
 			processes[name] = (Noise*) new Ornstein(p1, p2, p3);
+			break;
+
+		case DRYDEN:
+			root->GetFirstElement()->GetElement("lower")->GetValue()->Get(p1);
+			root->GetFirstElement()->GetElement("upper")->GetValue()->Get(p2);
+			processes[name] = (Noise*) new Dryden(p1, p2);
 			break;
 
 		case UNIFORM:

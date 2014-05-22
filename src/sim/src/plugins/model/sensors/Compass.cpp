@@ -32,10 +32,6 @@ bool Compass::Configure(sdf::ElementPtr root)
     // Subscribe to messages about wind conditions
     subPtr = nodePtr->Subscribe("~/environment", &Compass::Receive, this);
 
-    //  Create a pre-physics update call
-    conPtr = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&Aerodynamics::PrePhysics, this, _1));
-
     // Reset
     Reset();
 

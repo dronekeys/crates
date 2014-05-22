@@ -10,23 +10,21 @@ void Noise::Receive(NosiePtr noise)
     enabled = noise->enabled();
 }
 
-/// Destructor
-Noise::~Noise()
+// Configure the noise distributino
+void Noise::Configure(int num, ...)
 {
-    // Do nothing
+    // A place to store the list of arguments
+    va_list arguments;
+    va_start(arguments, num);
+    for (int x = 0; x < num; x++)
+        params[x] = va_arg(arguments,double);
+    va_end(arguments);
+
+    // Issue a reset after recalibration
+    Reset();
 }
 
-/// Constructor
-Noise::Noise() 
-{
-    // Initialise a node pointer
-    nodePtr = transport::NodePtr(new transport::Node());
-    nodePtr->Init(modPtr->GetWorld()->GetName());
-
-    // Subscribe to messages about wind conditions
-    subPtr = nodePtr->Subscribe("~/noise", &Noise::Receive, this);
-};
-
+// Draw a vector from the distribution
 gazebo::Vector3 Noise::DrawVector(physics::linkPtr link, double dt = 0)
 {
     if (enabled)
@@ -34,6 +32,7 @@ gazebo::Vector3 Noise::DrawVector(physics::linkPtr link, double dt = 0)
     return gazebo::Vector3(0,0,0);
 }
 
+// Draw a scalar from the distribution
 double Noise::DrawScalar(physics::linkPtr link, double dt = 0)
 {
     if (enabled)

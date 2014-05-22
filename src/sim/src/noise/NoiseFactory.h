@@ -13,19 +13,22 @@
 
 namespace gazebo
 {
-	// Define the gaussian types
-	typedef enum 
-	{
-		WHITE,    /* Zeroi-mean Gaussian noise            */
-		WIENER,   /* Weiner process noise                 */
-		ORNSTEIN, /* Ornstein-Uhlenbeck process nouse     */
-		UNIFORM,  /* Uniform noise                        */
-        UNKNOWN
-	} 
-	NoiseType;
-
     // Environment messages
     typedef const boost::shared_ptr<const msgs::Noise> NoisePtr;
+
+    // Define the gaussian types
+    typedef enum 
+    {
+        WHITE,    /* Zero-mean Gaussian noise             */
+        ORNSTEIN, /* Ornstein-Uhlenbeck process nouse     */
+        DRYDEN,   /* Dryden process noise                 */
+        UNKNOWN
+    } 
+    NoiseType;
+
+    // Convenience
+    typedef std::map<std::string,NoiseType> TypeVec;
+    typedef std::map<std::string,Noise*>    ProcessVec;
 
     // An abstract class for modelling noise
     class NoiseFactory
@@ -33,28 +36,30 @@ namespace gazebo
 
     private:
 
-    	// A list of noise types
-    	static std::map<std::string,NoiseType> types;
+        // Requirements for listening for Gazbeo messages
+        static event::ConnectionPtr     conPtr;
+        static transport::NodePtr       nodePtr;
+        static transport::SubscriberPtr subPtr;
 
         /// A list of noise processes
-        static std::map<std::string,Noise*> processes;
+        static TypeVec      types;
 
-    protected:
-
-        //! Obtain a noise type enumeration from a string
-        /*!
-            \param name the name of the noise type
-            \return an enumeration of the noise type
-        */
-        static NoiseType Lookup(std::string &name);
+        /// A list of noise processes
+        static ProcessVec   processes;
 
     public:    
 
-        /// Constructor
-        NoiseFactory();
+        //! Turn noise on or off
+        /*!
+            \param a pointer to the world
+        */
+        static void Receive(NoisePtr noise);
 
-        /// Destructor
-        ~NoiseFactory();
+        //! Initialize the noise factory
+        /*!
+            \param a pointer to the world
+        */
+        static void Init(physics::ModelPtr model);
 
         //! Obtain a pointer to the ROS node handle
         /*!

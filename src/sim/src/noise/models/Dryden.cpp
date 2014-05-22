@@ -3,19 +3,53 @@
 
 using namespace gazebo;
 
+#define METERS_TO_FEET      3.2808399
+#define FEET_TO_METERS      0.3048000
+#define INIT_ITERATIONS     1000
+#define INIT_DT             0.02
+#define PARAMETER_WINDSPEED 0
+
 Dryden::Dryden(double white) :
 {
-    // Do nothing
+    // Bootstrap the turbulence model
+    for (int i = 0; i < INIT_ITERATIONS; i++)
+        DrawVector(INIT_DT);
 }
 
-double Dryden::Sample(double dt)
+Dryden::Reset()
 {
 	// Extract the altitude and orientation from the state
-	double d = METERS_TO_FEET * modPtr->GetLink("body")->GetWorldLinearVel().GetLength() * dt;
+	double d = METERS_TO_FEET * link->GetWorldLinearVel().GetLength() * dt;
+    double a = METERS_TO_FEET * link->GetWorldPose().pos.z;
+	double k = 0.177 + 0.000823 * a;
+
+    // Initialise sigma
+    s.x = 1.0 / pow(k,0.4);
+    s.y = 1.0 / pow(k,0.4);
+    s.z = 1.0;
+    s  *= 0.1 * param[PARAMETER_WINDSPEED];
+    
+    // Initialise length scale
+    l.x = 1.0 / pow(k,1.2);
+    l.y = 1.0 / pow(k,1.2);
+    l.z = 1.0;
+    l  *= a;
+
+    // Bootstrap the turbulence model
+    for (int i = 0; i < INIT_ITERATIONS; i++)
+        DrawVector(INIT_DT);
+}
+
+// Sample the random process
+gazebo::Vector3 Dryden::DrawVector(double dt)
+{
+	// Extract the altitude and orientation from the state
+	double d = METERS_TO_FEET * link->GetWorldLinearVel().GetLength() * dt;
+    double a = METERS_TO_FEET * link->GetWorldPose().pos.z;
 	double k = 0.177 + 0.000823 * a;
 
 	// sigma
-	s.z = s20 * 0.1;
+	s.z = param[PARAMETER_WINDSPEED] * 0.1;
 	s.y = s.z / pow(k, 0.4);
 	s.x = s.y;
 
@@ -41,4 +75,13 @@ double Dryden::Sample(double dt)
 		(1-d/l.z) *  turbulence.z,    // Mean
 		sqrt(2*d/l.z) * s.z           // Stddev
 	);
+
+	// Return the turbulence vector
+	return turbulence;
+}
+
+// Sample the random process
+double Dryden::Sample(double dt)
+{
+	return ((math::Vector3)Sample(dt)).GetLength();
 }

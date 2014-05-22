@@ -3,5 +3,7 @@ package gazebo.msgs;
 // System noise information
 message Noise
 {
-	required bool enabled  	= 1;
+	required bool   enabled 	= 1;
+	optional string model      	= 2;
+	optional string process     = 3;
 }

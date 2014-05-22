@@ -20,14 +20,11 @@ namespace gazebo
 
         //! Configure a sensor
         /*!
-          \param msg the message to be populated
+          \param root the sdf sensor configuration
         */
         virtual bool Configure(sdf::ElementPtr root) = 0;
 
         //! Reset a sensor
-        /*!
-          \param msg the message to be populated
-        */
         virtual void Reset() = 0;
 
     };

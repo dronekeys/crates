@@ -105,7 +105,8 @@ namespace gazebo
 	    // All sensors must be configured using the current model information and the SDF
 	    void Load(physics::ModelPtr model, sdf::ElementPtr root)
 	    {
-	    	// BASE INITIALIZATION ///////////////////////////////////////////////
+	    	// Initialize the random number generator
+	    	NoiseFactory::Init(model);
 
 	    	// Initilize the HAL
 	    	hal::HAL::Init((std::string)"/hal/" + model->GetName());
