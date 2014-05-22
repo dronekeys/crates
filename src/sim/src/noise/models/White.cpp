@@ -3,13 +3,19 @@
 
 using namespace gazebo;
 
-White::White(double white) 
-    : Noise(), _white(white)
+// Configure using the given SDF
+White::White(std::string name, sdf::ElementPtr root) : Noise(name)
 {
-    // Do nothing
+	Reset();
 }
 
-double White::Sample(double dt)
+void White::Reset()
 {
-    return math::Rand::GetDblNormal(0.0, _white);
+	for (int i = 0; i < MAX_VARS; i++)
+		vars[i] = 0.0;
+}
+
+void White::Sample(double dt)
+{
+    // Do nothing
 }

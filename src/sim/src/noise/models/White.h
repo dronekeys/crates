@@ -12,25 +12,23 @@ namespace gazebo
 
     private:
 
-        // The distribution
-        double _white;
 
-    public:    
 
-        //! Create a new Gaussian process object
+    public:
+
+        // Configure using the given SDF
+        White(std::string name, sdf::ElementPtr root);
+
+        // Reset using the given list of arguments
+        Reset();
+
+        //! Sample a 3D vector from the random distribution
         /*!
-            \param mu mean
-            \param sigma variance
-            \return a new Gaussian object
-        */
-        White(double white = 1.0);
-
-        //! Sample the distribution
-        /*!
+            \param link the model link
             \param dt the discrete time step
-            \return a sample
         */
-        double Sample(double dt = 0);
+        void Sample(double dt = 0);
+
     };
 }
 

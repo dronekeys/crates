@@ -4,6 +4,10 @@
 // For base noise type
 #include "Noise.h"
 
+#define DRYDEN_PARS_AIRSPEED  0
+#define DRYDEN_PARS_ALTITUDE  1
+#define DRYDEN_PARS_WNDSPEED  2
+
 namespace gazebo
 {
     // An abstract class for modelling noise
@@ -12,37 +16,23 @@ namespace gazebo
 
     private:
 
-        // The current value
-        math::Vector3 turbulence, s, l;
+        // Intermediate values
+        math::Vector3 s, l;
+
+    public:
+
+        // Configure using the given SDF
+        Dryden(std::string name, sdf::ElementPtr root);
+
+        // Reset using the given list of arguments
+        Reset();
 
         //! Sample a 3D vector from the random distribution
         /*!
             \param link the model link
             \param dt the discrete time step
-            \return the sampled variable
         */
-        gazebo::Vector3 Sample(double dt = 0);
-
-        //! Sample a scalar from the random distribution
-        /*!
-            \param link the model link
-            \param dt the discrete time step
-            \return the sampled variable
-        */
-        double Sample(double dt = 0);
-
-    public:    
-
-        //! Sample a scalar from the random distribution
-        /*!
-            \param link the model link
-            \param dt the discrete time step
-            \return the sampled variable
-        */
-        Dryden(physics::linkPtr link);
-
-        // Reset using the given list of arguments
-        Reset();
+        void Sample(double dt = 0);
 
     };
 }

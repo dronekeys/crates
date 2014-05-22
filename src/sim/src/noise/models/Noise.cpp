@@ -3,39 +3,51 @@
 
 using namespace gazebo;
 
-// Incoming noise message
-void Noise::Receive(NosiePtr noise)
+// Allow up to two double parameters to be configured online
+void Noise::Config(int idx, double val)
 {
-    // Enable or disable the noise
-    enabled = noise->enabled();
+    if (idx < MAX_PARS)
+        pars[idx] = val;
 }
 
-// Configure the noise distributino
-void Noise::Configure(int num, ...)
+// Sample a scalar from the random distribution
+double Noise::Get(int idx)
 {
-    // A place to store the list of arguments
-    va_list arguments;
-    va_start(arguments, num);
-    for (int x = 0; x < num; x++)
-        params[x] = va_arg(arguments,double);
-    va_end(arguments);
-
-    // Issue a reset after recalibration
-    Reset();
+    if (enabled && idx < MAX_VARS)
+        return vars[idx];
+    return 0.0;
 }
 
-// Draw a vector from the distribution
-gazebo::Vector3 Noise::DrawVector(physics::linkPtr link, double dt = 0)
+// Enable and disable this noise stream,
+void Noise::Toggle(bool val)
 {
-    if (enabled)
-        return Sample(linkPtr, dt);
-    return gazebo::Vector3(0,0,0);
+    enabled = val;
 }
 
-// Draw a scalar from the distribution
-double Noise::DrawScalar(physics::linkPtr link, double dt = 0)
+// Enable and disable this noise stream,
+std::string Noise::GetName()
 {
-    if (enabled)
-        return Sample(linkPtr, dt);
-    return 0;
+    return name;
+}
+
+// Draw a scalar from the random distribution
+double Noise::Draw(int dt)
+{
+    // Sample and get!
+    Sample(dt);
+    return Get(0);
+}
+
+// Draw a vector from the random distribution
+double Noise::Draw(int dt)
+{
+    // Sample
+    Sample(dt);
+
+    // Get vector
+    return math::Vector3(
+        Get(0),
+        Get(1),
+        Get(2)
+    )
 }

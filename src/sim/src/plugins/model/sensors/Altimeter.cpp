@@ -42,7 +42,7 @@ bool Altimeter::GetMeasurement(double t, hal_sensor_altimeter::Data& msg)
 
 	// Calculate height and vertical velocity
 	msg.t = timNew;
-	msg.z = altNew + nAlt.DrawDouble(linkPtr, dt);			
+	msg.z = altNew + nAlt.Sample(dt);			
 	if (dt > 0)
 		msg.w = (altNew - altOld) / dt;
 

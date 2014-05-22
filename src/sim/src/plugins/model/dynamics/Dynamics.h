@@ -19,7 +19,7 @@ namespace gazebo
         /*!
           \param msg the message to be populated
         */
-        virtual bool Configure(sdf::ElementPtr root) = 0;
+        virtual bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root) = 0;
 
         //! Reset dynamics
         /*!
@@ -31,7 +31,7 @@ namespace gazebo
         /*!
           \param msg the message to be populated
         */
-        virtual void Update(physics::LinkPtr linkPtr, double dt) = 0;
+        virtual void Update(double dt) = 0;
 
     };
 }

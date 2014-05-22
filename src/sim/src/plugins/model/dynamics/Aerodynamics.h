@@ -17,6 +17,9 @@ namespace gazebo
   {
   private:
 
+    // Pointer to the rigid body
+    physics::LinkPtr              linkPtr;
+
     // Requirements for listening for Gazbeo messages
     event::ConnectionPtr          conPtr;
     transport::NodePtr            nodePtr;
@@ -28,22 +31,22 @@ namespace gazebo
     // Internal parameters
     math::Vector3                 wind;
 
-    // Current time
-    double _kuv, _kw;
+    // Drag parameters
+    double                        _kuv, _kw;
 
     // Periodically the simulation produces a wind message
-    void ReceiveWind(WindPtr& msg);
+    void ReceiveWind(WindPtr msg);
 
   public:
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    void Update(physics::LinkPtr linkPtr, double dt);
+    void Update(double dt);
 
   };
 

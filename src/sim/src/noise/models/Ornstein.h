@@ -12,29 +12,22 @@ namespace gazebo
 
     private:
 
-        // The distribution
-        double _theta, _bias, _white;
+       
 
-        // The current value
-        double current;
+    public:
 
-    public:    
+        // Configure using the given SDF
+        Ornstein(std::string name, sdf::ElementPtr root);
 
-        //! Create a new Ornstein process object
+        // Reset using the given list of arguments
+        Reset();
+
+        //! Sample a 3D vector from the random distribution
         /*!
-            \param mu mean value
-            \param sigma strength of perturbation
-            \param theta decay rate
-            \return a new Gaussian object
-        */
-        Ornstein(double theta = 1.0, double bias = 1.0, double white = 1.0);
-
-        //! Sample the distribution
-        /*!
+            \param link the model link
             \param dt the discrete time step
-            \return a sample
         */
-        double Sample(double dt = 0);
+        void Sample(double dt = 0);
 
     };
 }

@@ -9,6 +9,7 @@
 #include "models/Dryden.h"
 #include "models/Ornstein.h"
 #include "models/White.h"
+#include "models/Zero.h"
 
 namespace gazebo
 {
@@ -66,15 +67,6 @@ namespace gazebo
           	\return whether the random process could be created
         */
         static bool Create(sdf::ElementPtr root);
-
-        //! Obtain a pointer to the ROS node handle
-        /*!
-			\param name the name of the random stream
-			\param dt the discrete time step
-          	\return a sampled value
-        */
-        static double Sample(std::string& name, double dt = 0.0);
-
     };
 }
 

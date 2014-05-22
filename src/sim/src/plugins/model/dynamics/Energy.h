@@ -11,6 +11,9 @@ namespace gazebo
 
   private:
   
+      // Pointer to the rigid body
+    physics::LinkPtr linkPtr;
+
     // Parameters fro the energy model
     double energyRemaining;
     double energyConsumptionBase;
@@ -22,13 +25,13 @@ namespace gazebo
   public:
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();
 
     // Get the current altitude
-    void Update(physics::LinkPtr linkPtr, double dt);
+    void Update(double dt);
 
     // CUSTOM FUNCTIONALITY //////////////////////////////////////////////////////////
 

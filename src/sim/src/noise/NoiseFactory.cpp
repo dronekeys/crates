@@ -5,20 +5,6 @@ using namespace gazebo;
 // A list of all noise processes
 std::map<std::string,Noise*> NoiseFactory::processes;
 
-NoiseFactory::NoiseFactory()
-{
-	types["dryden"] 	= DRYDEN;
-	types["white"] 		= WHITE;
-	types["ou"] 		= ORNSTEIN;
-}
-
-NoiseFactory::~NoiseFactory()
-{
-	// Delete all factory-created processes
-	for (std::map<std::string,Noise*>::iterator i = processes.begin(); i != processes.end(); i++)
-		delete i->second;
-}
-
 NoiseType NoiseFactory::Lookup(std::string &name)
 {
 	// Check to see if the type exists in the container
@@ -38,7 +24,7 @@ void NoiseFactory::Receive(NoisePtr msg)
 
 	// Configure the noise processes
 	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
-		if (msg->process().compare(i->first)==0 || msg->process().empty())
+		if (msg->process().compare(i->first->GetName())==0 || msg->process().empty())
 			i->second->Toggle(msg->enabled());
 }
 
@@ -72,52 +58,30 @@ Noise* NoiseFactory::Create(sdf::ElementPtr root)
 	std::string name = root->GetName();
 	std::string type = root->GetFirstElement()->GetName();
 
-	// Check to see if the type exists in the container
-	if (processes.find(name) != processes.end())
-		return false;
-
 	// Check to see the root name
-	double p1, p2, p3;
+	Noise* noise;
 	switch (Lookup(type))
 	{
 		case WHITE:
-			root->GetFirstElement()->GetElement("white")->GetValue()->Get(p1);
-			processes[name] = (Noise*) new White(p1);
+			noise = (Noise*) new White(name, root->GetFirstElement());
 			break;
 
 		case ORNSTEIN:
-			root->GetFirstElement()->GetElement("lambda")->GetValue()->Get(p1);
-			root->GetFirstElement()->GetElement("bias")->GetValue()->Get(p2);
-			root->GetFirstElement()->GetElement("white")->GetValue()->Get(p3);
-			processes[name] = (Noise*) new Ornstein(p1, p2, p3);
+			noise = (Noise*) new Ornstein(name, root->GetFirstElement());
 			break;
 
 		case DRYDEN:
-			root->GetFirstElement()->GetElement("lower")->GetValue()->Get(p1);
-			root->GetFirstElement()->GetElement("upper")->GetValue()->Get(p2);
-			processes[name] = (Noise*) new Dryden(p1, p2);
+			noise = (Noise*) new Dryden(name, root->GetFirstElement());
 			break;
 
-		case UNIFORM:
-			root->GetFirstElement()->GetElement("lower")->GetValue()->Get(p1);
-			root->GetFirstElement()->GetElement("upper")->GetValue()->Get(p2);
-			processes[name] = (Noise*) new Uniform(p1, p2);
+		case UNKNOWN:
+			noise = (Noise*) new Zero(name, root->GetFirstElement());
 			break;
-
-        case UNKNOWN:
-        	return NULL;
 	}
 
+	// Destroy this on
+	processes.push_back(noise);
+
 	// Success!
-	return processes[name];
-}
-
-double NoiseFactory::Sample(std::string& name, double dt)
-{
-	// Todo: throw and error
-	if (processes.find(name) == processes.end())
-		return 0.0;
-
-	// Sample the process
-	return processes[name]->Sample(dt);
+	return noise;
 }

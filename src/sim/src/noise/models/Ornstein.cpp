@@ -3,17 +3,18 @@
 
 using namespace gazebo;
 
-Ornstein::Ornstein(double theta, double bias, double white) 
-    : Noise(), _theta(theta), _bias(bias), _white(white)
+// Configure using the given SDF
+Ornstein::Ornstein(std::string name, sdf::ElementPtr root) : Noise(name)
 {
-    current = math::Rand::GetDblNormal(0.0, _bias);
+
 }
 
-double Ornstein::Sample(double dt)
+void Ornstein::Reset()
 {
-    // Update internal state
-    current = current * exp(-_theta * dt) + math::Rand::GetDblNormal(0, _bias);
+	// Do nothing
+}
 
-    // Return the sample
-    return current + math::Rand::GetDblNormal(0, _white);
+void Ornstein::Sample(double dt)
+{
+    // Do nothing
 }
