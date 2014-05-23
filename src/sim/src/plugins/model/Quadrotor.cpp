@@ -179,8 +179,6 @@ namespace gazebo
 			// Create a pre-physics update call (before any physics)
 			conPtr = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Quadrotor::PrePhysics, this, _1));
-
-
 	    }
 
 	    // All sensors must be resettable

@@ -21,7 +21,8 @@ namespace gazebo
 	private:
 
 		// Parameters from the SDF config file
-      	int ye, mo, da, ho, mi, rate; double se;
+      	int ye, mo, da, ho, mi, rate; 
+      	double se, lat, lon, alt;
 
 	    // Required for messaging
 	    physics::WorldPtr 		worldPtr;
@@ -60,7 +61,7 @@ namespace gazebo
 			// Save the world pointer
 			worldPtr = world;
 
-			// Get the rate and start time
+			// Start time of experiment
 			root->GetElement("rate")->GetValue()->Get(rate);
 			root->GetElement("time")->GetElement("year")->GetValue()->Get(ye);
 			root->GetElement("time")->GetElement("month")->GetValue()->Get(mo);
@@ -68,7 +69,18 @@ namespace gazebo
 			root->GetElement("time")->GetElement("hour")->GetValue()->Get(ho);
 			root->GetElement("time")->GetElement("minute")->GetValue()->Get(mi);
 			root->GetElement("time")->GetElement("second")->GetValue()->Get(se);
+
+			// Latitude, longitude, altitude
+			root->GetElement("origin")->GetElement("latitude")->GetValue()->Get(lat);
+			root->GetElement("origin")->GetElement("longitude")->GetValue()->Get(lon);
+			root->GetElement("origin")->GetElement("altitude")->GetValue()->Get(alt);
 			
+			// Immediately set the spherical coordinates
+			worldPtr->GetSphericalCoordinates()->SetElevationReference(alt);
+			worldPtr->GetSphericalCoordinates()->SetLongitudeReference(lon);
+			worldPtr->GetSphericalCoordinates()->SetLatitudeReference(lat);
+			worldPtr->GetSphericalCoordinates()->SetHeadingOffset(0);
+
 			// The global WGS84 position
 			math::Vector3 msPositionGlobal = 
 				worldPtr->GetSphericalCoordinates()->SphericalFromLocal(
@@ -113,6 +125,9 @@ namespace gazebo
 			msg.set_hour(ho);
 			msg.set_minute(mi);
 			msg.set_second(se);
+			msg.set_latitude(lat);
+			msg.set_longitude(lon);
+			msg.set_altitude(alt);
 			msg.mutable_gravity()->set_x(gravity.x);
 			msg.mutable_gravity()->set_y(gravity.y);
 			msg.mutable_gravity()->set_z(gravity.z);
