@@ -6,18 +6,14 @@ using namespace gazebo;
 IMU::IMU() {}
 
 // All sensors must be configured using the current model information and the SDF
-bool IMU::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
+bool IMU::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
 	// Backup the link
-	link = linkPtr;
+	linkPtr = link;
 
 	// Initialise the noise distribution
-	nLinAccX = NoiseFactory::Create(root->GetElement("errors")->GetElement("a_x"));
-	nLinAccY = NoiseFactory::Create(root->GetElement("errors")->GetElement("a_y"));
-	nLinAccZ = NoiseFactory::Create(root->GetElement("errors")->GetElement("a_z"));
-	nAngVelX = NoiseFactory::Create(root->GetElement("errors")->GetElement("w_x"));
-	nAngVelY = NoiseFactory::Create(root->GetElement("errors")->GetElement("w_y"));
-	nAngVelZ = NoiseFactory::Create(root->GetElement("errors")->GetElement("w_z"));
+	nLinAcc = NoiseFactory::Create(root->GetElement("errors")->GetElement("linacc"));
+	nAngVel = NoiseFactory::Create(root->GetElement("errors")->GetElement("angvel"));
 
 	// Succes!
 	return true;
@@ -27,29 +23,29 @@ bool IMU::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 void IMU::Reset()
 {
 	// Initialise the noise distribution
-	nLinAccX.Reset();
-	nLinAccY.Reset();
-	nLinAccZ.Reset();
-	nAngVelX.Reset();
-	nAngVelY.Reset();
-	nAngVelZ.Reset();
+	nLinAcc->Reset();
+	nAngVel->Reset();
 }
 
 // Get the current altitude
 bool IMU::GetMeasurement(double t, hal_sensor_imu::Data& msg)
 {
 	// Get the quantities we want
-	math::Vector3 linAcc = linkPtr->GetRelativeLinearAcc();
+	math::Vector3 linAcc = linkPtr->GetRelativeLinearAccel();
 	math::Vector3 angVel = linkPtr->GetRelativeAngularVel();
 
 	// Perturb acceleration
+	linAcc += nLinAcc->DrawVector(t);
+	angVel += nAngVel->DrawVector(t);
+
+	// Package
 	msg.t  = t;
-	msg.du = linAcc.x + nLinAccX.Sample(linkPtr, dt);
-	msg.dv = linAcc.y + nLinAccY.Sample(linkPtr, dt);
-	msg.dw = linAcc.z + nLinAccZ.Sample(linkPtr, dt);
-	msg.p  = angVel.x + nAngVelX.Sample(linkPtr, dt);
-	msg.q  = angVel.y + nAngVelY.Sample(linkPtr, dt);
-	msg.r  = angVel.z + nAngVelZ.Sample(linkPtr, dt);
+	msg.du = linAcc.x;
+	msg.dv = linAcc.y;
+	msg.dw = linAcc.z;
+	msg.p  = angVel.x;
+	msg.q  = angVel.y;
+	msg.r  = angVel.z;
 
 	// Success!	
 	return true;

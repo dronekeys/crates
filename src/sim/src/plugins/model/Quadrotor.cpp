@@ -45,22 +45,22 @@ namespace gazebo
   	private:
 
 	    // Pointer to the update event connection
-	    event::ConnectionPtr 	conPtrBeg;
+	    event::ConnectionPtr 	conPtr;
 
 	    // Pointer to the model object
 	    physics::LinkPtr 		linkPtr;
 
 	    // Dynamics
-	    Aerodynamics 			dA;
-	    Propulsion				dP;
-	    Energy 					dE;
+	    gazebo::Aerodynamics    dA;
+	    gazebo::Propulsion		dP;
+	    gazebo::Energy 			dE;
 
 	    // Sensors
-	    Altimeter   			sA;
-	    Compass    				sC;
-	    GNSS    				sG;
-	    IMU    					sI;
-	    Orientation 			sO;
+	    gazebo::Altimeter   	sA;
+	    gazebo::Compass    		sC;
+	    gazebo::GNSS    		sG;
+	    gazebo::IMU    			sI;
+	    gazebo::Orientation 	sO;
 
 	    // Last time tick
 	    double 					tim;
@@ -91,7 +91,7 @@ namespace gazebo
   	public:
 
 	    // Default constructor
-	    Quadrotor() : hal::model::Quadrotor(), tim(0.0)
+	    Quadrotor() : hal::quadrotor::Quadrotor(), tim(0.0)
 	    {
 	      // Do nothing
 	    }
@@ -114,16 +114,16 @@ namespace gazebo
 			// FIND LINK AGAINST WHICH ALL FORCES AND SENSING IS DONE /////////////
 	    	
 	    	std::string linkName;
-			root->GetElement("link")->GetValue()->Get(linkName)
+			root->GetElement("link")->GetValue()->Get(linkName);
 			linkPtr = model->GetLink(linkName);
 
 			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR AND HAL ////////////////
 
 	    	// Initialize the random number generator
-	    	NoiseFactory::Init();
+	    	NoiseFactory::Init(model->GetWorld(), model->GetName());
 
 	    	// Initilize the HAL
-	    	hal::HAL::Init((std::string)"/hal/" + model->GetName());
+	    	hal::quadrotor::Quadrotor::Init((std::string)"/hal/" + model->GetName());
 
 			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 
@@ -154,7 +154,7 @@ namespace gazebo
 			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
 
 			// Create a pre-physics update call (before any physics)
-			conPtrBeg = event::Events::ConnectWorldUpdateBegin(
+			conPtr = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Quadrotor::PrePhysics, this, _1));
 	    }
 
@@ -204,7 +204,7 @@ namespace gazebo
 		// Called when the HAL wants a compass reading
 	    bool GetMeasurement(hal_sensor_compass::Data& msg)
 	    {
-	    	if (sCs.GetMeasurement(tim,msg))
+	    	if (sC.GetMeasurement(tim,msg))
 	    	{
 		    	Feed(msg);		// Also use for navigation
 		    	return true;
@@ -267,8 +267,8 @@ namespace gazebo
 			state.p 		= ang.x;
 			state.q 		= ang.y;
 			state.r 		= ang.z;
-			state.thrust 	= dPropulsion.GetThrust();
-			state.remaining	= dEnergy.GetRemaining();
+			state.thrust 	= dP.GetThrustForce();
+			state.remaining	= dE.GetRemaining();
 		}
 
 	    // Called when the HAL wants to set the truthful state of the platform
@@ -287,22 +287,22 @@ namespace gazebo
 			linkPtr->SetAngularVel(
 				pose.rot.RotateVector(ang)
 			);
-			linkPtr->SetLineaVel(
+			linkPtr->SetLinearVel(
 				pose.rot.RotateVector(vel)
 			);
 
 			// Set the thrust force
-			dPropulsion.SetThrust(state.thrust);
+			dP.SetThrustForce(state.thrust);
 
 			// Set the remaining energy
-			dEnergy.SetRemaining(state.remaining);
+			dE.SetRemaining(state.remaining);
 		}
 
 	    // Called when the HAL wants to pass down some control to the platform
 		void SetControl(const hal_quadrotor::Control &control)
 		{
 			// Pass control to the propulsion module
-			dPropulsion.SetControl(control);
+			dP.SetControl(control);
 		}
 	};
 

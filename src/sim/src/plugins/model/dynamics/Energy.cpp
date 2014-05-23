@@ -3,13 +3,22 @@
 using namespace gazebo;
 
 // All sensors must be configured using the current model information and the SDF
-bool Energy::Configure(sdf::ElementPtr root)
+bool Energy::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
+  // Save the link pointer
+  linkPtr = link;
+
+  // Configuration
   root->GetElement("remaining")->GetValue()->Get(energyRemaining);
   root->GetElement("consumption")->GetElement("base")->GetValue()->Get(energyConsumptionBase);
   root->GetElement("consumption")->GetElement("flight")->GetValue()->Get(energyRateFactor);
-  root->GetElement("limits")->GetElement("warn")->GetValue()->Get(energyKill);
+  root->GetElement("limits")->GetElement("warn")->GetValue()->Get(energyWarn);
   root->GetElement("limits")->GetElement("land")->GetValue()->Get(energyLand);
+
+  // Setup the noise distribution
+  nConsumption = NoiseFactory::Create(root->GetElement("errors")->GetElement("consumption"));
+
+  // Success!
   return true;
 }
 
@@ -24,11 +33,12 @@ void Energy::Reset()
 }
 
 // Get the current altitude
-void Energy::Update(physics::LinkPtr linkPtr, double dt)
+void Energy::Update(double dt)
 {
   // Store current consumption rate
   consumption = energyConsumptionBase 
-              + energyRateFactor * linkPtr->GetWorldLinearAccel().z;
+              + energyRateFactor * linkPtr->GetWorldLinearAccel().z
+              + (double) nConsumption->DrawScalar(dt);
 
   // Calculate th
   remaining -= dt * consumption;

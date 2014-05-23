@@ -14,11 +14,10 @@ namespace gazebo
   private:
 
     // Link onto which sensor is attached
-    physics::LinkPtr    link;
+    physics::LinkPtr    linkPtr;
     
     // Noise streams
-    Noise*              nRotX, nRotY, nRotZ;
-    Noise*              nAngX, nAngY, nAngZ;
+    Noise               *nRot, *nAng;
 
   public:
 
@@ -26,7 +25,7 @@ namespace gazebo
     Orientation();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr link, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();

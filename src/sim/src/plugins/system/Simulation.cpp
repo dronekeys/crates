@@ -32,6 +32,9 @@
 #include "sim/Noise.h"
 #include "sim/Seed.h"
 
+// Protobuf messages
+#include "noise.pb.h"
+
 #define ROS_TIMEOUT_SECONDS 1.0
 
 namespace gazebo
@@ -457,7 +460,7 @@ namespace gazebo
 		msgs::Noise msg;
 		msg.set_model(req.model);
 		msg.set_process(req.process);
-		msg.set_enabled(req.enabled);
+		msg.set_enabled(req.enable);
 		pubNoise->Publish(msg);
 
 		// Keep steps to a reasonable length

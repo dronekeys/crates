@@ -25,22 +25,25 @@ namespace gazebo
     transport::NodePtr            nodePtr;
     transport::SubscriberPtr      subPtr;
 
+    // When global wind has been received
+    bool                          ready;
+
     // Current wind cpnditions
     msgs::Wind                    global;
 
-    // Internal parameters
-    math::Vector3                 wind;
+    // Turbulence noise
+    Noise                         *nTurbulence;
 
     // Drag parameters
-    double                        _kuv, _kw;
+    double                        _kuv, _kw, _ma, _z0;
 
     // Periodically the simulation produces a wind message
-    void ReceiveWind(WindPtr msg);
+    void ReceiveWind(WindPtr& msg);
 
   public:
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(physics::LinkPtr, sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr link, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();

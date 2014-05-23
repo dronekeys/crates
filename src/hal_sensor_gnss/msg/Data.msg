@@ -1,4 +1,4 @@
-time    t     # Time at which measurement was taken
+float64 t     # Time at which measurement was taken
 float64 x     # Navigation frame position X
 float64 y     # Navigation frame position Y
 float64 z     # Navigation frame position Z

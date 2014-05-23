@@ -28,7 +28,7 @@ namespace gazebo
   private:
 
     // Link onto which sensor is attached
-    physics::LinkPtr                link;
+    physics::LinkPtr                linkPtr;
 
     // Have we received satellite data
     bool                            ready, enabled;
@@ -37,16 +37,18 @@ namespace gazebo
     event::ConnectionPtr            conPtr;
     transport::NodePtr              nodePtr;
     transport::SubscriberPtr        subPtr;
-    msgs::Satellites                msg;
+    msgs::Satellites                sats;
 
     // Solver parameters
+    bool                            _enabled;
     int                             _maxIterations;
     double                          _minError;
     double                          _minElevation;
-    bool                            _gpsUse _gpsEph. _gpsIon, _gpsClk,_gpsTro;
-    bool                            _gloUse _gloEph. _gloIon, _gloClk,_gloTro;
+    bool                            _gpsUse, _gpsEph, _gpsIon, _gpsClk, _gpsTro;
+    bool                            _gloUse, _gloEph, _gloIon, _gloClk, _gloTro;
 
     // Internal variables used for navigation
+    gpstk::CommonTime               currentTime;
     SatelliteSystemVec              systems;
     gpstk::WGS84Ellipsoid           wgs84;
     gpstk::GPSEllipsoid             ellip;
@@ -55,7 +57,7 @@ namespace gazebo
     gpstk::TropModel*               tropModel;
 
     // Receiver noise
-    Noise*                          nReceiver;
+    Noise                           *nReceiver;
 
     // Store the position and velocity
     math::Vector3                   posNew, posOld, velNew;
@@ -64,10 +66,7 @@ namespace gazebo
     double                          timOld, timNew;
 
     // When new environment data arrives
-    void Receive(SatellitesPtr msg);
-
-    // Solve the navigation problem
-    bool Solve();
+    void Receive(SatellitesPtr& msg);
 
   public:
 
@@ -75,7 +74,7 @@ namespace gazebo
     GNSS();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr link, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();

@@ -75,6 +75,7 @@ set(msgs
   src/msgs/meteorological.proto 
   src/msgs/environment.proto 
   src/msgs/satellites.proto
+  src/msgs/noise.proto
   src/msgs/wind.proto
   ${PROTOBUF_IMPORT_DIRS}/vector3d.proto
   ${PROTOBUF_IMPORT_DIRS}/header.proto
@@ -224,9 +225,10 @@ link_directories(
 
 # Compile the noise models
 add_library(sim_core               
+  src/noise/models/Noise.cpp
   src/noise/models/White.cpp
-  src/noise/models/Wiener.cpp
-  src/noise/models/Uniform.cpp
+  src/noise/models/Zero.cpp
+  src/noise/models/Dryden.cpp
   src/noise/models/Ornstein.cpp
   src/noise/NoiseFactory.cpp
 )
@@ -250,7 +252,6 @@ add_library(sim_quadrotor
   src/plugins/model/dynamics/Propulsion.cpp
   src/plugins/model/dynamics/Aerodynamics.cpp
   src/plugins/model/dynamics/Energy.cpp
-  src/plugins/model/dynamics/Motors.cpp
   src/plugins/model/sensors/Altimeter.cpp
   src/plugins/model/sensors/Compass.cpp
   src/plugins/model/sensors/GNSS.cpp

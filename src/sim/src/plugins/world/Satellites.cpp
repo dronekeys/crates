@@ -1,3 +1,6 @@
+// Standar dlibraries
+#include <vector>
+
 // Simulator description format (SDF)
 #include <sdf/sdf.hh>
 
@@ -47,7 +50,7 @@
 #include "satellites.pb.h"
 
 // Required for noise distributions
-#include "noise/NoiseFactory.h"
+#include "../../noise/NoiseFactory.h"
 
 // Approx frequencies used to claculate ionospheric perturbation
 #define GPS_L1 			1575.42e6
@@ -104,6 +107,36 @@ namespace gazebo
       	// Message containing information
       	msgs::Satellites 					msg;
       	msgs::Meteorological                met;
+      	msgs::Environment  		            env;
+
+      	// Meterological info
+      	bool								rcvMet, rcvEnv;
+
+        // Get the current time in a specific format
+        gpstk::CommonTime GetTime(const gpstk::TimeSystem &ts)
+        {
+            // Get the current time tick, which is the start of the experimetn plus simulated time
+            gpstk::CommonTime ret;
+
+            // UTC -> GPS
+            /*
+            if (ts == gpstk::TimeSystem::GPS)
+            {
+                ret.addSeconds(
+                    gpstk::TimeSystem::Correction(
+                        gpstk::TimeSystem::UTC, gpstk::TimeSystem::GPS,        // Source & Dest
+                        startTime.year, startTime.month, startTime.day         // Rough period
+                    )
+                );
+            }
+            */
+
+            // Set the time system
+            ret.setTimeSystem(ts);
+
+            // Return the time
+            return ret;
+        }
 
 	    //  Called to update the world information
 	    void Update(const ros::TimerEvent& event)
@@ -113,14 +146,29 @@ namespace gazebo
 	    		return;
 
 			// TIME CACHING /////////////////////////////////////////////////////////////////////
-	
-			gpstk::CommonTime currentTimeUTC = GetTime(gpstk::TimeSystem::UTC);
-			gpstk::CommonTime currentTimeGPS = GetTime(gpstk::TimeSystem::GPS);
-			gpstk::CommonTime currentTimeGLO = GetTime(gpstk::TimeSystem::GLO);
+			
+			/*
+		    int ye = GetSDFInteger(root,"year",2010);           // Year
+            int mo = GetSDFInteger(root,"month",1);             // Month
+            int da = GetSDFInteger(root,"day",6);               // Day
+            int ho = GetSDFInteger(root,"hour",10);             // Hour
+            int mi = GetSDFInteger(root,"minute",0);            // Minute
+            double se = GetSDFDouble(root,"second",0.0);        // Second
+
+            // Create a common time variable from the UTC info in the SDF data
+            startTime = gpstk::CivilTime(ye,mo,da,ho,mi,se,gpstk::TimeSystem::UTC);
+        	currentTime = startTime.convertToCommonTime();
+            currentTime.addSeconds(offset);
+            currentTime.setTimeSystem(gpstk::TimeSystem::UTC);
+			*/
+			double t = 0;
+			gpstk::CommonTime currentTimeUTC; //= GetTime(gpstk::TimeSystem::UTC);
+			gpstk::CommonTime currentTimeGPS; //= GetTime(gpstk::TimeSystem::GPS);
+			gpstk::CommonTime currentTimeGLO;// = GetTime(gpstk::TimeSystem::GLO);
 
 			// TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
-			tropModel.setWeather(met.temperature() - 273.15, met.pressure(), met.relhumidity());
+			tropModel.setWeather(met.temperature() - 273.15, met.pressure(), met.humidity());
 
 			// IONOSPHERIC DELAYS ///////////////////////////////////////////////////////////////
 
@@ -162,7 +210,7 @@ namespace gazebo
 
 						// Save to the message
 						msgs::Vehicle* gps = msg.add_svs();
-						gps->set_system(gpstk::SatID::systemGPS);
+						gps->set_sys(gpstk::SatID::systemGPS);
 						gps->set_prn(prn);
 
 						// Write the position
@@ -216,10 +264,10 @@ namespace gazebo
 						catch (const std::exception& e)
 						{ 
 							// Draw a new ephemeride error
-							math::vector err_pos = nGPSeph[prn]->DrawVector(t);
-							double       err_clk = nGPSclk[prn]->DrawVector(t);
-							double       err_ion = nGPSion[prn]->DrawVector(t);
-							double       err_tro = nGPStro[prn]->DrawVector(t);
+							math::Vector3 	err_pos = nGPSeph[prn]->DrawVector(t);
+							double       	err_clk = nGPSclk[prn]->DrawScalar(t);
+							double       	err_ion = nGPSion[prn]->DrawScalar(t);
+							double       	err_tro = nGPStro[prn]->DrawScalar(t);
 
 							// Set the ephemeris error
 							gps->mutable_err_pos()->set_x(err_pos.x);
@@ -227,7 +275,7 @@ namespace gazebo
 							gps->mutable_err_pos()->set_z(err_pos.z);
 							gps->set_err_clk(err_clk);
 							gps->set_err_tro(err_tro);
-							gps->set_err_ion(err_iom);
+							gps->set_err_ion(err_ion);
 						}
 					}
 				}
@@ -243,84 +291,85 @@ namespace gazebo
 			{
 				try
 				{
-				  // Don't look for invalid satellites
-				  if (sp3Ephemerides.isPresent(gpstk::SatID(prn,gpstk::SatID::systemGlonass)))
-				  {
-				    // Get the ephemeris (not that SP3 are in GPST)
-				    gpstk::Xvt eph = sp3Ephemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGPS);
+				  	// Don't look for invalid satellites
+				  	if (sp3Ephemerides.isPresent(gpstk::SatID(prn,gpstk::SatID::systemGlonass)))
+				  	{
+					    // Get the ephemeris (not that SP3 are in GPST)
+					    gpstk::Xvt eph = sp3Ephemerides.getXvt(gpstk::SatID(prn,gpstk::SatID::systemGlonass),currentTimeGPS);
 
-				    // Elevation of the current satellite with respect to HOME position
-				    gpstk::Triple satellitePos = eph.getPos();
-				
-					// Save to the message
-					msgs::Vehicle* glo = msg.add_svs();
-					glo->set_system(gpstk::SatID::systemGPS);
-					glo->set_prn(prn);
+					    // Elevation of the current satellite with respect to HOME position
+					    gpstk::Triple satellitePos = eph.getPos();
+					
+						// Save to the message
+						msgs::Vehicle* glo = msg.add_svs();
+						glo->set_sys(gpstk::SatID::systemGPS);
+						glo->set_prn(prn);
 
-					// Write the position
-					glo->mutable_pos()->set_x(satellitePos[0]);
-					glo->mutable_pos()->set_y(satellitePos[1]);
-					glo->mutable_pos()->set_z(satellitePos[2]);
+						// Write the position
+						glo->mutable_pos()->set_x(satellitePos[0]);
+						glo->mutable_pos()->set_y(satellitePos[1]);
+						glo->mutable_pos()->set_z(satellitePos[2]);
 
-					// Try and get the broadcast ephemeride
-					try
-					{
-						// Get the broadcast ephemeris
-						gpstk::Xvt ephb = gpsEphemerides.getXvt(
-							gpstk::SatID(prn,gpstk::SatID::systemGlonass),
-							currentTimeGPS
-						);
+						// Try and get the broadcast ephemeride
+						try
+						{
+							// Get the broadcast ephemeris
+							gpstk::Xvt ephb = gpsEphemerides.getXvt(
+								gpstk::SatID(prn,gpstk::SatID::systemGlonass),
+								currentTimeGPS
+							);
 
-						// Elevation of the current satellite with respect to HOME position
-						gpstk::Triple err = ephb.getPos() - satellitePos;
+							// Elevation of the current satellite with respect to HOME position
+							gpstk::Triple err = ephb.getPos() - satellitePos;
 
-						// Set the ephemeris error
-						glo->mutable_err_pos()->set_x(err[0]);
-						glo->mutable_err_pos()->set_y(err[1]);
-						glo->mutable_err_pos()->set_z(err[2]);
+							// Set the ephemeris error
+							glo->mutable_err_pos()->set_x(err[0]);
+							glo->mutable_err_pos()->set_y(err[1]);
+							glo->mutable_err_pos()->set_z(err[2]);
 
-						// Write the clock bias and relativity correction
-						glo->set_err_clk(
-							SPEED_OF_LIGHT * (ephb.getClockBias()-eph.getClockBias())
-						);
+							// Write the clock bias and relativity correction
+							glo->set_err_clk(
+								SPEED_OF_LIGHT * (ephb.getClockBias()-eph.getClockBias())
+							);
 
-						// Set the tropospheic delay, based on the simulation location
-						glo->set_err_tro(
-							SPEED_OF_LIGHT *
-							tropModel.correction(
-								originECEF,                      	 // Current receiver position
-								satellitePos,                        // Current satellite position
-								currentTimeGPS                       // Time of observation
-							)
-						);
+							// Set the tropospheic delay, based on the simulation location
+							glo->set_err_tro(
+								SPEED_OF_LIGHT *
+								tropModel.correction(
+									originECEF,                      	 // Current receiver position
+									satellitePos,                        // Current satellite position
+									currentTimeGPS                       // Time of observation
+								)
+							);
 
-						// GET L1 ionosphere delay
-						glo->set_err_ion(
-							SPEED_OF_LIGHT *
-							tecStore.getIono(
-								originECEF.elvAngle(satellitePos),    // Elevation of the satellite
-								tec[0],                               // Total electron count
-								GLO_L1,                               // L1 GPS frequency
-								"NONE"                                // Mapping function
-							) 
-						);
+							// GET L1 ionosphere delay
+							glo->set_err_ion(
+								SPEED_OF_LIGHT *
+								tecStore.getIono(
+									originECEF.elvAngle(satellitePos),    // Elevation of the satellite
+									tec[0],                               // Total electron count
+									GLO_L1,                               // L1 GPS frequency
+									"NONE"                                // Mapping function
+								) 
+							);
+						}
+						catch (const std::exception& e)
+						{ 
+							// Draw a new ephemeride error
+							math::Vector3	err_pos = nGLOeph[prn]->DrawVector(t);
+							double       	err_clk = nGLOclk[prn]->DrawScalar(t);
+							double       	err_ion = nGLOion[prn]->DrawScalar(t);
+							double       	err_tro = nGLOtro[prn]->DrawScalar(t);
+
+							// Set the ephemeris error
+							glo->mutable_err_pos()->set_x(err_pos.x);
+							glo->mutable_err_pos()->set_y(err_pos.y);
+							glo->mutable_err_pos()->set_z(err_pos.z);
+							glo->set_err_clk(err_clk);
+							glo->set_err_tro(err_tro);
+							glo->set_err_ion(err_ion);
+						}			  
 					}
-					catch (const std::exception& e)
-					{ 
-						// Draw a new ephemeride error
-						math::vector err_pos = nGLOeph[prn]->DrawVector(t);
-						double       err_clk = nGLOclk[prn]->DrawVector(t);
-						double       err_ion = nGLOion[prn]->DrawVector(t);
-						double       err_tro = nGLOtro[prn]->DrawVector(t);
-
-						// Set the ephemeris error
-						glo->mutable_err_pos()->set_x(err_pos.x);
-						glo->mutable_err_pos()->set_y(err_pos.y);
-						glo->mutable_err_pos()->set_z(err_pos.z);
-						glo->set_err_clk(err_clk);
-						glo->set_err_tro(err_tro);
-						glo->set_err_ion(err_iom);
-					}			  
 				}
 				catch(const std::exception& e)
 				{ 
@@ -371,7 +420,7 @@ namespace gazebo
 			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR ////////////////////////
 
 	    	// Initialize the random number generator
-	    	NoiseFactory::Init();
+	    	NoiseFactory::Init(worldPtr, world->GetName());
 
 			// PROCESS CONFIGURATION FILE /////////////////////////////////////////
 
@@ -381,14 +430,14 @@ namespace gazebo
 		    // Create a noise distribution for each satellite
 		    for (int prn = 1; prn <= gpstk::MAX_PRN; ++prn)
 		    {
-				nGPSeph[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
-				nGPSclk[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
-				nGPStro[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
-				nGPSion[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gpsclk"));
-				nGLOeph[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
-				nGLOclk[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
-				nGLOtro[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
-				nGLOion[prn] = NoiseFactory::Create(linkPtr,root->GetElement("errors")->GetElement("gloclk"));
+				nGPSeph[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gpsclk"));
+				nGPSclk[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gpsclk"));
+				nGPStro[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gpsclk"));
+				nGPSion[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gpsclk"));
+				nGLOeph[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gloclk"));
+				nGLOclk[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gloclk"));
+				nGLOtro[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gloclk"));
+				nGLOion[prn] = NoiseFactory::Create(root->GetElement("errors")->GetElement("gloclk"));
 			}
 
 			// PROCESS THE RINEX AND SP3 FILES FOR DATA ///////////////////////////

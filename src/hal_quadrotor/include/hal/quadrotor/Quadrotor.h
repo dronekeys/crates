@@ -203,6 +203,12 @@ namespace hal
             */
             void Feed(const hal_sensor_orientation::Data& msg);
 
+            //! Called to set the quadrotor state estimate manually
+            /*!
+            \param msg the quadrotor state
+            */
+            void Feed(const hal_quadrotor::State &state);
+
             /// INERACTION WITH THE FLIGHT CONTROL SYSTEM ///////////////////////
 
             //! Get the true quadrotor state
@@ -210,12 +216,6 @@ namespace hal
               \param state the state of the quadrotor
             */
             virtual void GetTruth(hal_quadrotor::State &state) = 0;
-
-            //! Get the estimated quadrotor state
-            /*!
-              \param state the state of the quadrotor
-            */
-            virtual void GetEstimate(hal_quadrotor::State &state) = 0;
 
             //! Set the true quadrotor state
             /*!

@@ -20,7 +20,7 @@ namespace gazebo
   private:
 
     // Link onto which sensor is attached
-    physics::LinkPtr              link;
+    physics::LinkPtr              linkPtr;
 
     // Requirements for listening for Gazbeo messages
     event::ConnectionPtr          conPtr;
@@ -34,10 +34,10 @@ namespace gazebo
     math::Vector3                 mag;
 
     // Noise streams
-    Noise*                        nMagX, nMagY, nMagZ;
+    Noise*                        nMag;
 
     // When new environment data arrives
-    void Receive(EnvironmentPtr msg);
+    void Receive(EnvironmentPtr& msg);
 
   public:
 
@@ -45,7 +45,7 @@ namespace gazebo
     Compass();
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr link, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();

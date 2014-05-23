@@ -230,3 +230,9 @@ void Quadrotor::Feed(const hal_sensor_orientation::Data &msg)
 {
     navigation.Process(msg);
 }
+
+// Called to set the quadrotor state estimate manually
+void Quadrotor::Feed(const hal_quadrotor::State &state)
+{
+    navigation.SetState(state);
+}

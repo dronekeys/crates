@@ -7,7 +7,7 @@
 #include <gazebo/transport/transport.hh>
 
 // Required for noise distributions
-#include "noise/NoiseFactory.h"
+#include "../../../noise/NoiseFactory.h"
 
 // Basic ROS stuff
 #include <ros/ros.h>
@@ -22,7 +22,7 @@ namespace gazebo
         /*!
           \param root the sdf sensor configuration
         */
-        virtual bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root) = 0;
+        virtual bool Configure(physics::LinkPtr link, sdf::ElementPtr root) = 0;
 
         //! Reset a sensor
         virtual void Reset() = 0;

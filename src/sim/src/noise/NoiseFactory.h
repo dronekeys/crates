@@ -1,8 +1,14 @@
 #ifndef SIM_NOISEFACTORY_H
 #define SIM_NOISEFACTORY_H
 
+// Required for gazebo math, messages and physics
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
+
 // System includes
 #include <map>
+#include <vector>
 #include <string>
 
 // Gazebo includes
@@ -27,14 +33,17 @@ namespace gazebo
     NoiseType;
 
     // Convenience
-    typedef std::map<std::string,NoiseType> TypeVec;
-    typedef std::map<std::string,Noise*>    ProcessVec;
+    typedef std::map<std::string,NoiseType>     TypeVec;
+    typedef std::vector<Noise*>                 ProcessVec;
 
     // An abstract class for modelling noise
     class NoiseFactory
     {     
 
     private:
+
+        // The name of this model
+        static std::string              name;
 
         // Requirements for listening for Gazbeo messages
         static event::ConnectionPtr     conPtr;
@@ -47,26 +56,33 @@ namespace gazebo
         /// A list of noise processes
         static ProcessVec               processes;
 
+        /// Find a distribution type
+        static NoiseType Lookup(std::string &name);
+
     public:    
 
         //! Turn noise on or off
         /*!
             \param a pointer to the world
         */
-        static void Receive(NoisePtr noise);
+        static void Receive(NoisePtr& noise);
 
         //! Initialize the noise factory
         /*!
             \param a pointer to the world
+            \param a pointer to the name of this node
         */
-        static void Init(physics::ModelPtr model);
+        static void Init(physics::WorldPtr worldPtr, std::string inname);
+
+        //! Destroy the noise factory
+        static void Destroy();
 
         //! Obtain a pointer to the ROS node handle
         /*!
 			\param root SDF defining the noise type
           	\return whether the random process could be created
         */
-        static bool Create(sdf::ElementPtr root);
+        static Noise* Create(sdf::ElementPtr root);
     };
 }
 

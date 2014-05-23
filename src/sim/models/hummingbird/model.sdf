@@ -136,8 +136,8 @@
           </voltage>
         </control>
         <errors>
-          <for><white>0.2 0.2 0.2</white></for>
-          <tor><white>0.2 0.2 0.2</white></tor>
+          <force><white>0.2 0.2 0.2</white></force>
+          <torque><white>0.2 0.2 0.2</white></torque>
         </errors>
       </propulsion>
 
@@ -152,6 +152,9 @@
           <warn>1000</warn>
           <land>100</land>
         </limits>
+        <errors>
+          <energy><white>0.02</white></energy>
+        </errors>
       </energy>
 
       <!-- Drag parameters -->

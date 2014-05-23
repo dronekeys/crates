@@ -12,7 +12,8 @@ namespace gazebo
 
     private:
 
-
+        // Configuration for each noise process
+        double cfg[MAX_VARS];
 
     public:
 
@@ -20,7 +21,7 @@ namespace gazebo
         White(std::string name, sdf::ElementPtr root);
 
         // Reset using the given list of arguments
-        Reset();
+        void Reset();
 
         //! Sample a 3D vector from the random distribution
         /*!

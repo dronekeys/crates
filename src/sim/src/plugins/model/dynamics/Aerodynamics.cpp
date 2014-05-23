@@ -53,12 +53,12 @@ void Aerodynamics::Update(double dt)
 
     // Calculate wind shear (in the navigation frame)
     math::Vector3 wind(0.0, 0.0, 0.0);
-    if (ready && altitude > MINIMUM_ALTITUDE)
+    if (ready && altitude > _ma)
     {
         // Calculate wind shear
-        double k = global->speed() * log(METERS_TO_FEET*altitude/z0) / log(20.0/z0);
-        wind.x  = -k * cos(DEGREES_TO_RADIANS * global->direction());
-        wind.y  = -k * sin(DEGREES_TO_RADIANS * global->direction());
+        double k = global.speed() * log(METERS_TO_FEET*altitude/_z0) / log(20.0/_z0);
+        wind.x  = -k * cos(DEGREES_TO_RADIANS * global.direction());
+        wind.y  = -k * sin(DEGREES_TO_RADIANS * global.direction());
         wind.z  = 0.0;
 
         // Parameterise the turbulence model
@@ -67,12 +67,12 @@ void Aerodynamics::Update(double dt)
         nTurbulence->Configure(DRYDEN_PARS_ALTITUDE, altitude);
 
         // Add wind turbulence
-        wind += (std::Vector3) nTurbulence.Draw(dt);
+        wind += (math::Vector3) nTurbulence->DrawVector(dt);
     }
 
     // Body-frame airspeed
     math::Vector3 airspeed = linkPtr->GetRelativeLinearVel() 
-        - linkPtr->GetWorldPose().rot.RotateVector(wind));
+                           - linkPtr->GetWorldPose().rot.RotateVector(wind);
 
     // Rotate to bodyframe,a nd 
     math::Vector3 force(
@@ -90,7 +90,7 @@ void Aerodynamics::Update(double dt)
 void Aerodynamics::ReceiveWind(WindPtr& msg)
 {
     // Save the wind data
-    global = msg;
+    global = *msg;
 
     // We now have wind data
     ready = true;

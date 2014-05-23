@@ -4,6 +4,10 @@
 // For base noise type
 #include "Noise.h"
 
+
+#define IDX_BETA  0
+#define IDX_SIGMA 1
+
 namespace gazebo
 {
     // An abstract class for modelling noise
@@ -12,7 +16,8 @@ namespace gazebo
 
     private:
 
-       
+        // Configuration for each noise process
+        double cfg[MAX_VARS][2];
 
     public:
 
@@ -20,7 +25,7 @@ namespace gazebo
         Ornstein(std::string name, sdf::ElementPtr root);
 
         // Reset using the given list of arguments
-        Reset();
+        void Reset();
 
         //! Sample a 3D vector from the random distribution
         /*!

@@ -14,7 +14,7 @@
 #include "noise.pb.h"
 
 // Maximum variables and parameters
-#define MAX_VARS 6
+#define MAX_VARS 3
 #define MAX_PARS 3
 
 namespace gazebo
@@ -38,6 +38,9 @@ namespace gazebo
 
     public:
 
+        // Constructor
+        Noise(std::string inval);
+
         /// Destructor
         virtual ~Noise() {};
 
@@ -57,7 +60,7 @@ namespace gazebo
             \param p1 first parameter
             \param p2 second parameter
         */
-        void Config(int idx p1, double val);
+        void Configure(int idx, double val);
 
         //! Sample a scalar from the random distribution
         /*!
@@ -85,7 +88,7 @@ namespace gazebo
             \param dt the discrete time step
             \return the sampled variable
         */
-        double Draw(double dt = 0) = 0;
+        double DrawScalar(double t = 0);
 
         //! Sample the random distribution and by default return the first three values
         /*!
@@ -93,7 +96,7 @@ namespace gazebo
             \param dt the discrete time step
             \return the sampled variable
         */
-        std::Vector3 Draw(double dt = 0) = 0;
+        math::Vector3 DrawVector(double t = 0);
 
     };
 }

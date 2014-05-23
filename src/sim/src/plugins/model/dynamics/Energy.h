@@ -12,20 +12,25 @@ namespace gazebo
   private:
   
       // Pointer to the rigid body
-    physics::LinkPtr linkPtr;
+    physics::LinkPtr    linkPtr;
 
     // Parameters fro the energy model
-    double energyRemaining;
-    double energyConsumptionBase;
-    double energyRateFactor;
+    double              energyRemaining;
+    double              energyConsumptionBase;
+    double              energyRateFactor;
+    double              energyLand;
+    double              energyWarn;
 
     // Used online to store tallys
-    double consumption, remaining;
+    double              consumption, remaining;
+
+    // Noise distributions
+    Noise*              nConsumption;
 
   public:
 
     // All sensors must be configured using the current model information and the SDF
-    bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root);
+    bool Configure(physics::LinkPtr link, sdf::ElementPtr root);
 
     // All sensors must be resettable
     void Reset();

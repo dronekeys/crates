@@ -20,7 +20,7 @@ Propulsion::Propulsion() :
 	_tau0(3.07321), 	_tau1(46.8004),
 
 	// Current control
-	thrust(0.0), roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0)
+	thrust(0.0), roll(0.0), pitch(0.0), yaw(0.0), throttle(0.0), voltage(12.0)
 {
 	// Do nothing
 }
@@ -34,8 +34,11 @@ double Propulsion::Clamp(const double& val, const double& minval, const double& 
 }
 
 // All sensors must be configured using the current model information and the SDF
-bool Propulsion::Configure(sdf::ElementPtr root)
+bool Propulsion::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
+	// Backup the link
+	linkPtr = link;
+
 	// Control parameters
 	root->GetElement("control")->GetElement("roll")->GetElement("scale")->GetValue()->Get(_srs);
 	root->GetElement("control")->GetElement("roll")->GetElement("min")->GetValue()->Get(_srl);
@@ -66,13 +69,22 @@ bool Propulsion::Configure(sdf::ElementPtr root)
 	root->GetElement("dynamics")->GetElement("tau0")->GetValue()->Get(_tau0);
 	root->GetElement("dynamics")->GetElement("tau1")->GetValue()->Get(_tau1);
 
+    // Setup the noise distribution
+    nForce  = NoiseFactory::Create(root->GetElement("errors")->GetElement("force"));
+	nTorque = NoiseFactory::Create(root->GetElement("errors")->GetElement("torque"));
+
     return true;
 }
 
 // All sensors must be resettable
 void Propulsion::Reset()
 {
-	roll 		= _srs * Clamp(0,	_srl,_sru);
+	// Reset error streams
+	nForce->Reset();
+	nTorque->Reset();
+
+	// Reset control
+	roll 		= _srs * Clamp(0,_srl,_sru);
 	pitch 		= _sps * Clamp(0,_spl,_spu);
 	yaw 		= _sys * Clamp(0,_syl,_syu);
 	throttle 	= _sts * Clamp(0,_stl,_stu);
@@ -80,7 +92,7 @@ void Propulsion::Reset()
 }
 
 // Get the current altitude
-void Propulsion::Update(physics::LinkPtr linkPtr, double dt)
+void Propulsion::Update(double dt)
 {
 	// Get the orientation
 	math::Quaternion q = linkPtr->GetWorldPose().rot;
@@ -112,7 +124,7 @@ void Propulsion::Update(physics::LinkPtr linkPtr, double dt)
 	math::Vector3 torque = math::Vector3(
 		_pq1*(_pq0*roll  - q.GetAsEuler().x) + _pq2*o.x,    
 		_pq1*(_pq0*pitch - q.GetAsEuler().y) + _pq2*o.y, 
-		_r0*yaw + _r1*o.z;
+		_r0*yaw + _r1*o.z
 	);
 
 	// Enforcce some limits on the angular velocity
@@ -121,10 +133,13 @@ void Propulsion::Update(physics::LinkPtr linkPtr, double dt)
 	if ((o.y > _MAX_ANGVEL && (torque.y > 0)) || (o.y < -_MAX_ANGVEL && (torque.y < 0)))
 	  torque.y = 0;
 
+	// Add errors to the dynamics
+	force  += (math::Vector3)  nForce->DrawVector(dt);
+	torque += (math::Vector3) nTorque->DrawVector(dt);
+
   	// Apply force and torque
   	linkPtr->AddRelativeForce(force);
-  	linkPtr->AddRelativeTorque(torque 
-  		+ linkPtr->GetInertial()->GetCoG().Cross(force));
+  	linkPtr->AddRelativeTorque(torque + linkPtr->GetInertial()->GetCoG().Cross(force));
 }
 
 // Get the remaining energy (mAh)

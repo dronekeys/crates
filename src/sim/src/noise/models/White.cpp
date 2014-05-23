@@ -6,7 +6,9 @@ using namespace gazebo;
 // Configure using the given SDF
 White::White(std::string name, sdf::ElementPtr root) : Noise(name)
 {
-	Reset();
+	// Obtain the parameter tokens
+	std::string tokenstring;
+	root->GetValue()->Get(tokenstring);
 }
 
 void White::Reset()
@@ -17,5 +19,6 @@ void White::Reset()
 
 void White::Sample(double dt)
 {
-    // Do nothing
+	for (int i = 0; i < MAX_VARS; i++)
+		vars[i] = math::Rand::GetDblNormal(0,cfg[i]);
 }

@@ -6,10 +6,10 @@ using namespace gazebo;
 Altimeter::Altimeter() : altOld(0), timOld(0) {}
 
 // All sensors must be configured using the current model information and the SDF
-bool Altimeter::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
+bool Altimeter::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
 	// Backup the link
-	link = linkPtr;
+	linkPtr = link;
 
 	// Create the noise distribution
 	nAlt = NoiseFactory::Create(root->GetElement("errors")->GetElement("z"));
@@ -22,7 +22,7 @@ bool Altimeter::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 void Altimeter::Reset()
 {
 	// Reset the noise distribution
-	nAlt.Reset();
+	nAlt->Reset();
 
 	// Reset the integrator
 	altOld = 0.0;
@@ -42,7 +42,7 @@ bool Altimeter::GetMeasurement(double t, hal_sensor_altimeter::Data& msg)
 
 	// Calculate height and vertical velocity
 	msg.t = timNew;
-	msg.z = altNew + nAlt.Sample(dt);			
+	msg.z = altNew + nAlt->DrawScalar(dt);			
 	if (dt > 0)
 		msg.w = (altNew - altOld) / dt;
 

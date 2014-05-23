@@ -6,7 +6,7 @@ using namespace gazebo;
 Compass::Compass() : ready(false) {}
 
 // When new environment data arrives
-void Compass::Receive(EnvironmentPtr msg)
+void Compass::Receive(EnvironmentPtr& msg)
 {
 	// Set the navigation frame magnetic field
 	mag.x = msg->magnetic().x();
@@ -18,19 +18,17 @@ void Compass::Receive(EnvironmentPtr msg)
 }
 
 // All sensors must be configured using the current model information and the SDF
-bool Compass::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
+bool Compass::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
 	// Backup the link
-	link = linkPtr;
+	linkPtr = link;
 	
 	// Initialise the noise distribution
-	nMagX = NoiseFactory::Create(root->GetElement("errors")->GetElement("m_x"));
-	nMagY = NoiseFactory::Create(root->GetElement("errors")->GetElement("m_y"));
-	nMagZ = NoiseFactory::Create(root->GetElement("errors")->GetElement("m_z"));
+	nMag = NoiseFactory::Create(root->GetElement("errors")->GetElement("magvec"));
 	
     // Initialise a node pointer
     nodePtr = transport::NodePtr(new transport::Node());
-    nodePtr->Init(modPtr->GetWorld()->GetName());
+    nodePtr->Init(linkPtr->GetModel()->GetWorld()->GetName());
 
     // Subscribe to messages about wind conditions
     subPtr = nodePtr->Subscribe("~/environment", &Compass::Receive, this);
@@ -46,25 +44,26 @@ bool Compass::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 void Compass::Reset()
 {
 	// Reset random number generators
-	nMagX.Reset();
-	nMagY.Reset();
-	nMagZ.Reset();
+	nMag->Reset();
 
 	// Reset ready flag
 	ready = false;
 }
 
 // Get the current altitude
-bool Compass::GetMeasurement(double t, physics::LinkPtr linkPtr, hal_sensor_compass::Data& msg)
+bool Compass::GetMeasurement(double t, hal_sensor_compass::Data& msg)
 {
 	// Get the quantities we want
 	math::Vector3 magB = linkPtr->GetWorldPose().rot.GetInverse().RotateVector(mag);
 
+	//Error perturb
+	magB += nMag->DrawVector(t);
+
 	// Perturb angular velocity
 	msg.t    = t;
-	msg.m_x  = magB.x + nMagX.Sample(linkPtr, dt);
-	msg.m_y  = magB.y + nMagY.Sample(linkPtr, dt);
-	msg.m_z  = magB.z + nMagZ.Sample(linkPtr, dt);
+	msg.m_x  = magB.x;
+	msg.m_y  = magB.y;
+	msg.m_z  = magB.z;
 
 	// Success!	
 	return ready;

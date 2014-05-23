@@ -20,7 +20,7 @@ namespace gazebo
         Zero(std::string name, sdf::ElementPtr root);
 
         // Reset using the given list of arguments
-        Reset();
+        void Reset();
 
         //! Sample a 3D vector from the random distribution
         /*!

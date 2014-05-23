@@ -3,8 +3,11 @@
 
 using namespace gazebo;
 
+// Constructor
+Noise::Noise(std::string inval) : name(inval) {}
+
 // Allow up to two double parameters to be configured online
-void Noise::Config(int idx, double val)
+void Noise::Configure(int idx, double val)
 {
     if (idx < MAX_PARS)
         pars[idx] = val;
@@ -31,23 +34,25 @@ std::string Noise::GetName()
 }
 
 // Draw a scalar from the random distribution
-double Noise::Draw(int dt)
+double Noise::DrawScalar(double t)
 {
-    // Sample and get!
-    Sample(dt);
+    // Sample
+    Sample(t);
+
+    // Return first value
     return Get(0);
 }
 
 // Draw a vector from the random distribution
-double Noise::Draw(int dt)
+math::Vector3 Noise::DrawVector(double t)
 {
     // Sample
-    Sample(dt);
+    Sample(t);
 
     // Get vector
     return math::Vector3(
         Get(0),
         Get(1),
         Get(2)
-    )
+    );
 }

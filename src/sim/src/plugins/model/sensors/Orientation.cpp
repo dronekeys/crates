@@ -6,18 +6,14 @@ using namespace gazebo;
 Orientation::Orientation() {}
 
 // All sensors must be configured using the current model information and the SDF
-bool Orientation::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
+bool Orientation::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
 	// Backup the link
-	link = linkPtr;
+	linkPtr = link;
 
 	// Initialise the noise distribution
-	nRotX = NoiseFactory::Create(root->GetElement("errors")->GetElement("roll"));
-	nRotY = NoiseFactory::Create(root->GetElement("errors")->GetElement("pitch"));
-	nRotZ = NoiseFactory::Create(root->GetElement("errors")->GetElement("yaw"));
-	nAngX = NoiseFactory::Create(root->GetElement("errors")->GetElement("p"));
-	nAngY = NoiseFactory::Create(root->GetElement("errors")->GetElement("q"));
-	nAngZ = NoiseFactory::Create(root->GetElement("errors")->GetElement("r"));
+	nRot = NoiseFactory::Create(root->GetElement("errors")->GetElement("rot"));
+	nAng = NoiseFactory::Create(root->GetElement("errors")->GetElement("ang"));
 	
 	// Success
 	return true;
@@ -27,12 +23,8 @@ bool Orientation::Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root)
 void Orientation::Reset()
 {
 	// Reset random number generators
-	nRotX.Reset();
-	nRotY.Reset();
-	nRotZ.Reset();
-	nAngX.Reset();
-	nAngY.Reset();
-	nAngZ.Reset();
+	nRot->Reset();
+	nAng->Reset();
 }
 
 // Get the current altitude
@@ -42,14 +34,18 @@ bool Orientation::GetMeasurement(double t, hal_sensor_orientation::Data& msg)
 	math::Vector3 rot = linkPtr->GetWorldPose().rot.GetAsEuler();
 	math::Vector3 ang = linkPtr->GetRelativeAngularVel();
 
+	// Perturb measuremnet
+	rot += nRot->DrawVector(t);
+	ang += nAng->DrawVector(t);
+
 	// Package up message
 	msg.t     = t;
-	msg.roll  = rot.x + nRotX.Sample(linkPtr, dt);
-	msg.pitch = rot.y + nRotY.Sample(linkPtr, dt);
-	msg.yaw   = rot.z + nRotZ.Sample(linkPtr, dt);
-	msg.p     = ang.x + nAngX.Sample(linkPtr, dt);
-	msg.q     = ang.y + nAngY.Sample(linkPtr, dt);
-	msg.r     = ang.z + nAngZ.Sample(linkPtr, dt);
+	msg.roll  = rot.x;
+	msg.pitch = rot.y;
+	msg.yaw   = rot.z;
+	msg.p     = ang.x;
+	msg.q     = ang.y;
+	msg.r     = ang.z;
 
 	// Success
 	return true;

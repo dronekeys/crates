@@ -6,8 +6,8 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 
-// Basic ROS stuff
-#include <ros/ros.h>
+// Required for noise distributions
+#include "../../../noise/NoiseFactory.h"
 
 namespace gazebo
 {
@@ -19,7 +19,7 @@ namespace gazebo
         /*!
           \param msg the message to be populated
         */
-        virtual bool Configure(physics::LinkPtr linkPtr, sdf::ElementPtr root) = 0;
+        virtual bool Configure(physics::LinkPtr link, sdf::ElementPtr root) = 0;
 
         //! Reset dynamics
         /*!

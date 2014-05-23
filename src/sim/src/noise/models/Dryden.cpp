@@ -11,7 +11,9 @@ using namespace gazebo;
 // Configure using the given SDF
 Dryden::Dryden(std::string name, sdf::ElementPtr root) : Noise(name)
 {
-
+	// Set all speeds and altitudes to zero
+	for (int i = 0; i < MAX_PARS; i++)
+		pars[i] = 0.0;
 }
 
 // Reset the nois stream
@@ -41,7 +43,7 @@ void Dryden::Reset()
     vars[1] = 0.0;
     vars[2] = 0.0;
     for (int i = 0; i < INIT_ITERATIONS; i++)
-        DrawVector(INIT_DT);
+        Sample(INIT_DT);
 }
 
 // Sample the random process
