@@ -12,7 +12,7 @@ bool Altimeter::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	linkPtr = link;
 
 	// Create the noise distribution
-	nAlt = NoiseFactory::Create(root->GetElement("errors")->GetElement("z"));
+	nAlt = NoiseFactory::Create(root->GetElement("errors")->GetElement("altitude"));
 
 	// Success!
 	return true;

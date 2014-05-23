@@ -14,6 +14,9 @@ Dryden::Dryden() : Noise()
 	// Set all speeds and altitudes to zero
 	for (int i = 0; i < MAX_PARS; i++)
 		pars[i] = 0.0;
+
+	// Issue a reset
+	Reset();
 }
 
 // Destructor
@@ -25,6 +28,9 @@ Dryden::~Dryden()
 // Reset the nois stream
 void Dryden::Reset()
 {
+	// Reset time
+	tim = 0;
+
 	// Extract parameters
 	double a = METERS_TO_FEET * pars[DRYDEN_PARS_ALTITUDE];
 	double w = METERS_TO_FEET * pars[DRYDEN_PARS_WNDSPEED];
@@ -48,17 +54,17 @@ void Dryden::Reset()
     vars[0] = 0.0;
     vars[1] = 0.0;
     vars[2] = 0.0;
-    for (int i = 0; i < INIT_ITERATIONS; i++)
-        Sample(INIT_DT);
+    for (int i = 1; i <= INIT_ITERATIONS; i++)
+        Sample(INIT_DT*i);
 }
 
 // Sample the random process
-void Dryden::Sample(double dt)
+void Dryden::Sample(double t)
 {
 	// Extract parameters
 	double a = METERS_TO_FEET * pars[DRYDEN_PARS_ALTITUDE];
 	double w = METERS_TO_FEET * pars[DRYDEN_PARS_WNDSPEED];
-	double d = METERS_TO_FEET * pars[DRYDEN_PARS_AIRSPEED] * dt;
+	double d = METERS_TO_FEET * pars[DRYDEN_PARS_AIRSPEED] * (t - tim);
 	double k = 0.177 + 0.000823 * a;
 
 	// sigma
@@ -88,5 +94,8 @@ void Dryden::Sample(double dt)
 		(1-d/l.z) *  vars[2],    // Mean
 		sqrt(2*d/l.z) * s.z        // Stddev
 	);
+
+	// Time lag
+	tim = t;
 }
 

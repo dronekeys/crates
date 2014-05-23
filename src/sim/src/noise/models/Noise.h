@@ -44,13 +44,12 @@ namespace gazebo
         /// Reset the random stream
         virtual void Reset() = 0;
 
-        //! Sample the random distribution
+        //! Sample a 3D vector from the random distribution
         /*!
             \param link the model link
-            \param dt the discrete time step
-            \return the sampled variable
+            \param t sample time
         */
-        virtual void Sample(double dt) = 0;
+        virtual void Sample(double t) = 0;
 
         //! Allow up to two double parameters to be configured online
         /*!

@@ -21,7 +21,7 @@ void Zero::Reset()
 	// Do nothing
 }
 
-void Zero::Sample(double dt)
+void Zero::Sample(double t)
 {
     // Do nothing
 }

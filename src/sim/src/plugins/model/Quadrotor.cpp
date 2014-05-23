@@ -50,25 +50,29 @@ namespace gazebo
   	private:
 
 	    // Pointer to the update event connection
-	    event::ConnectionPtr 	conPtr;
+	    event::ConnectionPtr 		conPtr;
 
 	    // Pointer to the model object
-	    physics::LinkPtr 		linkPtr;
+	    physics::LinkPtr 			linkPtr;
 
 	    // Dynamics
-	    gazebo::Aerodynamics    dA;
-	    gazebo::Propulsion		dP;
-	    gazebo::Energy 			dE;
+	    gazebo::Aerodynamics    	dA;
+	    gazebo::Propulsion			dP;
+	    gazebo::Energy 				dE;
 
 	    // Sensors
-	    gazebo::Altimeter   	sA;
-	    gazebo::Compass    		sC;
-	    gazebo::GNSS    		sG;
-	    gazebo::IMU    			sI;
-	    gazebo::Orientation 	sO;
+	    gazebo::Altimeter   		sA;
+	    gazebo::Compass    			sC;
+	    gazebo::GNSS    			sG;
+	    gazebo::IMU    				sI;
+	    gazebo::Orientation 		sO;
+
+	    // Gazebo communication
+		transport::NodePtr 			nodePtr;
+		transport::SubscriberPtr 	subPtr;
 
 	    // Last time tick
-	    double 					tim;
+	    double 						tim;
 
     	// Callback for physics timer
 		void PrePhysics(const common::UpdateInfo &_info)
@@ -93,12 +97,19 @@ namespace gazebo
 			tim = _info.simTime.Double();
 		}
 
+		// This will be called whenever a new meteorlogical topic is posted
+		void ReceiveNoise(NoisePtr& inmsg)
+		{
+			NoiseFactory::Toggle(inmsg->enable());
+		}
+
   	public:
 
 	    // Default constructor
 	    Quadrotor() : hal::quadrotor::Quadrotor(), tim(0.0)
 	    {
-	      // Do nothing
+    		// Kill all random number streams
+	    	NoiseFactory::Init();
 	    }
 
 	    /// Destructor
@@ -155,9 +166,20 @@ namespace gazebo
 			
 			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
 
+			// Create and initialize a new Gazebo transport node
+			nodePtr = transport::NodePtr(new transport::Node());
+			nodePtr->Init(model->GetName());
+
+			// Subscribe to meteorological updates
+			subPtr = nodePtr->Subscribe("~/noise", 
+				&Quadrotor::ReceiveNoise, this);
+
+			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
+
 			// Create a pre-physics update call (before any physics)
 			conPtr = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Quadrotor::PrePhysics, this, _1));
+
 
 	    }
 

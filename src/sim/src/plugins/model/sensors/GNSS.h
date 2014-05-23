@@ -31,7 +31,7 @@ namespace gazebo
     physics::LinkPtr                linkPtr;
 
     // Have we received satellite data
-    bool                            ready, enabled;
+    bool                            ready;
 
     // Requirements for listening for Gazbeo messages
     event::ConnectionPtr            conPtr;

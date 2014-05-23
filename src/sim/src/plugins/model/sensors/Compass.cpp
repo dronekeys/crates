@@ -24,7 +24,7 @@ bool Compass::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	linkPtr = link;
 	
 	// Initialise the noise distribution
-	nMag = NoiseFactory::Create(root->GetElement("errors")->GetElement("magvec"));
+	nMag = NoiseFactory::Create(root->GetElement("errors")->GetElement("magnetic"));
 	
     // Initialise a node pointer
     nodePtr = transport::NodePtr(new transport::Node());

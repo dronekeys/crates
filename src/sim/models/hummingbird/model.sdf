@@ -136,8 +136,8 @@
           </voltage>
         </control>
         <errors>
-          <force><white>0.2 0.2 0.2</white></force>
-          <torque><white>0.2 0.2 0.2</white></torque>
+          <force><white><sigma>0.2</sigma></white></force>
+          <torque><white><sigma>0.2</sigma></white></torque>
         </errors>
       </propulsion>
 
@@ -153,46 +153,41 @@
           <land>100</land>
         </limits>
         <errors>
-          <energy><white>0.02</white></energy>
+          <consumption><white><sigma>0.2</sigma></white></consumption>
         </errors>
       </energy>
 
       <!-- Drag parameters -->
       <aerodynamics>
-        <wind>
+        <shear>
           <ma>0.05</ma>
           <z0>0.15</z0>
-        </wind>
+        </shear>
         <drag>
           <kuv>-4.97391e-01</kuv>
           <kw>-1.35341</kw>
         </drag>
         <errors>
-          <wind>
-            <dryden></dryden>
-          </wind>
+          <turbulence><dryden></dryden></turbulence>
         </errors>
       </aerodynamics>
       
       <!-- Altimeter parameters -->
       <altimeter>
-        <enabled>true</enabled>
         <errors>
-          <altpos><ou>0.2</ou></altpos>
+          <altitude><ou><beta>1.0</beta><sigma>0.2</sigma></ou></ou></altitude>
         </errors>
       </altimeter>
 
       <!-- Compass parameters -->
       <compass>
-        <enabled>true</enabled>
         <errors>
-          <magvec><white>0.2 0.2 0.2</white></magvec>
+          <magnetic><white><sigma>0.2</sigma></white></magnetic>
         </errors>
       </compass>
 
       <!-- GNSS parameters -->
       <gnss>
-        <enabled>true</enabled>
         <solver>
           <minelevation>15</minelevation>
           <nsiterations>10</nsiterations>
@@ -213,25 +208,23 @@
           </glo>
         </solver>
         <errors>
-          <rcvclk><white>0.1</white></rcvclk>
+          <clock><white><sigma>0.2</sigma></white></clock>
         </errors>
       </gnss>
 
       <!-- IMU parameters -->
       <imu>
-        <enabled>true</enabled>
         <errors>
-          <angvel><ou>0.2 0.2 0.2</ou></angvel>
-          <linacc><ou>0.2 0.2 0.2</ou></linacc>
+          <linacc><white><sigma>0.2</sigma></white></linacc>
+          <angvel><white><sigma>0.2</sigma></white></angvel>
         </errors>
       </imu>
 
       <!-- Orientation parameters -->
       <orientation>
-        <enabled>true</enabled>
         <errors>
-          <angpos><ou>0.2 0.2 0.2</ou></angpos>
-          <angvel><ou>0.2 0.2 0.2</ou></angvel>
+          <orientation><ou><beta>1.0</beta><sigma>0.2</sigma></ou></orientation>
+          <angvel><ou><beta>1.0</beta><sigma>0.2</sigma></ou></angvel>
         </errors>
       </orientation>
 

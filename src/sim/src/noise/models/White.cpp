@@ -21,7 +21,7 @@ void White::Reset()
 		vars[i] = 0.0;
 }
 
-void White::Sample(double dt)
+void White::Sample(double t)
 {
 	for (int i = 0; i < MAX_VARS; i++)
 		vars[i] = math::Rand::GetDblNormal(0,_sigma);

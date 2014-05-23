@@ -12,8 +12,8 @@ bool Orientation::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	linkPtr = link;
 
 	// Initialise the noise distribution
-	nRot = NoiseFactory::Create(root->GetElement("errors")->GetElement("rot"));
-	nAng = NoiseFactory::Create(root->GetElement("errors")->GetElement("ang"));
+	nRot = NoiseFactory::Create(root->GetElement("errors")->GetElement("orientation"));
+	nAng = NoiseFactory::Create(root->GetElement("errors")->GetElement("angvel"));
 	
 	// Success
 	return true;

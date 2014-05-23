@@ -22,7 +22,7 @@ bool GNSS::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	linkPtr = link;
 
 	// Get parameters from the SDF file
-    std::string enabled, gpsUse, gpsEph, gpsClk, gpsIon, gpsTro, gloUse, gloEph, gloClk, gloIon, gloTro;
+    std::string gpsUse, gpsEph, gpsClk, gpsIon, gpsTro, gloUse, gloEph, gloClk, gloIon, gloTro;
     root->GetElement("solver")->GetElement("gps")->GetElement("use")->GetValue()->Get(gpsUse);
     root->GetElement("solver")->GetElement("gps")->GetElement("ion")->GetValue()->Get(gpsIon);
     root->GetElement("solver")->GetElement("gps")->GetElement("tro")->GetValue()->Get(gpsTro);
@@ -36,8 +36,6 @@ bool GNSS::Configure(physics::LinkPtr link, sdf::ElementPtr root)
     root->GetElement("solver")->GetElement("nsiterations")->GetValue()->Get(_maxIterations);
     root->GetElement("solver")->GetElement("errtolerance")->GetValue()->Get(_minError);
     root->GetElement("solver")->GetElement("minelevation")->GetValue()->Get(_minElevation);
-    root->GetElement("enabled")->GetElement("use")->GetValue()->Get(enabled);
-    _enabled = (enabled.compare("true")==0);
     _gpsUse  = ( gpsUse.compare("true")==0);
     _gpsEph  = ( gpsEph.compare("true")==0);
     _gpsClk  = ( gpsClk.compare("true")==0);
@@ -50,7 +48,7 @@ bool GNSS::Configure(physics::LinkPtr link, sdf::ElementPtr root)
     _gloTro  = ( gloTro.compare("true")==0);
 
     // Create a noise distribution to model receiver clock error
-	nReceiver = NoiseFactory::Create(root->GetElement("errors")->GetElement("rcvclk"));
+	nReceiver = NoiseFactory::Create(root->GetElement("errors")->GetElement("clock"));
 
 	// We will be using two GNSS systems in total
 	if (_gpsUse) 

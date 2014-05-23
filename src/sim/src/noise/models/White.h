@@ -29,9 +29,9 @@ namespace gazebo
         //! Sample a 3D vector from the random distribution
         /*!
             \param link the model link
-            \param dt the discrete time step
+            \param t sample time
         */
-        void Sample(double dt = 0);
+        void Sample(double t = 0);
 
     };
 }
