@@ -135,8 +135,14 @@ namespace gazebo
 
 			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR AND HAL ////////////////
 
-	    	// Initilize the HAL
-	    	hal::quadrotor::Quadrotor::Init((std::string)"/hal/" + model->GetName());
+	    	// Het
+	    	std::string halName = (std::string)"/hal/" + model->GetName();
+	    	hal::quadrotor::Quadrotor::Init(halName);
+	    	hal::sensor::Altimeter::Init(halName);
+	    	hal::sensor::Compass::Init(halName);
+	    	hal::sensor::GNSS::Init(halName);
+	    	hal::sensor::IMU::Init(halName);
+	    	hal::sensor::Orientation::Init(halName);
 
 			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 

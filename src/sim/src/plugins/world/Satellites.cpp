@@ -172,7 +172,7 @@ namespace gazebo
 			currentTimeUTC.get(epoch);
 			sat.set_epoch(epoch);
 
-			ROS_DEBUG("%d %d %d %d %d %f",
+			ROS_WARN("%d %d %d %d %d %f",
             	env.year(),
             	env.month(),
             	env.day(),
@@ -182,17 +182,18 @@ namespace gazebo
 
 			// CALCULATE THE CURRENT POSITION /////////////////////////////////////////////////
 
-			// Get the local origin position
-			math::Vector3 origin = worldPtr->GetSphericalCoordinates()->SphericalFromLocal(
-				math::Vector3(0.0,0.0,0.0)
-			);
-
 			// Do all neccessary coordinate transforms
-			gpstk::Position originPosGeodetic    = gpstk::Position(origin.x, origin.y, origin.z, gpstk::Position::Geodetic, &wgs84);
+			gpstk::Position originPosGeodetic    = gpstk::Position(
+				env.longitude(), 
+				env.latitude(), 
+				env.altitude(), 
+				gpstk::Position::Geodetic, 
+				&wgs84
+			);
 			gpstk::Position originPosGeocentric  = originPosGeodetic.transformTo(gpstk::Position::Geocentric);
 			gpstk::Position originPosECEF        = originPosGeodetic.asECEF();
 
-			ROS_DEBUG("%f %f %f %f",
+			ROS_WARN("%f %f %f %f",
 				originPosGeocentric[0],
 				originPosGeocentric[1],
 				originPosGeocentric[2],
@@ -658,7 +659,9 @@ namespace gazebo
 				timer = rosNode.createTimer(
 					ros::Duration(1.0/rate),
 					&Satellites::Update,
-					this
+					this,
+			        false,                                      // Oneshot
+			        true                                        // Autostart
 				);     
 			}  
 

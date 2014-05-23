@@ -263,6 +263,11 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
     timOld = timNew;
     posOld = posNew;
 
+   	// Temp hack
+    posNew = linkPtr->GetWorldPose().pos;
+    velNew = linkPtr->GetRelativeLinearVel();
+    
+
 	// Copy the solution
 	msg.t = timNew;
 	msg.x = posNew.x;
@@ -273,5 +278,5 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 	msg.w = velNew.z;
 
 	// Success!
-	return (statusFix == 0);
+	return true; //(statusFix == 0);
 }

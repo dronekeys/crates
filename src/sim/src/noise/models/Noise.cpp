@@ -4,7 +4,7 @@
 using namespace gazebo;
 
 // Constructor
-Noise::Noise()
+Noise::Noise() : enabled(false)
 {
     // Do nothing
 }

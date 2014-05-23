@@ -15,10 +15,10 @@ Orientation::Orientation() : hal::HAL()
 void Orientation::OnInit()
 {
     // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
-    publisher = GetRosNodePtr()->template advertise<hal_sensor_orientation::Data>("sensor/imu/Data", DEFAULT_QUEUE_LENGTH);
+    publisher = GetRosNodePtr()->template advertise<hal_sensor_orientation::Data>("sensor/orientation/Data", DEFAULT_QUEUE_LENGTH);
 
     // Advertice the ability to configure the sensor rate
-    service = GetRosNodePtr()->advertiseService("sensor/imu/Configure", &Orientation::Configure, this);
+    service = GetRosNodePtr()->advertiseService("sensor/orientation/Configure", &Orientation::Configure, this);
 
     // Create a timer to broadcast the data
     timerSamp = GetRosNodePtr()->createTimer(

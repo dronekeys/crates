@@ -76,7 +76,9 @@ namespace gazebo
 				timer = rosNode.createTimer(
 					ros::Duration(1.0/rate),
 					&Wind::Update,
-					this
+					this,
+			        false,                                      // Oneshot
+			        true                                        // Autostart
 				);  
 			}    
 
