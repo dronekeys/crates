@@ -201,8 +201,8 @@ target_link_libraries(hal_quadrotor ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
-target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_quadrotor)
+##catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
+##target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_quadrotor)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

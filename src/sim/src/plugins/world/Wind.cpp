@@ -29,10 +29,10 @@ namespace gazebo
 		ros::NodeHandle 			rosNode;
 
 		// Wind broadcast rate
-		double rate, speed, direction;
+		double 						rate, speed, direction;
 
       	// Message containing information
-      	msgs::Wind msg;
+      	msgs::Wind 					msg;
 
 	    //  Called to update the world information
 		void Update(const ros::TimerEvent& event)
@@ -63,13 +63,6 @@ namespace gazebo
 			root->GetElement("default")->GetElement("speed")->GetValue()->Get(speed);
 			root->GetElement("default")->GetElement("heading")->GetValue()->Get(direction);
 			
-			// Set up advertisements
-			Reset();
-		}
-
-		// Reset the publishers and subscribers
-		void Reset()
-		{
 			// Create and initialize a new Gazebo transport node
 			nodePtr = transport::NodePtr(new transport::Node());
 			nodePtr->Init(worldPtr->GetName());
@@ -85,7 +78,16 @@ namespace gazebo
 					&Wind::Update,
 					this
 				);  
-			}             
+			}    
+
+			// Set up advertisements
+			Reset();
+		}
+
+		// Reset the publishers and subscribers
+		void Reset()
+		{
+			// Reset         
 		}
 	};
 

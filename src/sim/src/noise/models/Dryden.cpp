@@ -9,11 +9,17 @@ using namespace gazebo;
 #define INIT_DT             0.02
 
 // Configure using the given SDF
-Dryden::Dryden(std::string name, sdf::ElementPtr root) : Noise(name)
+Dryden::Dryden() : Noise()
 {
 	// Set all speeds and altitudes to zero
 	for (int i = 0; i < MAX_PARS; i++)
 		pars[i] = 0.0;
+}
+
+// Destructor
+Dryden::~Dryden()
+{
+	// Do nothing
 }
 
 // Reset the nois stream

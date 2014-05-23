@@ -1,5 +1,3 @@
-string model                      # Model (optional)
-string process                    # Process (optional)
 bool   enable                  	  # Enable or disable this noise process
 ---
 bool   success                    # return true if spawn successful

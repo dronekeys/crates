@@ -4,11 +4,15 @@
 using namespace gazebo;
 
 // Configure using the given SDF
-White::White(std::string name, sdf::ElementPtr root) : Noise(name)
+White::White(double sigma) : Noise(), _sigma(sigma)
 {
-	// Obtain the parameter tokens
-	std::string tokenstring;
-	root->GetValue()->Get(tokenstring);
+	// Do nothing
+}
+
+// Destructor
+White::~White()
+{
+	// Do nothing
 }
 
 void White::Reset()
@@ -20,5 +24,5 @@ void White::Reset()
 void White::Sample(double dt)
 {
 	for (int i = 0; i < MAX_VARS; i++)
-		vars[i] = math::Rand::GetDblNormal(0,cfg[i]);
+		vars[i] = math::Rand::GetDblNormal(0,_sigma);
 }

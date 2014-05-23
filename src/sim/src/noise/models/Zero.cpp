@@ -4,10 +4,16 @@
 using namespace gazebo;
 
 // Configure using the given SDF
-Zero::Zero(std::string name, sdf::ElementPtr root) : Noise(name)
+Zero::Zero() : Noise()
 {
     for (int i = 0; i < MAX_VARS; i++)
         vars[i] = 0.0;
+}
+
+// Destructor
+Zero::~Zero()
+{
+	// Do nothing
 }
 
 void Zero::Reset()

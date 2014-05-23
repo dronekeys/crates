@@ -17,12 +17,16 @@ namespace gazebo
     private:
 
         // Configuration for each noise process
-        double cfg[MAX_VARS][2];
+        double _beta;
+        double _sigma;
 
     public:
 
         // Configure using the given SDF
-        Ornstein(std::string name, sdf::ElementPtr root);
+        Ornstein(double beta, double sigma);
+
+        // Destructor
+        ~Ornstein(); 
 
         // Reset using the given list of arguments
         void Reset();

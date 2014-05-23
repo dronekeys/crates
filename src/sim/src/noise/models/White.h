@@ -13,12 +13,15 @@ namespace gazebo
     private:
 
         // Configuration for each noise process
-        double cfg[MAX_VARS];
+        double _sigma;
 
     public:
-
+        
         // Configure using the given SDF
-        White(std::string name, sdf::ElementPtr root);
+        White(double sigma);
+
+        // Destructor
+        ~White(); 
 
         // Reset using the given list of arguments
         void Reset();

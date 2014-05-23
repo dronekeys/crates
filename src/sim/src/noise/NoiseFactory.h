@@ -22,19 +22,8 @@ namespace gazebo
     // Environment messages
     typedef const boost::shared_ptr<const msgs::Noise> NoisePtr;
 
-    // Define the gaussian types
-    typedef enum 
-    {
-        WHITE,    /* Zero-mean Gaussian noise             */
-        ORNSTEIN, /* Ornstein-Uhlenbeck process nouse     */
-        DRYDEN,   /* Dryden process noise                 */
-        UNKNOWN
-    } 
-    NoiseType;
-
-    // Convenience
-    typedef std::map<std::string,NoiseType>     TypeVec;
-    typedef std::vector<Noise*>                 ProcessVec;
+    // Vector of noise processes
+    typedef std::vector<Noise*> ProcessVec;
 
     // An abstract class for modelling noise
     class NoiseFactory
@@ -42,22 +31,8 @@ namespace gazebo
 
     private:
 
-        // The name of this model
-        static std::string              name;
-
-        // Requirements for listening for Gazbeo messages
-        static event::ConnectionPtr     conPtr;
-        static transport::NodePtr       nodePtr;
-        static transport::SubscriberPtr subPtr;
-
         /// A list of noise processes
-        static TypeVec                  types;
-
-        /// A list of noise processes
-        static ProcessVec               processes;
-
-        /// Find a distribution type
-        static NoiseType Lookup(std::string &name);
+        static ProcessVec processes;
 
     public:    
 
@@ -65,14 +40,10 @@ namespace gazebo
         /*!
             \param a pointer to the world
         */
-        static void Receive(NoisePtr& noise);
+        static void Toggle(bool enabled);
 
-        //! Initialize the noise factory
-        /*!
-            \param a pointer to the world
-            \param a pointer to the name of this node
-        */
-        static void Init(physics::WorldPtr worldPtr, std::string inname);
+        //! Destroy the noise factory
+        static void Init();
 
         //! Destroy the noise factory
         static void Destroy();

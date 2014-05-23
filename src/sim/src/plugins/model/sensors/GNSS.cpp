@@ -257,7 +257,6 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
    	posNew.y = estPos[1];
    	posNew.z = estPos[2];
 
-
     // Work out the velocity
 	if (timNew - timOld > 0)
     	velNew = (posNew - posOld) / (timNew - timOld);

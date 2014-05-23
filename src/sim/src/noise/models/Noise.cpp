@@ -4,7 +4,17 @@
 using namespace gazebo;
 
 // Constructor
-Noise::Noise(std::string inval) : name(inval) {}
+Noise::Noise()
+{
+    // Do nothing
+}
+
+// Constructor
+Noise::~Noise()
+{
+    // Do nothing
+}
+
 
 // Allow up to two double parameters to be configured online
 void Noise::Configure(int idx, double val)
@@ -25,12 +35,6 @@ double Noise::Get(int idx)
 void Noise::Toggle(bool val)
 {
     enabled = val;
-}
-
-// Enable and disable this noise stream,
-std::string Noise::GetName()
-{
-    return name;
 }
 
 // Draw a scalar from the random distribution

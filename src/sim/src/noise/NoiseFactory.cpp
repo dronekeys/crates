@@ -1,51 +1,22 @@
 #include "NoiseFactory.h"
-
+#include <ros/ros.h>
 using namespace gazebo;
 
-// A list of all noise processes
-TypeVec    NoiseFactory::types;
-ProcessVec NoiseFactory::processes;
-
-NoiseType NoiseFactory::Lookup(std::string &str)
-{
-	// Check to see if the type exists in the container
-	if (types.find(str) == types.end())
-		return UNKNOWN;
-
-	// Check to
-	return types[str];
-}
+// Forward declaration of statics
+ProcessVec               NoiseFactory::processes;
 
 // Initialise the noise factory
-void NoiseFactory::Receive(NoisePtr& msg)
+void NoiseFactory::Toggle(bool enabled)
 {
-	// If the model is empty and doesn't match, don't do anything
-	if (msg->model().compare(name) !=0 && !msg->model().empty())
-		return;
-
 	// Configure the noise processes
 	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
-		if (msg->process().compare((*i)->GetName())==0 || msg->process().empty())
-			(*i)->Toggle(msg->enabled());
+		(*i)->Toggle(enabled);
 }
 
 // Initialise the noise factory
-void NoiseFactory::Init(physics::WorldPtr worldPtr, std::string inname)
+void NoiseFactory::Init()
 {
-	// Copy thre 
-	name = inname;
-
-	// Add the various types
-	types["dryden"] 	= DRYDEN;
-	types["white"] 		= WHITE;
-	types["ou"] 		= ORNSTEIN;
-
-    // Initialise a node pointer
-    nodePtr = transport::NodePtr(new transport::Node());
-    nodePtr->Init(worldPtr->GetName());
-
-    // Subscribe to messages about wind conditions
-    subPtr = nodePtr->Subscribe("~/noise", &NoiseFactory::Receive);
+	// Do nothing
 }
 
 // Initialise the noise factory
@@ -60,26 +31,41 @@ Noise* NoiseFactory::Create(sdf::ElementPtr root)
 {
 	// Get the name and type
 	std::string type = root->GetFirstElement()->GetName();
-
-	// Check to see the root name
-	Noise* noise;
-	switch (Lookup(type))
+	
+	// Create the noise distribution
+	Noise *noise; 
+	if (type.compare("dryden")==0)
 	{
-		case WHITE:
-			noise = (Noise*) new White(root->GetName(),root->GetFirstElement());
-			break;
+		// Create the noise process
+		noise = (Noise*) new Dryden();
+	}
+	else if (type.compare("white")==0)
+	{
+		// Get parameters
+		double sigma;
+		root->GetFirstElement()->GetElement("sigma")->GetValue()->Get(sigma);
 
-		case ORNSTEIN:
-			noise = (Noise*) new Ornstein(root->GetName(),root->GetFirstElement());
-			break;
+		// ROS_WARN("WHITE: %f", sigma);
 
-		case DRYDEN:
-			noise = (Noise*) new Dryden(root->GetName(),root->GetFirstElement());
-			break;
+		// Create the noise process
+		noise = (Noise*) new White(sigma);
+	}
+	else if (type.compare("ou")==0)
+	{
+		// Get parameters
+		double beta, sigma;
+		root->GetFirstElement()->GetElement("beta")->GetValue()->Get(beta);
+		root->GetFirstElement()->GetElement("sigma")->GetValue()->Get(sigma);
 
-		case UNKNOWN:
-			noise = (Noise*) new Zero(root->GetName(),root->GetFirstElement());
-			break;
+		// ROS_WARN("OU: %f %f", beta, sigma);
+
+		// Create the noise process
+		noise = (Noise*) new Ornstein(beta, sigma);
+	}
+	else
+	{
+		// Create the noise process
+		noise = (Noise*) new Zero();
 	}
 
 	// Destroy this on

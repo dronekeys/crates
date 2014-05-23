@@ -30,8 +30,13 @@
 #include "sensors/IMU.h"
 #include "sensors/Orientation.h"
 
+// Custom messages
+#include "noise.pb.h"
+
 namespace gazebo
 {
+	typedef const boost::shared_ptr<const msgs::Noise> NoisePtr;
+
 	class Quadrotor : 
 		public ModelPlugin, 				/* Needed for Gazebo integration */
 		public hal::quadrotor::Quadrotor,	/* Exposes Quadrotor model       */
@@ -119,9 +124,6 @@ namespace gazebo
 
 			// INITIALIZE THE NOISE DISTRIBUTION GENERATOR AND HAL ////////////////
 
-	    	// Initialize the random number generator
-	    	NoiseFactory::Init(model->GetWorld(), model->GetName());
-
 	    	// Initilize the HAL
 	    	hal::quadrotor::Quadrotor::Init((std::string)"/hal/" + model->GetName());
 
@@ -156,6 +158,7 @@ namespace gazebo
 			// Create a pre-physics update call (before any physics)
 			conPtr = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Quadrotor::PrePhysics, this, _1));
+
 	    }
 
 	    // All sensors must be resettable

@@ -25,10 +25,7 @@ namespace gazebo
     private:
 
         // This flag decide whether random numbers are enabled
-        bool            enabled;
-
-        // Name of the noise stream
-        std::string     name;
+        bool enabled;
 
     protected:
 
@@ -39,10 +36,10 @@ namespace gazebo
     public:
 
         // Constructor
-        Noise(std::string inval);
+        Noise();
 
         /// Destructor
-        virtual ~Noise() {};
+        ~Noise();
 
         /// Reset the random stream
         virtual void Reset() = 0;
@@ -53,7 +50,7 @@ namespace gazebo
             \param dt the discrete time step
             \return the sampled variable
         */
-        virtual void Sample(double dt);
+        virtual void Sample(double dt) = 0;
 
         //! Allow up to two double parameters to be configured online
         /*!
@@ -75,12 +72,6 @@ namespace gazebo
             \param enabled whether to enable the stream
         */
         void Toggle(bool enabled);
-        
-        //! Get the name of the noise stream
-        /*!
-            \returns the name of the noise stream
-        */
-        std::string GetName();
 
         //! Sample the random distribution and by default return the first value
         /*!

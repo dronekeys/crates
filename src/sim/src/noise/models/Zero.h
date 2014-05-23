@@ -17,7 +17,10 @@ namespace gazebo
     public:
 
         // Configure using the given SDF
-        Zero(std::string name, sdf::ElementPtr root);
+        Zero();
+
+        // Destructor
+        ~Zero(); 
 
         // Reset using the given list of arguments
         void Reset();

@@ -458,9 +458,7 @@ namespace gazebo
 	{
 		// Create and publish the message to gazebo
 		msgs::Noise msg;
-		msg.set_model(req.model);
-		msg.set_process(req.process);
-		msg.set_enabled(req.enable);
+		msg.set_enable(req.enable);
 		pubNoise->Publish(msg);
 
 		// Keep steps to a reasonable length

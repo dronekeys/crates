@@ -9,7 +9,6 @@
   <!-- set use_sim_time flag -->
   <group>
     <param name="/use_sim_time"  value="true" />
-    <param name="/use_sim_noise" value="true" />
   </group>
 
   <!-- start gazebo server-->

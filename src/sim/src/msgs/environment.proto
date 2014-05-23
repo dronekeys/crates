@@ -11,7 +11,12 @@ message Vec3D
 // Information broadcast about the environment
 message Environment
 {
-	required double     utc         = 1;
-	required Vec3D      gravity     = 2;
-	required Vec3D      magnetic    = 3;
+	required int32     year        = 1;
+	required int32     month       = 2;
+	required int32     day         = 3;
+	required int32     hour        = 4;
+	required int32     minute      = 5;
+	required double    second      = 6;
+	required Vec3D     gravity     = 7;
+	required Vec3D     magnetic    = 8;
 }

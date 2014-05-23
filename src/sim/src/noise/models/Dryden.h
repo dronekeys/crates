@@ -22,7 +22,10 @@ namespace gazebo
     public:
 
         // Configure using the given SDF
-        Dryden(std::string name, sdf::ElementPtr root);
+        Dryden();
+
+        // Destructor
+        ~Dryden(); 
 
         // Reset using the given list of arguments
         void Reset();

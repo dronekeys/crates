@@ -355,8 +355,8 @@ target_link_libraries(sim_quadrotor       ${SYS_LIBS})
 #############
 
 ## Noise tests
-##catkin_add_gtest(${PROJECT_NAME}_noise-test tests/TEST_${PROJECT_NAME}_noise.cpp)
-##target_link_libraries(${PROJECT_NAME}_noise-test sim_core)
+catkin_add_gtest(${PROJECT_NAME}_noise-test tests/TEST_${PROJECT_NAME}_noise.cpp)
+target_link_libraries(${PROJECT_NAME}_noise-test sim_core)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

@@ -7,10 +7,6 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 
-// GPSTK time management
-#include <gpstk/CommonTime.hpp>
-#include <gpstk/CivilTime.hpp>
-
 // ROS communication subsystem (mainly for debugging)
 #include <ros/ros.h>
 
@@ -37,9 +33,6 @@ namespace gazebo
 	    // Stores the current magnetic ang gravity field
 	    math::Vector3 			magnetic;
 	    math::Vector3 			gravity;
-
-        // The start time and current time, both in UTC
-        gpstk::CivilTime     	startTime;
 
       	// Message containing information
       	msgs::Environment 		msg;
@@ -76,9 +69,6 @@ namespace gazebo
 			root->GetElement("time")->GetElement("minute")->GetValue()->Get(mi);
 			root->GetElement("time")->GetElement("second")->GetValue()->Get(se);
 			
-        	// Create a common time variable from the UTC info in the SDF data
-            startTime = gpstk::CivilTime(ye,mo,da,ho,mi,se,gpstk::TimeSystem::UTC);
-
 			// The global WGS84 position
 			math::Vector3 msPositionGlobal = 
 				worldPtr->GetSphericalCoordinates()->SphericalFromLocal(
@@ -117,7 +107,12 @@ namespace gazebo
 			worldPtr->GetPhysicsEngine()->SetGravity(gravity);
 
 			// Set the mesage data
-			msg.set_utc(startTime.convertToCommonTime().getDays());
+			msg.set_year(ye);
+			msg.set_month(mo);
+			msg.set_day(da);
+			msg.set_hour(ho);
+			msg.set_minute(mi);
+			msg.set_second(se);
 			msg.mutable_gravity()->set_x(gravity.x);
 			msg.mutable_gravity()->set_y(gravity.y);
 			msg.mutable_gravity()->set_z(gravity.z);
@@ -125,13 +120,6 @@ namespace gazebo
 			msg.mutable_magnetic()->set_y(magnetic.y);
 			msg.mutable_magnetic()->set_z(magnetic.z);
 
-			// Set up advertisements
-			Reset();
-		}
-
-		// Reset the publishers and subscribers
-		void Reset()
-		{
 			// Create and initialize a new Gazebo transport node
 			nodePtr = transport::NodePtr(new transport::Node());
 			nodePtr->Init(worldPtr->GetName());
@@ -147,7 +135,16 @@ namespace gazebo
 					&Environment::Update,
 					this
 				);     
-			}          
+			}  
+
+			// Issue a reset
+			Reset();	
+		}
+
+		// Reset the publishers and subscribers
+		void Reset()
+		{
+			// Do nothing       
 		}
 	};
 
