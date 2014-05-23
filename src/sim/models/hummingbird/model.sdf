@@ -143,11 +143,11 @@
 
       <!-- Energy parameters -->
       <energy>
-        <mah>6000</mah>
-        <amps>
+        <remaining>6000</remaining>
+        <consumption>
           <base>0.1</base>
           <flight>6.6</flight>
-        </amps>
+        </consumption>
         <limits>
           <warn>1000</warn>
           <land>100</land>
@@ -175,7 +175,7 @@
       <!-- Altimeter parameters -->
       <altimeter>
         <errors>
-          <altitude><ou><beta>1.0</beta><sigma>0.2</sigma></ou></ou></altitude>
+          <altitude><ou><beta>1.0</beta><sigma>0.2</sigma></ou></altitude>
         </errors>
       </altimeter>
 

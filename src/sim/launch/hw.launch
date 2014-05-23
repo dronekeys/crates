@@ -4,14 +4,15 @@
   <!-- these are the arguments you can pass this launch file, for example debug:=true gui:=true -->
   <arg name="gui" default="true"/>
   <arg name="world" default="worlds/empty.world"/>
- 
+  <arg name="bin" default="server"/>
+
   <!-- set use_sim_time flag -->
   <group>
     <param name="/use_sim_time"  value="false" />
   </group>
 
   <!-- start gazebo server-->
-  <node name="experiment" pkg="sim" type="server" respawn="false" output="screen" args="-s libsim_experiment.so -s libsim_resources.so -r -u $(arg world)">
+  <node name="experiment" pkg="sim" type="$(arg bin)" respawn="false" output="screen" args="-s libsim_experiment.so -s libsim_resources.so -r -u $(arg world)">
     <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
     <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
     <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/models"/>

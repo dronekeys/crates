@@ -16,11 +16,20 @@ namespace gazebo
 
     private:
 
+        // Flag true when initialised
+        bool ready;
+
         // Time lag
         double tim;
 
         // Intermediate values
         math::Vector3 s, l;
+
+        // Used to initialise the distribution
+        void Bootstrap();
+
+        // Sample the random process
+        void Equations(double dt);
 
     public:
 
