@@ -3,20 +3,31 @@
 using namespace gazebo;
 
 // Forward declaration of statics
-ProcessVec               NoiseFactory::processes;
+bool  		NoiseFactory::enabled;
+ProcessVec 	NoiseFactory::processes;
 
-// Initialise the noise factory
-void NoiseFactory::Toggle(bool enabled)
+// Check whether noise is enabled
+bool NoiseFactory::GetEnabled()
 {
-	// Configure the noise processes
-	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
-		(*i)->Toggle(enabled);
+	return enabled;
 }
 
 // Initialise the noise factory
-void NoiseFactory::Init()
+void NoiseFactory::SetEnabled(bool en)
+{
+	// Configure the noise processes
+	for (ProcessVec::iterator i = processes.begin(); i != processes.end(); i++)
+		(*i)->Toggle(en);
+
+	// Set enabled
+	enabled = en;
+}
+
+// Initialise the noise factory
+void NoiseFactory::Init(bool en)
 {
 	// Do nothing
+	enabled = en;
 }
 
 // Initialise the noise factory
@@ -67,6 +78,9 @@ Noise* NoiseFactory::Create(sdf::ElementPtr root)
 		// Create the noise process
 		noise = (Noise*) new Zero();
 	}
+
+	// Set the noise state
+	noise->Toggle(enabled);
 
 	// Destroy this on
 	processes.push_back(noise);

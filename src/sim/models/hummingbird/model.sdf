@@ -153,7 +153,7 @@
           <land>100</land>
         </limits>
         <errors>
-          <consumption><white><sigma>0.2</sigma></white></consumption>
+          <consumption><white><sigma>0.002</sigma></white></consumption>
         </errors>
       </energy>
 
@@ -175,14 +175,14 @@
       <!-- Altimeter parameters -->
       <altimeter>
         <errors>
-          <altitude><ou><beta>1.0</beta><sigma>0.2</sigma></ou></altitude>
+          <altitude><ou><beta>300</beta><sigma>0.003</sigma></ou></altitude>
         </errors>
       </altimeter>
 
       <!-- Compass parameters -->
       <compass>
         <errors>
-          <magnetic><white><sigma>0.2</sigma></white></magnetic>
+          <magnetic><white><sigma>0.02</sigma></white></magnetic>
         </errors>
       </compass>
 
@@ -208,23 +208,22 @@
           </glo>
         </solver>
         <errors>
-          <clock><white><sigma>0.2</sigma></white></clock>
+          <clock><white><sigma>0.002</sigma></white></clock>
         </errors>
       </gnss>
 
       <!-- IMU parameters -->
       <imu>
         <errors>
-          <linacc><white><sigma>0.2</sigma></white></linacc>
-          <angvel><white><sigma>0.2</sigma></white></angvel>
+          <linacc><white><sigma>0.0025</sigma></white></linacc>
+          <angvel><white><sigma>0.0002</sigma></white></angvel>
         </errors>
       </imu>
 
       <!-- Orientation parameters -->
       <orientation>
         <errors>
-          <orientation><ou><beta>1.0</beta><sigma>0.2</sigma></ou></orientation>
-          <angvel><ou><beta>1.0</beta><sigma>0.2</sigma></ou></angvel>
+          <orientation><ou><beta>0.01</beta><sigma>0.0005</sigma></ou></orientation>
         </errors>
       </orientation>
 

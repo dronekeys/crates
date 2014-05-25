@@ -52,7 +52,7 @@
 
     <!-- Location -->
     <include>
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <uri>model://hummingbird</uri>
     </include>
 
@@ -73,7 +73,7 @@
     <plugin name="wind" filename="libsim_wind.so">
       <rate>1</rate>
       <default>
-        <speed>1</speed>
+        <speed>0</speed>
         <heading>90</heading>
       </default>
     </plugin>
@@ -97,7 +97,7 @@
     <plugin name="satellites" filename="libsim_satellites.so">
       
       <!-- RATE at which all GNSS sensors will be updated -->
-      <rate>1</rate>
+      <rate>5</rate>
       
       <!-- Ephemerides (must match time period in environment) -->
       <ephemerides>

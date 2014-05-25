@@ -17,6 +17,8 @@
 #include "models/White.h"
 #include "models/Zero.h"
 
+#define DEFAULT_NOISE_STATE false
+
 namespace gazebo
 {
     // Environment messages
@@ -31,19 +33,28 @@ namespace gazebo
 
     private:
 
+        /// Current noise state
+        static bool enabled;
+
         /// A list of noise processes
         static ProcessVec processes;
 
     public:    
 
+        //! Check whethe rnoise is turned on or off
+        /*!
+            \returns Whether noise is enabled globally
+        */
+        static bool GetEnabled();
+
         //! Turn noise on or off
         /*!
             \param a pointer to the world
         */
-        static void Toggle(bool enabled);
+        static void SetEnabled(bool en);
 
         //! Destroy the noise factory
-        static void Init();
+        static void Init(bool en = DEFAULT_NOISE_STATE);
 
         //! Destroy the noise factory
         static void Destroy();

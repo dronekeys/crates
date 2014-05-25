@@ -17,7 +17,11 @@ namespace gazebo
     physics::LinkPtr    linkPtr;
     
     // Noise streams
-    Noise               *nRot, *nAng;
+    Noise               *nAng;
+
+    // Temp vectors
+    math::Vector3       newAng, oldAng, newVel;
+    double              newTim, oldTim;
 
   public:
 

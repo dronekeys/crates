@@ -444,7 +444,7 @@ namespace gazebo
 		// This will be called whenever a new meteorlogical topic is posted
 		void ReceiveNoise(NoisePtr& inmsg)
 		{
-			NoiseFactory::Toggle(inmsg->enable());
+			NoiseFactory::SetEnabled(inmsg->enable());
 		}
 
 	public:

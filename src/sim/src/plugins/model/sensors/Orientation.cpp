@@ -12,9 +12,8 @@ bool Orientation::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	linkPtr = link;
 
 	// Initialise the noise distribution
-	nRot = NoiseFactory::Create(root->GetElement("errors")->GetElement("orientation"));
-	nAng = NoiseFactory::Create(root->GetElement("errors")->GetElement("angvel"));
-	
+	nAng = NoiseFactory::Create(root->GetElement("errors")->GetElement("orientation"));
+
 	// Success
 	return true;
 }
@@ -23,7 +22,6 @@ bool Orientation::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 void Orientation::Reset()
 {
 	// Reset random number generators
-	nRot->Reset();
 	nAng->Reset();
 }
 
@@ -31,21 +29,25 @@ void Orientation::Reset()
 bool Orientation::GetMeasurement(double t, hal_sensor_orientation::Data& msg)
 {
 	// Get the quantities we want
-	math::Vector3 rot = linkPtr->GetWorldPose().rot.GetAsEuler();
-	math::Vector3 ang = linkPtr->GetRelativeAngularVel();
-
-	// Perturb measuremnet
-	rot += nRot->DrawVector(t);
-	ang += nAng->DrawVector(t);
+	newAng = linkPtr->GetWorldPose().rot.GetAsEuler() + nAng->DrawVector(t);
+	newTim = t;
+	
+	// Diff measurements to get angvel
+	if (newTim - oldTim > 0)
+		newVel = (newAng - oldAng) / (newTim - oldTim);
 
 	// Package up message
-	msg.t     = t;
-	msg.roll  = rot.x;
-	msg.pitch = rot.y;
-	msg.yaw   = rot.z;
-	msg.p     = ang.x;
-	msg.q     = ang.y;
-	msg.r     = ang.z;
+	msg.t     = newTim;
+	msg.roll  = newAng.x;
+	msg.pitch = newAng.y;
+	msg.yaw   = newAng.z;
+	msg.p     = newVel.x;
+	msg.q     = newVel.y;
+	msg.r     = newVel.z;
+
+	// Carry values
+	oldAng = newAng;
+	oldTim = newTim;
 
 	// Success
 	return true;
