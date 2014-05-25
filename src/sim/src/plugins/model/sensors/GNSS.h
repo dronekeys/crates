@@ -4,6 +4,10 @@
 // HAL functionality
 #include <hal/sensor/GNSS.h>
 
+// For converting Gazebo <-> ECEF coordinates
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 // GNSS basics
 #include <gpstk/WGS84Ellipsoid.hpp> // GPS ellipsoid
 #include <gpstk/TropModel.hpp>      // Tropospheric model
@@ -37,7 +41,9 @@ namespace gazebo
     event::ConnectionPtr            conPtr;
     transport::NodePtr              nodePtr;
     transport::SubscriberPtr        subPtr;
-    msgs::Satellites                sats;
+    
+    // Gazebo messages
+    msgs::Satellites                sat;
 
     // Solver parameters
     bool                            _enabled;
@@ -65,8 +71,9 @@ namespace gazebo
     // For storing time (needed to calcualte velocity)
     double                          timOld, timNew;
 
-    // When new environment data arrives
+    // When new satellite data arrives
     void Receive(SatellitesPtr& msg);
+
 
   public:
 

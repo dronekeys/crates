@@ -5,11 +5,11 @@ using namespace gazebo;
 // Constructor
 GNSS::GNSS() : ready(false), tropModel(&tropModelZero) {}
 
-// When new environment data arrives
+// When new satellite data arrives
 void GNSS::Receive(SatellitesPtr& msg)
 {
 	// Use the copy constructor to copy the message
-	sats = *msg;
+	sat = *msg;
 
 	// We now have data, so we can obtain a solution
 	ready = true;
@@ -61,7 +61,7 @@ bool GNSS::Configure(physics::LinkPtr link, sdf::ElementPtr root)
     nodePtr->Init(linkPtr->GetModel()->GetWorld()->GetName());
 
     // Subscribe to messages about wind conditions
-    subPtr = nodePtr->Subscribe("~/satellites", &GNSS::Receive, this);
+    subPtr = nodePtr->Subscribe("~/satellites",  &GNSS::Receive, this);
 
     // Success
 	return true;
@@ -78,32 +78,44 @@ void GNSS::Reset()
 bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 {
 	// SPECIAL CASE: NO SATELLITES RECEIVED YET ////////////////////////////
-
+	
 	if (!ready)
 		return false;
 
 	// OBTAIN THE CURRENT TIME /////////////////////////////////////////////
 
 	currentTime.set(
-		(double) sats.epoch(),
+		(double) sat.epoch(),
 		(gpstk::TimeSystem) gpstk::TimeSystem::UTC
 	);
 
 	// OBTAIN THE CURRENT RECEIVER POSITION ////////////////////////////////
    
-   	// Get the gazebo WGS84 position of the receiver
-    math::Vector3 rcvPos = linkPtr->GetModel()->GetWorld()->GetSphericalCoordinates()
-    	->SphericalFromLocal(linkPtr->GetWorldPose().pos);
-      
-    // Get the gpstk WGS84 position of the receiver
-  	gpstk::Position rcvWGS84(
-  		rcvPos.x, rcvPos.y, rcvPos.z, gpstk::Position::Geodetic, &wgs84
+	// Use geographiclib for projection
+	GeographicLib::Geocentric wgs84_ecef(
+		GeographicLib::Constants::WGS84_a(), 
+		GeographicLib::Constants::WGS84_f()
+	);
+	GeographicLib::LocalCartesian wgs84_enu(
+		linkPtr->GetModel()->GetWorld()->GetSphericalCoordinates()->GetLatitudeReference().Degree(), 
+		linkPtr->GetModel()->GetWorld()->GetSphericalCoordinates()->GetLongitudeReference().Degree(), 
+		linkPtr->GetModel()->GetWorld()->GetSphericalCoordinates()->GetElevationReference(), 
+		wgs84_ecef
 	);
 
-  	// Convert to ECEF position
-	gpstk::Position rcvECEF 
-		= rcvWGS84.transformTo(gpstk::Position::Geocentric).asECEF();
-
+	// Find the ECEF receiver position from the local tangent plane
+	double lat, lon, h, x, y, z;
+	wgs84_enu.Reverse(
+		linkPtr->GetWorldPose().pos.x,
+		linkPtr->GetWorldPose().pos.y,
+		linkPtr->GetWorldPose().pos.z, 
+		lat, 
+		lon, 
+		h
+	);
+	wgs84_ecef.Forward(lat, lon, h, x, y, z);
+	gpstk::Position rcvECEF(x,y,z);
+	
 	// PROCESS THE SATELLITE DATA //////////////////////////////////////////
 
 	// Allocate for solution
@@ -115,25 +127,25 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
     gpstk::Vector<double>           slopes;         // Residual slopes
 	
 	// Make the ephemerides container big enough to store all SV info
-	ephemerides.resize(sats.svs_size(), 4, 0.0);
+	ephemerides.resize(sat.svs_size(), 4, 0.0);
 
 	// Iterate over the GPS satellite vehicles
-	for (int i = 0; i < sats.svs_size(); i++)
+	for (int i = 0; i < sat.svs_size(); i++)
 	{
 		// Work out the range
 		try
 		{
 			// Get the true position
 			gpstk::Position satECEF = gpstk::Position(
-				sats.svs(i).pos().x(),
-				sats.svs(i).pos().y(),
-				sats.svs(i).pos().z(), 
+				sat.svs(i).pos().x(),
+				sat.svs(i).pos().y(),
+				sat.svs(i).pos().z(), 
 				gpstk::Position::Cartesian
 			);
 
 			// If the satellite is below a certain elevation, ignore
 			// it by changing the ID to negative (see PRSOlver)
-			int id = sats.svs(i).prn();
+			int id = sat.svs(i).prn();
 			if (rcvECEF.elvAngle(satECEF) < _minElevation)
 				id *= -1;
 
@@ -146,41 +158,44 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 			// will add it back, thereby correcting for the effect.
 			double tof = pseudorange / ellip.c();
 			double ang = ellip.angVelocity() * tof;
-			satECEF[0] = -::cos(ang)*satECEF[0] - ::sin(ang)*satECEF[1];
-			satECEF[1] =  ::sin(ang)*satECEF[0] - ::cos(ang)*satECEF[1];
+			satECEF[0] =  ::cos(ang)*satECEF[0] + ::sin(ang)*satECEF[1];
+			satECEF[1] = -::sin(ang)*satECEF[0] + ::cos(ang)*satECEF[1];
 
 			// Get the satellite system
-			gpstk::SatID::SatelliteSystem sys = (gpstk::SatID::SatelliteSystem) sats.svs(i).sys();
+			gpstk::SatID::SatelliteSystem sys = (gpstk::SatID::SatelliteSystem) sat.svs(i).sys();
 
 			// Save the satellite
 			satellites.push_back(gpstk::SatID(id,sys));
 
 			// Perform error perturbation
+			/*
 			switch(sys)
 			{
 			case gpstk::SatID::systemGPS:
 				if (!_gpsEph)
 				{
-					satECEF[0] += sats.svs(i).err_pos().x();
-					satECEF[1] += sats.svs(i).err_pos().y();
-					satECEF[2] += sats.svs(i).err_pos().z();
+					satECEF[0] += sat.svs(i).err_pos().x();
+					satECEF[1] += sat.svs(i).err_pos().y();
+					satECEF[2] += sat.svs(i).err_pos().z();
 				}
-				if (!_gpsClk) pseudorange += sats.svs(i).err_clk();
-				if (!_gpsTro) pseudorange += sats.svs(i).err_tro();
-				if (!_gpsIon) pseudorange += sats.svs(i).err_ion();
+				if (!_gpsClk) pseudorange += sat.svs(i).err_clk();
+				if (!_gpsTro) pseudorange += sat.svs(i).err_tro();
+				if (!_gpsIon) pseudorange += sat.svs(i).err_ion();
 				break;
+
 			case gpstk::SatID::systemGlonass:
 				if (!_gloEph)
 				{
-					satECEF[0] += sats.svs(i).err_pos().x();
-					satECEF[1] += sats.svs(i).err_pos().y();
-					satECEF[2] += sats.svs(i).err_pos().z();
+					satECEF[0] += sat.svs(i).err_pos().x();
+					satECEF[1] += sat.svs(i).err_pos().y();
+					satECEF[2] += sat.svs(i).err_pos().z();
 				}
-				if (!_gloClk) pseudorange += sats.svs(i).err_clk();
-				if (!_gloTro) pseudorange += sats.svs(i).err_tro();
-				if (!_gloIon) pseudorange += sats.svs(i).err_ion();
+				if (!_gloClk) pseudorange += sat.svs(i).err_clk();
+				if (!_gloTro) pseudorange += sat.svs(i).err_tro();
+				if (!_gloIon) pseudorange += sat.svs(i).err_ion();
 				break;
 			}
+			*/
 
 			// Add the local receive clock noise
 			pseudorange += nReceiver->DrawScalar(t);
@@ -199,12 +214,12 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 
 
 	// Resize other matrices used in the computation
-	SVD.resize(sats.svs_size(),4,0.0);
-	for (int i = 0; i < sats.svs_size(); i++)
+	SVD.resize(sat.svs_size(),4,0.0);
+	for (int i = 0; i < sat.svs_size(); i++)
 		for (int j = 0; j < 4; j++)
 			SVD(i,j) = ephemerides(i,j);
-  	resids.resize(sats.svs_size());
-  	slopes.resize(sats.svs_size());
+  	resids.resize(sat.svs_size());
+  	slopes.resize(sat.svs_size());
 
   	// TRY AND OBTAIN A NAVIGATION SOLUTION ///////////////////////////////////
 
@@ -236,24 +251,31 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 	}
 
 	// CONVERT BACK TO GAZEBO COORDINATE FRAME //////////////////////////////
-	      
-    // Get the ECEF position of the receiver
-  	gpstk::Position estPos(
-  		solver.Solution[0], solver.Solution[0], solver.Solution[0]
-	);
-
-  	// Convert to a wgs84 position
-  	estPos = estPos.asGeodetic(&wgs84);
 
    	// Get the gazebo WGS84 position of the receiver
    	timNew = t;
 
-   	// TODO: fix this
-    //posNew = linkPtr->GetModel()->GetWorld()->GetSphericalCoordinates()
-    // 	->LocalFromSpherical(math::Vector3(estPos[0],estPos[1],estPos[2]));
-   	posNew.x = estPos[0];
-   	posNew.y = estPos[1];
-   	posNew.z = estPos[2];
+   	// Recover WGS84 coordinates from ECEF
+	wgs84_ecef.Reverse(
+		solver.Solution[0], 
+		solver.Solution[1], 
+		solver.Solution[2], 
+		lat, 
+		lon, 
+		h
+	);
+
+	// Recover LTP coordinates from WGS84
+	wgs84_enu.Forward(
+		lat, 
+		lon, 
+		h,
+		posNew.x,
+		posNew.y,
+		posNew.z
+	);
+	
+	ROS_WARN("%f %f %f", posNew.x, posNew.y, posNew.z);
 
     // Work out the velocity
 	if (timNew - timOld > 0)
@@ -262,11 +284,6 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
     // Backup the old position for next iteration
     timOld = timNew;
     posOld = posNew;
-
-   	// Temp hack
-    posNew = linkPtr->GetWorldPose().pos;
-    velNew = linkPtr->GetRelativeLinearVel();
-    
 
 	// Copy the solution
 	msg.t = timNew;

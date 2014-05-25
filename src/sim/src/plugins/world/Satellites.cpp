@@ -8,6 +8,10 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
+// For converting Gazebo <-> ECEF coordinates
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 // Required for the maths functions
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
@@ -172,34 +176,35 @@ namespace gazebo
 			currentTimeUTC.get(epoch);
 			sat.set_epoch(epoch);
 
-			ROS_WARN("%d %d %d %d %d %f",
-            	env.year(),
-            	env.month(),
-            	env.day(),
-            	env.hour(),
-            	env.minute(),
-            	env.second());
-
 			// CALCULATE THE CURRENT POSITION /////////////////////////////////////////////////
 
-			// Do all neccessary coordinate transforms
+			// Use geographiclib for projection
+			GeographicLib::Geocentric wgs84_ecef(
+				GeographicLib::Constants::WGS84_a(), 
+				GeographicLib::Constants::WGS84_f()
+			);
+			GeographicLib::LocalCartesian wgs84_enu(
+				worldPtr->GetSphericalCoordinates()->GetLatitudeReference().Degree(), 
+				worldPtr->GetSphericalCoordinates()->GetLongitudeReference().Degree(), 
+				worldPtr->GetSphericalCoordinates()->GetElevationReference(), 
+				wgs84_ecef
+			);
+
+			// Find the latitude, longitude and height for the origin
+			double lat, lon, h;
+			wgs84_enu.Reverse(0, 0, 0, lat, lon, h);
+
+			// USE gpstk for projection
 			gpstk::Position originPosGeodetic    = gpstk::Position(
-				env.longitude(), 
-				env.latitude(), 
-				env.altitude(), 
+				lat, 
+				lon, 
+				h, 
 				gpstk::Position::Geodetic, 
 				&wgs84
 			);
 			gpstk::Position originPosGeocentric  = originPosGeodetic.transformTo(gpstk::Position::Geocentric);
 			gpstk::Position originPosECEF        = originPosGeodetic.asECEF();
 
-			ROS_WARN("%f %f %f %f",
-				originPosGeocentric[0],
-				originPosGeocentric[1],
-				originPosGeocentric[2],
-				epoch
-			);
-			
 			// TROPOSHPERIC DELAYS //////////////////////////////////////////////////////////////
 
 			tropModel.setWeather(met.temperature() - 273.15, met.pressure(), met.humidity());
@@ -408,8 +413,9 @@ namespace gazebo
 				  ROS_DEBUG("GLO-F: %s", e.what().c_str());
 				}
 			}
-
+			
 			// Publish wind information to all subscribers
+			ROS_WARN("Sending satellite data");
 			pubPtr->Publish(sat);
 	    }
 

@@ -1,7 +1,7 @@
 package gazebo.msgs;
 import "vector3d.proto";
 
-// GNSS Satellite ephemeris
+// A satellite vehicle
 message Vehicle
 {
 	required int32 	  sys	    	  = 1;	// Satellite system
@@ -9,9 +9,8 @@ message Vehicle
 	required Vector3d pos        	  = 3;	// Satellite truth ECEF position
 	required Vector3d err_pos    	  = 4;	// Satellite noisy ECEF position
 	required double   err_clk         = 5;	// Satellite clock error
-	required double   err_rel  		  = 6;	// Relativity error
-	required double   err_ion   	  = 7;	// L1 ionospheric phase delay
-	required double   err_tro   	  = 8;	// Tropospheric phase delay
+	required double   err_ion   	  = 6;	// L1 ionospheric phase delay
+	required double   err_tro   	  = 7;	// Tropospheric phase delay
 }
 
 // Information broadcast about the environment

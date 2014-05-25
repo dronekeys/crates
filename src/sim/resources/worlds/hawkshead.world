@@ -18,6 +18,15 @@
       <real_time_update_rate>50</real_time_update_rate>
     </physics>
 
+    <!-- Defines the location -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>51.71190</latitude_deg>
+      <longitude_deg>-0.21052</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
     <!-- Setup a basic scene with a sky and clouds -->
     <scene>
       <sky>
@@ -58,11 +67,6 @@
         <minute>0</minute>
         <second>0</second>
       </time>
-      <origin>
-        <latitude>51.71190</latitude>
-        <longitude>-0.21052</longitude>
-        <altitude>0</altitude>
-      </origin>  
     </plugin>
 
     <!-- Wind conditions -->
