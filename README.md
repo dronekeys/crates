@@ -1,9 +1,9 @@
 Overview
 ========
 
-CRATES stands for "Cognitive Robotics Architecture for Transitioning to Experiments from Simulation". The overarching goal of the project is to create an easy-to-use architecture for writing high-level cognitive controllers fr simulated robot problems, which can easily be ported to real experiments. It achieves this using the notion of a hardware abstraction layer. 
+CRATES stands for "Cognitive Robotics Architecture for Tightly-Coupled Experiments and Simulation". The overarching goal of the project is to create an easy-to-use architecture for writing high-level cognitive controllers for simulated robot problems, which can easily be transferred to real experiments. It achieves this by routing all communication through a hardware abstraction layer.
 
-The general idea is that both simulated and actual hardware platforms inherit functionality from a common HAL. The HAL exposes itself to a congintive controller over a messaging backbone. In so doing the HAL abstracts away from the detailed implementation, and presents itself as a more general robot type, such as a 'quadrotor'. 
+The general idea is that both simulated and actual hardware platforms inherit functionality from a common HAL. The HAL exposes itself to a controller over a messaging backbone. In so doing the HAL abstracts away from the detailed implementation, and presents itself as a general robot type, such as a 'quadrotor'. 
 
 In addition to offering this abstraction service, the HAL may also include type-specific perception, navigation and low-level control algorithms. By implementing such functionality directly in the HAL, functionality is reused between experiments and simulation, and the mission-critical functions do not contend with bandwidth-intensive applications on the messaging system.
 
