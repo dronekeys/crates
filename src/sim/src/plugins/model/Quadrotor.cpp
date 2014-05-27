@@ -196,7 +196,7 @@ namespace gazebo
 			// Reset the aerodynamics
 			dA.Reset();	
 
-			// Reset the aerodynamics
+			// Reset the energy 
 			dE.Reset();	
 
 			// Reset the altitude sensor
