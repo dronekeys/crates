@@ -1,8 +1,10 @@
 <launch>
+	<arg name="port" default="/dev/ttyUSB0"/>
+	<arg name="baud" default="57600"/>
 	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" output="screen"/>
 	<node pkg="nodelet" type="nodelet" name="fcs" args="load platform_asctec/FlightControlSystem nodelet_manager" output="screen">
-		<param name="serial_port" type="string" value="/dev/ttyUSB0"/>
-		<param name="serial_baud" type="int" value="57600"/>
+		<param name="serial_port" type="string" value="$(arg port)"/>
+		<param name="serial_baud" type="int" value="$(arg baud)"/>
 		<param name="rate_max" type="int" value="100"/>		
 		<param name="rate_aci" type="int" value="10"/>
 		<param name="rate_est" type="int" value="50"/>
