@@ -2,7 +2,7 @@
 #define SIM_SENSOR_ALTIMETER_H
 
 // HAL functionality
-#include <hal/sensor/Altimeter.h>
+#include <hal_sensor_altimeter/Altimeter.h>
 
 // Basic sensor functionality
 #include "Sensor.h"

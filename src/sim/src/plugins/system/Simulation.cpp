@@ -19,8 +19,6 @@
 // Global clock tick
 #include <rosgraph_msgs/Clock.h>
 
-// For blank requests
-#include <std_srvs/Empty.h>
 
 // ROS topics
 #include "sim/Contacts.h"
@@ -29,6 +27,9 @@
 #include "sim/Insert.h"
 #include "sim/Delete.h"
 #include "sim/Step.h"
+#include "sim/Reset.h"
+#include "sim/Resume.h"
+#include "sim/Pause.h"
 #include "sim/Noise.h"
 #include "sim/Seed.h"
 
@@ -219,19 +220,19 @@ namespace gazebo
 		serviceDelete = rosNode->advertiseService(adDelete);
 
 		// Advertise more services on the custom queue
-		ros::AdvertiseServiceOptions adPause = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+		ros::AdvertiseServiceOptions adPause = ros::AdvertiseServiceOptions::create<sim::Pause>(
 			"Pause",boost::bind(&Simulation::Pause,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		servicePause = rosNode->advertiseService(adPause);
 
 		// Advertise more services on the custom queue
-		ros::AdvertiseServiceOptions adResume = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+		ros::AdvertiseServiceOptions adResume = ros::AdvertiseServiceOptions::create<sim::Resume>(
 			"Resume",boost::bind(&Simulation::Resume,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceResume = rosNode->advertiseService(adResume);
 
 		// Advertise more services on the custom queue
-		ros::AdvertiseServiceOptions adReset = ros::AdvertiseServiceOptions::create<std_srvs::Empty>(
+		ros::AdvertiseServiceOptions adReset = ros::AdvertiseServiceOptions::create<sim::Reset>(
 			"Reset",boost::bind(&Simulation::Reset,this,_1,_2),ros::VoidPtr(), &queue
 		);
 		serviceReset = rosNode->advertiseService(adReset);
@@ -322,7 +323,7 @@ namespace gazebo
 		if (xmlDocument.LoadFile(filename.c_str()))
 		{
 			res.success = false;
-			res.status_message = std::string("Insert: could not load model file");
+			res.status_message = std::string("Could not load model file.");
 			return true;
 		}
 
@@ -331,7 +332,7 @@ namespace gazebo
 		if (!xmlElementSDF)
 		{
 			res.success = false;
-			res.status_message = std::string("Insert: no <sdf> tag");
+			res.status_message = std::string("No <sdf> tag in model file.");
 			return true;
 		}
 		
@@ -340,7 +341,7 @@ namespace gazebo
 		if (!xmlElementMODEL)
 		{
 			res.success = false;
-			res.status_message = std::string("Insert: no <model> tag");
+			res.status_message = std::string("No <model> tage in model file.");
 			return true;
 		}
 
@@ -362,7 +363,7 @@ namespace gazebo
 			if (ros::Time::now() > timeout)
 			{
 				res.success = false;
-				res.status_message = std::string("Insert: Added to the insertion queue, but failed to appear in the world. Did you forget the model:// prefix?");
+				res.status_message = std::string("Added to the insertion queue, but failed to appear in the world. Did you forget the model:// prefix?");
 				return true;
 			}
 			if (world->GetModel(req.model_name)) 
@@ -372,7 +373,7 @@ namespace gazebo
 		}
 
 		res.success = true;
-		res.status_message = std::string("Insert: successfully inserted model");
+		res.status_message = std::string("Successfully inserted model");
 		return true;
 	}
 
@@ -384,7 +385,7 @@ namespace gazebo
 		{
 			ROS_ERROR("Delete: model [%s] does not exist",req.model_name.c_str());
 			res.success = false;
-			res.status_message = "Delete: model does not exist";
+			res.status_message = "Cannot delete model, because it does not exist";
 			return true;
 		}
 
@@ -399,7 +400,7 @@ namespace gazebo
 			if (ros::Time::now() > timeout)
 			{
 				res.success = false;
-				res.status_message = std::string("Delete: Model pushed to delete queue, but delete service timed out waiting for model to disappear from simulation");
+				res.status_message = std::string("Model pushed to delete queue, but delete service timed out waiting for model to disappear from simulation");
 				return true;
 			}
 			if (!world->GetModel(req.model_name)) 
@@ -408,28 +409,34 @@ namespace gazebo
 			usleep(1000);
 		}
 		res.success = true;
-		res.status_message = std::string("Delete: successfully deleted model");
+		res.status_message = std::string("Successfully deleted model");
 		return true;
 	}
 
 	// Reset the world
-	bool Reset(std_srvs::Empty::Request &req,std_srvs::Empty::Response &res)
+	bool Reset(sim::Reset::Request &req,sim::Reset::Response &res)
 	{
 		world->Reset();
+		res.success = true;
+		res.status_message = std::string("Successfully paused the simulation.");
 		return true;
 	}
 
 	// Pause physics
-	bool Pause(std_srvs::Empty::Request &req,std_srvs::Empty::Response &res)
+	bool Pause(sim::Pause::Request &req,sim::Pause::Response &res)
 	{
 		world->SetPaused(true);
+		res.success = true;
+		res.status_message = std::string("Successfully paused the simulation.");
 		return true;
 	}
 
 	// Resume physics
-	bool Resume(std_srvs::Empty::Request &req,std_srvs::Empty::Response &res)
+	bool Resume(sim::Resume::Request &req,sim::Resume::Response &res)
 	{
 		world->SetPaused(false);
+		res.success = true;
+		res.status_message = std::string("Successfully resumed the simulation");
 		return true;
 	}
 
@@ -440,7 +447,7 @@ namespace gazebo
 		if (req.num_steps > 128)
 		{
 			res.success = false;
-			res.status_message = std::string("Step: number of steps must be less than 128");
+			res.status_message = std::string("Number of steps must be less than 128");
 			return true;
 		}
 
@@ -449,7 +456,7 @@ namespace gazebo
 
 		// Error message
 		res.success = true;
-		res.status_message = std::string("Step: successfully stepped the simulaor");
+		res.status_message = std::string("Successfully stepped the simulaor");
 		return true;
 	}
 

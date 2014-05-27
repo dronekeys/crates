@@ -1,5 +1,5 @@
 // Standard libraries
-#include <hal/quadrotor/Quadrotor.h>
+#include <hal_quadrotor/Quadrotor.h>
 
 using namespace hal::quadrotor;
 

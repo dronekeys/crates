@@ -15,12 +15,12 @@
 #include <pluginlib/class_list_macros.h>
 
 // Integration with the CRATES HAL
-#include <hal/quadrotor/Quadrotor.h>
-#include <hal/sensor/Altimeter.h>
-#include <hal/sensor/Compass.h>
-#include <hal/sensor/GNSS.h>
-#include <hal/sensor/IMU.h>
-#include <hal/sensor/Orientation.h>
+#include <hal_quadrotor/Quadrotor.h>
+#include <hal_sensor_altimeter/Altimeter.h>
+#include <hal_sensor_compass/Compass.h>
+#include <hal_sensor_gnss/GNSS.h>
+#include <hal_sensor_imu/IMU.h>
+#include <hal_sensor_orientation/Orientation.h>
 
 // Required serial engine
 #include "serial/AsyncSerial.h"

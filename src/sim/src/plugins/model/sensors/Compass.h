@@ -2,7 +2,7 @@
 #define SIM_SENSOR_COMPASS_H
 
 // HAL functionality
-#include <hal/sensor/Compass.h>
+#include <hal_sensor_compass/Compass.h>
 
 // Basic sensor functionality
 #include "Sensor.h"

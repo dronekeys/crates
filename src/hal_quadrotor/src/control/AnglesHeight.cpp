@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/AnglesHeight.h>
+#include <hal_quadrotor/control/AnglesHeight.h>
 
 // Constant parameters
 #define _Kv         0.09     /* xy velocity proportional constant  */

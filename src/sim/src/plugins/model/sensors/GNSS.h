@@ -2,7 +2,7 @@
 #define SIM_SENSOR_GNSS_H
 
 // HAL functionality
-#include <hal/sensor/GNSS.h>
+#include <hal_sensor_gnss/GNSS.h>
 
 // For converting Gazebo <-> ECEF coordinates
 #include <GeographicLib/Geocentric.hpp>

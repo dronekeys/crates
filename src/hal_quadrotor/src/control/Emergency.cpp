@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Emergency.h>
+#include <hal_quadrotor/control/Emergency.h>
 
 using namespace hal::quadrotor;
 

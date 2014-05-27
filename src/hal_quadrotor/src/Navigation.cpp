@@ -1,4 +1,4 @@
-#include <hal/quadrotor/Navigation.h>
+#include <hal_quadrotor/Navigation.h>
 
 using namespace hal::quadrotor;
 

@@ -1,0 +1,9 @@
+[submodule "src/rosjava_build_tools"]
+	path = src/rosjava_build_tools
+	url = https://github.com/rosjava/rosjava_build_tools.git
+[submodule "src/rosjava_bootstrap"]
+	path = src/rosjava_bootstrap
+	url = https://github.com/rosjava/rosjava_bootstrap
+[submodule "src/rosjava_messages"]
+	path = src/rosjava_messages
+	url = https://github.com/rosjava/rosjava_messages

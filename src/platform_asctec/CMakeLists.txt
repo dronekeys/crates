@@ -87,10 +87,20 @@ find_package(Boost REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
-#catkin_package(
-#  LIBRARIES
-#    fcs
-#)
+catkin_package(
+  LIBRARIES
+    platform_asctec
+  DEPENDS 
+    roscpp
+    nodelet
+    hal
+    hal_quadrotor
+    hal_sensor_altimeter
+    hal_sensor_compass
+    hal_sensor_gnss
+    hal_sensor_imu
+    hal_sensor_orientation
+)
 
 ###########
 ## Build ##
@@ -150,11 +160,11 @@ target_link_libraries(platform_asctec
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS uav_msgs uav_msgs_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS platform_asctec
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/

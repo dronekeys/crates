@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: hal
+Description: Description of hal
+Version: 0.1.0
+Cflags: -I/home/asymingt/Workspace/Source/crates/install/include
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lhal
+Requires: roscpp message_runtime

@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Takeoff.h>
+#include <hal_quadrotor/control/Takeoff.h>
 
 // COntroller constants
 #define _X          0

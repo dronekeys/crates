@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: rosjava_bootstrap
+Description: Description of rosjava_bootstrap
+Version: 0.1.20
+Cflags: 
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib 
+Requires: 

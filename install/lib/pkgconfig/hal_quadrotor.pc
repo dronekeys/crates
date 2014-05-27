@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: hal_quadrotor
+Description: Description of hal_quadrotor
+Version: 0.1.0
+Cflags: -I/home/asymingt/Workspace/Source/crates/install/include
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lhal_quadrotor
+Requires: roscpp message_runtime hal hal_sensor_altimeter hal_sensor_compass hal_sensor_gnss hal_sensor_imu hal_sensor_orientation

@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Velocity.h>
+#include <hal_quadrotor/control/Velocity.h>
 
 // Controller constants
 #define _X          0

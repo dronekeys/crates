@@ -2,7 +2,7 @@
 #define SIM_SENSOR_ORIENTATION_H
 
 // HAL functionality
-#include <hal/sensor/Orientation.h>
+#include <hal_sensor_orientation/Orientation.h>
 
 // Basic sensor functionality
 #include "Sensor.h"

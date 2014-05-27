@@ -1,5 +1,5 @@
 // Library headers
-#include <hal/sensor/GNSS.h>
+#include <hal_sensor_gnss/GNSS.h>
 
 #define DEFAULT_SAMP_RATE 50
 #define DEFAULT_SEND_RATE  1

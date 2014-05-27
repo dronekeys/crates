@@ -8,12 +8,7 @@
 #include <gazebo/transport/transport.hh>
 
 // Integration with the CRATES HAL
-#include <hal/quadrotor/Quadrotor.h>
-#include <hal/sensor/Altimeter.h>
-#include <hal/sensor/Compass.h>
-#include <hal/sensor/GNSS.h>
-#include <hal/sensor/IMU.h>
-#include <hal/sensor/Orientation.h>
+#include <hal_quadrotor/Quadrotor.h>
 
 // Noise distributions
 #include "../../noise/NoiseFactory.h"

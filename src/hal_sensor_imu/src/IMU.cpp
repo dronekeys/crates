@@ -1,5 +1,5 @@
 // Library headers
-#include <hal/sensor/IMU.h>
+#include <hal_sensor_imu/IMU.h>
 
 #define DEFAULT_SAMP_RATE 50
 #define DEFAULT_SEND_RATE  1

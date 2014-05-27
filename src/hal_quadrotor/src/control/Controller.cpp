@@ -1,5 +1,5 @@
 // State and control messages
-#include <hal/quadrotor/control/Controller.h>
+#include <hal_quadrotor/control/Controller.h>
 
 using namespace hal::quadrotor;
 

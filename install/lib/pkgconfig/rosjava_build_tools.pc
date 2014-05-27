@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: rosjava_build_tools
+Description: Description of rosjava_build_tools
+Version: 0.1.33
+Cflags: 
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib 
+Requires: 

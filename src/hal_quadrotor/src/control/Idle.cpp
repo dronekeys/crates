@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Idle.h>
+#include <hal_quadrotor/control/Idle.h>
 
 using namespace hal::quadrotor;
 

@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Hover.h>
+#include <hal_quadrotor/control/Hover.h>
 
 // COntroller constants
 #define _X          0

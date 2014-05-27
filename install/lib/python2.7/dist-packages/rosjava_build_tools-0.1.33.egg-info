@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: rosjava_build_tools
+Version: 0.1.33
+Summary: Simple tools and catkin modules for rosjava development.
+Home-page: http://ros.org/wiki/rosjava_build_tools
+Author: Daniel Stonier
+Author-email: d.stonier@gmail.com
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires: rospyrospkg

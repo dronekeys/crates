@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: platform_asctec
+Description: Description of platform_asctec
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lplatform_asctec
+Requires: roscpp nodelet hal hal_quadrotor hal_sensor_altimeter hal_sensor_compass hal_sensor_gnss hal_sensor_imu hal_sensor_orientation

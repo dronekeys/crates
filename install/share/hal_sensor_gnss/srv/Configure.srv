@@ -1,0 +1,5 @@
+float64 samprate
+float64 sendrate
+---
+bool    success
+string  status

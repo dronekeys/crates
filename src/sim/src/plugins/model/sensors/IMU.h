@@ -2,7 +2,7 @@
 #define SIM_SENSOR_IMU_H
 
 // HAL functionality
-#include <hal/sensor/IMU.h>
+#include <hal_sensor_imu/IMU.h>
 
 // Basic sensor functionality
 #include "Sensor.h"

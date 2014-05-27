@@ -1,0 +1,8 @@
+prefix=/home/asymingt/Workspace/Source/crates/install
+
+Name: hal_sensor_orientation
+Description: Description of hal_sensor_orientation
+Version: 0.1.0
+Cflags: -I/home/asymingt/Workspace/Source/crates/install/include
+Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lhal_sensor_orientation
+Requires: roscpp message_runtime

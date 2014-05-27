@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/Waypoint.h>
+#include <hal_quadrotor/control/Waypoint.h>
 
 // COntroller constants
 #define _X          0

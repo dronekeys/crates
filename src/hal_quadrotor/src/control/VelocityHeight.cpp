@@ -1,4 +1,4 @@
-#include <hal/quadrotor/control/VelocityHeight.h>
+#include <hal_quadrotor/control/VelocityHeight.h>
 
 // Controller constants
 #define _U          0       

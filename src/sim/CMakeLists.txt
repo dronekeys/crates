@@ -14,8 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 	roslib
   roscpp
 	std_msgs
-  std_srvs
-	geometry_msgs
 	message_generation
   hal
   hal_quadrotor
@@ -128,6 +126,9 @@ add_service_files(
     Step.srv
     Noise.srv
     Seed.srv
+    Resume.srv
+    Reset.srv
+    Pause.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -140,7 +141,6 @@ add_service_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(DEPENDENCIES
     std_msgs
-    geometry_msgs
 )
 
 ###################################
@@ -168,11 +168,9 @@ catkin_package(
       roslib
       roscpp
       std_msgs
-      std_srvs
       message_generation
       message_runtime
       rosgraph_msgs
-      geometry_msgs
       hal
       hal_quadrotor
       hal_sensor_altimeter
@@ -329,18 +327,31 @@ target_link_libraries(sim_quadrotor       ${SYS_LIBS})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS uav_msgs uav_msgs_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(
+  TARGETS 
+    sim_core
+    sim_resources
+    sim_experiment
+    sim_simulation
+    sim_environment
+    sim_meteorological
+    sim_satellites
+    sim_wind
+    sim_quadrotor
+  ARCHIVE DESTINATION 
+    ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION 
+    ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION
+    ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(

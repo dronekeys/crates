@@ -1,4 +1,4 @@
-#include <hal/quadrotor/Actuation.h>
+#include <hal_quadrotor/Actuation.h>
 
 using namespace hal::quadrotor;
 
