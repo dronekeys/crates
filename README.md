@@ -153,7 +153,7 @@ In addition to offering request-response services, the simulated entity also off
 
 For example, each platform has a truthful state (Truth) and an estimated version of this state (Estimate). Since we are currently in simulated mode, both of these states are observable. For example, to see the estimated state, use the following command.
 
-	rostopic echo /hal/hummingbird/UAV1/Estimate
+	rostopic echo /hal/UAV1/Estimate
 
 If nothing appears, its likely that you have the simulation paused. Remember that clocks are bound to simulated time, and if you have time paused then no callbacks will be triggered. In the very special case where you have no wind, dynamic or sensor noise, then the Estimate equals the Truth.
 
