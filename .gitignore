@@ -3,7 +3,6 @@
 /install/
 /docs/html/
 /docs/latex/
-/src/crates_msgs/*gradle
 /src/crates_msgs/*/build/
 /src/CMakeLists.txt
 /thirdparty/gpstk*
