@@ -1,0 +1,5 @@
+try {
+    project.catkin.tree.generateMessageArtifact(project, 'hal_quadrotor')
+} catch (NullPointerException e) {
+    println("Couldn't find ackermann_msgs on the ROS_PACKAGE_PATH")
+}
