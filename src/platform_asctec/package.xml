@@ -3,15 +3,14 @@
 
   <name>platform_asctec</name>
   
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   
-  <description>The platform_asctec spackage</description>
+  <description>Provides a flight control system for an Ascending Technologies quadrotor.</description>
   
-  <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
+  <author email="a.symington@ucl.ac.uk">Andrew Symington</author>
   <author email="r.denardi@ucl.ac.uk">Renzo De Nardi</author>
-  
-  <license>BSD</license>
-  
+  <maintainer email="a.symington@ucl.ac.uk">Andrew Symington</maintainer>
+  <license>PLEASE REFER TO LICENCE IN PROJECT ROOT</license>  
   <url type="website">https://github.com/UCL-CompLACS/qrsim</url>
   
   <buildtool_depend>catkin</buildtool_depend>

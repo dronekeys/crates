@@ -92,6 +92,10 @@ Source the new CRATES installation
 
 	source ~/crates/devel/setup.bash
 
+Optional: if you plan to interact with the simulator using MATLAB, please also install the ROS IO bridge for MATLAB for your architecture:
+
+https://www.mathworks.co.uk/hardware-support/robot-operating-system.html
+
 You can now follow the basic usage instructions below.
 
 Example usage instructions
