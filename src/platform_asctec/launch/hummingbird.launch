@@ -1,6 +1,6 @@
 <launch>
 	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" output="screen"/>
-	<node pkg="nodelet" type="nodelet" name="fcs" args="load platform_complacs/fcs nodelet_manager" output="screen">
+	<node pkg="nodelet" type="nodelet" name="fcs" args="load platform_asctec/FlightControlSystem nodelet_manager" output="screen">
 		<param name="serial_port" type="string" value="/dev/ttyUSB0"/>
 		<param name="serial_baud" type="int" value="57600"/>
 		<param name="rate_max" type="int" value="100"/>		

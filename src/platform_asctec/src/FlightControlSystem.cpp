@@ -592,5 +592,5 @@ namespace platform_asctec
     };
 
     // Required in order to be used as a nodelet
-    PLUGINLIB_EXPORT_CLASS(FlightControlSystem, nodelet::Nodelet);
+    PLUGINLIB_EXPORT_CLASS(platform_asctec::FlightControlSystem, nodelet::Nodelet);
 }
