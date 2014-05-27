@@ -72,7 +72,7 @@ namespace hal
           \param nh the ROS node handle
           \param controller the default controller
       */
-      void Init(ros::NodeHandle* nh, ControllerType controller = CONTROLLER_IDLE);
+      void Init(ros::NodeHandle nh, ControllerType controller = CONTROLLER_IDLE);
 
       //! Switch to a new controller
       /*!

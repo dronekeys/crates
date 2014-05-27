@@ -17,59 +17,59 @@ void Quadrotor::OnInit()
     actuation.Init(GetRosNodePtr(), CONTROLLER_IDLE);
 
     // In both experiments and simulation the state and LL control can be queried
-    srvGetEstimate = GetRosNodePtr()->advertiseService("GetEstimate", &Quadrotor::RcvGetEstimate, this);
-    srvGetControl  = GetRosNodePtr()->advertiseService("GetControl", &Quadrotor::RcvGetControl, this);
+    srvGetEstimate = GetRosNodePtr().advertiseService("GetEstimate", &Quadrotor::RcvGetEstimate, this);
+    srvGetControl  = GetRosNodePtr().advertiseService("GetControl", &Quadrotor::RcvGetControl, this);
 
     // If we are in a simulation, additional services are avilable
     bool isSimulated = false;
-    if (GetRosNodePtr()->getParam("/use_sim_time",isSimulated) && isSimulated)
+    if (GetRosNodePtr().getParam("/use_sim_time",isSimulated) && isSimulated)
     {
         // Allow the true state to be mutable (hidden state in experiments)
-        srvGetTruth = GetRosNodePtr()->advertiseService("GetTruth", &Quadrotor::RcvGetTruth, this);
-        srvSetTruth = GetRosNodePtr()->advertiseService("SetTruth", &Quadrotor::RcvSetTruth, this);
+        srvGetTruth = GetRosNodePtr().advertiseService("GetTruth", &Quadrotor::RcvGetTruth, this);
+        srvSetTruth = GetRosNodePtr().advertiseService("SetTruth", &Quadrotor::RcvSetTruth, this);
         
         // Allow the low-level control to be set manually (too dangerous in experiments)
-        srvSetControl = GetRosNodePtr()->advertiseService("SetControl", &Quadrotor::RcvSetControl, this);
+        srvSetControl = GetRosNodePtr().advertiseService("SetControl", &Quadrotor::RcvSetControl, this);
         
         // Allow the internal state exstimate to be changed (too dangerous in experiments)
-        srvSetEstimate = GetRosNodePtr()->advertiseService("SetEstimate", &Quadrotor::RcvSetEstimate, this);
+        srvSetEstimate = GetRosNodePtr().advertiseService("SetEstimate", &Quadrotor::RcvSetEstimate, this);
     }
 
     // Publish the estimated state. For noiseless simulations, this is equal to the Truth.
-    pubTruth = hal::quadrotor::Quadrotor::GetRosNodePtr()->template 
+    pubTruth = hal::quadrotor::Quadrotor::GetRosNodePtr().template 
         advertise<hal_quadrotor::State>("Truth", DEFAULT_QUEUE_LENGTH);
 
     // Publish the estimated state. For noiseless simulations, this is equal to the Truth.
-    pubEstimate = hal::quadrotor::Quadrotor::GetRosNodePtr()->template 
+    pubEstimate = hal::quadrotor::Quadrotor::GetRosNodePtr().template 
         advertise<hal_quadrotor::State>("Estimate", DEFAULT_QUEUE_LENGTH);
 
     // Publish the control (roll, pitch, yaw, throttle) from the low-level position controller.
-    pubControl = hal::quadrotor::Quadrotor::GetRosNodePtr()->template 
+    pubControl = hal::quadrotor::Quadrotor::GetRosNodePtr().template 
         advertise<hal_quadrotor::Control>("Control", DEFAULT_QUEUE_LENGTH);
 
     // Immediately start control loop
-    timerUpdate = GetRosNodePtr()->createTimer(
+    timerUpdate = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_UPDATE_RATE), 
         &Quadrotor::Update, 
         this
     );
 
     // Immediately start control loop
-    timerTruth = GetRosNodePtr()->createTimer(
+    timerTruth = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_TRUTH_RATE), 
         &Quadrotor::BroadcastTruth, 
         this
     );
 
     // Immediately start control loop
-    timerEstimate = GetRosNodePtr()->createTimer(
+    timerEstimate = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_ESTIMATE_RATE), 
         &Quadrotor::BroadcastEstimate, 
         this
     );
 
     // Immediately start control loop
-    timerControl = GetRosNodePtr()->createTimer(
+    timerControl = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_CONTROL_RATE), 
         &Quadrotor::BroadcastControl, 
         this

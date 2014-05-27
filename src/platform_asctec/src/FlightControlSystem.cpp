@@ -14,14 +14,13 @@
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 
-// Hardware abstraction layer for a UAV
-#include <hal/model/quadrotor/Quadrotor.h>
-
-// Hardware abstraction layer for UAV sensors    
-#include <hal/sensor/IMU.h>
-#include <hal/sensor/GNSS.h>
-#include <hal/sensor/Compass.h>
+// Integration with the CRATES HAL
+#include <hal/quadrotor/Quadrotor.h>
 #include <hal/sensor/Altimeter.h>
+#include <hal/sensor/Compass.h>
+#include <hal/sensor/GNSS.h>
+#include <hal/sensor/IMU.h>
+#include <hal/sensor/Orientation.h>
 
 // Required serial engine
 #include "serial/AsyncSerial.h"
@@ -311,243 +310,287 @@ void cb_config(void)
 
 }
 
-namespace platform
+namespace platform_asctec
 {
-    namespace asctec
+    // Class derives from Nodelet and all HALs
+    class FlightControlSystem : 
+        public nodelet::Nodelet, 
+        public hal::quadrotor::Quadrotor,
+        public hal::sensor::Altimeter,
+        public hal::sensor::IMU,
+        public hal::sensor::Compass,
+        public hal::sensor::GNSS,
+        public hal::sensor::Orientation
     {
 
-        // Class derives from Nodelet and all HALs
-        class FlightControlSystem : 
-            public nodelet::Nodelet, 
-            public hal::model::Quadrotor,
-            public hal::sensor::IMU,
-            public hal::sensor::Compass,
-            public hal::sensor::Altimeter,
-            public hal::sensor::GNSS
+    private:
+
+        // Callback timers for probing data
+        ros::Timer timerHeartbeat;
+        ros::Timer timerEstimate;
+        ros::Timer timerInertial;
+        ros::Timer timerPosition;
+        ros::Timer timerMagnetic;
+        ros::Timer timerAltitude;
+        ros::Timer timerInfo;
+
+        // Configure variables
+        void cb_est(const ros::TimerEvent& event)
         {
-
-        private:
-
-            // Callback timers for probing data
-            ros::Timer timerHeartbeat;
-            ros::Timer timerEstimate;
-            ros::Timer timerInertial;
-            ros::Timer timerPosition;
-            ros::Timer timerMagnetic;
-            ros::Timer timerAltitude;
-            ros::Timer timerInfo;
-
-            // Configure variables
-            void cb_est(const ros::TimerEvent& event)
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Configure variables
-            void cb_imu(const ros::TimerEvent& event)
+        // Configure variables
+        void cb_imu(const ros::TimerEvent& event)
+        {
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Configure variables
-            void cb_pos(const ros::TimerEvent& event)
+        // Configure variables
+        void cb_pos(const ros::TimerEvent& event)
+        {
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Configure variables
-            void cb_mag(const ros::TimerEvent& event)
+        // Configure variables
+        void cb_mag(const ros::TimerEvent& event)
+        {
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Configure variables
-            void cb_alt(const ros::TimerEvent& event)
+        // Configure variables
+        void cb_alt(const ros::TimerEvent& event)
+        {
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Configure variables
-            void cb_inf(const ros::TimerEvent& event)
+        // Configure variables
+        void cb_inf(const ros::TimerEvent& event)
+        {
+            // Syncrhonise variables
+            if (fcsready)
             {
-                // Syncrhonise variables
-                if (fcsready)
-                {
-                    // Copy the data from the ACI to raw packet 
-                    aciSynchronizeVars();
-                }
+                // Copy the data from the ACI to raw packet 
+                aciSynchronizeVars();
             }
+        }
 
-            // Derived classes of HAL must implement a control reception mechanism
-            void ReceiveControl(const hal_model_quadrotor::Control &ctl)
+        // Called when the HAL wants an altimeter reading
+        bool GetMeasurement(hal_sensor_altimeter::Data& msg)
+        {
+            // Get the altimeter
+            return false;
+        }
+
+        // Called when the HAL wants a compass reading
+        bool GetMeasurement(hal_sensor_compass::Data& msg)
+        {
+            // Get the compass
+            return false;
+        }
+        
+        // Called when the HAL wants an imu reading
+        bool GetMeasurement(hal_sensor_imu::Data& msg)
+        {
+            // Get the imu
+            return false;
+        }
+        
+        // Called when the HAL wants a gnss reading
+        bool GetMeasurement(hal_sensor_gnss::Data& msg)
+        {
+            // Get the GNSS
+            return false;
+        }
+        
+        // Called when the HAL wants an orientation reading
+        bool GetMeasurement(hal_sensor_orientation::Data& msg)
+        {
+            // Get the orientation
+            return false;
+        }
+
+        // Called when the HAL wants the truthful state of the platform
+        void GetTruth(hal_quadrotor::State& state)
+        {
+            // Not valid for hardware platforms
+        }
+
+        // Called when the HAL wants to set the truthful state of the platform
+        void SetTruth(const hal_quadrotor::State& state)
+        {
+            // Not valid for hardware platforms
+        }
+        
+        // Called when the HAL wants to pass down some control to the platform
+        void SetControl(const hal_quadrotor::Control &control)
+        {
+            // Pass control to the propulsion module
+        }
+
+    public:
+
+        // Constructor
+        FlightControlSystem() :
+            nodelet::Nodelet(), 
+            hal::quadrotor::Quadrotor(),
+            hal::sensor::Altimeter(),
+            hal::sensor::IMU(),
+            hal::sensor::Compass(),
+            hal::sensor::GNSS(),
+            hal::sensor::Orientation()
+        {
+            // Do nothing
+        }
+
+        // When nodelet is initialised
+        void onInit()
+        {
+            // Get the node handle
+            ros::NodeHandle nh = getPrivateNodeHandle();
+
+            // Initialise the HALs
+            ROS_INFO("Initialising HALS");
+            hal::quadrotor::Quadrotor::Init(nh);
+            hal::sensor::Altimeter::Init(nh);
+            hal::sensor::Compass::Init(nh);
+            hal::sensor::GNSS::Init(nh);
+            hal::sensor::IMU::Init(nh);
+            hal::sensor::Orientation::Init(nh);
+
+            // Extract launch file parameters
+            ROS_INFO("Grabbing parameters from launch file");
+            std::string port; int baud;
+            if (!nh.getParam("serial_port",port))   port     = "/dev/ttyUSB0";
+            if (!nh.getParam("serial_baud",baud))   baud     = 57600;
+            if (!nh.getParam("rate_max",rate_max))  rate_max = 100;
+            if (!nh.getParam("rate_aci",rate_aci))  rate_aci = 10;
+            if (!nh.getParam("rate_est",rate_est))  rate_est = 0;
+            if (!nh.getParam("rate_imu",rate_imu))  rate_imu = 0;
+            if (!nh.getParam("rate_pos",rate_pos))  rate_pos = 0;
+            if (!nh.getParam("rate_alt",rate_alt))  rate_alt = 0;
+            if (!nh.getParam("rate_inf",rate_inf))  rate_inf = 0;
+            if (!nh.getParam("rate_mag",rate_inf))  rate_inf = 0;
+
+            // So we don't try and poll before some data is there
+            fcsready = false;
+
+            ROS_INFO("Initialising ACI engine");
+            aciInit();
+            
+            // Ope serial port
+            ROS_INFO("Opening serial port");
+            serial.open(port, baud);
+            if (serial.isOpen())
             {
-                // Do something with the control
-            }
-
-        public:
-
-            // Constructor
-            FlightControlSystem() : 
-                hal::model::Quadrotor(getPrivateNodeHandle()),                 // Instantiate quadrotor HAL       
-                hal::sensor::IMU(getPrivateNodeHandle()),                         // Instantiate IMU
-                hal::sensor::Compass(getPrivateNodeHandle()),                     // Instantiate compass HAL
-                hal::sensor::Altimeter(getPrivateNodeHandle()),                   // Instantiate altimeter HAL
-                hal::sensor::GNSS(getPrivateNodeHandle())                         // Instantiate GNSS HAL
-            {}
-
-            // Called when nodelet is initialised
-            void onInit()
-            {
-                /////////////////////////////////////////
-                // Get parameters from the launch file //
-                /////////////////////////////////////////
-
-                std::string port; int baud;
-
-                ROS_INFO("Grabbing serial parameters from launch file");
-                if (!getPrivateNodeHandle().getParam("serial_port",port)) 
-                    port = "/dev/ttyUSB0";
-                if (!getPrivateNodeHandle().getParam("serial_baud",baud))
-                    baud = 57600;
-
-                ROS_INFO("Grabbing rate parameters from launch file");
-                if (!getPrivateNodeHandle().getParam("rate_max",rate_max))
-                    rate_max = 100;
-                if (!getPrivateNodeHandle().getParam("rate_aci",rate_aci))
-                    rate_aci = 10;
-                if (!getPrivateNodeHandle().getParam("rate_est",rate_est))
-                    rate_est = 0;
-                if (!getPrivateNodeHandle().getParam("rate_imu",rate_imu))
-                    rate_imu = 0;
-                if (!getPrivateNodeHandle().getParam("rate_pos",rate_pos))
-                    rate_pos = 0;
-                if (!getPrivateNodeHandle().getParam("rate_alt",rate_alt))
-                    rate_alt = 0;
-                if (!getPrivateNodeHandle().getParam("rate_inf",rate_inf))
-                    rate_inf = 0;
-                if (!getPrivateNodeHandle().getParam("rate_mag",rate_inf))
-                    rate_inf = 0;
-
-                // So we don't try and poll before some data is there
-                fcsready = false;
-
-                ROS_INFO("Initialising ACI engine");
-                aciInit();
+                ROS_INFO("Configuring ACI receive callback");
+                serial.setCallback(&cb_rx);
                 
-                // Ope serial port
-                ROS_INFO("Opening serial port");
-                serial.open(port, baud);
-                if (serial.isOpen())
+                ROS_INFO("Configuring ACI transmit callback");
+                aciSetSendDataCallback(&cb_tx);
+                
+                ROS_INFO("Configuring ACI messages");
+                aciSetVarListUpdateFinishedCallback(&cb_config);
+
+                ROS_INFO("Configuring ACI engine rate");
+                aciSetEngineRate(rate_max,rate_aci);
+
+                ROS_INFO("Querying variable list");
+                aciGetDeviceVariablesList();
+
+                ROS_INFO("Starting timers");
+                if (rate_aci > 0)
                 {
-                    ROS_INFO("Configuring ACI receive callback");
-                    serial.setCallback(&cb_rx);
-                    
-                    ROS_INFO("Configuring ACI transmit callback");
-                    aciSetSendDataCallback(&cb_tx);
-                    
-                    ROS_INFO("Configuring ACI messages");
-                    aciSetVarListUpdateFinishedCallback(&cb_config);
-
-                    ROS_INFO("Configuring ACI engine rate");
-                    aciSetEngineRate(rate_max,rate_aci);
-
-                    ROS_INFO("Querying variable list");
-                    aciGetDeviceVariablesList();
-
-                    ROS_INFO("Starting timers");
-                    if (rate_aci > 0)
-                    {
-                        ROS_INFO("- Starting ACI polling timer");
-                        timerHeartbeat = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_aci),        // duration
-                            &cb_heartbeat,                              // callback
-                            false                                       // oneshot?
-                        );
-                    }
-                    if (rate_est > 0)
-                    {
-                        ROS_INFO("- Starting EST polling timer");
-                        timerEstimate = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_est),                    // duration
-                            boost::bind(&FlightControlSystem::cb_est, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
-                    if (rate_pos > 0)
-                    {
-                        ROS_INFO("- Starting POS polling timer");
-                        timerPosition = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_pos),                    // duration
-                            boost::bind(&FlightControlSystem::cb_pos, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
-                    if (rate_imu > 0)
-                    {
-                        ROS_INFO("- Starting IMU polling timer");
-                        timerInertial = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_imu),                    // duration
-                            boost::bind(&FlightControlSystem::cb_imu, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
-                    if (rate_mag > 0)
-                    {
-                        ROS_INFO("- Starting MAG polling timer");
-                        timerMagnetic = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_mag),                    // duration
-                            boost::bind(&FlightControlSystem::cb_mag, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
-                    if (rate_alt > 0)
-                    {
-                        ROS_INFO("- Starting ALT polling timer");
-                        timerAltitude = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_alt),                    // duration
-                            boost::bind(&FlightControlSystem::cb_alt, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
-                    if (rate_inf > 0)
-                    {
-                        ROS_INFO("- Starting INF polling timer");
-                        timerInfo = getPrivateNodeHandle().createTimer(
-                            ros::Duration(1.0/(double)rate_inf),                    // duration
-                            boost::bind(&FlightControlSystem::cb_inf, this, _1),    // callback
-                            false                                                   // oneshot?
-                        );
-                    }
+                    ROS_INFO("- Starting ACI polling timer");
+                    timerHeartbeat = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_aci),        // duration
+                        &cb_heartbeat,                              // callback
+                        false                                       // oneshot?
+                    );
+                }
+                if (rate_est > 0)
+                {
+                    ROS_INFO("- Starting EST polling timer");
+                    timerEstimate = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_est),                    // duration
+                        boost::bind(&FlightControlSystem::cb_est, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
+                }
+                if (rate_pos > 0)
+                {
+                    ROS_INFO("- Starting POS polling timer");
+                    timerPosition = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_pos),                    // duration
+                        boost::bind(&FlightControlSystem::cb_pos, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
+                }
+                if (rate_imu > 0)
+                {
+                    ROS_INFO("- Starting IMU polling timer");
+                    timerInertial = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_imu),                    // duration
+                        boost::bind(&FlightControlSystem::cb_imu, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
+                }
+                if (rate_mag > 0)
+                {
+                    ROS_INFO("- Starting MAG polling timer");
+                    timerMagnetic = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_mag),                    // duration
+                        boost::bind(&FlightControlSystem::cb_mag, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
+                }
+                if (rate_alt > 0)
+                {
+                    ROS_INFO("- Starting ALT polling timer");
+                    timerAltitude = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_alt),                    // duration
+                        boost::bind(&FlightControlSystem::cb_alt, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
+                }
+                if (rate_inf > 0)
+                {
+                    ROS_INFO("- Starting INF polling timer");
+                    timerInfo = nh.createTimer(
+                        ros::Duration(1.0/(double)rate_inf),                    // duration
+                        boost::bind(&FlightControlSystem::cb_inf, this, _1),    // callback
+                        false                                                   // oneshot?
+                    );
                 }
             }
-        };
+        }
+    };
 
-        // Required in order to be used as a nodelet
-        PLUGINLIB_EXPORT_CLASS(FlightControlSystem, nodelet::Nodelet);
-    }
+    // Required in order to be used as a nodelet
+    PLUGINLIB_EXPORT_CLASS(FlightControlSystem, nodelet::Nodelet);
 }

@@ -2,17 +2,17 @@
 
 using namespace hal::quadrotor;
 
-void Actuation::Init(ros::NodeHandle* nh, ControllerType controller)
+void Actuation::Init(ros::NodeHandle nh, ControllerType controller)
 {
 	// Create services
-	srvAnglesHeight 	= nh->advertiseService("controller/AnglesHeight", &Actuation::RcvAnglesHeight, this);
-    srvEmergency 		= nh->advertiseService("controller/Emergency", &Actuation::RcvEmergency, this);
-    srvHover 			= nh->advertiseService("controller/Hover", &Actuation::RcvHover, this);
-    srvLand 			= nh->advertiseService("controller/Land", &Actuation::RcvLand, this);                 
-    srvTakeoff 			= nh->advertiseService("controller/Takeoff", &Actuation::RcvTakeoff, this);
-    srvVelocity 		= nh->advertiseService("controller/Velocity", &Actuation::RcvVelocity, this);
-    srvVelocityHeight 	= nh->advertiseService("controller/VelocityHeight", &Actuation::RcvVelocityHeight, this);
-    srvWaypoint 		= nh->advertiseService("controller/Waypoint", &Actuation::RcvWaypoint, this);
+	srvAnglesHeight 	= nh.advertiseService("controller/AnglesHeight", &Actuation::RcvAnglesHeight, this);
+    srvEmergency 		= nh.advertiseService("controller/Emergency", &Actuation::RcvEmergency, this);
+    srvHover 			= nh.advertiseService("controller/Hover", &Actuation::RcvHover, this);
+    srvLand 			= nh.advertiseService("controller/Land", &Actuation::RcvLand, this);                 
+    srvTakeoff 			= nh.advertiseService("controller/Takeoff", &Actuation::RcvTakeoff, this);
+    srvVelocity 		= nh.advertiseService("controller/Velocity", &Actuation::RcvVelocity, this);
+    srvVelocityHeight 	= nh.advertiseService("controller/VelocityHeight", &Actuation::RcvVelocityHeight, this);
+    srvWaypoint 		= nh.advertiseService("controller/Waypoint", &Actuation::RcvWaypoint, this);
 
     // Set the starting controller
     Switch(controller);

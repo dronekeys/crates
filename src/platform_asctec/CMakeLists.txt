@@ -10,12 +10,12 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   nodelet
   hal
-  hal_model_quadrotor
+  hal_quadrotor
   hal_sensor_altimeter
   hal_sensor_compass
-  hal_sensor_energy
   hal_sensor_gnss
   hal_sensor_imu
+  hal_sensor_orientation
 ) 
 
 # Find Boost
@@ -121,12 +121,12 @@ add_library(platform_asctec
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(platform_asctec 
   hal
-  hal_model_quadrotor
+  hal_quadrotor
   hal_sensor_altimeter
   hal_sensor_compass
-  hal_sensor_energy
   hal_sensor_gnss
   hal_sensor_imu
+  hal_sensor_orientation
 )
 
 ## Specify libraries to link a library or executable target against

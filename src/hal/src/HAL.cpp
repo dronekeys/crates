@@ -3,32 +3,26 @@
 using namespace hal;
 
 // Obtain a pointer to the ROS node
-ros::NodeHandle* HAL::GetRosNodePtr()
+ros::NodeHandle HAL::GetRosNodePtr()
 {
-    if (!rosNode)
-        ROS_FATAL("A ROS node has not been initialized");
     return rosNode;
 }
 
 // Initialise the HAL with an existing node handle
-void HAL::Init(ros::NodeHandle* nh, bool manage)
+void HAL::Init(ros::NodeHandle nh, bool manage)
 {
-    // First, make sure we cleanly shut down the last handle
-    if (rosNode && isManaged)
-        delete rosNode;
-
     // Copy over the new handle, and store whether memory shoudl be managed
     rosNode   = nh;
     isManaged = manage;
 
     // Advertise this message on the ROS backbone
-    publisher = rosNode->advertise<hal::Status>("Status", DEFAULT_QUEUE_LENGTH);
+    publisher = rosNode.advertise<hal::Status>("Status", DEFAULT_QUEUE_LENGTH);
 
     // Set the name of this device
     message.start = ros::Time::now();
 
     // Create a timer to broadcast the data
-    timer = rosNode->createTimer(
+    timer = rosNode.createTimer(
         ros::Duration(1.0/DEFAULT_STATUS_RATE),     // Callback rate
         &HAL::Broadcast,                            // Callback
         this,                                       // Callee
@@ -43,7 +37,7 @@ void HAL::Init(ros::NodeHandle* nh, bool manage)
 // Initialise the HAL with a name, so allocate!
 void HAL::Init(std::string name)
 {
-    HAL::Init(new ros::NodeHandle(name), true);
+    HAL::Init(ros::NodeHandle(name), true);
 }
 
 // Constructor
@@ -57,14 +51,8 @@ HAL::HAL() : isManaged(false)
 HAL::~HAL()
 {
     // If we alloc'd the ROS node, clean up
-    if (rosNode && isManaged)
-    {
-        // Shut down
-        rosNode->shutdown();
-
-        // Delete
-        delete rosNode;
-    }
+    if (isManaged)
+        rosNode.shutdown();
 }
 
 // Set the status of this HAL

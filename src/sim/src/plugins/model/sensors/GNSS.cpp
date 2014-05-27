@@ -202,7 +202,7 @@ void GNSS::Receive(SatellitesPtr& sat)
 		posNew.z
 	);
 	
-	ROS_WARN("%f %f %f", posNew.x, posNew.y, posNew.z);
+	//ROS_WARN("%f %f %f", posNew.x, posNew.y, posNew.z);
 
     // Work out the velocity
 	if (timNew - timOld > 0)

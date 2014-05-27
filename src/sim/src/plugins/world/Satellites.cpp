@@ -415,7 +415,7 @@ namespace gazebo
 			}
 			
 			// Publish wind information to all subscribers
-			ROS_WARN("Sending satellite data");
+			ROS_DEBUG("Sending satellite data");
 			pubPtr->Publish(sat);
 	    }
 

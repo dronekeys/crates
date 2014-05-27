@@ -38,7 +38,7 @@ namespace hal
         ros::Publisher      publisher;
 
         /// Handle to a ROS node
-        ros::NodeHandle*    rosNode;
+        ros::NodeHandle    rosNode;
 
         /// Do we get to delete the new node handle?
         bool                isManaged;    
@@ -55,14 +55,14 @@ namespace hal
         /*!
           \return The current ros node handle
         */
-        ros::NodeHandle* GetRosNodePtr();
+        ros::NodeHandle GetRosNodePtr();
 
         //! Initialise the HAL with an existing node handle (will not dealloc!)
         /*!
           \param nh the node handle
           \param manage should we dealloc the node handle memeory?
         */
-        void Init(ros::NodeHandle* nh, bool manage = false);
+        void Init(ros::NodeHandle nh, bool manage = false);
 
         //! Create a new Platform HAL
         /*!
