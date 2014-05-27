@@ -1,8 +1,0 @@
-prefix=/home/asymingt/Workspace/Source/crates/install
-
-Name: sim
-Description: Description of sim
-Version: 0.1.0
-Cflags: -I/home/asymingt/Workspace/Source/crates/install/include
-Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lsim_core -lsim_resources -lsim_experiment -lsim_simulation -lsim_environment -lsim_meteorological -lsim_satellites -lsim_wind -lsim_quadrotor
-Requires: roslib roscpp std_msgs message_generation message_runtime rosgraph_msgs hal hal_quadrotor hal_sensor_altimeter hal_sensor_compass hal_sensor_imu hal_sensor_gnss hal_sensor_orientation

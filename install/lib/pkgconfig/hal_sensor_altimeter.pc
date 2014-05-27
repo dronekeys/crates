@@ -1,8 +1,0 @@
-prefix=/home/asymingt/Workspace/Source/crates/install
-
-Name: hal_sensor_altimeter
-Description: Description of hal_sensor_altimeter
-Version: 0.1.0
-Cflags: -I/home/asymingt/Workspace/Source/crates/install/include
-Libs: -L/home/asymingt/Workspace/Source/crates/install/lib -lhal_sensor_altimeter
-Requires: roscpp message_runtime

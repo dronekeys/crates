@@ -1,6 +1,0 @@
-# INSTRUCTION
-float64 altitude
----
-# RESULT
-bool    success
-string  status

@@ -1,9 +1,0 @@
-# INSTRUCTION
-float64 u
-float64 v
-float64 z
-float64 yaw
----
-# RESULT
-bool    success
-string  status

@@ -1,4 +1,0 @@
-bool   enable                  	  # Enable or disable this noise process
----
-bool   success                    # return true if spawn successful
-string status_message             # comments if available
