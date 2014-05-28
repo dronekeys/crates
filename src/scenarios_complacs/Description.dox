@@ -1,7 +1,6 @@
 /**
 
-\defgroup scenario_catsandmouse scenario_catsandmouse
-\brief Cats and Mouse scenario
-
+\defgroup scenarios_complacs scenarios_complacs
+\brief A collection of scenarios for testing ML applications.
 
 */

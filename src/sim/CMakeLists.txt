@@ -245,7 +245,7 @@ add_library(sim_meteorological        src/plugins/world/Meteorological.cpp)
 add_library(sim_satellites            src/plugins/world/Satellites.cpp)
 add_library(sim_wind                  src/plugins/world/Wind.cpp)
 
-# The model plugins
+# The quadrotor plugin
 add_library(sim_quadrotor             
   src/plugins/model/dynamics/Propulsion.cpp
   src/plugins/model/dynamics/Aerodynamics.cpp
@@ -257,6 +257,7 @@ add_library(sim_quadrotor
   src/plugins/model/sensors/Orientation.cpp
   src/plugins/model/Quadrotor.cpp
 )
+
 
 ##################################
 ## Add cmake target dependencies #
@@ -275,11 +276,12 @@ add_dependencies(sim_wind             custom_msgs)
 # The model plugin
 add_dependencies(sim_quadrotor        custom_msgs)
 
+
 ###########################
 ## Set up dynamic linking #
 
 # Link the message library
-target_link_libraries(custom_msgs         ${PROTOBUF_LIBRARIES})
+target_link_libraries(custom_msgs       ${PROTOBUF_LIBRARIES})
 
 ## System plugins
 target_link_libraries(sim_core          
@@ -308,7 +310,7 @@ target_link_libraries(sim_meteorological  ${SYS_LIBS})
 target_link_libraries(sim_satellites      ${SYS_LIBS})
 target_link_libraries(sim_wind            ${SYS_LIBS})
 
-# Model plugin
+# Model plugins
 target_link_libraries(sim_quadrotor       ${SYS_LIBS})
 
 

@@ -41,6 +41,19 @@ namespace gazebo
 	    //  Called to update the world information
 		void Update(const ros::TimerEvent& event)
 		{
+			// Print out the spherical coordinates
+			/*
+			ROS_WARN("POKE");	
+  			common::SphericalCoordinatesPtr sphericalCoordinates = this->worldPtr->GetSphericalCoordinates();
+			if (sphericalCoordinates)
+			{
+				math::Angle lat = sphericalCoordinates->GetLatitudeReference();
+				math::Angle lon = sphericalCoordinates->GetLongitudeReference();
+				double 		ele = sphericalCoordinates->GetElevationReference();
+				ROS_WARN("LAT: %f, LON: %f, ALT: %f", lat.Degree(), lon.Degree(), ele);	
+			}
+			*/
+
 			// Publish the message immediately
 			pubPtr->Publish(msg);
 		}

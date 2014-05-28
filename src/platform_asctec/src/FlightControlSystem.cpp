@@ -6,6 +6,14 @@
     which means that all callbacks (denoted cb_XXX) are in the ::platform_complacs namespace. 
     This would be a problem for multiple class instantiations, but since there should be a 1
     to 1 relationship between the FCS and ROS node, this should not cause any problems.
+
+    USING AN ASCTEC QUAD
+
+    1. Turn on the UAV with the remote control, and move the throttle to its lowest point.
+    2. Wait for sufficient satellites.
+    2. Turn the serial switch to enabled.
+    3. Start the control .
+
 */
 // System libraries
 #include <boost/utility.hpp>
@@ -112,7 +120,7 @@ extern "C"
 #define CMD_ATT_PITCH               0x050A  // [ INT16] Attitude control, Pitch angle (-2047..+2047 (0=neutral))
 #define CMD_ATT_ROLL                0x050B  // [ INT16] Attitude control, Roll angle (-2047..+2047 (0=neutral))
 #define CMD_ATT_YAW                 0x050C  // [ INT16] Attitude control, Yaw angle (-2047..+2047 (0=neutral))
-#define CMD_ATT_THRUST              0x050D  // [ INT16] Attitude control, Thrust (0..4095 = 0..100%)
+#define CMD_ATT_THOTTLE             0x050D  // [ INT16] Attitude control, Throttle (0..4095 = 0..100%)
 #define CMD_CTRL_OPTS               0x050E  // [ INT16] Control byte for attitude control (bit 0: pitch, bit 1: roll, bit 2: yaw, bit 3: thrust, bit 4: height, bit 5: GPS position)
 #define CMD_CTRL_MODE               0x0600  // [ UINT8] Parameter to set control mode (0x00: direct individual motor control (DIMC), 0x01: direct motor control using standard output mapping (DMC), 0x02: attitude and throttle control (CTRL), 0x03: GPS waypoint control)
 #define CMD_CTRL_ENABLED            0x0601  // [ UINT8] Control commands are accepted/ignored by LL processor   UINT8   0x00: ignored, 0x01: accepted)
@@ -200,6 +208,30 @@ struct _raw_alt
     int32_t     vel_z;
 } raw_alt;
 
+// Raw IMU messages
+struct _raw_ctl
+{
+    int16_t     roll;
+    int16_t     pitch;
+    int16_t     yaw;
+    int16_t     throttle;
+} raw_ctl;
+
+// Raw settings
+struct _raw_set
+{
+    uint8_t     enabled;
+    uint8_t     stick;
+    uint8_t     mode;
+} raw_set;
+
+// Raw settings
+struct _raw_cam
+{
+    int32_t     pitch;
+    int32_t     roll;
+} raw_cam;
+
 // Asycronous callback to transmit data to the serial port
 void cb_tx(void* byte, unsigned short cnt)
 {
@@ -223,7 +255,7 @@ void cb_heartbeat(const ros::TimerEvent& event)
 
 // This is called when the ACI engine's internal list of variables is updated
 // At this point we are able to setup our own custom packets
-void cb_config(void)
+void cb_varlist(void)
 {
     ROS_INFO("Variable list received from ACI device");
 
@@ -307,7 +339,38 @@ void cb_config(void)
 
     // We are now ready to capture
     fcsready = true;
+}
 
+// This is called when the ACI engine's internal list of commands is updated
+// At this point we are able to setup our own custom packets
+void cb_cmdlist(void)
+{
+    ROS_INFO("Variable list received from ACI device");
+
+    ROS_INFO("Creating control packet");
+    aciAddContentToCmdPacket(0, CMD_ATT_ROLL, &raw_ctl.roll);
+    aciAddContentToCmdPacket(0, CMD_ATT_PITCH, &raw_ctl.pitch);
+    aciAddContentToCmdPacket(0, CMD_ATT_YAW, &raw_ctl.yaw);
+    aciAddContentToCmdPacket(0, CMD_ATT_THOTTLE, &raw_ctl.throttle);
+    aciAddContentToCmdPacket(1, CMD_CTRL_MODE, &raw_set.mode);
+    aciAddContentToCmdPacket(1, CMD_CTRL_ENABLED, &raw_set.enabled);
+    aciAddContentToCmdPacket(1, CMD_CTRL_STICKCTL, &raw_set.stick);
+
+    ROS_INFO("Updating command configuration");
+    aciSendCommandPacketConfiguration(0, 0);
+    aciSendCommandPacketConfiguration(1, 1);
+}
+
+// This is called when the ACI engine's internal list of parameters is updated
+// At this point we are able to setup our own custom packets
+void cb_parlist(void)
+{
+    ROS_INFO("Parameter list received from ACI device");
+    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_ROLL_OFF, &raw_cam.roll);
+    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_PITCH_OFF, &raw_cam.pitch);
+
+    ROS_INFO("Updating parameter configuration");
+    aciSendParameterPacketConfiguration(0);
 }
 
 namespace platform_asctec
@@ -450,7 +513,14 @@ namespace platform_asctec
         // Called when the HAL wants to pass down some control to the platform
         void SetControl(const hal_quadrotor::Control &control)
         {
-            // Pass control to the propulsion module
+            // Roll, pitch, yaw and throttle command
+            raw_ctl.roll        = 0;
+            raw_ctl.pitch       = 0;
+            raw_ctl.yaw         = 0;
+            raw_ctl.throttle    = 0;
+
+            // Pass control to the Asctec FCS
+            aciUpdateCmdPacket(0);
         }
 
     public:
@@ -515,7 +585,9 @@ namespace platform_asctec
                 aciSetSendDataCallback(&cb_tx);
                 
                 ROS_INFO("Configuring ACI messages");
-                aciSetVarListUpdateFinishedCallback(&cb_config);
+                aciSetVarListUpdateFinishedCallback(&cb_varlist);
+                aciSetCmdListUpdateFinishedCallback(&cb_cmdlist);
+                aciSetParamListUpdateFinishedCallback(&cb_parlist);
 
                 ROS_INFO("Configuring ACI engine rate");
                 aciSetEngineRate(rate_max,rate_aci);

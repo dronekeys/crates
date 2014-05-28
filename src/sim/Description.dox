@@ -1,0 +1,6 @@
+/**
+
+\defgroup sim sim
+\brief A robotic simulator written in Gazebo to interact with the CRATES HAL.
+
+*/

@@ -162,3 +162,21 @@ Finally, it is possible to launch a hardware version of an experiment using the 
 	roslaunch sim hw.launch world:=worlds/hawkshead.world
 
 This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
+
+Common issues
+=============
+Periodically, the following message is received on starting the simulator
+
+	terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'what():  remote_endpoint: Transport endpoint is not connected
+	Aborted (core dumped)
+  
+It is caused by roslaunch firing up the GUI before the simulation server has loaded. Here's a workaround.
+
+	roslaunch sim sw.launch world:=worlds/hawkshead.world gui:=false
+	roslaunch sim gui.launch
+ 
+Note that you can debug any runtime issues with the simulator in debug mode
+
+	roslaunch sim sw.launch world:=worlds/hawkshead.world gui:=false bin:=server_debug
+
+ 
