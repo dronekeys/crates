@@ -60,10 +60,10 @@ bool Compass::GetMeasurement(double t, hal_sensor_compass::Data& msg)
 	magB += nMag->DrawVector(t);
 
 	// Perturb angular velocity
-	msg.t    = t;
-	msg.m_x  = magB.x;
-	msg.m_y  = magB.y;
-	msg.m_z  = magB.z;
+	msg.t  = t;
+	msg.x  = magB.x;
+	msg.y  = magB.y;
+	msg.z  = magB.z;
 
 	// Success!	
 	return ready;

@@ -88,8 +88,8 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     // Find the control, given the current state
     actuation.GetControl(estimate, event.current_real.toSec() - tick, control);
 
-    // Pass the control to the FCS
-    SetControl(control);
+    // Pass the control to the FCS and set the time it was applied
+    control.t = SetControl(control);
 
     // Save the current time tick for the next iteration
     tick = event.current_real.toSec();

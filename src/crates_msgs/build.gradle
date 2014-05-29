@@ -45,7 +45,7 @@ allprojects {
       A github url provides a good standard unique name for your project
       Example below, but you may wish to switch to your own unique url.
     */
-    group 'com.github.crates.crates_msgs'
+    group 'org.crates.crates_msgs'
     version = project.catkin.pkg.version
 }
 

@@ -7,11 +7,8 @@
 		<param name="serial_baud" type="int" value="$(arg baud)"/>
 		<param name="rate_max" type="int" value="100"/>		
 		<param name="rate_aci" type="int" value="10"/>
-		<param name="rate_est" type="int" value="50"/>
 		<param name="rate_imu" type="int" value="100"/>
-		<param name="rate_mag" type="int" value="50"/>
+		<param name="rate_sen" type="int" value="50"/>
 		<param name="rate_pos" type="int" value="5"/>
-		<param name="rate_alt" type="int" value="5"/>
-		<param name="rate_inf" type="int" value="1"/>
 	</node>
 </launch>

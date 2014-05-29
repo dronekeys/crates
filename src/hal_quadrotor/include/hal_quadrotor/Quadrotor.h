@@ -219,8 +219,9 @@ namespace hal
             //! Set the quadrotor control
             /*!
               \param control the control to apply
+              \return time at which the control was set 
             */
-            virtual void SetControl(const hal_quadrotor::Control &control) = 0;
+            virtual double SetControl(const hal_quadrotor::Control &control) = 0;
 
         public:
 

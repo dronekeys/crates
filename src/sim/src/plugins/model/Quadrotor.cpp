@@ -279,6 +279,7 @@ namespace gazebo
 			math::Vector3 ang = linkPtr->GetRelativeAngularVel();
 
 			// Update the state
+			state.t         = tim;
 			state.x 		= pos.x;
 			state.y 		= pos.y;
 			state.z 		= pos.z;
@@ -323,10 +324,13 @@ namespace gazebo
 		}
 
 	    // Called when the HAL wants to pass down some control to the platform
-		void SetControl(const hal_quadrotor::Control &control)
+		double SetControl(const hal_quadrotor::Control &control)
 		{
 			// Pass control to the propulsion module
 			dP.SetControl(control);
+
+			// Return the time at which control was applied
+			return tim;
 		}
 	};
 

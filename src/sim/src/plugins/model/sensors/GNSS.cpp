@@ -280,12 +280,14 @@ bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 {
 	// Copy the solution
 	msg.t = t;
+	/*
 	msg.x = posNew.x;
 	msg.y = posNew.y;
 	msg.z = posNew.z;
 	msg.u = velNew.x;
 	msg.v = velNew.y;
 	msg.w = velNew.z;
+	*/
 
 	// Success!
 	return ready;

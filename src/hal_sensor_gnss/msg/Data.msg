@@ -1,7 +1,11 @@
-float64 t     # Time at which measurement was taken
-float64 x     # Navigation frame position X
-float64 y     # Navigation frame position Y
-float64 z     # Navigation frame position Z
-float64 u     # Navigation frame velocity X
-float64 v     # Navigation frame velocity Y
-float64 w     # Navigation frame velocity Z
+float64 t         # Time
+float64 latitude  # Latitude from the GPS sensor (degrees)
+float64 longitude # Longitude from the GPS sensor (degrees)
+float64 altitude  # Height from the GPS sensor (m)
+float64 vel_ew    # Speed in East/West from the GPS sensor (m/s)
+float64 vel_ns    # Speed in North/South from the GPS sensor (m/s)
+float64 heading   # GPS Heading  (deg)
+float64 pdop      # GPS position accuracy estimate (m)
+float64 hdop      # GPS height accuracy estimate (m)
+float64 vdop      # GPS speed accuracy estimate (m/s)
+uint32  numsvs    # Number of satellites used in NAV solution (count)
