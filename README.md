@@ -18,67 +18,22 @@ Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machin
 
 Add the ROS PPA to your Ubuntu Sources
 
-	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list' 
-	wget http://packages.ros.org/ros.key -O - | sudo apt-key add - 
-
-Add the Gazebo PPA to your Ubuntu Sources
-
-	sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu trusty main" > /etc/apt/sources.list.d/gazebo-latest.list'
-	wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-
-Update the system packages list
-
-	sudo apt-get update
-
-Follow the instructions to build Gazebo 3.0 from source using ODE only. If you disable building the test suite, Gazbo builds much quicker!
-
-	http://gazebosim.org/wiki/3.0/install
-
-Follow the instructions to build Gazebo 3.0 models
-
-	http://gazebosim.org/wiki/3.0/install
-
-Make sure you create this link, or gazebo wont see your models
-
-	ln -s ~/.gazebo/models /usr/share/models
-
-Take note that you may need need to update your OS's library search path. For example, add the following to /etc/ld.so.conf.d/gazebo.config
-
-	/usr/local/lib/x86_64-linux-gnu
-	/usr/local/lib
-
-Then run
-
-	sudo ldconfig
-
-Install ROS Indigo
-
-	sudo apt-get install ros-indigo-roscpp ros-indigo-roslaunch ros-indigo-rosbash ros-indigo-geometry-msgs ros-indigo-std-msgs ros-indigo-std-srvs ros-indigo-rostopic ros-indigo-std-rosservice
-
-Source the new ROS installation
-
-	source /opt/ros/indigo/setup.bash
-
-Initialise and update ROS
-
-	sudo rosdep init 
-	rosdep update 
+	sudo apt-get install git
 
 Checkout the CRATES framework
 
 	cd ~/workspace
 	git clone https://bitbucket.org/asymingt/crates.git
 
-Build and install the two libraries in the ./thirdparty directory, eg. for each library 'xyz' do
+Build/install the ROS, gazebo and gpstk libraries using the scripts
 
-	cd  ~/workspace/crates/thirdparty/xyz
-	mkdir build
-	cd build
-	cmake ..
-	make
-	sudo make install
+	cd  ~/workspace/crates/thirdparty
+	./install_sysdeps.sh
+	./install_ros.sh
+	./install_gazebo.sh
+	./install_gpstk.sh
 
-Source the new workspace ~/.bashrc 
+Initialise your catkin workspace
 
 	cd  ~/workspace/crates/src
 	catkin_init_workspace
@@ -103,7 +58,7 @@ Example usage instructions
 
 The ROS messaging architecture offers broadcast-style 'topics' or request-response style 'services'. We'll use the 'roslaunch' application to launch the simulator from the command line:
 
-	roslaunch sim sw.launch world:=worlds/hawkshead.world
+	roslaunch sim sw.launch
 
 The argument 'sim' is the package in CRATES containing the sw.launch file. The last argument is the world that we want to load in stead of an empty default.
 
@@ -159,7 +114,7 @@ If nothing appears, its likely that you have the simulation paused. Remember tha
 
 Finally, it is possible to launch a hardware version of an experiment using the hw.launch file using the collowing command
 
-	roslaunch sim hw.launch world:=worlds/hawkshead.world
+	roslaunch sim hw.launch
 
 This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
 
@@ -172,11 +127,11 @@ Periodically, the following message is received on starting the simulator
   
 It is caused by roslaunch firing up the GUI before the simulation server has loaded. Here's a workaround.
 
-	roslaunch sim sw.launch world:=worlds/hawkshead.world gui:=false
+	roslaunch sim sw.launch gui:=false
 	roslaunch sim gui.launch
  
 Note that you can debug any runtime issues with the simulator in debug mode
 
-	roslaunch sim sw.launch world:=worlds/hawkshead.world gui:=false bin:=server_debug
+	roslaunch sim sw.launch gui:=false bin:=server_debug
 
  
