@@ -655,19 +655,6 @@ namespace platform_asctec
 
                 ROS_INFO("Starting timers");
                 ready = true;
-
-                /*
-                ROS_INFO("Starting timers");
-                if (rate_aci > 0)
-                {
-                    ROS_INFO("- Starting ACI polling timer");
-                    timerHeartbeat = nh.createTimer(
-                        ros::Duration(1.0/(double)rate_aci),        // duration
-                        &cb_heartbeat,                              // callback
-                        false                                       // oneshot?
-                    );
-                }
-               
             }
         }
     };
