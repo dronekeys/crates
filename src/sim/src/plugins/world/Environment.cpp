@@ -42,8 +42,6 @@ namespace gazebo
 		void Update(const ros::TimerEvent& event)
 		{
 			// Print out the spherical coordinates
-			/*
-			ROS_WARN("POKE");	
   			common::SphericalCoordinatesPtr sphericalCoordinates = this->worldPtr->GetSphericalCoordinates();
 			if (sphericalCoordinates)
 			{
@@ -52,7 +50,6 @@ namespace gazebo
 				double 		ele = sphericalCoordinates->GetElevationReference();
 				ROS_WARN("LAT: %f, LON: %f, ALT: %f", lat.Degree(), lon.Degree(), ele);	
 			}
-			*/
 
 			// Publish the message immediately
 			pubPtr->Publish(msg);

@@ -71,6 +71,9 @@ namespace gazebo
     // For storing time (needed to calcualte velocity)
     double                          timOld, timNew;
 
+    // The actual solution
+    hal_sensor_gnss::Data           soln;
+
     // When new satellite data arrives
     void Receive(SatellitesPtr& msg);
 

@@ -535,7 +535,7 @@ namespace platform_asctec
         }
 
         // Arm the motors
-        void Arm(bool arm)
+        void ArmMotors(bool arm)
         {
             if (arm)
             {

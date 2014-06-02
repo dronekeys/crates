@@ -85,8 +85,22 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     // Get the estimated state from the navigation engine
     navigation.GetState(estimate);
 
-    // Find the control, given the current state
-    actuation.GetControl(estimate, event.current_real.toSec() - tick, control);
+    // Find the control and whether motor arming is required
+    bool arm = actuation.GetControl(
+        estimate,                                  // current state
+        event.current_real.toSec() - tick,         // time tick
+        control                                    // resultant control
+    );
+
+    // If an arming change is needed
+    if (armed != arm)
+    {
+        // Issue the arm change
+        ArmMotors(arm);
+        
+        // Switch internal state
+        armed = arm;
+    }
 
     // Pass the control to the FCS and set the time it was applied
     control.t = SetControl(control);
@@ -114,7 +128,7 @@ void Quadrotor::BroadcastTruth(const ros::TimerEvent& event)
 }
 
 // Constructor
-Quadrotor::Quadrotor() : hal::HAL()
+Quadrotor::Quadrotor() : hal::HAL(), armed(false)
 {
     // Do nothing
 }

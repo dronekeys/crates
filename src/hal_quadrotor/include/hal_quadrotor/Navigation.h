@@ -1,6 +1,10 @@
 #ifndef HAL_QUADROTOR_NAVIGATION_H
 #define HAL_QUADROTOR_NAVIGATION_H
 
+// For converting Gazebo <-> ECEF coordinates
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 // Sensors
 #include <hal_sensor_altimeter/Altimeter.h>
 #include <hal_sensor_compass/Compass.h>
@@ -23,11 +27,18 @@ namespace hal
     {     
 
     private:
-      
+
+      // For oordinat conversions
+      GeographicLib::Geocentric       wgs84_ecef;
+      GeographicLib::LocalCartesian   wgs84_enu;
+    
       /// The estimated state
-      hal_quadrotor::State state;
+      hal_quadrotor::State            state;
 
     public:    
+
+      /// Constructor
+      Navigation();
 
       /// INITIALIZE AND RESET THE NAVIGATION ENGINE //////////////////
 
@@ -50,6 +61,16 @@ namespace hal
           \param state the current platform state
       */
       void SetState(const hal_quadrotor::State &msg);
+
+      /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////      
+
+      //! Set the home position (origin)
+      /*!
+          \param latitude the home latitude
+          \param longitude the home longitude
+          \param altitude the home altitude
+      */
+      void SetHome(double latitude, double longitude, double altitude);
 
       /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////
 

@@ -29,6 +29,9 @@ namespace hal
 
         private:
 
+            /// Whether the motors are currently armed
+            bool armed;
+
             /// Current state of the quadrotor
             hal_quadrotor::State estimate, truth;
 
@@ -203,6 +206,12 @@ namespace hal
             void Feed(const hal_quadrotor::State &state);
 
             /// INERACTION WITH THE FLIGHT CONTROL SYSTEM ///////////////////////
+
+            //! Arm or disarm the motors
+            /*!
+              \param arm whether the motors should be armed
+            */
+            virtual void ArmMotors(bool arm) = 0;
 
             //! Get the true quadrotor state
             /*!

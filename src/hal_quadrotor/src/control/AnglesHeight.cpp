@@ -35,7 +35,7 @@ bool AnglesHeight::SetGoal(
     return true;
 }
 
-bool AnglesHeight::Update(const hal_quadrotor::State &state, 
+void AnglesHeight::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
 
@@ -85,11 +85,6 @@ bool AnglesHeight::Update(const hal_quadrotor::State &state,
     control.pitch    = sp[_PITCH];
     control.yaw      = ya;
     control.throttle = th;
-    
-    //////////////////////// CHECK IF GOAL REACHED //////////////////////
-
-    // Success!    
-    return true;
 }
 
 // Goal reach implementations

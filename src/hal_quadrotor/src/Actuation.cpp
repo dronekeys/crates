@@ -26,6 +26,7 @@ void Actuation::Switch(ControllerType controller)
 bool Actuation::GetControl(const hal_quadrotor::State &state, 
 	double dt, hal_quadrotor::Control &control)
 {
+	// Find the controller
 	Controller* ptr;
 	switch (current)
 	{
@@ -45,7 +46,7 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 	// Check to see if the controller has reached its goal
 	if (ptr->HasGoalBeenReached())
 	{
-		// At the end of takeoff / motion control, always switch to hover
+		// At the end of takeoff / motion control, always switch back to hover
 		switch (current)
 		{
 		case CONTROLLER_TAKEOFF:
@@ -53,6 +54,7 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 			ptr = (Controller*) &cIdle;
 			break;
 
+		// At the end of landing, always switch back to idle
 		case CONTROLLER_LAND:
 			current = CONTROLLER_IDLE;
 			ptr = (Controller*) &cIdle;
@@ -60,8 +62,11 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 		}
 	}
 
-	// Get some control from the controller
-	return ptr->Update(state,dt,control);
+	// Update the controller
+	ptr->Update(state,dt,control);
+
+	// Return whether the motors should be armed or disarmed
+	return (current != CONTROLLER_IDLE);
 }
 
 bool Actuation::RcvAnglesHeight(

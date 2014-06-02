@@ -12,7 +12,7 @@ bool Emergency::SetGoal(
     return true;
 }
 
-bool Emergency::Update(const hal_quadrotor::State &state, 
+void Emergency::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
 	// Do something more elegant than this ultimately...
@@ -20,7 +20,6 @@ bool Emergency::Update(const hal_quadrotor::State &state,
     control.pitch    = 0.0;
     control.yaw      = 0.0;
     control.throttle = 0.0;
-    return true;
 }
 
 // Goal reach implementations

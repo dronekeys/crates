@@ -269,6 +269,13 @@ namespace gazebo
 	    	return false;
 	    }
 
+	    // Called to arm or disarm the motors
+		void ArmMotors(bool arm)
+		{
+			// Enable and disable the propulsion system
+			dP.SetEnabled(arm);
+		}
+
     	// Called when the HAL wants the truthful state of the platform
 		void GetTruth(hal_quadrotor::State& state)
 		{

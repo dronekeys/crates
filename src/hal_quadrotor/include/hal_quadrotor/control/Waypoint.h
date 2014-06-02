@@ -47,7 +47,7 @@ namespace hal
               \param control the output control from the controller
               \return if the state could be updated
             */
-            bool Update(const hal_quadrotor::State &state, 
+            void Update(const hal_quadrotor::State &state, 
                 double dt, hal_quadrotor::Control &control);
 
             //! Goal reach implementations
