@@ -252,9 +252,21 @@ namespace gazebo
 						gps->mutable_pos()->set_y(satellitePos[1]);
 						gps->mutable_pos()->set_z(satellitePos[2]);
 
+						// Default = zero error
+						gps->mutable_err_pos()->set_x(0);
+						gps->mutable_err_pos()->set_y(0);
+						gps->mutable_err_pos()->set_z(0);
+						gps->set_err_clk(0);
+						gps->set_err_tro(0);
+						gps->set_err_ion(0);
+
 						// Try and get the broadcast ephemeride
 						try
 						{
+							// Only add noise if its needed
+							if (!NoiseFactory::GetEnabled())
+								continue;
+
 							// Get the broadcast ephemeris
 							gpstk::Xvt ephb = gpsEphemerides.getXvt(
 								gpstk::SatID(prn,gpstk::SatID::systemGPS),
@@ -346,9 +358,21 @@ namespace gazebo
 						glo->mutable_pos()->set_y(satellitePos[1]);
 						glo->mutable_pos()->set_z(satellitePos[2]);
 
+						// Default = zero error
+						glo->mutable_err_pos()->set_x(0);
+						glo->mutable_err_pos()->set_y(0);
+						glo->mutable_err_pos()->set_z(0);
+						glo->set_err_clk(0);
+						glo->set_err_tro(0);
+						glo->set_err_ion(0);
+
 						// Try and get the broadcast ephemeride
 						try
 						{
+							// Only add noise if its needed
+							if (!NoiseFactory::GetEnabled())
+								continue;
+							
 							// Get the broadcast ephemeris
 							gpstk::Xvt ephb = gloEphemerides.getXvt(
 								gpstk::SatID(prn,gpstk::SatID::systemGlonass),
