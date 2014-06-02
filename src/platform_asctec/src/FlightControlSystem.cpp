@@ -151,10 +151,7 @@ extern "C"
 // LOOP RATES AND FLAGS ///////////////////////////////////////////////////////////
 
 // Receive flags
-bool rcv_varlst = false;
-bool rcv_cmdlst = false;
-bool rcv_parlst = false;
-bool ready      = false;
+bool ready = false;
 
 // Data polling rates
 int rate_max = 0;       // Maximum data rate of any packet
@@ -162,6 +159,11 @@ int rate_aci = 0;       // Rate of aci engine
 int rate_imu = 0;       // Rate of state estimate
 int rate_sen = 0;       // Rate of state estimate
 int rate_pos = 0;       // Position estimate rate
+
+// Origin position (LTP <-> WGS84 conversion)
+double latitude  = 51.714403;
+double longitude = -0.213223;
+double altitude  = 93.070000;
 
 // SERIAL CALLBACKS ///////////////////////////////////////////////////////////////
 
@@ -187,6 +189,86 @@ void cb_heartbeat(const ros::TimerEvent& event)
 {
     // This needs to be called to keep the ACI interface alive
     aciEngine();
+}
+
+// PARAMETERS //////////////////////////////////////////////////////////////////////
+
+// Camera pitch and roll
+struct _raw_cam
+{
+    int32_t     pitch;
+    int32_t     roll;
+} raw_cam;
+
+// This is called when the ACI engine's internal list of parameters is updated
+// At this point we are able to setup our own custom packets
+void cb_parlist(void)
+{
+    ROS_INFO("Parameter list received from ACI device");
+    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_ROLL_OFF,  &raw_cam.roll);
+    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_PITCH_OFF, &raw_cam.pitch);
+
+    ROS_INFO("Updating parameter configuration");
+    aciSendParameterPacketConfiguration(0);
+
+    ROS_INFO("Flight control system ready");
+    ready = true;
+}
+
+// COMMANDS //////////////////////////////////////////////////////////////////////
+
+// Raw control messages
+struct _raw_ctl
+{
+    int16_t     roll;
+    int16_t     pitch;
+    int16_t     yaw;
+    int16_t     throttle;
+    int16_t     mask;
+} raw_ctl;
+
+// Raw settings
+struct _raw_set
+{
+    uint8_t    mode;
+    uint8_t    enabled;
+    uint8_t    stick;
+    int8_t     m0;
+    int8_t     m1;
+    int8_t     m2;
+    int8_t     m3;
+} raw_set;
+
+// This is called when the ACI engine's internal list of commands is updated
+// At this point we are able to setup our own custom packets
+void cb_cmdlist(void)
+{
+    ROS_INFO("Command list received from ACI device");
+
+    // This is the packet that will be used to send motor control commands
+    ROS_INFO("Creating control packet");
+    aciAddContentToCmdPacket(0, CMD_ATT_PITCH,      &raw_ctl.pitch);
+    aciAddContentToCmdPacket(0, CMD_ATT_ROLL,       &raw_ctl.roll);
+    aciAddContentToCmdPacket(0, CMD_ATT_YAW,        &raw_ctl.yaw);
+    aciAddContentToCmdPacket(0, CMD_ATT_THROTTLE,   &raw_ctl.throttle);
+    aciAddContentToCmdPacket(0, CMD_ATT_MASK,       &raw_ctl.mask);
+
+    // This is the packet that will be used to enable and disable control
+    ROS_INFO("Creating settings packet");
+    aciAddContentToCmdPacket(1, CMD_CTRL_MODE,      &raw_set.mode);
+    aciAddContentToCmdPacket(1, CMD_CTRL_ENABLED,   &raw_set.enabled);
+    aciAddContentToCmdPacket(1, CMD_CTRL_STICKCTL,  &raw_set.stick);
+    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_0,   &raw_set.m0);
+    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_1,   &raw_set.m1);
+    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_2,   &raw_set.m2);
+    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_3,   &raw_set.m3);
+
+    ROS_INFO("Updating command configuration");
+    aciSendCommandPacketConfiguration(0,0);
+    aciSendCommandPacketConfiguration(1,1);
+    
+    ROS_INFO("Querying parameter list");
+    aciGetDeviceParametersList();
 }
 
 // VARIABLES ////////////////////////////////////////////////////////////////////
@@ -294,88 +376,9 @@ void cb_varlist(void)
     aciSendVariablePacketConfiguration(1);
     aciSendVariablePacketConfiguration(2);
 
-    // We are now ready to capture
-    rcv_varlst = true;
-}
-
-// CONTROL //////////////////////////////////////////////////////////////////////
-
-// Raw control messages
-struct _raw_ctl
-{
-    int16_t     roll;
-    int16_t     pitch;
-    int16_t     yaw;
-    int16_t     throttle;
-    int16_t     mask;
-} raw_ctl;
-
-// Raw settings
-struct _raw_set
-{
-    uint8_t    mode;
-    uint8_t    enabled;
-    uint8_t    stick;
-    int8_t     m0;
-    int8_t     m1;
-    int8_t     m2;
-    int8_t     m3;
-} raw_set;
-
-// This is called when the ACI engine's internal list of commands is updated
-// At this point we are able to setup our own custom packets
-void cb_cmdlist(void)
-{
-    ROS_INFO("Command list received from ACI device");
-
-    // This is the packet that will be used to send motor control commands
-    ROS_INFO("Creating control packet");
-    aciAddContentToCmdPacket(0, CMD_ATT_PITCH,      &raw_ctl.pitch);
-    aciAddContentToCmdPacket(0, CMD_ATT_ROLL,       &raw_ctl.roll);
-    aciAddContentToCmdPacket(0, CMD_ATT_YAW,        &raw_ctl.yaw);
-    aciAddContentToCmdPacket(0, CMD_ATT_THROTTLE,   &raw_ctl.throttle);
-    aciAddContentToCmdPacket(0, CMD_ATT_MASK,       &raw_ctl.mask);
-
-    // This is the packet that will be used to enable and disable control
-    ROS_INFO("Creating settings packet");
-    aciAddContentToCmdPacket(1, CMD_CTRL_MODE,      &raw_set.mode);
-    aciAddContentToCmdPacket(1, CMD_CTRL_ENABLED,   &raw_set.enabled);
-    aciAddContentToCmdPacket(1, CMD_CTRL_STICKCTL,  &raw_set.stick);
-    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_0,   &raw_set.m0);
-    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_1,   &raw_set.m1);
-    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_2,   &raw_set.m2);
-    aciAddContentToCmdPacket(1, CMD_DIMC_MOTOR_3,   &raw_set.m3);
-
-    ROS_INFO("Updating command configuration");
-    aciSendCommandPacketConfiguration(0,0);
-    aciSendCommandPacketConfiguration(1,1);
-    
-    // We are now ready to capture
-    rcv_cmdlst = true;
-}
-
-// PARAMETERS //////////////////////////////////////////////////////////////////////
-
-// Camera pitch and roll
-struct _raw_cam
-{
-    int32_t     pitch;
-    int32_t     roll;
-} raw_cam;
-
-// This is called when the ACI engine's internal list of parameters is updated
-// At this point we are able to setup our own custom packets
-void cb_parlist(void)
-{
-    ROS_INFO("Parameter list received from ACI device");
-    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_ROLL_OFF,  &raw_cam.roll);
-    aciAddContentToParamPacket(0, PAR_CAM_ANGLE_PITCH_OFF, &raw_cam.pitch);
-
-    ROS_INFO("Updating parameter configuration");
-    aciSendParameterPacketConfiguration(0);
-
-    // We are now ready to capture
-    rcv_parlst = true;
+    // Now, query the command list
+    ROS_INFO("Querying command list");
+    aciGetDeviceCommandsList();
 }
 
 // FLIGHT CONTROL SYSTEM ///////////////////////////////////////////////////////////
@@ -412,6 +415,9 @@ namespace platform_asctec
             msg.z   = (double) raw_sen.pos_z / 1e3; // [ INT32] Height after data fusion (mm)
             msg.w   = (double) raw_sen.vel_z / 1e3; // [ INT32] Differential height after data fusion (mm/s)
 
+            // Feed the measurement to the navigation engine
+            GetNavPtr()->Process(msg);
+
             // Success!
             return true;
         }
@@ -430,6 +436,9 @@ namespace platform_asctec
             msg.x   = 0.000400000 * (double) raw_sen.mag_x; // Magnetic field strength: +-2500 = +- earth field strength
             msg.y   = 0.000400000 * (double) raw_sen.mag_y; // Magnetic field strength: +-2500 = +- earth field strength
             msg.z   = 0.000400000 * (double) raw_sen.mag_z; // Magnetic field strength: +-2500 = +- earth field strength
+
+            // Feed the measurement to the navigation engine
+            GetNavPtr()->Process(msg);
 
             // Success!
             return true;
@@ -452,6 +461,9 @@ namespace platform_asctec
             msg.du  = 0.000980665 * (double) raw_imu.acc_x;
             msg.dv  = 0.000980665 * (double) raw_imu.acc_y;
             msg.dw  = 0.000980665 * (double) raw_imu.acc_z;
+
+            // Feed the measurement to the navigation engine
+            GetNavPtr()->Process(msg);
 
             // Get the imu
             return true;
@@ -479,6 +491,9 @@ namespace platform_asctec
             msg.vdop      = (double) raw_pos.vdop      / 1e3;   // [UINT32] GPS speed accuracy estimate (mm/s)
             msg.numsvs    = raw_pos.numsvs;                     // [UINT32] Number of satellites used in NAV solution (count)
 
+            // Feed the measurement to the navigation engine
+            GetNavPtr()->Process(msg);
+
             // Get the GNSS
             return false;
         }
@@ -501,6 +516,9 @@ namespace platform_asctec
             msg.q     = 0.00026878000 * (double) raw_imu.gyr_y;         // Drift-free gyro y
             msg.r     = 0.00026878000 * (double) raw_imu.gyr_z;         // Drift-free gyro z
 
+            // Feed the measurement to the navigation engine
+            GetNavPtr()->Process(msg);
+
             // Success!
             return true;
         }
@@ -520,18 +538,20 @@ namespace platform_asctec
         // Called when the HAL wants to pass down some control to the platform
         double SetControl(const hal_quadrotor::Control &control)
         {
-            /*
-            ROS_INFO("Passing device control");
-            raw_ctl.roll        = 0;            // -2047..+2047 (max = GPS ? 3 m/s : 51.2deg)
-            raw_ctl.pitch       = 0;            // -2047..+2047 (max = GPS ? 3 m/s : 51.2deg)
-            raw_ctl.yaw         = 0;            // -2047..+2047 (rate)
-            raw_ctl.throttle    = 500;          //     0..+4095
-            raw_ctl.mask        = 0b00001111;   // Roll, pitch, yaw, throttle only
-            aciUpdateCmdPacket(0);
-            */
+            // Only issue control when system is ready
+            if (ready)
+            {
+                ROS_INFO("Passing device control");
+                raw_ctl.roll        = -2291.83118052329 * control.roll;
+                raw_ctl.pitch       = -2291.83118052329 * control.pitch;
+                raw_ctl.yaw         = -460.597254433196 * control.yaw;
+                raw_ctl.throttle    =  4097.00000000000 * control.throttle;
+                raw_ctl.mask        = 0b00001111;   // Direct control (no height/gps)
+                aciUpdateCmdPacket(0);
+            }
 
-            // TODO: Save time
-            return 0.0;
+            // Time st which control was applied
+            return ros::Time::now().toSec();
         }
 
         // Arm the motors
@@ -597,14 +617,22 @@ namespace platform_asctec
             // Extract launch file parameters
             ROS_INFO("Grabbing parameters from launch file");
             std::string port; int baud;
-            if (!nh.getParam("serial_port",port))   port     = "/dev/ttyUSB0";
-            if (!nh.getParam("serial_baud",baud))   baud     = 57600;
-            if (!nh.getParam("rate_max",rate_max))  rate_max = 100;
-            if (!nh.getParam("rate_aci",rate_aci))  rate_aci = 10;
-            if (!nh.getParam("rate_imu",rate_imu))  rate_imu = 0;
-            if (!nh.getParam("rate_sen",rate_sen))  rate_sen = 0;
-            if (!nh.getParam("rate_pos",rate_pos))  rate_pos = 0;
+            if (!nh.getParam("serial_port",port))     port      = "/dev/ttyUSB0";
+            if (!nh.getParam("serial_baud",baud))     baud      = 57600;
+            if (!nh.getParam("rate_max",rate_max))    rate_max  = 100;
+            if (!nh.getParam("rate_aci",rate_aci))    rate_aci  = 10;
+            if (!nh.getParam("rate_imu",rate_imu))    rate_imu  = 0;
+            if (!nh.getParam("rate_sen",rate_sen))    rate_sen  = 0;
+            if (!nh.getParam("rate_pos",rate_pos))    rate_pos  = 0;
+            if (!nh.getParam("origin_lat",latitude))  latitude  = 0;
+            if (!nh.getParam("origin_lon",longitude)) longitude = 0;
+            if (!nh.getParam("origin_alt",altitude))  altitude  = 0;
 
+            // Calibrate navigation
+            ROS_INFO("Calibrating navigation %f %f %f", latitude, longitude, altitude);
+            GetNavPtr()->SetOrigin(latitude, longitude, altitude);
+
+            // Initialise the ACI engine
             ROS_INFO("Initialising ACI engine");
             aciInit();
             
@@ -640,21 +668,6 @@ namespace platform_asctec
 
                 ROS_INFO("Querying variable list");
                 aciGetDeviceVariablesList();
-                while (!rcv_varlst) 
-                    usleep(1000);
-
-                ROS_INFO("Querying command list");
-                aciGetDeviceCommandsList();
-                while (!rcv_cmdlst) 
-                    usleep(1000);
-
-                ROS_INFO("Querying parameter list");
-                aciGetDeviceParametersList();
-                while (!rcv_parlst) 
-                    usleep(1000);
-
-                ROS_INFO("Starting timers");
-                ready = true;
             }
         }
     };

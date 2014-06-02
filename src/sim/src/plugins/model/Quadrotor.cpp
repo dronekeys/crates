@@ -219,7 +219,7 @@ namespace gazebo
 	    {
 	    	if (sA.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -230,7 +230,7 @@ namespace gazebo
 	    {
 	    	if (sC.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -241,7 +241,7 @@ namespace gazebo
 	    {
 	    	if (sI.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -252,7 +252,7 @@ namespace gazebo
 	    {
 	    	if (sG.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -263,7 +263,7 @@ namespace gazebo
 	    {
 	    	if (sO.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;

@@ -65,8 +65,12 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 	// Update the controller
 	ptr->Update(state,dt,control);
 
-	// Return whether the motors should be armed or disarmed
-	return (current != CONTROLLER_IDLE);
+	// In case of emergency or idle, the motors must be cut
+	if (current == CONTROLLER_IDLE || current == CONTROLLER_EMERGENCY)
+		return false;
+
+	// Motors must eb enabled
+	return true;
 }
 
 bool Actuation::RcvAnglesHeight(

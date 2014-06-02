@@ -28,6 +28,9 @@ namespace hal
 
     private:
 
+      // When the FCS has been initialised
+      bool                            ready;
+
       // For oordinat conversions
       GeographicLib::Geocentric       wgs84_ecef;
       GeographicLib::LocalCartesian   wgs84_enu;
@@ -64,16 +67,6 @@ namespace hal
 
       /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////      
 
-      //! Set the home position (origin)
-      /*!
-          \param latitude the home latitude
-          \param longitude the home longitude
-          \param altitude the home altitude
-      */
-      void SetHome(double latitude, double longitude, double altitude);
-
-      /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////
-
       //! Called when new altimeter data arrives
       /*!
         \param msg the sensor data
@@ -103,6 +96,14 @@ namespace hal
         \param msg the sensor data
       */
       void Process(const hal_sensor_orientation::Data& msg);
+
+      //! Called to set the navigation origin. This allows LTP <-> WGS84 conversion
+      /*!
+        \param latitude latitude in decimal degrees north
+        \param longitude longiude in decimal degrees east
+        \param altitude meters above the WGS84 ellipsoid
+      */
+      void SetOrigin(double latitude, double longitude, double altitude);
 
     };
   }

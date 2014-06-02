@@ -216,37 +216,7 @@ bool Quadrotor::RcvSetControl(
 }
 
 // Called when new altimeter data arrives
-void Quadrotor::Feed(const hal_sensor_altimeter::Data &msg)
+Navigation* Quadrotor::GetNavPtr()
 {
-    navigation.Process(msg);
-}
-
-// Called when new compass data arrives
-void Quadrotor::Feed(const hal_sensor_compass::Data &msg)
-{
-    navigation.Process(msg);
-}
-
-// Called when new IMU data arrives
-void Quadrotor::Feed(const hal_sensor_imu::Data &msg)
-{
-    navigation.Process(msg);
-}
-
-// Called when new GNSS data arrives
-void Quadrotor::Feed(const hal_sensor_gnss::Data &msg)
-{
-    navigation.Process(msg);
-}
-
-// Called when new orientation data arrives
-void Quadrotor::Feed(const hal_sensor_orientation::Data &msg)
-{
-    navigation.Process(msg);
-}
-
-// Called to set the quadrotor state estimate manually
-void Quadrotor::Feed(const hal_quadrotor::State &state)
-{
-    navigation.SetState(state);
+    return &navigation;
 }
