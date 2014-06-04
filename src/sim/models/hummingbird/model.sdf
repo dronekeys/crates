@@ -194,17 +194,17 @@
           <errtolerance>3.e-7</errtolerance>
           <gps>
             <use>true</use>
-            <ion>true</ion>
-            <tro>true</tro>
-            <eph>true</eph>
-            <clk>true</clk>
+            <ion>false</ion>
+            <tro>false</tro>
+            <eph>false</eph>
+            <clk>false</clk>
           </gps>
           <glo>
-            <use>true</use>
-            <ion>true</ion>
-            <tro>true</tro>
-            <eph>true</eph>
-            <clk>true</clk>
+            <use>false</use>
+            <ion>false</ion>
+            <tro>false</tro>
+            <eph>false</eph>
+            <clk>false</clk>
           </glo>
         </solver>
         <errors>

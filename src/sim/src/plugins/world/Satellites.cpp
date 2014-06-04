@@ -283,12 +283,11 @@ namespace gazebo
 
 							// Write the clock bias and relativity correction
 							gps->set_err_clk(
-								SPEED_OF_LIGHT * (ephb.getClockBias()-eph.getClockBias())
+								SPEED_OF_LIGHT * (ephb.getClockBias() - eph.getClockBias())
 							);
 
 							// Set the tropospheic delay, based on the simulation location
 							gps->set_err_tro(
-								SPEED_OF_LIGHT *
 								tropModel.correction(
 									originPosECEF,                     	 // Current receiver position
 									satellitePos,                        // Current satellite position
@@ -298,7 +297,6 @@ namespace gazebo
 
 							// GET L1 ionosphere delay
 							gps->set_err_ion(
-								SPEED_OF_LIGHT *
 								tecStore.getIonoL1(
 									originPosECEF.elvAngle(satellitePos), // Elevation of the satellite
 									tec[0],                               // Total electron count
@@ -350,7 +348,7 @@ namespace gazebo
 					
 						// Save to the message
 						msgs::Vehicle* glo = sat.add_svs();
-						glo->set_sys(gpstk::SatID::systemGPS);
+						glo->set_sys(gpstk::SatID::systemGlonass);
 						glo->set_prn(prn);
 
 						// Write the position
@@ -394,7 +392,6 @@ namespace gazebo
 
 							// Set the tropospheic delay, based on the simulation location
 							glo->set_err_tro(
-								SPEED_OF_LIGHT *
 								tropModel.correction(
 									originPosECEF,                       // Current receiver position
 									satellitePos,                        // Current satellite position
@@ -404,7 +401,6 @@ namespace gazebo
 
 							// GET L1 ionosphere delay
 							glo->set_err_ion(
-								SPEED_OF_LIGHT *
 								tecStore.getIonoL1(
 									originPosECEF.elvAngle(satellitePos), // Elevation of the satellite
 									tec[0],                               // Total electron count

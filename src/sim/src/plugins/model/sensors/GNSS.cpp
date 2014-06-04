@@ -46,17 +46,12 @@ void GNSS::Receive(SatellitesPtr& sat)
 	gpstk::Position rcvECEF(x,y,z);
 	
 	// PROCESS THE SATELLITE DATA //////////////////////////////////////////
-
-	// Allocate for solution
-    std::vector<gpstk::SatID>       satellites;     // List of satellite vehicles
-    gpstk::Matrix<double>           covariance;     // For weighting variou solutions!
-    gpstk::Matrix<double>           ephemerides;    // All ephemerides
-    gpstk::Matrix<double>           SVD;            // Solution vector 
-    gpstk::Vector<double>           resids;         // Residual errors 
-    gpstk::Vector<double>           slopes;         // Residual slopes
 	
 	// Make the ephemerides container big enough to store all SV info
 	ephemerides.resize(sat->svs_size(), 4, 0.0);
+	
+	// Start from scratch
+	satellites.clear();
 
 	// Iterate over the GPS satellite vehicles
 	for (int i = 0; i < sat->svs_size(); i++)
@@ -72,11 +67,20 @@ void GNSS::Receive(SatellitesPtr& sat)
 				gpstk::Position::Cartesian
 			);
 
-			// If the satellite is below a certain elevation, ignore
-			// it by changing the ID to negative (see PRSOlver)
+			// Get the system (GPS/Glonass)
+			gpstk::SatID::SatelliteSystem sys = (gpstk::SatID::SatelliteSystem) sat->svs(i).sys();
+			
+			// Get the satellite ID
 			int id = sat->svs(i).prn();
-			if (rcvECEF.elvAngle(satECEF) < _minElevation)
-				id *= -1;
+
+			// Calculate the satellite elevation
+			double elv = rcvECEF.elvAngle(satECEF);
+
+			// If we are not using the satellite system, or bad elevation			
+			if (   (elv < _minElevation) 								// Bad elevation
+				|| (sys==gpstk::SatID::systemGPS && !_gpsUse)			// GPS disabled
+				|| (sys==gpstk::SatID::systemGlonass && !_gloUse))		// Glonass disabled
+				id = -id;
 
 			// Calculate the true pseudorange
 			double pseudorange = range(rcvECEF, satECEF);
@@ -89,9 +93,6 @@ void GNSS::Receive(SatellitesPtr& sat)
 			double ang = ellip.angVelocity() * tof;
 			satECEF[0] =  ::cos(ang)*satECEF[0] - ::sin(ang)*satECEF[1];
 			satECEF[1] =  ::sin(ang)*satECEF[0] + ::cos(ang)*satECEF[1];
-
-			// Get the satellite system
-			gpstk::SatID::SatelliteSystem sys = (gpstk::SatID::SatelliteSystem) sat->svs(i).sys();
 
 			// Save the satellite
 			satellites.push_back(gpstk::SatID(id,sys));
@@ -139,7 +140,6 @@ void GNSS::Receive(SatellitesPtr& sat)
 		}
 	}
 
-
 	// Resize other matrices used in the computation
 	SVD.resize(sat->svs_size(),4,0.0);
 	for (int i = 0; i < sat->svs_size(); i++)
@@ -181,7 +181,6 @@ void GNSS::Receive(SatellitesPtr& sat)
 		pdop = SQRT(Cov(0,0)+Cov(1,1));
 		hdop = SQRT(Cov(2,2));
 		vdop = 6.0; // How do I compute this?
-
 	}
 	catch (gpstk::Exception &e)
 	{
@@ -275,10 +274,8 @@ bool GNSS::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 	nReceiver = NoiseFactory::Create(root->GetElement("errors")->GetElement("clock"));
 
 	// We will be using two GNSS systems in total
-	if (_gpsUse) 
-		systems.push_back(gpstk::SatID::systemGPS);
-	if (_gloUse) 
-		systems.push_back(gpstk::SatID::systemGlonass);
+	systems.push_back(gpstk::SatID::systemGPS);
+	systems.push_back(gpstk::SatID::systemGlonass);
 
     // Initialise a node pointer
     nodePtr = transport::NodePtr(new transport::Node());

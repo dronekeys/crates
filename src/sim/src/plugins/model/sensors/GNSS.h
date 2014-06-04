@@ -55,12 +55,18 @@ namespace gazebo
 
     // Internal variables used for navigation
     gpstk::CommonTime               currentTime;
-    SatelliteSystemVec              systems;
     gpstk::WGS84Ellipsoid           wgs84;
     gpstk::GPSEllipsoid             ellip;
     gpstk::PRSolution               solver;
     gpstk::ZeroTropModel            tropModelZero;
     gpstk::TropModel*               tropModel;
+    SatelliteSystemVec              systems;
+    std::vector<gpstk::SatID>       satellites;     // List of satellite vehicles
+    gpstk::Matrix<double>           covariance;     // For weighting variou solutions!
+    gpstk::Matrix<double>           ephemerides;    // All ephemerides
+    gpstk::Matrix<double>           SVD;            // Solution vector 
+    gpstk::Vector<double>           resids;         // Residual errors 
+    gpstk::Vector<double>           slopes;         // Residual slopes
 
     // Receiver noise
     Noise                           *nReceiver;

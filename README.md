@@ -118,8 +118,13 @@ Finally, it is possible to launch a hardware version of an experiment using the 
 
 This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
 
-Common issues
-=============
+Known issues
+============
+
+CRATES is currently a work in progress. Bugs are continually being fixed, and you are therefore strongly urged to do a 'git pull' on a regular basis. 
+
+At height zero the quadrotor jumps in and out of the ground plane. This has to do with the fact that the GeoTiff used to draw the ground does not provide a perfectly flat surface. The heightmap generated from this image therefore has little bumps all over it, and simulated gravity causes small oscillations.
+
 Periodically, the following message is received on starting the simulator
 
 	terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'what():  remote_endpoint: Transport endpoint is not connected
