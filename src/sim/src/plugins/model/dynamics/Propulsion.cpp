@@ -5,6 +5,9 @@ using namespace gazebo;
 
 Propulsion::Propulsion() :
 
+	// Motors disarmed for safety
+	isArmed(false),
+
 	// Control parameters
 	_srs(-2291.83118052329), _srl(-0.9), _sru(0.9), 
     _sps(-2291.83118052329), _spl(-0.9), _spu(0.9), 
@@ -88,7 +91,7 @@ void Propulsion::Reset()
 	pitch 		= _sps * Clamp(0,_spl,_spu);
 	yaw 		= _sys * Clamp(0,_syl,_syu);
 	throttle 	= _sts * Clamp(0,_stl,_stu);
-	thrust = 0.0;
+	thrust 		= 0.0;
 }
 
 // Get the current altitude
@@ -98,9 +101,12 @@ void Propulsion::Update(double dt)
 	math::Quaternion q = linkPtr->GetWorldPose().rot;
 	math::Vector3    o = linkPtr->GetRelativeAngularVel();
 
+	// A disarmed system zeros motor speeds
+	double thr = (isArmed ? throttle : 0.0 );
+
 	// Update thrust force
-	double dFth = (_Cth0 + _Cth1*throttle + _Cth2*throttle*throttle) - thrust;
-	if (throttle < _LOW_THROTT)
+	double dFth = (_Cth0 + _Cth1*thr + _Cth2*thr*thr) - thrust;
+	if (thr < _LOW_THROTT)
 		dFth = _tau0 * dFth;
 	else
 	{
@@ -140,6 +146,12 @@ void Propulsion::Update(double dt)
   	// Apply force and torque
   	linkPtr->AddRelativeForce(force);
   	linkPtr->AddRelativeTorque(torque + linkPtr->GetInertial()->GetCoG().Cross(force));
+}
+
+// Enable or disable the motors
+void Propulsion::SetEnabled(bool enable)
+{
+	isArmed = enable;
 }
 
 // Get the remaining energy (mAh)

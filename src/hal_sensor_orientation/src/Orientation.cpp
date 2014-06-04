@@ -1,8 +1,8 @@
 // Library headers
 #include <hal_sensor_orientation/Orientation.h>
 
-#define DEFAULT_SAMP_RATE 50
-#define DEFAULT_SEND_RATE  1
+#define DEFAULT_SAMP_RATE 1
+#define DEFAULT_SEND_RATE 1
 
 using namespace hal::sensor;
 

@@ -150,7 +150,10 @@ void GNSS::Receive(SatellitesPtr& sat)
 
   	// TRY AND OBTAIN A NAVIGATION SOLUTION ///////////////////////////////////
 
-  	// Did we
+  	// Dilution of precision
+  	double pdop, hdop, vdop;
+  	
+  	// Try and obtain a solution
   	int statusFix = -1;
 	try
 	{
@@ -159,7 +162,7 @@ void GNSS::Receive(SatellitesPtr& sat)
 		solver.RMSLimit  = 3e6;
 	 
 	  	// Position solution
-		statusFix =  solver.SimplePRSolution(
+		statusFix = solver.SimplePRSolution(
 			currentTime,							// Current time
 			satellites,								// Satellite with negative id are ignored by the solver
 			SVD,									// Satellite direction cosines and corrected pseudorange data.
@@ -171,6 +174,14 @@ void GNSS::Receive(SatellitesPtr& sat)
 			resids,									// Post-fit range residuals
 			slopes									// Slope value used for each satellite
 		);
+
+		// Dilution of precision calculation
+		gpstk::Matrix<double> PTP(gpstk::transpose(solver.Partials)*solver.Partials);
+		gpstk::Matrix<double> Cov(gpstk::inverseLUD(PTP));
+		pdop = SQRT(Cov(0,0)+Cov(1,1));
+		hdop = SQRT(Cov(2,2));
+		vdop = 6.0; // How do I compute this?
+
 	}
 	catch (gpstk::Exception &e)
 	{
@@ -202,11 +213,23 @@ void GNSS::Receive(SatellitesPtr& sat)
 		posNew.z
 	);
 	
-	//ROS_WARN("%f %f %f", posNew.x, posNew.y, posNew.z);
+	// /ROS_WARN("%f %f %f", posNew.x, posNew.y, posNew.z);
 
     // Work out the velocity
 	if (timNew - timOld > 0)
     	velNew = (posNew - posOld) / (timNew - timOld);
+
+    // Package up the solution
+	soln.latitude  = lat;
+	soln.longitude = lon;
+	soln.altitude  = h;
+	soln.vel_ew    = velNew.x;
+	soln.vel_ns    = velNew.y;
+	soln.heading   = -90 - 57.2957795 * atan2(velNew.y, velNew.x);
+	soln.pdop      = pdop;	// Position error
+	soln.hdop      = hdop;	// Height error
+	soln.vdop      = vdop;	// Speed error
+	soln.numsvs    = solver.Nsvs;
 
     // Backup the old position for next iteration
     timOld = timNew;
@@ -279,15 +302,10 @@ void GNSS::Reset()
 bool GNSS::GetMeasurement(double t, hal_sensor_gnss::Data& msg)
 {
 	// Copy the solution
+	msg = soln;
+
+	// Mark the time
 	msg.t = t;
-	/*
-	msg.x = posNew.x;
-	msg.y = posNew.y;
-	msg.z = posNew.z;
-	msg.u = velNew.x;
-	msg.v = velNew.y;
-	msg.w = velNew.z;
-	*/
 
 	// Success!
 	return ready;

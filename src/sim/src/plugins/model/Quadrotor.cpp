@@ -164,6 +164,14 @@ namespace gazebo
 			
 			// Configure the orientation sensor
 			sO.Configure(linkPtr, root->GetElement("orientation"));
+
+			// INITIALISE WGS84 <-> LTP CONVERSION CONSTANTS /////////////////////
+
+			GetNavPtr()->SetOrigin(
+				model->GetWorld()->GetSphericalCoordinates()->GetLatitudeReference().Degree(), 
+				model->GetWorld()->GetSphericalCoordinates()->GetLongitudeReference().Degree(), 
+				model->GetWorld()->GetSphericalCoordinates()->GetElevationReference()
+			);
 			
 			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
 
@@ -219,7 +227,7 @@ namespace gazebo
 	    {
 	    	if (sA.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -230,7 +238,7 @@ namespace gazebo
 	    {
 	    	if (sC.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -241,7 +249,7 @@ namespace gazebo
 	    {
 	    	if (sI.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -252,7 +260,7 @@ namespace gazebo
 	    {
 	    	if (sG.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
@@ -263,11 +271,21 @@ namespace gazebo
 	    {
 	    	if (sO.GetMeasurement(tim,msg))
 	    	{
-		    	Feed(msg);		// Also use for navigation
+		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
 	    	return false;
 	    }
+
+	    // Called to arm or disarm the motors
+		bool ArmMotors(bool arm)
+		{
+			// Enable and disable the propulsion system
+			dP.SetEnabled(arm);
+
+			// Success
+			return arm;
+		}
 
     	// Called when the HAL wants the truthful state of the platform
 		void GetTruth(hal_quadrotor::State& state)

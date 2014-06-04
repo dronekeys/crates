@@ -24,6 +24,9 @@ find_package(catkin REQUIRED COMPONENTS
   hal_sensor_orientation
 ) 
 
+# Find GPS toolkit
+find_package(GeographicLib REQUIRED)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -128,7 +131,20 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(
+  include 
+  ${catkin_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${GEOGRAPHICLIB_INCLUDE_DIR} 
+)
+
+## Specify additional locations of library files
+link_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${catkin_LIBRARY_DIRS}
+  ${GEOGRAPHICLIB_LIBRARY_DIRS}
+)
+
 
 ## Declare a cpp library
 add_library(hal_quadrotor
@@ -154,10 +170,15 @@ add_library(hal_quadrotor
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal_quadrotor hal_quadrotor_generate_messages_cpp)
+add_dependencies(hal_quadrotor 
+  hal_quadrotor_generate_messages_cpp
+)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_quadrotor ${catkin_LIBRARIES})
+target_link_libraries(hal_quadrotor 
+  ${catkin_LIBRARIES}
+  ${GEOGRAPHICLIB_LIBRARY}
+)
 
 #############
 ## Install ##

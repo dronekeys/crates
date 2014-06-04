@@ -33,7 +33,7 @@ namespace hal
                 \param control the output control from the controller
                 \return if the state could be updated
             */
-            virtual bool Update(const hal_quadrotor::State &state, 
+            virtual void Update(const hal_quadrotor::State &state, 
                 double dt, hal_quadrotor::Control &control) = 0;
 
             //! Goal reach implementations

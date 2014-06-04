@@ -47,7 +47,7 @@ bool VelocityHeight::SetGoal(
     return true;
 }
 
-bool VelocityHeight::Update(const hal_quadrotor::State &state, 
+void VelocityHeight::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
@@ -135,11 +135,6 @@ bool VelocityHeight::Update(const hal_quadrotor::State &state,
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
-
-    //////////////////////// CHECK IF GOAL REACHED //////////////////////
-
-    // Success!    
-    return true;
 }
 
 // Goal reach implementations

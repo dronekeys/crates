@@ -36,7 +36,7 @@ bool Hover::SetGoal(
     return true;
 }
 
-bool Hover::Update(const hal_quadrotor::State &state, 
+void Hover::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
@@ -110,9 +110,6 @@ bool Hover::Update(const hal_quadrotor::State &state,
     control.pitch    = desP;
     control.yaw      = desY;
     control.throttle = th;
-
-    // Success!    
-    return true;
 }
 
 // Goal is never reached

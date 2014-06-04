@@ -41,7 +41,7 @@ bool Takeoff::SetGoal(
     return true;
 }
 
-bool Takeoff::Update(const hal_quadrotor::State &state, 
+void Takeoff::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
@@ -123,10 +123,6 @@ bool Takeoff::Update(const hal_quadrotor::State &state,
     );
     if (!reach && dist < 0.1)
     	reach = true;
-
-    /////////////////////////////////////////////////////////////////////
-
-    return true;
 }
 
 // Goal reach implementations

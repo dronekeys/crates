@@ -1,6 +1,10 @@
 #ifndef HAL_QUADROTOR_NAVIGATION_H
 #define HAL_QUADROTOR_NAVIGATION_H
 
+// For converting Gazebo <-> ECEF coordinates
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 // Sensors
 #include <hal_sensor_altimeter/Altimeter.h>
 #include <hal_sensor_compass/Compass.h>
@@ -23,11 +27,24 @@ namespace hal
     {     
 
     private:
-      
+
+      // When the FCS has been initialised
+      bool                            ready;
+
+      // Bitmask for data received
+      uint8_t                         data;
+
+      // For oordinat conversions
+      GeographicLib::Geocentric       wgs84_ecef;
+      GeographicLib::LocalCartesian   wgs84_enu;
+    
       /// The estimated state
-      hal_quadrotor::State state;
+      hal_quadrotor::State            state;
 
     public:    
+
+      /// Constructor
+      Navigation();
 
       /// INITIALIZE AND RESET THE NAVIGATION ENGINE //////////////////
 
@@ -42,8 +59,9 @@ namespace hal
       //! Get the state estimate
       /*!
           \param state the current platform state
+          \return whether this can be interpreted as a valid state
       */
-      void GetState(hal_quadrotor::State &msg);
+      bool GetState(hal_quadrotor::State &msg);
 
       //! Set the state estimate
       /*!
@@ -51,7 +69,7 @@ namespace hal
       */
       void SetState(const hal_quadrotor::State &msg);
 
-      /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////
+      /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////      
 
       //! Called when new altimeter data arrives
       /*!
@@ -82,6 +100,14 @@ namespace hal
         \param msg the sensor data
       */
       void Process(const hal_sensor_orientation::Data& msg);
+
+      //! Called to set the navigation origin. This allows LTP <-> WGS84 conversion
+      /*!
+        \param latitude latitude in decimal degrees north
+        \param longitude longiude in decimal degrees east
+        \param altitude meters above the WGS84 ellipsoid
+      */
+      void SetOrigin(double latitude, double longitude, double altitude);
 
     };
   }

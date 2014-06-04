@@ -16,6 +16,9 @@ namespace gazebo
     // Pointer to the rigid body
     physics::LinkPtr           linkPtr;
 
+    // Whether the motors are armed
+    bool                        isArmed;
+
     // Control parameters
     double                      _srs, _sps, _sys, _sts;
     double                      _srl, _spl, _syl, _stl;
@@ -50,6 +53,9 @@ namespace gazebo
     void Update(double dt);
 
     // CUSTOM FUNCTIONALITY //////////////////////////////////////////////////////////
+
+    // Enable or disable the motors
+    void SetEnabled(bool enable);
 
     // Get the remaining energy (mAh)
     double GetThrustForce();

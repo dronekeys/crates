@@ -42,7 +42,7 @@ bool Waypoint::SetGoal(
     return true;
 }
 
-bool Waypoint::Update(const hal_quadrotor::State &state, 
+void Waypoint::Update(const hal_quadrotor::State &state, 
     double dt, hal_quadrotor::Control &control)
 {
     /******************************************************************
@@ -114,15 +114,10 @@ bool Waypoint::Update(const hal_quadrotor::State &state,
     );
     if (!reach && dist < 0.1)
         reach = true;
-
-    /////////////////////////////////////////////////////////////////////
-
-    // Success!    
-    return true;
 }
 
 // Goal reach implementations
 bool Waypoint::HasGoalBeenReached()
 {
-    return false;
+    return reach;
 }

@@ -29,6 +29,9 @@ namespace hal
 
         private:
 
+            /// Whether the motors are currently armed
+            bool armed;
+
             /// Current state of the quadrotor
             hal_quadrotor::State estimate, truth;
 
@@ -165,44 +168,20 @@ namespace hal
         protected:
 
             /// RECEIVE CALLS FOR ALL SENSOR DATA ////////////////////////////
-
-            //! Called when new altimeter data arrives
+ 
+            //! Get a pointer to the navigation subsystem
             /*!
-            \param msg the sensor data
+              \return a pointer to the navigation subsystem
             */
-            void Feed(const hal_sensor_altimeter::Data& msg);
-
-            //! Called when new compass data arrives
-            /*!
-            \param msg the sensor data
-            */
-            void Feed(const hal_sensor_compass::Data& msg);
-
-            //! Called when new IMU data arrives
-            /*!
-            \param msg the sensor data
-            */
-            void Feed(const hal_sensor_imu::Data& msg);
-
-            //! Called when new GNSS data arrives
-            /*!
-            \param msg the sensor data
-            */
-            void Feed(const hal_sensor_gnss::Data& msg);
-
-            //! Called when new orientation data arrives
-            /*!
-            \param msg the sensor data
-            */
-            void Feed(const hal_sensor_orientation::Data& msg);
-
-            //! Called to set the quadrotor state estimate manually
-            /*!
-            \param msg the quadrotor state
-            */
-            void Feed(const hal_quadrotor::State &state);
+            Navigation* GetNavPtr();
 
             /// INERACTION WITH THE FLIGHT CONTROL SYSTEM ///////////////////////
+
+            //! Arm or disarm the motors
+            /*!
+              \param arm whether the motors should be armed
+            */
+            virtual bool ArmMotors(bool arm) = 0;
 
             //! Get the true quadrotor state
             /*!
