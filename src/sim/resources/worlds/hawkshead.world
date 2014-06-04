@@ -28,7 +28,7 @@
           <speed>12</speed>
         </clouds>
       </sky>
-      <shadows>true</shadows>
+      <shadows>false</shadows>
     </scene>
 
     <!-- Sun (so that things look lit up) -->

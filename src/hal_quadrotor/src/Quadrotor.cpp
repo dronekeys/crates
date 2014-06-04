@@ -4,11 +4,11 @@
 using namespace hal::quadrotor;
 
 // Rate at which control is updated internally
-#define DEFAULT_QUEUE_LENGTH   10
-#define DEFAULT_UPDATE_RATE  50.0
-#define DEFAULT_CONTROL_RATE  1.0
-#define DEFAULT_TRUTH_RATE    1.0
-#define DEFAULT_ESTIMATE_RATE 1.0
+#define DEFAULT_QUEUE_LENGTH     10
+#define DEFAULT_UPDATE_RATE    50.0
+#define DEFAULT_CONTROL_RATE    1.0
+#define DEFAULT_TRUTH_RATE      1.0
+#define DEFAULT_ESTIMATE_RATE   1.0
 
 // Called on initialization
 void Quadrotor::OnInit()
@@ -79,30 +79,27 @@ void Quadrotor::OnInit()
 // This is called at a fixed rate of 50Hz
 void Quadrotor::Update(const ros::TimerEvent& event)
 {
-    // Get the truthful state from the FCS
+    // Get the truthful state from the FCS, if available (simulation only)
     GetTruth(truth);
 
-    // Get the estimated state from the navigation engine
-    navigation.GetState(estimate);
-
-    // Find the control and whether motor arming is required
-    bool arm = actuation.GetControl(
-        estimate,                                  // current state
-        event.current_real.toSec() - tick,         // time tick
-        control                                    // resultant control
-    );
-
-    // If an arming change is needed
-    if (armed != arm)
+    // If the current navigation state is valid
+    if (navigation.GetState(estimate))
     {
-        // Issue the arm change
-        ArmMotors(arm);
-        
-        // Switch internal state
-        armed = arm;
+        // Find the control and whether motors must be armed 
+        bool arm = actuation.GetControl(
+            estimate,                                  // current state
+            event.current_real.toSec() - tick,         // time tick
+            control                                    // resultant control
+        );
+
+        // If an arming change is needed
+        if (armed != arm)
+            armed = ArmMotors(arm);
     }
 
-    // Pass the control to the FCS and set the time it was applied
+    // Pass the control to the FCS and set the time it was applied. The 
+    // flight control system will clamp the values to an acceptable range
+    // and return the exact ROS time at which the control was applied.
     control.t = SetControl(control);
 
     // Save the current time tick for the next iteration

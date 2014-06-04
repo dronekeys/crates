@@ -31,6 +31,9 @@ namespace hal
       // When the FCS has been initialised
       bool                            ready;
 
+      // Bitmask for data received
+      uint8_t                         data;
+
       // For oordinat conversions
       GeographicLib::Geocentric       wgs84_ecef;
       GeographicLib::LocalCartesian   wgs84_enu;
@@ -56,8 +59,9 @@ namespace hal
       //! Get the state estimate
       /*!
           \param state the current platform state
+          \return whether this can be interpreted as a valid state
       */
-      void GetState(hal_quadrotor::State &msg);
+      bool GetState(hal_quadrotor::State &msg);
 
       //! Set the state estimate
       /*!

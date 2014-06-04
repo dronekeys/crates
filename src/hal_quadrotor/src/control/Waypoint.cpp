@@ -119,5 +119,5 @@ void Waypoint::Update(const hal_quadrotor::State &state,
 // Goal reach implementations
 bool Waypoint::HasGoalBeenReached()
 {
-    return false;
+    return reach;
 }

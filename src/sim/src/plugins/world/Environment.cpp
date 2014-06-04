@@ -48,7 +48,7 @@ namespace gazebo
 				math::Angle lat = sphericalCoordinates->GetLatitudeReference();
 				math::Angle lon = sphericalCoordinates->GetLongitudeReference();
 				double 		ele = sphericalCoordinates->GetElevationReference();
-				ROS_WARN("LAT: %f, LON: %f, ALT: %f", lat.Degree(), lon.Degree(), ele);	
+				//ROS_WARN("LAT: %f, LON: %f, ALT: %f", lat.Degree(), lon.Degree(), ele);	
 			}
 
 			// Publish the message immediately

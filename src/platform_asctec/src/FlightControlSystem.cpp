@@ -151,11 +151,14 @@ extern "C"
 // LOOP RATES AND FLAGS ///////////////////////////////////////////////////////////
 
 // Receive flags
-bool ready = false;
+bool rcv_aci = false;
+bool rcv_var = false;
+bool rcv_cmd = false;
+bool rcv_par = false;
+bool ready   = false;
+bool error   = false;
 
 // Data polling rates
-int rate_max = 0;       // Maximum data rate of any packet
-int rate_aci = 0;       // Rate of aci engine
 int rate_imu = 0;       // Rate of state estimate
 int rate_sen = 0;       // Rate of state estimate
 int rate_pos = 0;       // Position estimate rate
@@ -185,10 +188,13 @@ void cb_rx(const char* byte, size_t cnt)
 }
 
 // Heartbeat callback for the ACI engine
-void cb_heartbeat(const ros::TimerEvent& event)
+void cb_hb(const ros::TimerEvent& event)
 {
     // This needs to be called to keep the ACI interface alive
     aciEngine();
+
+    // Heartbeat received
+    rcv_aci = true;
 }
 
 // PARAMETERS //////////////////////////////////////////////////////////////////////
@@ -211,8 +217,8 @@ void cb_parlist(void)
     ROS_INFO("Updating parameter configuration");
     aciSendParameterPacketConfiguration(0);
 
-    ROS_INFO("Flight control system ready");
-    ready = true;
+    // Parameters received
+    rcv_par = true;
 }
 
 // COMMANDS //////////////////////////////////////////////////////////////////////
@@ -247,8 +253,8 @@ void cb_cmdlist(void)
 
     // This is the packet that will be used to send motor control commands
     ROS_INFO("Creating control packet");
-    aciAddContentToCmdPacket(0, CMD_ATT_PITCH,      &raw_ctl.pitch);
     aciAddContentToCmdPacket(0, CMD_ATT_ROLL,       &raw_ctl.roll);
+    aciAddContentToCmdPacket(0, CMD_ATT_PITCH,      &raw_ctl.pitch);
     aciAddContentToCmdPacket(0, CMD_ATT_YAW,        &raw_ctl.yaw);
     aciAddContentToCmdPacket(0, CMD_ATT_THROTTLE,   &raw_ctl.throttle);
     aciAddContentToCmdPacket(0, CMD_ATT_MASK,       &raw_ctl.mask);
@@ -266,9 +272,9 @@ void cb_cmdlist(void)
     ROS_INFO("Updating command configuration");
     aciSendCommandPacketConfiguration(0,0);
     aciSendCommandPacketConfiguration(1,1);
-    
-    ROS_INFO("Querying parameter list");
-    aciGetDeviceParametersList();
+
+    // Commands received
+    rcv_cmd = true;
 }
 
 // VARIABLES ////////////////////////////////////////////////////////////////////
@@ -313,7 +319,7 @@ struct _raw_pos
     uint32_t    pdop;
     uint32_t    hdop;
     uint32_t    vdop;
-    int32_t     numsvs;
+    uint32_t    numsvs;
 } raw_pos;
 
 // This is called when the ACI engine's internal list of variables is updated
@@ -322,63 +328,65 @@ void cb_varlist(void)
 {
     ROS_INFO("Variable list received from ACI device");
 
+    int pkt = 0;
     if (rate_imu > 0)
     {
-        ROS_INFO("Setting up IMU data packets");
-        aciAddContentToVarPacket(0,VAR_GYR_CAL_X,           &raw_imu.gyr_x);
-        aciAddContentToVarPacket(0,VAR_GYR_CAL_Y,           &raw_imu.gyr_y);
-        aciAddContentToVarPacket(0,VAR_GYR_CAL_Z,           &raw_imu.gyr_z);
-        aciAddContentToVarPacket(0,VAR_ACC_CAL_X,           &raw_imu.acc_x);
-        aciAddContentToVarPacket(0,VAR_ACC_CAL_Y,           &raw_imu.acc_y);
-        aciAddContentToVarPacket(0,VAR_ACC_CAL_Z,           &raw_imu.acc_z);
-        aciSetVarPacketTransmissionRate(0,1000/rate_imu);
+        ROS_INFO("Setting up IMU data in packet %d",pkt);
+        aciAddContentToVarPacket(pkt,VAR_GYR_CAL_X,           &raw_imu.gyr_x);
+        aciAddContentToVarPacket(pkt,VAR_GYR_CAL_Y,           &raw_imu.gyr_y);
+        aciAddContentToVarPacket(pkt,VAR_GYR_CAL_Z,           &raw_imu.gyr_z);
+        aciAddContentToVarPacket(pkt,VAR_ACC_CAL_X,           &raw_imu.acc_x);
+        aciAddContentToVarPacket(pkt,VAR_ACC_CAL_Y,           &raw_imu.acc_y);
+        aciAddContentToVarPacket(pkt,VAR_ACC_CAL_Z,           &raw_imu.acc_z);
+        aciSetVarPacketTransmissionRate(pkt,1000/rate_imu);
+        pkt++;
     }
 
     if (rate_sen > 0)
     {
-        ROS_INFO("Setting up SEN data packets");
-        aciAddContentToVarPacket(1,VAR_EST_POS_X,           &raw_sen.pos_x);
-        aciAddContentToVarPacket(1,VAR_EST_POS_Y,           &raw_sen.pos_y);
-        aciAddContentToVarPacket(1,VAR_EST_POS_Z,           &raw_sen.pos_z);
-        aciAddContentToVarPacket(1,VAR_EST_ANG_X,           &raw_sen.ang_x);
-        aciAddContentToVarPacket(1,VAR_EST_ANG_Y,           &raw_sen.ang_y);
-        aciAddContentToVarPacket(1,VAR_EST_ANG_Z,           &raw_sen.ang_z);
-        aciAddContentToVarPacket(1,VAR_EST_VEL_X,           &raw_sen.vel_x);
-        aciAddContentToVarPacket(1,VAR_EST_VEL_Y,           &raw_sen.vel_y);
-        aciAddContentToVarPacket(1,VAR_EST_VEL_Z,           &raw_sen.vel_z);
-        aciAddContentToVarPacket(1,VAR_MAG_CAL_X,           &raw_sen.mag_x);
-        aciAddContentToVarPacket(1,VAR_MAG_CAL_Y,           &raw_sen.mag_y);
-        aciAddContentToVarPacket(1,VAR_MAG_CAL_Z,           &raw_sen.mag_z);
-        aciSetVarPacketTransmissionRate(1,1000/rate_sen);
+        ROS_INFO("Setting up SEN data in packet %d",pkt);
+        aciAddContentToVarPacket(pkt,VAR_EST_POS_X,           &raw_sen.pos_x);
+        aciAddContentToVarPacket(pkt,VAR_EST_POS_Y,           &raw_sen.pos_y);
+        aciAddContentToVarPacket(pkt,VAR_EST_POS_Z,           &raw_sen.pos_z);
+        aciAddContentToVarPacket(pkt,VAR_EST_ANG_X,           &raw_sen.ang_x);
+        aciAddContentToVarPacket(pkt,VAR_EST_ANG_Y,           &raw_sen.ang_y);
+        aciAddContentToVarPacket(pkt,VAR_EST_ANG_Z,           &raw_sen.ang_z);
+        aciAddContentToVarPacket(pkt,VAR_EST_VEL_X,           &raw_sen.vel_x);
+        aciAddContentToVarPacket(pkt,VAR_EST_VEL_Y,           &raw_sen.vel_y);
+        aciAddContentToVarPacket(pkt,VAR_EST_VEL_Z,           &raw_sen.vel_z);
+        aciAddContentToVarPacket(pkt,VAR_MAG_CAL_X,           &raw_sen.mag_x);
+        aciAddContentToVarPacket(pkt,VAR_MAG_CAL_Y,           &raw_sen.mag_y);
+        aciAddContentToVarPacket(pkt,VAR_MAG_CAL_Z,           &raw_sen.mag_z);
+        aciSetVarPacketTransmissionRate(pkt,1000/rate_sen);
+        pkt++;
     }
 
     if (rate_pos > 0)
     {
-        ROS_INFO("Setting up POS data packets");        
-        aciAddContentToVarPacket(2,VAR_GPS_LAT,             &raw_pos.latitude);
-        aciAddContentToVarPacket(2,VAR_GPS_LON,             &raw_pos.longitude);
-        aciAddContentToVarPacket(2,VAR_GPS_HEIGHT,          &raw_pos.altitude);
-        aciAddContentToVarPacket(2,VAR_GPS_VEL_NS,          &raw_pos.vel_ns);
-        aciAddContentToVarPacket(2,VAR_GPS_VEL_EW,          &raw_pos.vel_ew);
-        aciAddContentToVarPacket(2,VAR_GPS_HEADING,         &raw_pos.heading);
-        aciAddContentToVarPacket(2,VAR_GPS_POS_ACC,         &raw_pos.pdop);
-        aciAddContentToVarPacket(2,VAR_GPS_HEIGHT_ACC,      &raw_pos.hdop);
-        aciAddContentToVarPacket(2,VAR_GPS_VEL_ACC,         &raw_pos.vdop);
-        aciAddContentToVarPacket(2,VAR_GPS_NUM_SATS,        &raw_pos.numsvs);
-        aciSetVarPacketTransmissionRate(2,1000/rate_pos);
+        ROS_INFO("Setting up POS data in packet %d",pkt);        
+        aciAddContentToVarPacket(pkt,VAR_GPS_LAT,             &raw_pos.latitude);
+        aciAddContentToVarPacket(pkt,VAR_GPS_LON,             &raw_pos.longitude);
+        aciAddContentToVarPacket(pkt,VAR_GPS_HEIGHT,          &raw_pos.altitude);
+        aciAddContentToVarPacket(pkt,VAR_GPS_VEL_NS,          &raw_pos.vel_ns);
+        aciAddContentToVarPacket(pkt,VAR_GPS_VEL_EW,          &raw_pos.vel_ew);
+        aciAddContentToVarPacket(pkt,VAR_GPS_HEADING,         &raw_pos.heading);
+        aciAddContentToVarPacket(pkt,VAR_GPS_POS_ACC,         &raw_pos.pdop);
+        aciAddContentToVarPacket(pkt,VAR_GPS_HEIGHT_ACC,      &raw_pos.hdop);
+        aciAddContentToVarPacket(pkt,VAR_GPS_VEL_ACC,         &raw_pos.vdop);
+        aciAddContentToVarPacket(pkt,VAR_GPS_NUM_SATS,        &raw_pos.numsvs);
+        aciSetVarPacketTransmissionRate(pkt,1000/rate_pos);
+        pkt++;
     }
 
     ROS_INFO("Updating packet rates");
     aciVarPacketUpdateTransmissionRates();
 
     ROS_INFO("Updating packet configuration");
-    aciSendVariablePacketConfiguration(0);
-    aciSendVariablePacketConfiguration(1);
-    aciSendVariablePacketConfiguration(2);
+    for (int i = 0; i < pkt; i++)
+        aciSendVariablePacketConfiguration(i);
 
-    // Now, query the command list
-    ROS_INFO("Querying command list");
-    aciGetDeviceCommandsList();
+    // We have received the variables
+    rcv_var = true;
 }
 
 // FLIGHT CONTROL SYSTEM ///////////////////////////////////////////////////////////
@@ -397,9 +405,13 @@ namespace platform_asctec
     {
 
     private:
-
+        
         // Callback timers for probing data
         ros::Timer timerHeartbeat;
+        ros::Timer timerTimeout;
+
+        // Used for timeout checking
+        bool timeout;
 
         // Called when the HAL wants an altimeter reading
         bool GetMeasurement(hal_sensor_altimeter::Data& msg)
@@ -538,50 +550,67 @@ namespace platform_asctec
         // Called when the HAL wants to pass down some control to the platform
         double SetControl(const hal_quadrotor::Control &control)
         {
+            /*
             // Only issue control when system is ready
             if (ready)
             {
-                ROS_INFO("Passing device control");
                 raw_ctl.roll        = -2291.83118052329 * control.roll;
                 raw_ctl.pitch       = -2291.83118052329 * control.pitch;
                 raw_ctl.yaw         = -460.597254433196 * control.yaw;
-                raw_ctl.throttle    =  4097.00000000000 * control.throttle;
+                raw_ctl.throttle    = 4097.00000000000 * control.throttle;
                 raw_ctl.mask        = 0b00001111;   // Direct control (no height/gps)
+                
+                // Send the control command
                 aciUpdateCmdPacket(0);
             }
-
+            */
             // Time st which control was applied
             return ros::Time::now().toSec();
         }
 
         // Arm the motors
-        void ArmMotors(bool arm)
+        bool ArmMotors(bool arm)
         {
-            if (arm)
+            /*
+            // Only issue control when system is ready
+            if (ready)
             {
-                ROS_INFO("Arming motors");
-                raw_set.mode        = 0x02;
-                raw_set.enabled     = 0x01;
-                raw_set.stick       = 0x01;   
-                raw_set.m0          = 0x00;
-                raw_set.m1          = 0x00;
-                raw_set.m2          = 0x00;
-                raw_set.m3          = 0x00; 
-            }
-            else
-            {
-                ROS_INFO("Disarming motors");
-                raw_set.mode        = 0x00;
-                raw_set.enabled     = 0x01;
-                raw_set.stick       = 0x01;
-                raw_set.m0          = 0x00;
-                raw_set.m1          = 0x00;
-                raw_set.m2          = 0x00;
-                raw_set.m3          = 0x00;    
-            }
+                if (arm)
+                {
+                    ROS_INFO("Arming motors");
+                    raw_set.mode        = 0x02;
+                    raw_set.enabled     = 0x01;
+                    raw_set.stick       = 0x01;   
+                    raw_set.m0          = 0x00;
+                    raw_set.m1          = 0x00;
+                    raw_set.m2          = 0x00;
+                    raw_set.m3          = 0x00; 
+                }
+                else
+                {
+                    ROS_INFO("Disarming motors");
+                    raw_set.mode        = 0x00;
+                    raw_set.enabled     = 0x01;
+                    raw_set.stick       = 0x01;
+                    raw_set.m0          = 0x00;
+                    raw_set.m1          = 0x00;
+                    raw_set.m2          = 0x00;
+                    raw_set.m3          = 0x00;    
+                }
 
-            // Send the control command
-            aciUpdateCmdPacket(1);
+                // Send the control command
+                aciUpdateCmdPacket(1);
+            }
+            */
+
+            // Success
+            return arm;
+        }
+
+        // Error callback
+        void Timeout(const ros::TimerEvent& event)
+        {
+            timeout = true;
         }
 
     public:
@@ -619,8 +648,6 @@ namespace platform_asctec
             std::string port; int baud;
             if (!nh.getParam("serial_port",port))     port      = "/dev/ttyUSB0";
             if (!nh.getParam("serial_baud",baud))     baud      = 57600;
-            if (!nh.getParam("rate_max",rate_max))    rate_max  = 100;
-            if (!nh.getParam("rate_aci",rate_aci))    rate_aci  = 10;
             if (!nh.getParam("rate_imu",rate_imu))    rate_imu  = 0;
             if (!nh.getParam("rate_sen",rate_sen))    rate_sen  = 0;
             if (!nh.getParam("rate_pos",rate_pos))    rate_pos  = 0;
@@ -653,21 +680,88 @@ namespace platform_asctec
                 aciSetParamListUpdateFinishedCallback(&cb_parlist);
 
                 ROS_INFO("Configuring ACI engine rate");
-                aciSetEngineRate(rate_max,rate_aci);
+                aciSetEngineRate(1000,1);
 
                 ROS_INFO("Starting ACI heartbeat");
-                if (rate_aci > 0)
-                {
-                    ROS_INFO("- Starting ACI polling timer");
-                    timerHeartbeat = nh.createTimer(
-                        ros::Duration(1.0/(double)rate_aci),        // duration
-                        &cb_heartbeat,                              // callback
-                        false                                       // oneshot?
-                    );
-                }
+                timerHeartbeat = nh.createTimer(
+                    ros::Duration(0.001),                  // duration
+                    &cb_hb,                              // callback
+                    false                                // object
+                );
+                
+                ROS_INFO("Waiting for first heartbeat");
+                while (!rcv_aci)
+                    usleep(1000);
 
-                ROS_INFO("Querying variable list");
-                aciGetDeviceVariablesList();
+                // Timeout-based parameter list querying
+                do
+                {
+                    ROS_INFO("Querying parameter list");
+                    aciGetDeviceParametersList();
+                    timeout = false;
+                    timerTimeout = nh.createTimer(
+                        ros::Duration(5.0),                   // duration
+                        &FlightControlSystem::Timeout,         // callback
+                        this,                                  // object
+                        true                                   // oneshot
+                    );
+                    while (!rcv_par && !timeout)
+                        usleep(1000);
+                    timerTimeout.stop();
+                    if (!timeout)
+                        break;
+                    ROS_WARN("Timeout");
+                }
+                while (timeout);
+
+                // Timeout-based command list querying
+                do
+                {
+                    ROS_INFO("Querying command list");
+                    aciGetDeviceCommandsList();
+                    timeout = false;
+                    timerTimeout = nh.createTimer(
+                        ros::Duration(5.0),                   // duration
+                        &FlightControlSystem::Timeout,         // callback
+                        this,                                  // object
+                        true                                   // oneshot
+                    );
+                    while (!rcv_cmd && !timeout)
+                        usleep(1000);
+                    timerTimeout.stop();
+                    if (!timeout)
+                        break;
+                    ROS_WARN("Timeout");
+                }
+                while (timeout);
+
+                // Disarm the motors
+                ROS_INFO("Disarming motors");
+                ArmMotors(false);
+
+                // Timeout-based variable list querying
+                do
+                {
+                    ROS_INFO("Querying variable list");
+                    aciGetDeviceVariablesList();
+                    timeout = false;
+                    timerTimeout = nh.createTimer(
+                        ros::Duration(5.0),                   // duration
+                        &FlightControlSystem::Timeout,         // callback
+                        this,                                  // object
+                        true                                   // oneshot
+                    );
+                    while (!rcv_var && !timeout)
+                        usleep(1000);
+                    timerTimeout.stop();
+                    if (!timeout)
+                        break;
+                    ROS_WARN("Timeout");
+                }
+                while (timeout);
+
+                // FCS ready
+                ready = true;
             }
         }
     };

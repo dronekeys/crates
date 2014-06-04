@@ -2,6 +2,8 @@
 
 using namespace hal::quadrotor;
 
+#define DEBUG true
+
 void Actuation::Init(ros::NodeHandle nh, ControllerType controller)
 {
 	// Create services
@@ -20,6 +22,22 @@ void Actuation::Init(ros::NodeHandle nh, ControllerType controller)
 
 void Actuation::Switch(ControllerType controller)
 {
+	if (DEBUG)
+	{
+		switch(controller)
+		{
+		case CONTROLLER_ANGLESHEIGHT: 	ROS_INFO("Switching to AnglesHeight controller."); 	 break;
+		case CONTROLLER_EMERGENCY: 		ROS_INFO("Switching to Emergency controller."); 	 break;
+		case CONTROLLER_HOVER: 			ROS_INFO("Switching to Hover controller.");  		 break;
+		case CONTROLLER_IDLE: 			ROS_INFO("Switching to Idle controller.");  		 break;
+		case CONTROLLER_LAND: 			ROS_INFO("Switching to Land controller.");  		 break;
+		case CONTROLLER_TAKEOFF: 		ROS_INFO("Switching to Takeoff controller.");  		 break;
+		case CONTROLLER_VELOCITYHEIGHT: ROS_INFO("Switching to VelocityHeight controller."); break;
+		case CONTROLLER_VELOCITY: 		ROS_INFO("Switching to Velocity controller.");  	 break;
+		case CONTROLLER_WAYPOINT: 		ROS_INFO("Switching to Waypoint controller.");  	 break;
+		}
+	}
+
 	current = controller;
 }
 
@@ -50,12 +68,14 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 		switch (current)
 		{
 		case CONTROLLER_TAKEOFF:
+			if (DEBUG) ROS_INFO("Goal reached. Switching to hover.");
 			current = CONTROLLER_HOVER;
 			ptr = (Controller*) &cIdle;
 			break;
 
 		// At the end of landing, always switch back to idle
 		case CONTROLLER_LAND:
+			if (DEBUG) ROS_INFO("Goal reached. Switching to land.");
 			current = CONTROLLER_IDLE;
 			ptr = (Controller*) &cIdle;
 			break;

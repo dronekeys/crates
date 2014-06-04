@@ -181,7 +181,7 @@ namespace hal
             /*!
               \param arm whether the motors should be armed
             */
-            virtual void ArmMotors(bool arm) = 0;
+            virtual bool ArmMotors(bool arm) = 0;
 
             //! Get the true quadrotor state
             /*!

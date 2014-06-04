@@ -164,6 +164,14 @@ namespace gazebo
 			
 			// Configure the orientation sensor
 			sO.Configure(linkPtr, root->GetElement("orientation"));
+
+			// INITIALISE WGS84 <-> LTP CONVERSION CONSTANTS /////////////////////
+
+			GetNavPtr()->SetOrigin(
+				model->GetWorld()->GetSphericalCoordinates()->GetLatitudeReference().Degree(), 
+				model->GetWorld()->GetSphericalCoordinates()->GetLongitudeReference().Degree(), 
+				model->GetWorld()->GetSphericalCoordinates()->GetElevationReference()
+			);
 			
 			// WORLD UPDATE CALLBACK CONFIGURATION ////////////////////////////////
 
@@ -270,10 +278,13 @@ namespace gazebo
 	    }
 
 	    // Called to arm or disarm the motors
-		void ArmMotors(bool arm)
+		bool ArmMotors(bool arm)
 		{
 			// Enable and disable the propulsion system
 			dP.SetEnabled(arm);
+
+			// Success
+			return arm;
 		}
 
     	// Called when the HAL wants the truthful state of the platform

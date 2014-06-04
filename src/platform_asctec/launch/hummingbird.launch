@@ -7,11 +7,9 @@
 		<node pkg="nodelet" type="nodelet" name="$(arg id)" args="load platform_asctec/FlightControlSystem nodelet_manager" output="screen">
 			<param name="serial_port" type="string" value="$(arg port)"/>
 			<param name="serial_baud" type="int"    value="$(arg baud)"/>
-			<param name="rate_max"    type="int"    value="100"/>		
-			<param name="rate_aci"    type="int"    value="10"/>
-			<param name="rate_imu"    type="int"    value="100"/>
-			<param name="rate_sen"    type="int"    value="50"/>
-			<param name="rate_pos"    type="int"    value="5"/>
+			<param name="rate_imu"    type="int"    value="128"/>
+			<param name="rate_sen"    type="int"    value="32"/>
+			<param name="rate_pos"    type="int"    value="4"/>
 			<!-- ROYAL VETERINARY COLLEGE
 			<param name="origin_lat"  type="double" value="51.714403"/>
 			<param name="origin_lon"  type="double" value="-0.213223"/>
