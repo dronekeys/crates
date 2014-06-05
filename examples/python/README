@@ -1,0 +1,12 @@
+Instructions
+------------
+
+1. Make sure that you have successfully built CRATES and that you have 'sourced'
+   the devel environment. i.e. 'source /path/to/crates/devel/setup.bash'
+2. Switch to a second terminal and run the CRATES simulator
+   > roslaunch sim sw.launch
+4. Return to your original terminal and run the example
+   > python example.py
+
+The code will pause the simulation, insert a quadrotor and run the simulator.
+The position of the quadrotor will be published at 1Hz to the console.
