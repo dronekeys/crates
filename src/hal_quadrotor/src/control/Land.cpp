@@ -116,12 +116,12 @@ void Land::Update(const hal_quadrotor::State &state,
 
     //////////////////////// CHECK IF GOAL REACHED //////////////////////
 
-    double dist = sqrt(
-    		(sp[_X]-state.x)*(sp[_X]-state.x) 
-    	+	(sp[_Y]-state.y)*(sp[_Y]-state.y)
-    	+	(sp[_Z]-state.z)*(sp[_Z]-state.z)
+    double vel = sqrt(
+            (state.u * state.u) 
+        +   (state.v * state.v)
+        +   (state.w * state.w)
     );
-    if (!reach && dist < 0.1)
+    if (!reach && vel < 0.1)
     	reach = true;
 }
 

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <model name="axes">
+    <static>true</static>
+    <link name="link">
+      <visual name="origin">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.2</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>0 0 0 0</ambient>
+        </material>
+      </visual>
+      <visual name="east">
+        <pose>2.5 0 0 0 1.57079632679 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.1</radius>
+            <length>5.0</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>1 0 0 0</ambient>
+        </material>
+      </visual>
+      <visual name="north">
+        <pose>0 2.5 0 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.1</radius>
+            <length>5.0</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0 1 0 0</ambient>
+        </material>
+      </visual>
+      <visual name="up">
+        <pose>0 0 2.5 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.1</radius>
+            <length>5.0</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0 0 1 0</ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
