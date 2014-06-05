@@ -1,60 +1,78 @@
+// General ROS functionality
 #include <ros/ros.h>
-#include <hal_quadrotor/Quadrotor.h>
 
+// Simulator services
+#include <sim/Insert.h>
+#include <sim/Resume.h>
+#include <sim/Pause.h>
+
+// Quadrotor services
+#include <hal_quadrotor/State.h>
+
+// Callback for quadrotor state
 void StateCallback(const hal_quadrotor::State::ConstPtr& msg)
 {
-  ROS_INFO("I heard: [%s]", msg->data.c_str());
+  ROS_INFO("Quadrotor position: [%f,%f,%f]", msg->x, msg->y, msg->z);
 }
 
-
+// Main entry point of application
 int main(int argc, char **argv)
 {
-  /**
-   * The ros::init() function needs to see argc and argv so that it can perform
-   * any ROS arguments and name remapping that were provided at the command line. For programmatic
-   * remappings you can use a different version of init() which takes remappings
-   * directly, but for most command-line programs, passing argc and argv is the easiest
-   * way to do it.  The third argument to init() is the name of the node.
-   *
-   * You must call one of the versions of ros::init() before using any other
-   * part of the ROS system.
-   */
-  ros::init(argc, argv, "controller");
+  // Initialise the ROS client
+  ros::init(argc, argv, "example");
 
-  /**
-   * NodeHandle is the main access point to communications with the ROS system.
-   * The first NodeHandle constructed will fully initialize this node, and the last
-   * NodeHandle destructed will close down the node.
-   */
+  // Create a node handle, which this C code will use to bind to the ROS server
   ros::NodeHandle n;
 
-  /**
-   * The subscribe() call is how you tell ROS that you want to receive messages
-   * on a given topic.  This invokes a call to the ROS
-   * master node, which keeps a registry of who is publishing and who
-   * is subscribing.  Messages are passed to a callback function, here
-   * called chatterCallback.  subscribe() returns a Subscriber object that you
-   * must hold on to until you want to unsubscribe.  When all copies of the Subscriber
-   * object go out of scope, this callback will automatically be unsubscribed from
-   * this topic.
-   *
-   * The second parameter to the subscribe() function is the size of the message
-   * queue.  If messages are arriving faster than they are being processed, this
-   * is the number of messages that will be buffered up before beginning to throw
-   * away the oldest ones.
-   */
+  // Create a client for interacting with the Simulator insert and Resume services
+  ros::ServiceClient srvInsert = n.serviceClient<sim::Insert>("/simulator/Insert");
+  ros::ServiceClient srvResume = n.serviceClient<sim::Resume>("/simulator/Resume");
+  ros::ServiceClient srvPause  = n.serviceClient<sim::Pause> ("/simulator/Pause");
 
-  ros::Subscriber sub = n.subscribe("chatter", 1000, StateCallback);
+  // Subscribe to the state of the quadrotor
+  ros::Subscriber topState = n.subscribe("/hal/UAV0/Estimate", 1000, StateCallback);
 
+  // Create a resume message, which takes no arguments
+  sim::Pause msgPause;
 
-  /**
-   * ros::spin() will enter a loop, pumping callbacks.  With this version, all
-   * callbacks will be called from within this thread (the main one).  ros::spin()
-   * will exit when Ctrl-C is pressed, or the node is shutdown by the master.
-   */
+  // Call the client with this message
+  if (!srvPause.call(msgPause))
+  {
+    ROS_FATAL("Failed to pause the simulator");
+    return 1;
+  }
+
+  // Create a message instructing a quadrotor UAV0 to be inserted in to the world
+  sim::Insert msgInsert;
+  msgInsert.request.model_name = "UAV0";
+  msgInsert.request.model_type = "model://hummingbird";
+  
+  // Call the client with this message
+  if (!srvInsert.call(msgInsert))
+  {
+    ROS_FATAL("Failed to insert a hummingbird quadrotor into the simulator");
+    return 1;
+  }
+
+  // You should now see the quadrotor
+  ROS_INFO("Successfully inserted the model into the world");
+
+  // Create a resume message, which takes no arguments
+  sim::Resume msgResume;
+
+  // Call the client with this message
+  if (!srvResume.call(msgResume))
+  {
+    ROS_FATAL("Failed to resume the simulator");
+    return 1;
+  }
+
+  // You should now see the quadrotor
+  ROS_INFO("Successfully resumed the simulation");
+
+  // Keep going until ctl+c is pressed
   ros::spin();
 
-  // Everything is OK
+  // Success!
   return 0;
-
 }
