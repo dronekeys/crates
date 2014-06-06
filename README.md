@@ -20,10 +20,12 @@ Add the ROS PPA to your Ubuntu Sources
 
 	sudo apt-get install git
 
-Checkout the CRATES framework
+Checkout the CRATES framework and pull the submodules
 
 	cd ~/workspace
 	git clone https://bitbucket.org/asymingt/crates.git
+	git submodule init
+	git submodule update
 
 Build/install the ROS, gazebo and gpstk libraries using the scripts
 

@@ -1,0 +1,32 @@
+Instructions
+------------
+
+Java support is slightly more difficult to achieve than C++ and Python, which
+are natively supported by ROS. The CRATES source pulls in two submodules,
+rosjava_bootstrap and rosjava_build_tools, which provide basic Java bindings for
+ROS, the ability to compile *.msg and *.srv files into JARs, and compile rosjava
+projects. This rosjava package provides java subprojects for the custom messages
+offered by CRATES, as well as an example project.
+
+Basic usage instructions:
+
+1. Make sure that you have successfully built CRATES and that you have 'sourced'
+   the devel environment. i.e. 'source /path/to/crates/devel/setup.bash'
+2. Compile the example code in a terminal:
+   > mkdir build
+   > cd build
+   > cmake ..
+   > make
+3. Switch to a second terminal and run the CRATES simulator
+   > roslaunch sim sw.launch
+4. Return to your original terminal and run the example
+   > ../example/build/install/example/bin/example org.crates.example.Example
+
+The code will pause the simulation, insert a quadrotor and run the simulator.
+The position of the quadrotor will be published at 1Hz to the console.
+
+Hints:
+* Getters and setters for message fields obey the following rules:
+  1. msg.foo     -> msg.getFoo()    / msg.setFoo()
+  2. msg.foo_bar -> msg.getFooBar() / msg.setFooBar()
+* Look in the xyz/hal/build/generated-src directory for the xyz message sources.
