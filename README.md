@@ -120,6 +120,11 @@ Finally, it is possible to launch a hardware version of an experiment using the 
 
 This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
 
+Language bindings
+=================
+
+Although interacting with the simulator over the command prompt is an interesting exercise, it is impractical to make system calls to 'rostopic' and 'rosservice' from the language of your choice. CRATES supports bindings for C++, Python, Matlab and Java. Please refer to READMEs in the examples directory for usage instructions.
+
 Known issues
 ============
 
