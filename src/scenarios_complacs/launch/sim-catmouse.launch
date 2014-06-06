@@ -1,0 +1,20 @@
+<launch>
+
+	<!-- Launch the simulation of RVC -->
+	<include file="$(find sim)/launch/sw.launch">
+		<arg name="world" value="worlds/hawkshead.world"/>
+		<arg name="gui" value="false"/>
+	</include>
+
+	<!-- Launch the simulator user interface -->
+	<include file="$(find sim)/launch/gui.launch"/>
+
+	<!-- Launch the mouse controller -->
+	<node name="mouse0" pkg="scenarios_complacs" type="mouse"/>
+
+	<!-- Launch the cats -->
+	<node name="cat0" pkg="scenarios_complacs" type="cat"/>
+	<node name="cat1" pkg="scenarios_complacs" type="cat"/>
+	<node name="cat2" pkg="scenarios_complacs" type="cat"/>	
+
+</launch>
