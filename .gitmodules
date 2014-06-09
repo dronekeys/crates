@@ -7,3 +7,6 @@
 [submodule "src/rosjava_core"]
 	path = src/rosjava_core
 	url = https://github.com/rosjava/rosjava_core.git
+[submodule "src/rosjava_messages"]
+	path = src/rosjava_messages
+	url = https://github.com/rosjava/rosjava_messages.git
