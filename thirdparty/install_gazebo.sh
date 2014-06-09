@@ -40,8 +40,3 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Debug ../
 make -j4
 sudo make install
-
-# Post-installation configuration
-ln -s /usr/share/models ~/.gazebo/models
-sudo sh -c 'echo "/usr/local/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/gazebo.config' 
-sudo ldconfig

@@ -35,6 +35,15 @@ Build/install the ROS, gazebo and gpstk libraries using the scripts
 	./install_gazebo.sh
 	./install_gpstk.sh
 
+Make sure that gazebo can see the standard set of models
+
+	ln -s /usr/share/models ~/.gazebo/models
+
+Make sure that gazebo is in your search path. For example, if you are using 64 bit Linux, then the correct path is /usr/local/lib/x86_64-linux-gnu. Eg.
+
+	sudo sh -c 'echo "/usr/local/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/gazebo.conf 
+	sudo ldconfig
+
 Initialise your catkin workspace
 
 	cd  ~/workspace/crates/src
@@ -49,11 +58,6 @@ Source the new CRATES installation
 
 	source ~/crates/devel/setup.bash
 
-Optional: if you plan to interact with the simulator using MATLAB, please also install the ROS IO bridge for MATLAB for your architecture:
-
-https://www.mathworks.co.uk/hardware-support/robot-operating-system.html
-
-You can now follow the basic usage instructions below.
 
 Example usage instructions
 ==========================
