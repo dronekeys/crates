@@ -88,11 +88,11 @@ To resume the simulation we are going to need to call the /simulator/Resume serv
 
 You will see that it takes none. So, go ahead and call it without arguments:
 
-	rosservice call /simulator/Pause
+	rosservice call /simulator/Resume
 
 Time should now be ticking in the simulation. Try playing with the Pause and Step services. Note that the Step service takes an integer number of steps as an argument. Also note that the commands all support tab-completion. 
 
-Arguments follow JSON-style syntax:
+Arguments follow JSON-like syntax:
 
 	rosservice call /simulator/Step "num_steps: 1"
 

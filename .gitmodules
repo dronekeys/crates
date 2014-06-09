@@ -4,3 +4,6 @@
 [submodule "src/rosjava_bootstrap"]
 	path = src/rosjava_bootstrap
 	url = https://github.com/rosjava/rosjava_bootstrap
+[submodule "src/rosjava_core"]
+	path = src/rosjava_core
+	url = https://github.com/rosjava/rosjava_core.git
