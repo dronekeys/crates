@@ -6,6 +6,9 @@ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt
 # Add the key
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 
+# Update the libraries
+sudo apt-get update
+
 # Install base libraries
 sudo apt-get install ros-indigo-roscpp ros-indigo-roslaunch ros-indigo-rosbash ros-indigo-geometry-msgs ros-indigo-std-msgs ros-indigo-std-srvs ros-indigo-rostopic ros-indigo-rosservice
 

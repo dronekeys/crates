@@ -22,8 +22,10 @@ Add the ROS PPA to your Ubuntu Sources
 
 Checkout the CRATES framework and pull the submodules
 
+	mkdir -p ~/workspace
 	cd ~/workspace
 	git clone https://bitbucket.org/asymingt/crates.git
+	cd crates
 	git submodule init
 	git submodule update
 
