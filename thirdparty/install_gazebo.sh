@@ -10,7 +10,7 @@ wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 sudo apt-get update
 
 # Install base libraries
-sudo apt-get -yinstall libgazebo-dev
+sudo apt-get -y install libgazebo-dev
 
 # Save the base directory
 BASEDIR=${PWD}
