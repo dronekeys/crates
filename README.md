@@ -9,8 +9,8 @@ In addition to offering this abstraction service, the HAL may also include type-
 
 CRATES is based upon several open source and actively-developed libraries. ROS is used for the entire messaging backbone, while Gazebo is used for simulation and visualisation. In addition, the GPS toolkit is used to simulate global navigation satellite systems, while GeographicLib is used to to project between coordinate frames and calculate gravitational and magnetic fields.
 
-Installation instructions
-=========================
+Installation instructions (quick)
+=================================
 
 Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine (not recommended -- for performance reasons)
 
@@ -29,7 +29,7 @@ Checkout the CRATES framework and pull the submodules
 	git submodule init
 	git submodule update
 
-Build/install the ROS, gazebo and gpstk libraries using the scripts
+Install syste dependencies, ROS, gazebo and gpstk libraries using the bash scripts supplied in the the thirdparty directory.
 
 	cd  ~/workspace/crates/thirdparty
 	./install_sysdeps.sh
@@ -37,9 +37,12 @@ Build/install the ROS, gazebo and gpstk libraries using the scripts
 	./install_gazebo.sh
 	./install_gpstk.sh
 
-Initialise your catkin workspace
-	
+Make your bash environment aware of the ROS binaries
+
 	source /opt/ros/indigo/setup.bash
+
+Initialise the catkin workspace
+	
 	cd  ~/workspace/crates/src
 	catkin_init_workspace
 
@@ -48,11 +51,19 @@ Build the CRATES framework
 	cd ~/workspace/crates
 	catkin_make
 
-Source the new CRATES installation 
+Make your bash environment aware of the CRATES binaries
 
-	source ~/crates/devel/setup.bash
+	source ~/workspace/crates/devel/setup.bash
 
-Make sure you are connected to the internet, as gazebo will need to download and cache some models on first starting up.
+Finally, test the simulator to make sure everything is working as expected Make sure you are connected to the internet, as gazebo will need to download and cache some third party models on first starting up.
+
+	roslaunch sim sw.launch
+
+Some additional information about the installation process:
+1. We compile gazebo3 from source in order to obtain gdal support, which allows us to load maps containing geographic projections. This simplifies the conversion between various geographic coordinate systems.
+2. We compile gpstk from source becuase no Ubuntu PPA exists for this library. This library allows us to accurately model GPS and Glonass trajectories, and perform full GPS solutions from pseudoranges.
+3. We don't use the gazebo simulator distributed with ROS, as it's quite old (version 2.2) and doesn't support loading DEM files.
+4. We need java and gradle in order to compile our custom messages into java objects for use by the Java language binding.
 
 Example usage instructions
 ==========================
@@ -73,13 +84,14 @@ For your convenience, time has been paused. Like any platform, the simulator off
 
 The list will contain the following, amongst others:
 
-	/simulator/Delete
-	/simulator/Insert
-	/simulator/Noise
-	/simulator/Pause
-	/simulator/Reset
-	/simulator/Resume
-	/simulator/Seed
+	/simulator/Delete    # Delete a model
+	/simulator/Insert    # Insert a model
+	/simulator/Noise     # Turn on and off noise
+	/simulator/Pause     # Pause simulation
+	/simulator/Reset     # Reset simulation
+	/simulator/Resume    # Resume simulation
+	/simulator/Step      # Step the simulator one tick
+	/simulator/Seed      # Seed the random number generator
 
 To resume the simulation we are going to need to call the /simulator/Resume service. Let's get a list of the arguments we'll need to send to this service:
 
