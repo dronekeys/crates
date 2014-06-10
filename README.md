@@ -16,7 +16,7 @@ Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machin
 
 	Visit http://releases.ubuntu.com/14.04/
 
-Add the ROS PPA to your Ubuntu Sources
+Install git
 
 	sudo apt-get install git
 
