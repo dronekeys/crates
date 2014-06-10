@@ -29,7 +29,7 @@ Checkout the CRATES framework and pull the submodules
 	git submodule init
 	git submodule update
 
-Install syste dependencies, ROS, gazebo and gpstk libraries using the bash scripts supplied in the the thirdparty directory.
+Install system dependencies, ROS, gazebo and gpstk libraries using the bash scripts supplied in the the thirdparty directory. You'll probably want to look at each of these scripts to see what they are doing, as they call sudo.
 
 	cd  ~/workspace/crates/thirdparty
 	./install_sysdeps.sh
@@ -70,7 +70,7 @@ If you have an error similar to the one below, it's because the gazebo libraries
 
 Some additional information about the installation process:
 1. We compile gazebo3 from source in order to obtain gdal support, which allows us to load maps containing geographic projections. This simplifies the conversion between various geographic coordinate systems.
-2. We compile gpstk from source becuase no Ubuntu PPA exists for this library. This library allows us to accurately model GPS and Glonass trajectories, and perform full GPS solutions from pseudoranges.
+2. We compile gpstk from source because no Ubuntu PPA exists for this library. This library allows us to accurately model GPS and Glonass trajectories, and perform full GPS solutions from pseudoranges.
 3. We don't use the gazebo simulator distributed with ROS, as it's quite old (version 2.2) and doesn't support loading DEM files.
 4. We need java and gradle in order to compile our custom messages into java objects for use by the Java language binding.
 
@@ -124,7 +124,7 @@ Now, add a single 'hummingbird' quadrotor model to the simulation:
 
 	rosservice call /simulator/Insert UAV1 model://hummingbird
 
-You should see a model appear in simulation. In addition to apparing in the simulation, the HAL inherited by the simulator has also presented itself on the messaging backbone. Use the rosservice tool to see what services it offers.
+You should see a model appear in simulation. In addition to appearing in the simulation, the HAL inherited by the simulator has also presented itself on the messaging backbone. Use the rosservice tool to see what services it offers.
 
 In addition to offering request-response services, the simulated entity also offers some broadcast-style messages on topics. To see what the platform offers, use the rostopic tool. 
 
@@ -134,7 +134,7 @@ For example, each platform has a truthful state (Truth) and an estimated version
 
 If nothing appears, its likely that you have the simulation paused. Remember that clocks are bound to simulated time, and if you have time paused then no callbacks will be triggered. In the very special case where you have no wind, dynamic or sensor noise, then the Estimate equals the Truth.
 
-Finally, it is possible to launch a hardware version of an experiment using the hw.launch file using the collowing command
+Finally, it is possible to launch a hardware version of an experiment using the hw.launch file using the following command
 
 	roslaunch sim hw.launch
 
@@ -168,4 +168,4 @@ Note that you can debug any runtime issues with the simulator in debug mode
 
 If you experience any strange GCC errors when running the install scripts within a VM then you may be running out of memory. Try increasing the memory to at least 2GB and changing the variable NT=2 to NT=1 in the install scripts.
 
-VMWare blacklists intel graphics drivers from direct rendering. You can hack the vmx config file to allow blackisted drivers, and Ubuntu works well. However, I have noticed that textures do not render correctly in gazebo, when using a VM hosted on an Ubuntu machine with an Intel driver.
+VMWare blacklists intel graphics drivers from direct rendering. You can hack the vmx config file to allow blacklisted drivers, and Ubuntu works well. However, I have noticed that textures do not render correctly in gazebo, when using a VM hosted on an Ubuntu machine with an Intel driver.
