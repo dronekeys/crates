@@ -8,4 +8,3 @@
 /thirdparty/gazebo*
 /thirdparty/sdformat*
 /.catkin_workspace
-/src/rosjava_messages/*/build.gradle

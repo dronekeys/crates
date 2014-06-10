@@ -51,7 +51,7 @@ Build the CRATES framework
 	cd ~/workspace/crates
 	catkin_make
 
-Make your bash environment aware of the CRATES binaries
+Make your bash environment aware of the CRATES binaries. You will need to do this each time that you start a new terminal. If you want to avoid having to type this in each time, add the line to ~/.bashrc
 
 	source ~/workspace/crates/devel/setup.bash
 
