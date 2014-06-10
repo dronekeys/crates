@@ -37,17 +37,9 @@ Build/install the ROS, gazebo and gpstk libraries using the scripts
 	./install_gazebo.sh
 	./install_gpstk.sh
 
-Make sure that gazebo can see the standard set of models
-
-	ln -s /usr/share/models ~/.gazebo/models
-
-Make sure that gazebo is in your search path. For example, if you are using 64 bit Linux, then the correct path is /usr/local/lib/x86_64-linux-gnu. Eg.
-
-	sudo sh -c 'echo "/usr/local/lib/x86_64-linux-gnu" > /etc/ld.so.conf.d/gazebo.conf 
-	sudo ldconfig
-
 Initialise your catkin workspace
-
+	
+	source /opt/ros/indigo/setup.bash
 	cd  ~/workspace/crates/src
 	catkin_init_workspace
 
@@ -60,6 +52,7 @@ Source the new CRATES installation
 
 	source ~/crates/devel/setup.bash
 
+Make sure you are connected to the internet, as gazebo will need to download and cache some models on first starting up.
 
 Example usage instructions
 ==========================

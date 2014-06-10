@@ -14,9 +14,11 @@
 
   <!-- start gazebo server-->
   <node name="simulator" pkg="sim" type="$(arg bin)" respawn="false" output="screen" args="-s libsim_simulation.so -s libsim_resources.so --seed $(arg seed) -r -u $(arg world)">
+    <env name="LD_LIBRARY_PATH" value="${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu/gazebo-3.0/plugins"/>
     <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
-    <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
-    <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/models"/>
+    <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
+    <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>
+    <env name="GAZEBO_MODEL_PATH" value="$(find sim)/models"/>
     <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find sim)/resources"/>
     <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
   </node>
@@ -24,9 +26,11 @@
   <!-- start gazebo client -->
   <group if="$(arg gui)">
     <node name="client" pkg="sim" type="client" respawn="false" args="-g libsim_resources.so" output="screen">
+      <env name="LD_LIBRARY_PATH" value="${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu/gazebo-3.0/plugins"/>
       <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
-      <env name="GAZEBO_MODEL_DATABASE_URI" value=""/>
-      <env name="GAZEBO_MODEL_PATH" value="/usr/share/models:$(find sim)/models"/>
+      <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
+      <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>
+      <env name="GAZEBO_MODEL_PATH" value="$(find sim)/models"/>
       <env name="GAZEBO_RESOURCE_PATH" value="/usr/local/share/gazebo-3.0:$(find sim)/resources"/>
       <env name="OGRE_RESOURCE_PATH" value="/usr/lib/x86_64-linux-gnu/OGRE-1.8.0"/>
     </node>
