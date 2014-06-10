@@ -9,7 +9,7 @@ if [[ ! -d $BASEDIR/sdformat ]]; then
 	hg clone https://bitbucket.org/osrf/sdformat
 fi
 cd sdformat
-hg up sdf_2.0
+hg up sdf_2.0.0
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Debug ../
@@ -22,7 +22,7 @@ if [[ ! -d $BASEDIR/gazebo ]]; then
 	hg clone https://bitbucket.org/osrf/gazebo
 fi
 cd gazebo
-hg up gazebo_3.0
+hg up gazebo3_3.0.0
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_TESTS_COMPILATION:BOOL=False -DCMAKE_BUILD_TYPE=Debug ../
