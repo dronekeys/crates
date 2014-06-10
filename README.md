@@ -12,7 +12,7 @@ CRATES is based upon several open source and actively-developed libraries. ROS i
 Installation instructions (quick)
 =================================
 
-Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine (not recommended -- for performance reasons)
+Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine. If you choose to install in a VM, then please ensure you allocate at least 2GB of RAM and enable direct rendering.
 
 	Visit http://releases.ubuntu.com/14.04/
 
@@ -55,9 +55,18 @@ Make your bash environment aware of the CRATES binaries. You will need to do thi
 
 	source ~/workspace/crates/devel/setup.bash
 
-Finally, test the simulator to make sure everything is working as expected Make sure you are connected to the internet, as gazebo will need to download and cache some third party models on first starting up.
+Finally, test the simulator to make sure everything is working as expected Make sure you are connected to the internet, as gazebo will need to download and cache some third party models on first starting up. Note that the first start up
 
 	roslaunch sim sw.launch
+
+If you have an error similar to the one below, it's because the gazebo libraries are not in the search path.
+
+	gazebo: error while loading shared libraries: libgazebo_common.so.1: cannot open shared object file: No such file or directory
+
+ This is likely because you're using 64 bit Ubuntu, and the gazebo libraries get dumped into the non-standard /usr/local/lib/x86_64-linux-gnu directory. To resolve this, add the library search path.
+
+	echo '/usr/local/lib/x86_64-linux-gnu' | sudo tee /etc/ld.so.conf.d/gazebo.conf 
+	sudo ldconfig
 
 Some additional information about the installation process:
 1. We compile gazebo3 from source in order to obtain gdal support, which allows us to load maps containing geographic projections. This simplifies the conversion between various geographic coordinate systems.
@@ -129,7 +138,7 @@ Finally, it is possible to launch a hardware version of an experiment using the 
 
 	roslaunch sim hw.launch
 
-This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the simulator is listening for real (hardware) platforms on the ROS messaging backbone. If some device (a real platform) connected to ROS master server and broadcasts on some message /hal/xxx/yyy/State, then the simulator will pick up on this, and spawn a model that represents the hardware platform.
+This command will again open an interface to a similar-looking world. However, you will notice that there are no /simulator services. This is because the gazebo is listening for real (hardware) platforms on the ROS backbone. If a platform broadcasts its state, then the simulator will pick up on this, and spawn a model representing the hardware platform.
 
 Language bindings
 =================
@@ -157,4 +166,6 @@ Note that you can debug any runtime issues with the simulator in debug mode
 
 	roslaunch sim sw.launch gui:=false bin:=server_debug
 
- 
+If you experience any strange GCC errors when running the install scripts within a VM then you may be running out of memory. Try increasing the memory to at least 2GB and changing the variable NT=2 to NT=1 in the install scripts.
+
+VMWare blacklists intel graphics drivers from direct rendering. You can hack the vmx config file to allow blackisted drivers, and Ubuntu works well. However, I have noticed that textures do not render correctly in gazebo, when using a VM hosted on an Ubuntu machine with an Intel driver.

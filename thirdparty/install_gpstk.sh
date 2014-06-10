@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Number of compilation threads (reduce if there are problems with vm calculations)
+NT=2
+
 # Save the base directory
 BASEDIR=${PWD}
 
@@ -21,5 +24,5 @@ cd $BASEDIR
 mkdir -p ./gpstk-2.4.src/dev/build
 cd ./gpstk-2.4.src/dev/build
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Debug ../
-make -j4
+make -j$NT
 sudo make install
