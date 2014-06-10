@@ -2,7 +2,7 @@
 <launch>
 
   <!-- start gazebo server-->
-  <node name="client" pkg="sim" type="client" respawn="false" args="-g libsim_resources.so" output="screen">
+  <node name="client" pkg="sim" type="client" respawn="false" output="screen">
     <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
     <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
     <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>

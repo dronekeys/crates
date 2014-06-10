@@ -156,7 +156,6 @@ generate_messages(DEPENDENCIES
 catkin_package(
     LIBRARIES
       sim_core
-      sim_resources
       sim_experiment
       sim_simulation
       sim_environment
@@ -235,7 +234,6 @@ add_library(sim_core
 add_library(custom_msgs               ${PROTO_SRCS})
 
 # The base system plugins gzclient and gzserver
-add_library(sim_resources             src/plugins/system/Resources.cpp)
 add_library(sim_experiment            src/plugins/system/Experiment.cpp)
 add_library(sim_simulation            src/plugins/system/Simulation.cpp)
 
@@ -263,7 +261,6 @@ add_library(sim_quadrotor
 ## Add cmake target dependencies #
 
 # ROS message building dependencies
-add_dependencies(sim_resources        sim_generate_messages_cpp)
 add_dependencies(sim_experiment       sim_generate_messages_cpp)
 add_dependencies(sim_simulation       sim_generate_messages_cpp)
 
@@ -300,7 +297,6 @@ set(SYS_LIBS
 )
 
 ## System plugins
-target_link_libraries(sim_resources       ${SYS_LIBS})
 target_link_libraries(sim_experiment      ${SYS_LIBS})
 target_link_libraries(sim_simulation      ${SYS_LIBS})
 
@@ -333,7 +329,6 @@ install(PROGRAMS scripts/server_debug DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATI
 install(
   TARGETS 
     sim_core
-    sim_resources
     sim_experiment
     sim_simulation
     sim_environment

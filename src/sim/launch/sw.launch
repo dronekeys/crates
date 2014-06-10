@@ -13,7 +13,7 @@
   </group>
 
   <!-- start gazebo server-->
-  <node name="simulator" pkg="sim" type="$(arg bin)" respawn="false" output="screen" args="-s libsim_simulation.so -s libsim_resources.so --seed $(arg seed) -r -u $(arg world)">
+  <node name="simulator" pkg="sim" type="$(arg bin)" respawn="false" output="screen" args="-s libsim_simulation.so --seed $(arg seed) -r -u $(arg world)">
     <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
     <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
     <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>
@@ -24,7 +24,7 @@
 
   <!-- start gazebo client -->
   <group if="$(arg gui)">
-    <node name="client" pkg="sim" type="client" respawn="false" args="-g libsim_resources.so" output="screen">
+    <node name="client" pkg="sim" type="client" respawn="false" output="screen">
       <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
       <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
       <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>
