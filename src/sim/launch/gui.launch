@@ -3,7 +3,6 @@
 
   <!-- start gazebo server-->
   <node name="client" pkg="sim" type="client" respawn="false" args="-g libsim_resources.so" output="screen">
-    <env name="LD_LIBRARY_PATH" value="${LD_LIBRARY_PATH}:/usr/lib/x86_64-linux-gnu/gazebo-3.0/plugins"/>
     <env name="GEOGRAPHICLIB_DATA" value="$(find sim)/resources/gis"/>
     <env name="GAZEBO_MASTER_URI" value="http://localhost:11345"/>
     <env name="GAZEBO_MODEL_DATABASE_URI" value="http://gazebosim.org/models"/>

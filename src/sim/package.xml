@@ -43,6 +43,6 @@
   <run_depend>hal_sensor_orientation</run_depend>
 
   <export>
-    <sim plugin_path="${prefix}/../devel/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/models"/>
+    <sim plugin_path="${prefix}/../../devel/lib" gazebo_media_path="${prefix}/resources" gazebo_model_path="${prefix}/models"/>
   </export>
 </package>
