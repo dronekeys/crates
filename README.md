@@ -12,7 +12,7 @@ CRATES is based upon several open source and actively-developed libraries. ROS i
 Installation instructions (quick)
 =================================
 
-Install Ubuntu 14.04 "Trusty Tahr" as an OS (recommended) or in a Virtual Machine. If you choose to install in a VM, then please ensure you allocate at least 2GB of RAM and enable direct rendering.
+Install Ubuntu 14.04 "Trusty Tahr" as an dual-boot (recommended) or in a Virtual Machine. If you choose to install in a VM, then the guest VM will need (a) at least 2GB ram, (b) two cores, (c) 3D support, and (d) guest drivers for 3D support. I have only managed to get CRATES working in vmware,  and so I would suggest using this. For Intel graphics cards mesa doesn't support GLSL 1.3 (a requirement for rendering terrain) and so you'll need to follow additional instructions (https://launchpad.net/~oibaf/+archive/graphics-drivers). Hopefully, NVidia and ATI works out of the box.
 
 	Visit http://releases.ubuntu.com/14.04/
 

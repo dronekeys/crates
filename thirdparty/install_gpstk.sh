@@ -23,6 +23,6 @@ cp ./patches/cmake_uninstall.cmake.in ./gpstk-2.4.src/dev/cmake_uninstall.cmake.
 cd $BASEDIR
 mkdir -p ./gpstk-2.4.src/dev/build
 cd ./gpstk-2.4.src/dev/build
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Debug ../
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release ../
 make -j$NT
 sudo make install

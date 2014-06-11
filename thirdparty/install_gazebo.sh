@@ -15,7 +15,7 @@ cd sdformat
 hg up sdformat_2.0.0
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Debug ../
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release ../
 make -j$NT
 sudo make install
 
@@ -28,7 +28,7 @@ cd gazebo
 hg up gazebo3_3.0.0
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_TESTS_COMPILATION:BOOL=False -DCMAKE_BUILD_TYPE=Debug ../
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_TESTS_COMPILATION:BOOL=False -DCMAKE_BUILD_TYPE=Release ../
 make -j$NT
 sudo make install
 
