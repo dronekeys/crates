@@ -33,4 +33,4 @@ make -j$NT
 sudo make install
 
 # Create a home directory or gazebo wont start
-mkdir -p ~/.gazebo
+mkdir -p ~/.gazebo/models
