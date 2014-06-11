@@ -1,18 +1,18 @@
 Overview
 ========
 
-CRATES stands for "Cognitive Robotics Architecture for Tightly-Coupled Experiments and Simulation". The overarching goal of the project is to create an easy-to-use architecture for writing high-level cognitive controllers for simulated robot problems, which can easily be transferred to real experiments. It achieves this by routing all communication through a hardware abstraction layer.
+CRATES stands for "Cognitive Robotics Architecture for Tightly-Coupled Experiments and Simulation". The overarching goal of the project is to create an easy-to-use architecture for writing high-level cognitive controllers for simulated robot problems, which can easily be transferred to real experiments.
 
-The general idea is that both simulated and actual hardware platforms inherit functionality from a common HAL. The HAL exposes itself to a controller over a messaging backbone. In so doing the HAL abstracts away from the detailed implementation, and presents itself as a general robot type, such as a 'quadrotor'. 
+The overarching idea is that both simulated and actual hardware platforms inherit functionality from a common HAL, which exposes itself over a messaging backbone. In so doing the HAL abstracts away from the detailed implementation, and presents itself as a general robot type, like a 'quadrotor'. 
 
-In addition to offering this abstraction service, the HAL may also include type-specific perception, navigation and low-level control algorithms. By implementing such functionality directly in the HAL, functionality is reused between experiments and simulation, and the mission-critical functions do not contend with bandwidth-intensive applications on the messaging system.
+In addition to offering this abstraction service, the HAL may also include type-specific perception, navigation and low-level control algorithms. By implementing such functionality directly in the HAL, it is reused between experiments and simulation, and the mission-critical functions do not contend with bandwidth-intensive applications on the ROS messaging system.
 
 CRATES is based upon several open source and actively-developed libraries. ROS is used for the entire messaging backbone, while Gazebo is used for simulation and visualisation. In addition, the GPS toolkit is used to simulate global navigation satellite systems, while GeographicLib is used to to project between coordinate frames and calculate gravitational and magnetic fields.
 
 Installation instructions (quick)
 =================================
 
-Install Ubuntu 14.04 "Trusty Tahr" as an dual-boot (recommended) or in a Virtual Machine. If you choose to install in a VM, then the guest VM will need (a) at least 2GB ram, (b) two cores, (c) 3D support, and (d) guest drivers for 3D support. I have only managed to get CRATES working in vmware,  and so I would suggest using this. For Intel graphics cards mesa doesn't support GLSL 1.3 (a requirement for rendering terrain) and so you'll need to follow additional instructions (https://launchpad.net/~oibaf/+archive/graphics-drivers). Hopefully, NVidia and ATI works out of the box.
+Install Ubuntu 14.04 "Trusty Tahr" as an dual-boot (recommended) or in a Virtual Machine. If you choose to install in a VM, then the guest VM will need (a) at least 2GB ram, (b) two cores, (c) 3D support, and (d) guest drivers for 3D support. I have only managed to get CRATES working in vmware,  and so I would suggest using this. For Intel graphics cards mesa doesn't support GLSL 1.Please be sure to read the 'known issues' sections at the bottom of this page if you choose to run within a VM.
 
 	Visit http://releases.ubuntu.com/14.04/
 
@@ -166,6 +166,16 @@ Note that you can debug any runtime issues with the simulator in debug mode
 
 	roslaunch sim sw.launch gui:=false bin:=server_debug
 
-If you experience any strange GCC errors when running the install scripts within a VM then you may be running out of memory. Try increasing the memory to at least 2GB and changing the variable NT=2 to NT=1 in the install scripts.
+If you experience any strange GCC errors when running the install scripts within a VM then you may be running out of memory. Try increasing the VM memory to 2GB and changing the variable NT=2 to NT=1 in the install scripts.
 
-VMWare blacklists intel graphics drivers from direct rendering. You can hack the vmx config file to allow blacklisted drivers, and Ubuntu works well. However, I have noticed that textures do not render correctly in gazebo, when using a VM hosted on an Ubuntu machine with an Intel driver.
+	c++: internal compiler error: Killed (program cc1plus)
+
+VMWare blacklists intel graphics drivers from direct rendering. You can hack the vmx config file to allow blacklisted drivers, and Ubuntu works well. For even better performance install a non-compiz window manager.
+
+	sudo apt-get install gnome-session-flashback
+
+You can switch to this new window manager by logging out and clicking on the Ubuntu icon next to your name in the login screen.
+
+For Intel systems the VMWare host graphics drivers provide GL Shading Language 1.2, where 1.3 is required to texture terrain in Gazebo. To resolve this you'll need to add some new mesa drivers:
+
+	visit https://launchpad.net/~oibaf/+archive/graphics-drivers/
