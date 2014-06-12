@@ -46,10 +46,10 @@ Initialise the catkin workspace
 	cd  ~/workspace/crates/src
 	catkin_init_workspace
 
-Build the CRATES framework
+Build the CRATES framework. We are building the code in release mode for two reasons. Firstly, it will run significantly faster without debug symbols. Secondly, there is a race condition bug on Trusty (https://bitbucket.org/osrf/gazebo/issue/1204/trusty-remote_endpoint-transport-endpoint) that causes a transport end point failure on launching.
 
 	cd ~/workspace/crates
-	catkin_make
+	catkin_make -DCMAKE_BUILD_TYPE=Release
 
 Make your bash environment aware of the CRATES binaries. You will need to do this each time that you start a new terminal. If you want to avoid having to type this in each time, add the line to ~/.bashrc
 
@@ -148,7 +148,7 @@ Although interacting with the simulator over the command prompt is an interestin
 Known issues
 ============
 
-CRATES is currently a work in progress. Bugs are continually being fixed, and you are therefore strongly urged to do a 'git pull' on a regular basis. 
+CRATES is currently a work in progress. Bugs are continually being fixed, and you are therefore strongly urged to pull and recompile on a regular basis. 
 
 At height zero the quadrotor jumps in and out of the ground plane. This has to do with the fact that the GeoTiff used to draw the ground does not provide a perfectly flat surface. The heightmap generated from this image therefore has little bumps all over it, and simulated gravity causes small oscillations.
 
@@ -157,16 +157,12 @@ Periodically, the following message is received on starting the simulator
 	terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'what():  remote_endpoint: Transport endpoint is not connected
 	Aborted (core dumped)
   
-It is caused by roslaunch firing up the GUI before the simulation server has loaded. Here's a workaround.
-
-	roslaunch sim sw.launch gui:=false
-	roslaunch sim gui.launch
- 
-Note that you can debug any runtime issues with the simulator in debug mode
+This is a known bug with Gazebo running on Trusty Tahr, and it is caused by a race condition between the Gazebo client and server, when gazebo plugins are compiled with debug flags. If you need to debug the simulator for some reason, here's a workaround that will prevent this error. This will also start the server in debug mode (assuming of course you've compiled crates with catkin_make -DCMAKE_BUILD_TYPE=Release) so you can drop to GDB and backtrace.
 
 	roslaunch sim sw.launch gui:=false bin:=server_debug
-
-If you experience any strange GCC errors when running the install scripts within a VM then you may be running out of memory. Try increasing the VM memory to 2GB and changing the variable NT=2 to NT=1 in the install scripts.
+	roslaunch sim gui.launch
+ 
+If you experience any strange GCC errors when running the install scripts within a VM then you're probably running out of memory. Try increasing the VM memory to 2GB and changing the variable NT=2 to NT=1 in the install scripts.
 
 	c++: internal compiler error: Killed (program cc1plus)
 
@@ -176,6 +172,13 @@ VMWare blacklists intel graphics drivers from direct rendering. You can hack the
 
 You can switch to this new window manager by logging out and clicking on the Ubuntu icon next to your name in the login screen.
 
-For Intel systems the VMWare host graphics drivers provide GL Shading Language 1.2, where 1.3 is required to texture terrain in Gazebo. To resolve this you'll need to add some new mesa drivers:
+For Intel systems the VMWare host graphics drivers provide GL Shading Language 1.20, where 1.30 is required to texture terrain in Gazebo. If you find the simulator is starting, but all you see is a black screen then you've likely got GLSL 1.20. To verify this, type 
 
-	visit https://launchpad.net/~oibaf/+archive/graphics-drivers/
+	sudo apt-get install mesa-utils
+	glxinfo | grep version
+
+This will print out all sorts of interesting information about your GL environment. Most importantly, you're looking for this line:
+
+	OpenGL shading language version string: x.y
+
+If you see any x.y version less than 1.30, then you'll need to work out how to increase it to 1.30. I've only managed to get the simulator working with software rendering in VMware on a host with an Intel, but it may very well be possible to get it up and running with other graphics cards.
