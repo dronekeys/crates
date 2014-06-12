@@ -126,6 +126,14 @@ Now, add a single 'hummingbird' quadrotor model to the simulation:
 
 You should see a model appear in simulation. In addition to appearing in the simulation, the HAL inherited by the simulator has also presented itself on the messaging backbone. Use the rosservice tool to see what services it offers.
 
+Take note that, for safety reasons, quadrotor control adheres to the finite state machine pictured below.
+
+![Quadrotor HAL](https://bytebucket.org/asymingt/crates/raw/199f5e9a2750208e9866c1456d0913b90e5d7393/docs/images/quadrotor_state.png "Finite State Machine for Control coded into the Quadrotor HAL")
+
+A quadrotor is always spawned in the idle state (motors off). Hence, when simulation time resumes, you will notice that gravity pulls the platform to the ground. To actually begin flying you'll need to takeoff first. To takeoff to a five meter altitude, type the following.
+
+	rosservice call /hal/UAV1/controller/Takeoff 5
+
 In addition to offering request-response services, the simulated entity also offers some broadcast-style messages on topics. To see what the platform offers, use the rostopic tool. 
 
 For example, each platform has a truthful state (Truth) and an estimated version of this state (Estimate). Since we are currently in simulated mode, both of these states are observable. For example, to see the estimated state, use the following command.
