@@ -70,7 +70,7 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 		case CONTROLLER_TAKEOFF:
 			if (DEBUG) ROS_INFO("Goal reached. Switching to hover.");
 			current = CONTROLLER_HOVER;
-			ptr = (Controller*) &cIdle;
+			ptr = (Controller*) &cHover;
 			break;
 
 		// At the end of landing, always switch back to idle
@@ -89,7 +89,7 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 	if (current == CONTROLLER_IDLE || current == CONTROLLER_EMERGENCY)
 		return false;
 
-	// Motors must eb enabled
+	// Motors must be enabled
 	return true;
 }
 
