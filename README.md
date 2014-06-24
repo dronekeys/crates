@@ -191,6 +191,6 @@ This will print out all sorts of interesting information about your GL environme
 
 If you see any x.y version less than 1.30, then you'll need to work out how to increase it to 1.30. I've only managed to get the simulator working with software rendering in VMware on a host with an Intel, but it may very well be possible to get it up and running with other graphics cards. To check if this is a problem that affects you, try this:
 
-	LIBGL_ALWAYS_SOFTWARE=1 slaunch sim sw.launch
+	LIBGL_ALWAYS_SOFTWARE=1 roslaunch sim sw.launch
 
 This is essentially a full version of the simulator, which uses software 3D rendering in place of hardware 3d rendering. It will therefore run very slowly.
