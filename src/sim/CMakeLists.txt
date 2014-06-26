@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   hal_sensor_gnss
   hal_sensor_imu
   hal_sensor_orientation
+  hal_sensor_transceiver
 ) 
 
 # Find Gazebo
@@ -177,6 +178,7 @@ catkin_package(
       hal_sensor_imu
       hal_sensor_gnss
       hal_sensor_orientation
+      hal_sensor_transceiver
 )
 
 ###########
@@ -253,6 +255,7 @@ add_library(sim_quadrotor
   src/plugins/model/sensors/GNSS.cpp
   src/plugins/model/sensors/IMU.cpp
   src/plugins/model/sensors/Orientation.cpp
+  src/plugins/model/sensors/Receiver.cpp
   src/plugins/model/Quadrotor.cpp
 )
 

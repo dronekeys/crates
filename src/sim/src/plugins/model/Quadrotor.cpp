@@ -24,6 +24,8 @@
 #include "sensors/GNSS.h"
 #include "sensors/IMU.h"
 #include "sensors/Orientation.h"
+#include "sensors/Receiver.h"
+//#include "sensors/Transmitter.h"
 
 // Custom messages
 #include "noise.pb.h"
@@ -39,7 +41,9 @@ namespace gazebo
 		public hal::sensor::Compass,		/* Exposes Compass sensor      	 */
 		public hal::sensor::GNSS,			/* Exposes GNSS sensor      	 */
 		public hal::sensor::IMU,			/* Exposes IMU sensor      		 */
-		public hal::sensor::Orientation 	/* Exposes Orientation sensor    */
+		public hal::sensor::Orientation, 	/* Exposes Orientation sensor    */
+//		public hal::sensor::Transmitter, 	/* Exposes Transitter sensor 	 */
+		public hal::sensor::Receiver 		/* Exposes Receiver 			 */
  	{
 
   	private:
@@ -61,6 +65,8 @@ namespace gazebo
 	    gazebo::GNSS    			sG;
 	    gazebo::IMU    				sI;
 	    gazebo::Orientation 		sO;
+	    //gazebo::Transmitter 		sT;
+	    gazebo::Receiver 			sR;
 
 	    // Gazebo communication
 		transport::NodePtr 			nodePtr;
@@ -138,6 +144,7 @@ namespace gazebo
 	    	hal::sensor::GNSS::Init(halName);
 	    	hal::sensor::IMU::Init(halName);
 	    	hal::sensor::Orientation::Init(halName);
+            hal::sensor::Receiver::Init(halName);
 
 			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 
@@ -164,6 +171,9 @@ namespace gazebo
 			
 			// Configure the orientation sensor
 			sO.Configure(linkPtr, root->GetElement("orientation"));
+
+			// Configure the Receiver sensor
+			sR.Configure(linkPtr, root->GetElement("transceiver"));
 
 			// INITIALISE WGS84 <-> LTP CONVERSION CONSTANTS /////////////////////
 
@@ -215,7 +225,10 @@ namespace gazebo
 			sI.Reset();
 			
 			// Reset the orientation sensor
-			sO.Reset();		
+			sO.Reset();	
+
+			// Reset the Receiver sensor
+			sR.Reset();
 	    }
 
 	    /////////////////////////////////////////////////////////////////////////////////////
@@ -274,6 +287,13 @@ namespace gazebo
 		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
+	    	return false;
+	    }
+
+	    //Called when the HAL wants an receiver reading
+	    //@todo update this code!!
+	    bool GetMeasurement(hal_sensor_transceiver::Data &msg)
+	    {
 	    	return false;
 	    }
 
