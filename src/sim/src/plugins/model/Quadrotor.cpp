@@ -25,7 +25,6 @@
 #include "sensors/IMU.h"
 #include "sensors/Orientation.h"
 #include "sensors/Receiver.h"
-//#include "sensors/Transmitter.h"
 
 // Custom messages
 #include "noise.pb.h"
@@ -42,7 +41,6 @@ namespace gazebo
 		public hal::sensor::GNSS,			/* Exposes GNSS sensor      	 */
 		public hal::sensor::IMU,			/* Exposes IMU sensor      		 */
 		public hal::sensor::Orientation, 	/* Exposes Orientation sensor    */
-//		public hal::sensor::Transmitter, 	/* Exposes Transitter sensor 	 */
 		public hal::sensor::Receiver 		/* Exposes Receiver 			 */
  	{
 
@@ -65,7 +63,6 @@ namespace gazebo
 	    gazebo::GNSS    			sG;
 	    gazebo::IMU    				sI;
 	    gazebo::Orientation 		sO;
-	    //gazebo::Transmitter 		sT;
 	    gazebo::Receiver 			sR;
 
 	    // Gazebo communication
@@ -109,6 +106,7 @@ namespace gazebo
 	    // Default constructor
 	    Quadrotor() : hal::quadrotor::Quadrotor(), tim(0.0)
 	    {
+	    	ROS_INFO("Quadrotor!!!!!!!!");
     		// Kill all random number streams
 	    	NoiseFactory::Init();
 	    }
@@ -145,7 +143,7 @@ namespace gazebo
 	    	hal::sensor::IMU::Init(halName);
 	    	hal::sensor::Orientation::Init(halName);
             hal::sensor::Receiver::Init(halName);
-
+         
 			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 
 			// Configure the propulsion dynamics
@@ -173,7 +171,7 @@ namespace gazebo
 			sO.Configure(linkPtr, root->GetElement("orientation"));
 
 			// Configure the Receiver sensor
-			sR.Configure(linkPtr, root->GetElement("transceiver"));
+			sR.Configure(linkPtr, root->GetElement("imu"));
 
 			// INITIALISE WGS84 <-> LTP CONVERSION CONSTANTS /////////////////////
 
@@ -294,7 +292,12 @@ namespace gazebo
 	    //@todo update this code!!
 	    bool GetMeasurement(hal_sensor_transceiver::Data &msg)
 	    {
-	    	return false;
+	    	if (sR.GetMeasurement(tim,msg))
+	    	{
+		    	//GetNavPtr()->Process(msg);		// Also use for navigation
+		    	return true;
+		    }
+	    	return true;
 	    }
 
 	    // Called to arm or disarm the motors

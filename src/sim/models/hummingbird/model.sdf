@@ -227,15 +227,13 @@
         </errors>
       </orientation>
 
+	<!-- TRANSCEIVER parameters -->
+	<transceiver>
+		<essid>crates</essid>
+		<gain>2.5</gain>
+		<power>14.5</power>
+	</transceiver>
 
-      <transceiver>
-          <min_frequency>2412.0</min_frequency>
-          <max_frequency>2484.0</max_frequency>
-          <power>14.5</power>
-          <gain>2.5</gain>
-          <sensitivity>-90.0</sensitivity>
-    </transceiver>
-    
     </plugin>
   
   </model>

@@ -32,7 +32,7 @@ namespace hal
 
 		protected:
 
-			virtual bool GetMeasurement(hal_sensor_transceiver::Data& msg);
+			virtual bool GetMeasurement(hal_sensor_transceiver::Data& msg) = 0;
 
 		public:
 
