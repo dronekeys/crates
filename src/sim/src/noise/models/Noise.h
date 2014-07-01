@@ -39,7 +39,7 @@ namespace gazebo
         Noise();
 
         /// Destructor
-        ~Noise();
+        virtual ~Noise();
 
         /// Reset the random stream
         virtual void Reset() = 0;
