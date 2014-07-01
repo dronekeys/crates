@@ -1,17 +1,19 @@
+// General ROS functionality
 #include <ros/ros.h>
 
+// Simulator services
 #include <sim/Insert.h>
 #include <sim/Resume.h>
 #include <sim/Pause.h>
 
+// Quadrotor services
 #include <hal_quadrotor/State.h>
-#include <hal_quadrotor/control/Takeoff.h>
-#include <hal_quadrotor/control/Waypoint.h>
-#include <hal_quadrotor/control/Hover.h>
 #include <hal_sensor_transceiver/Receiver.h>
 
-void StateCallback(const hal_quadrotor::State::ConstPtr& msg){
-	ROS_INFO("Quadrotor position: [%f, %f, %f]", msg->x, msg->y, msg->z);
+// Callback for quadrotor state
+void StateCallback(const hal_quadrotor::State::ConstPtr& msg)
+{
+  ROS_INFO("Quadrotor position: [%f,%f,%f]", msg->x, msg->y, msg->z);
 }
 
 void ReceiverCallback(hal_sensor_transceiver::Data msg)
@@ -19,68 +21,64 @@ void ReceiverCallback(hal_sensor_transceiver::Data msg)
   ROS_INFO("Quadrotor Receiver: [%f, %f]", msg.gain, msg.power);
 }
 
+// Main entry point of application
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "move_quadrotor");
+  // Initialise the ROS client
+  ros::init(argc, argv, "example");
 
-	ros::NodeHandle n;
+  // Create a node handle, which this C code will use to bind to the ROS server
+  ros::NodeHandle n;
 
-	ros::ServiceClient srvInsert = n.serviceClient<sim::Insert>("/simulator/Insert");
-	ros::ServiceClient srvResume = n.serviceClient<sim::Resume>("/simulator/Resume");
-	ros::ServiceClient srvPause = n.serviceClient<sim::Pause>("/simulator/Pause");
-	
-	
-	ros::Subscriber topState = n.subscribe("/hal/UAV2/Estimate", 1000, StateCallback);	
-	ros::Subscriber receiverState = n.subscribe("/hal/UAV0/sensor/receiver/Data", 1000, ReceiverCallback);
+  // Create a client for interacting with the Simulator insert and Resume services
+  ros::ServiceClient srvInsert = n.serviceClient<sim::Insert>("/simulator/Insert");
+  ros::ServiceClient srvResume = n.serviceClient<sim::Resume>("/simulator/Resume");
+  ros::ServiceClient srvPause  = n.serviceClient<sim::Pause> ("/simulator/Pause");
 
-	sim::Pause msgPause;
+  // Subscribe to the state of the quadrotor
+  ros::Subscriber topState = n.subscribe("/hal/UAV0/Estimate", 1000, StateCallback);
+  ros::Subscriber receiverState = n.subscribe("/hal/UAV0/sensor/receiver/Data", 1000, ReceiverCallback);
+  // Create a resume message, which takes no arguments
+  sim::Pause msgPause;
 
-	if(!srvPause.call(msgPause)){
-		ROS_FATAL("Failed to pause the simulator");
-		return 1;
-	}
+  // Call the client with this message
+  if (!srvPause.call(msgPause))
+  {
+    ROS_FATAL("Failed to pause the simulator");
+    return 1;
+  }
 
-	sim::Insert msgInsert;
-	msgInsert.request.model_name = "UAV2";
-	msgInsert.request.model_type = "model://hummingbird";
+  // Create a message instructing a quadrotor UAV0 to be inserted in to the world
+  sim::Insert msgInsert;
+  msgInsert.request.model_name = "UAV0";
+  msgInsert.request.model_type = "model://hummingbird";
+  
+  // Call the client with this message
+  if (!srvInsert.call(msgInsert))
+  {
+    ROS_FATAL("Failed to insert a hummingbird quadrotor into the simulator");
+    return 1;
+  }
 
-	if(!srvInsert.call(msgInsert)){
-		ROS_FATAL("Failed to insert a hummingbird");
-		return 1;
-	}
+  // You should now see the quadrotor
+  ROS_INFO("Successfully inserted the model into the world");
 
-	sim::Resume msgResume;
+  // Create a resume message, which takes no arguments
+  sim::Resume msgResume;
 
-	if(!srvResume.call(msgResume)){
-		ROS_FATAL("Failed to resume the simulator");
-		return 1;
-	}
+  // Call the client with this message
+  if (!srvResume.call(msgResume))
+  {
+    ROS_FATAL("Failed to resume the simulator");
+    return 1;
+  }
 
-	ROS_INFO("Successfully resumed the simulator");
-	
-	ros::Rate rate(2);
-	rate.sleep();
+  // You should now see the quadrotor
+  ROS_INFO("Successfully resumed the simulation");
 
-	hal_quadrotor::Takeoff req_Takeoff;
-	req_Takeoff.request.altitude = 4.0;
+  // Keep going until ctl+c is pressed
+  ros::spin();
 
-	ros::ServiceClient srvTakeOff = n.serviceClient<hal_quadrotor::Takeoff>("/hal/UAV2/controller/Takeoff");
-	if(!srvTakeOff.call(req_Takeoff)){
-		ROS_FATAL("NO TAKE OFF!!");
-		return 1;
-	} else {
-		ROS_INFO("TAKE OFF!!");
-	}
-
-	hal_quadrotor::Hover req_Hover;
-
-	ros::ServiceClient srvHover = n.serviceClient<hal_quadrotor::Hover>("/hal/UAV2/controller/Hover");
-	if(!srvHover.call(req_Hover)){
-		ROS_FATAL("NO HOVER!!");
-	}	
-
-	ros::spin();
-
-	//Success!!
-	return 0;
+  // Success!
+  return 0;
 }
