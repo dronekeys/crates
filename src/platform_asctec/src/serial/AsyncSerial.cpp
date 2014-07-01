@@ -511,7 +511,7 @@ void AsyncSerial::setErrorStatus(bool e)
 }
 
 void AsyncSerial::setReadCallback(const
-        function<void (const char*, size_t)>& callback)
+                                  boost::function<void (const char*, size_t)>& callback)
 {
     pimpl->callback=callback;
 }
