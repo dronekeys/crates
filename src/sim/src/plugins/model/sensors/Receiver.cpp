@@ -21,8 +21,7 @@ void Receiver::Reset()
 
 bool Receiver::GetMeasurement(double t, hal_sensor_transceiver::Data& msg)
 {
-	msg.gain = 3.4;
-	msg.power = 2.3;
-	 
+	msg.gain = sensors::WirelessReceiver::GetGain();
+	msg.power = sensors::WirelessReceiver::GetPower();
 	return true;
 }

@@ -8,12 +8,12 @@
 #include "Sensor.h"
 
 //Inherit Gazebo Receiver
-//#include <gazebo/sensors/WirelessReceiver.hh>
+#include <gazebo/sensors/WirelessReceiver.hh>
 
 namespace gazebo
 {
-	class Receiver : public Sensor
-	//public gazebo::sensors::WirelessReceiver
+	class Receiver : public Sensor,
+	public gazebo::sensors::WirelessReceiver
 	{
 	private:
 

@@ -8,9 +8,15 @@
 #include <hal_quadrotor/control/Takeoff.h>
 #include <hal_quadrotor/control/Waypoint.h>
 #include <hal_quadrotor/control/Hover.h>
+#include <hal_sensor_transceiver/Receiver.h>
 
 void StateCallback(const hal_quadrotor::State::ConstPtr& msg){
 	ROS_INFO("Quadrotor position: [%f, %f, %f]", msg->x, msg->y, msg->z);
+}
+
+void ReceiverCallback(hal_sensor_transceiver::Data msg)
+{
+  ROS_INFO("Quadrotor Receiver: [%f, %f]", msg.gain, msg.power);
 }
 
 int main(int argc, char **argv)
@@ -25,7 +31,8 @@ int main(int argc, char **argv)
 	
 	
 	ros::Subscriber topState = n.subscribe("/hal/UAV2/Estimate", 1000, StateCallback);	
-	
+	ros::Subscriber receiverState = n.subscribe("/hal/UAV0/sensor/receiver/Data", 1000, ReceiverCallback);
+
 	sim::Pause msgPause;
 
 	if(!srvPause.call(msgPause)){
@@ -70,19 +77,7 @@ int main(int argc, char **argv)
 	ros::ServiceClient srvHover = n.serviceClient<hal_quadrotor::Hover>("/hal/UAV2/controller/Hover");
 	if(!srvHover.call(req_Hover)){
 		ROS_FATAL("NO HOVER!!");
-	}
-
-
-	hal_quadrotor::Waypoint req_Waypoint;
-	req_Waypoint.request.x = 4.0;
-	req_Waypoint.request.y = 4.0;
-	req_Waypoint.request.z = 4.0;
-	req_Waypoint.request.yaw = 4.0;
-
-	ros::ServiceClient srvWaypoint = n.serviceClient<hal_quadrotor::Waypoint>("/hal/UAV2/controller/Waypoint");
-	if(!srvWaypoint.call(req_Waypoint)){
-		ROS_FATAL("NO WAYPOINT!!");
-	}
+	}	
 
 	ros::spin();
 
