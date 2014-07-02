@@ -54,6 +54,7 @@ add_message_files(
     msg
   FILES  
     Data.msg
+    TData.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -108,7 +109,9 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(hal_sensor_transceiver src/Receiver.cpp)
+add_library(hal_sensor_transceiver 
+  src/Receiver.cpp
+  src/Transmitter.cpp)
 
 ## Declare a cpp executable
 # add_executable(uav_driver 

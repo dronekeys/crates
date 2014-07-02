@@ -256,6 +256,7 @@ add_library(sim_quadrotor
   src/plugins/model/sensors/IMU.cpp
   src/plugins/model/sensors/Orientation.cpp
   src/plugins/model/sensors/Receiver.cpp
+  src/plugins/model/sensors/Transmitter.cpp
   src/plugins/model/Quadrotor.cpp
 )
 

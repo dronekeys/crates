@@ -7,6 +7,7 @@
 
 #include <hal_quadrotor/State.h>
 #include <hal_sensor_transceiver/Receiver.h>
+#include <hal_sensor_transceiver/Transmitter.h>
 #include <hal_quadrotor/control/Takeoff.h>
 #include <hal_quadrotor/control/Waypoint.h>
 #include <hal_quadrotor/control/Hover.h>
@@ -62,6 +63,11 @@ void ReceiverCallback(hal_sensor_transceiver::Data msg)
   ROS_INFO("Quadrotor Receiver: [%f, %f]", msg.gain, msg.power);
 }
 
+void TransmitterCallback(hal_sensor_transceiver::TData msg)
+{
+	ROS_INFO("Quadrotor Transmitter: [%f, %f]". msg.gain, msg.power);
+}
+
 void QuadrotorRoute(){
 	hal_quadrotor::Waypoint wp1, wp2, wp3, wp4;
 	//TAKE OFF WAYPOINT
@@ -107,6 +113,7 @@ int main(int argc, char **argv)
 	
 	ros::Subscriber topState = n.subscribe("/hal/UAV2/Estimate", 1000, StateCallback);	
 	ros::Subscriber receiverState = n.subscribe("/hal/UAV2/sensor/receiver/Data", 1000, ReceiverCallback);
+	ros::Subscriber tranmsitterState = n.subscribe("/hal/UAV2/sensor/Transmitter/Data", 1000, TransmitterCallback);
  
 	sim::Pause msgPause;
 

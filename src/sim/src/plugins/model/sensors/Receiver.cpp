@@ -2,9 +2,7 @@
 
 using namespace gazebo;
 
-Receiver::Receiver(){
-	ROS_INFO("RECEIVER INIT!!");
-}
+Receiver::Receiver() {}
 
 bool Receiver::Configure(physics::LinkPtr link, sdf::ElementPtr root)
 {
