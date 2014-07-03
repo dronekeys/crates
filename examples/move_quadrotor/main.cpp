@@ -15,6 +15,9 @@
 std::list<hal_quadrotor::Waypoint> movement;
 std::list<hal_quadrotor::Waypoint>::iterator list_iterator;
 ros::ServiceClient srvWaypoint;
+hal_quadrotor::Waypoint wp1, wp2, wp3, wp4;
+ros::ServiceClient srvHover;
+hal_quadrotor::Hover req_Hover;
 
 bool isAtGoal(const hal_quadrotor::Waypoint &goal, const hal_quadrotor::State::ConstPtr& state){
 	double dst = sqrt(
@@ -28,7 +31,7 @@ bool isAtGoal(const hal_quadrotor::Waypoint &goal, const hal_quadrotor::State::C
         +   (state->w * state->w)
     );
 
-    if (dst < 1.0 && vel < 0.8){
+    if (dst < 1.0 && vel < 0.4){
     	return true;
     }
 
@@ -37,16 +40,18 @@ bool isAtGoal(const hal_quadrotor::Waypoint &goal, const hal_quadrotor::State::C
 
 void StateCallback(const hal_quadrotor::State::ConstPtr& msg){
 	hal_quadrotor::Waypoint& tmp = *list_iterator;
-
 	ROS_INFO("Quadrotor position: [%f, %f, %f, %f]", msg->x, msg->y, msg->z, msg->remaining);
 	ROS_INFO("WAYPOINT: [%f, %f, %f]", tmp.request.x, tmp.request.y, tmp.request.z);
 
 	if(isAtGoal(*list_iterator, msg)){
 		ROS_INFO("GOAL REACHED!!");
 		if(movement.end() != list_iterator){
-			ROS_INFO("!!!--CALLING NEW WAYPOINT--!!!");
+			if(!srvHover.call(req_Hover)){
+				ROS_FATAL("NO HOVER!!");
+			}
 			++list_iterator;
 			tmp = *list_iterator;
+			ROS_INFO("!!!--CALLING NEW WAYPOINT--!!!");
 			if(!srvWaypoint.call(tmp)){
 				ROS_FATAL("NO WAYPOINT!!");
 			}
@@ -58,6 +63,10 @@ void StateCallback(const hal_quadrotor::State::ConstPtr& msg){
 	//@todo check if message was missed!! Check if velocity is low and distance not changing!! and Not at Goal!!
 }
 
+void WayPointCallback(){
+	ROS_INFO("CALLBACK WAYPOINT!!!!");
+}
+
 void ReceiverCallback(hal_sensor_transceiver::Data msg)
 {
   ROS_INFO("Quadrotor Receiver: [%f, %f]", msg.gain, msg.power);
@@ -65,11 +74,11 @@ void ReceiverCallback(hal_sensor_transceiver::Data msg)
 
 void TransmitterCallback(hal_sensor_transceiver::TData msg)
 {
-	ROS_INFO("Quadrotor Transmitter: [%f, %f]". msg.gain, msg.power);
+	ROS_INFO("Quadrotor Transmitter: [%f, %f]", msg.gain, msg.power);
 }
 
 void QuadrotorRoute(){
-	hal_quadrotor::Waypoint wp1, wp2, wp3, wp4;
+	
 	//TAKE OFF WAYPOINT
 	wp1.request.x = 5.0;
 	wp1.request.y = 5.0;
@@ -112,8 +121,8 @@ int main(int argc, char **argv)
 	
 	
 	ros::Subscriber topState = n.subscribe("/hal/UAV2/Estimate", 1000, StateCallback);	
-	ros::Subscriber receiverState = n.subscribe("/hal/UAV2/sensor/receiver/Data", 1000, ReceiverCallback);
-	ros::Subscriber tranmsitterState = n.subscribe("/hal/UAV2/sensor/Transmitter/Data", 1000, TransmitterCallback);
+	//ros::Subscriber receiverState = n.subscribe("/hal/UAV2/sensor/receiver/Data", 1000, ReceiverCallback);
+	//ros::Subscriber tranmsitterState = n.subscribe("/hal/UAV2/sensor/transmitter/Data", 1000, TransmitterCallback);
  
 	sim::Pause msgPause;
 
@@ -145,22 +154,12 @@ int main(int argc, char **argv)
 
 	//Initialize Clients needeed!!
 	ros::ServiceClient srvTakeOff = n.serviceClient<hal_quadrotor::Takeoff>("/hal/UAV2/controller/Takeoff");
-	ros::ServiceClient srvHover = n.serviceClient<hal_quadrotor::Hover>("/hal/UAV2/controller/Hover");
+	srvHover = n.serviceClient<hal_quadrotor::Hover>("/hal/UAV2/controller/Hover");
 	srvWaypoint = n.serviceClient<hal_quadrotor::Waypoint>("/hal/UAV2/controller/Waypoint");
 
 	if(!srvTakeOff.call(req_Takeoff)){
 		ROS_FATAL("NO TAKE OFF!!");
 		return 1;
-	}
-
-	hal_quadrotor::Hover req_Hover;
-
-	ros::Rate ratess(200);
-	ratess.sleep();
-
-	
-	if(!srvHover.call(req_Hover)){
-		ROS_FATAL("NO HOVER!!");
 	}
 	
 	ros::spin();
