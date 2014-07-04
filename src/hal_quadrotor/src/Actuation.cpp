@@ -41,7 +41,12 @@ void Actuation::Switch(ControllerType controller)
 	current = controller;
 }
 
-Controller *Actuation::GetControler(void)
+ControllerType Actuation::GetControllerType(void)
+{
+  return current;
+}
+
+Controller *Actuation::GetController(void)
 {
   Controller* ptr;
 	switch (current)

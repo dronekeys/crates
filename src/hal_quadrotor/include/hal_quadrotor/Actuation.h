@@ -80,11 +80,17 @@ namespace hal
       */
       void Switch(ControllerType controller);
 
+      //! Obtain current ControllerType
+      /*!
+          \return current ControllerType
+      */
+      ControllerType GetControllerType(void);
+
       //! Obtain current controller
       /*!
           \return current Controller or NULL
       */
-      Controller *GetControler(void);
+      Controller *GetController(void);
       //! Obtain control from state and timestep
       /*!
           \param state the current platform state

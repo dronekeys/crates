@@ -102,9 +102,11 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     // and return the exact ROS time at which the control was applied.
     control.t = SetControl(control);
 
-    // Add a bool value if the goal have been reached or not.
-    Controller *ctrl = actuation.GetControler();
+    // a bool value if the goal have been reached or not.
+    // controller type curently in effect
+    Controller *ctrl = actuation.GetController();
     estimate.rch = ctrl->HasGoalBeenReached();
+    estimate.ctrl = actuation.GetControllerType();
 
     // Save the current time tick for the next iteration
     tick = event.current_real.toSec();
