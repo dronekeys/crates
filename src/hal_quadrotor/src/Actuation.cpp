@@ -10,7 +10,7 @@ void Actuation::Init(ros::NodeHandle nh, ControllerType controller)
 	srvAnglesHeight 	= nh.advertiseService("controller/AnglesHeight", &Actuation::RcvAnglesHeight, this);
     srvEmergency 		= nh.advertiseService("controller/Emergency", &Actuation::RcvEmergency, this);
     srvHover 			= nh.advertiseService("controller/Hover", &Actuation::RcvHover, this);
-    srvLand 			= nh.advertiseService("controller/Land", &Actuation::RcvLand, this);                 
+    srvLand 			= nh.advertiseService("controller/Land", &Actuation::RcvLand, this);
     srvTakeoff 			= nh.advertiseService("controller/Takeoff", &Actuation::RcvTakeoff, this);
     srvVelocity 		= nh.advertiseService("controller/Velocity", &Actuation::RcvVelocity, this);
     srvVelocityHeight 	= nh.advertiseService("controller/VelocityHeight", &Actuation::RcvVelocityHeight, this);
@@ -41,7 +41,27 @@ void Actuation::Switch(ControllerType controller)
 	current = controller;
 }
 
-bool Actuation::GetControl(const hal_quadrotor::State &state, 
+Controller *Actuation::GetControler(void)
+{
+  Controller* ptr;
+	switch (current)
+	{
+		case CONTROLLER_ANGLESHEIGHT: 	ptr = (Controller*) &cAnglesHeight;		break;
+		case CONTROLLER_EMERGENCY: 		  ptr = (Controller*) &cEmergency;		  break;
+		case CONTROLLER_HOVER: 			    ptr = (Controller*) &cHover;			    break;
+		case CONTROLLER_IDLE: 			    ptr = (Controller*) &cIdle;				    break;
+		case CONTROLLER_LAND: 			    ptr = (Controller*) &cLand;				    break;
+		case CONTROLLER_TAKEOFF: 		    ptr = (Controller*) &cTakeoff;			  break;
+		case CONTROLLER_VELOCITYHEIGHT: ptr = (Controller*) &cVelocityHeight;	break;
+		case CONTROLLER_VELOCITY: 		  ptr = (Controller*) &cVelocity;			  break;
+		case CONTROLLER_WAYPOINT: 		  ptr = (Controller*) &cWaypoint;			  break;
+		default:
+			ptr = NULL;
+	}
+  return ptr;
+}
+
+bool Actuation::GetControl(const hal_quadrotor::State &state,
 	double dt, hal_quadrotor::Control &control)
 {
 	// Find the controller
@@ -57,7 +77,7 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 		case CONTROLLER_VELOCITYHEIGHT: ptr = (Controller*) &cVelocityHeight;	break;
 		case CONTROLLER_VELOCITY: 		ptr = (Controller*) &cVelocity;			break;
 		case CONTROLLER_WAYPOINT: 		ptr = (Controller*) &cWaypoint;			break;
-		default:		
+		default:
 			return false;
 	}
 
@@ -94,15 +114,15 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 }
 
 bool Actuation::RcvAnglesHeight(
-    hal_quadrotor::AnglesHeight::Request  &req, 
+    hal_quadrotor::AnglesHeight::Request  &req,
     hal_quadrotor::AnglesHeight::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cAnglesHeight.SetGoal(req, res);
 		if (res.success)
@@ -115,7 +135,7 @@ bool Actuation::RcvAnglesHeight(
 }
 
 bool Actuation::RcvEmergency(
-    hal_quadrotor::Emergency::Request  &req, 
+    hal_quadrotor::Emergency::Request  &req,
     hal_quadrotor::Emergency::Response &res)
 {
 	cEmergency.SetGoal(req, res);
@@ -125,15 +145,15 @@ bool Actuation::RcvEmergency(
 }
 
 bool Actuation::RcvHover(
-    hal_quadrotor::Hover::Request  &req, 
+    hal_quadrotor::Hover::Request  &req,
     hal_quadrotor::Hover::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cHover.SetGoal(req, res);
 		if (res.success)
@@ -146,15 +166,15 @@ bool Actuation::RcvHover(
 }
 
 bool Actuation::RcvLand(
-    hal_quadrotor::Land::Request  &req, 
+    hal_quadrotor::Land::Request  &req,
     hal_quadrotor::Land::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cLand.SetGoal(req, res);
 		if (res.success)
@@ -167,7 +187,7 @@ bool Actuation::RcvLand(
 }
 
 bool Actuation::RcvTakeoff(
-    hal_quadrotor::Takeoff::Request  &req, 
+    hal_quadrotor::Takeoff::Request  &req,
     hal_quadrotor::Takeoff::Response &res)
 {
 	switch (current)
@@ -184,15 +204,15 @@ bool Actuation::RcvTakeoff(
 }
 
 bool Actuation::RcvVelocity(
-    hal_quadrotor::Velocity::Request  &req, 
+    hal_quadrotor::Velocity::Request  &req,
     hal_quadrotor::Velocity::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cVelocity.SetGoal(req, res);
 		if (res.success)
@@ -205,15 +225,15 @@ bool Actuation::RcvVelocity(
 }
 
 bool Actuation::RcvVelocityHeight(
-    hal_quadrotor::VelocityHeight::Request  &req, 
+    hal_quadrotor::VelocityHeight::Request  &req,
     hal_quadrotor::VelocityHeight::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cVelocityHeight.SetGoal(req, res);
 		if (res.success)
@@ -226,15 +246,15 @@ bool Actuation::RcvVelocityHeight(
 }
 
 bool Actuation::RcvWaypoint(
-    hal_quadrotor::Waypoint::Request  &req, 
+    hal_quadrotor::Waypoint::Request  &req,
     hal_quadrotor::Waypoint::Response &res)
 {
 	switch (current)
 	{
 	case CONTROLLER_HOVER:
-	case CONTROLLER_ANGLESHEIGHT: 
-	case CONTROLLER_VELOCITYHEIGHT: 
-	case CONTROLLER_VELOCITY: 
+	case CONTROLLER_ANGLESHEIGHT:
+	case CONTROLLER_VELOCITYHEIGHT:
+	case CONTROLLER_VELOCITY:
 	case CONTROLLER_WAYPOINT:
 		cWaypoint.SetGoal(req, res);
 		if (res.success)
