@@ -84,7 +84,7 @@ namespace hal
       /*!
           \return current Controller or NULL
       */
-      Controller *GetControler(void)
+      Controller *GetControler(void);
       //! Obtain control from state and timestep
       /*!
           \param state the current platform state
