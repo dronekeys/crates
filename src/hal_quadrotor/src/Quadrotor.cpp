@@ -103,7 +103,8 @@ void Quadrotor::Update(const ros::TimerEvent& event)
     control.t = SetControl(control);
 
     // Add a bool value if the goal have been reached or not.
-    estimate.rch = control.HasGoalBeenReached();
+    Controller *ctrl = actuation.GetControler();
+    estimate.rch = ctrl->HasGoalBeenReached();
 
     // Save the current time tick for the next iteration
     tick = event.current_real.toSec();
