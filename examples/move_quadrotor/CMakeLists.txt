@@ -12,15 +12,20 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Include CRATES libraries
 include_directories( 
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(dronkey_nav
+	src/Navigate.cpp
+)
 ## The example executable
-add_executable(
-  move_quadrotor main.cpp
+add_executable(move_quadrotor 
+	main.cpp
 )
 
 ## Link against CRATES libraries
 target_link_libraries(move_quadrotor 
   ${catkin_LIBRARIES}
+  dronkey_nav
 )
