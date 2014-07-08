@@ -21,9 +21,24 @@ namespace dronkey {
 		std::list<hal_quadrotor::Waypoint>::iterator movement_iterator;
 
 		/**
+		 * Hover Message
+		 */
+		hal_quadrotor::Hover req_Hover;
+		
+		/**
 		 * 
 		 */
 		ros::Subscriber quadState;
+
+		/**
+		 * Hover Service
+		 */
+		ros::ServiceClient srvHover;
+
+		/**
+		 * 
+		 */
+		ros::ServiceClient srvWaypoint;
 
 		/**
 		 * [StateCallback description]

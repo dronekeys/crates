@@ -24,11 +24,35 @@ Navigate::Navigate(ros::NodeHandle &n){
 	movement.push_back(wp4);
 
 	movement_iterator = movement.begin();
+
+	srvHover = n.serviceClient<hal_quadrotor::Hover>("/hal/UAV2/controller/Hover");
+	srvWaypoint = n.serviceClient<hal_quadrotor::Waypoint>("/hal/UAV2/controller/Waypoint");
 	quadState = n.subscribe("/hal/UAV2/Estimate", 1000, &Navigate::StateCallback, this);
 }	
 
 void Navigate::StateCallback(const hal_quadrotor::State::ConstPtr& msg){
 	ROS_INFO("Quadrotor Update: [%f, %f, %f, %f] Destination State: [%d, %d]", msg->x, msg->y, msg->z, msg->yaw, msg->rch, msg->ctrl);
+	hal_quadrotor::Waypoint& tmp = *movement_iterator;
+	
+	if(msg->ctrl == 2 || msg->rch == 1){
+		ROS_INFO("GOAL REACHED!!");
+		if(msg->ctrl != 2 && msg->rch == 1){
+			if(!srvHover.call(req_Hover)){
+				ROS_FATAL("NO HOVER!!");
+			}
+		}
+
+		if(movement.end() != movement_iterator){
+			++movement_iterator;
+			tmp = *movement_iterator;
+			ROS_INFO("!!!--CALLING NEW WAYPOINT--!!!");
+			if(!srvWaypoint.call(tmp)){
+				ROS_FATAL("NO WAYPOINT!!");
+			}
+		} else {
+			movement_iterator = movement.begin();
+		}
+	}
 }
 
 Navigate::~Navigate(){
