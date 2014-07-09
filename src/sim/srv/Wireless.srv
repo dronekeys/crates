@@ -1,0 +1,5 @@
+# INSTRUCTION
+string msg
+---
+# RESULT
+bool isSent
