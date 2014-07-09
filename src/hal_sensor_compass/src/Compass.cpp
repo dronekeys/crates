@@ -9,7 +9,7 @@ using namespace hal::sensor;
 Compass::Compass() : hal::HAL()
 {
 	// Do nothign
-}        
+}
 
 // Called when HAL loads
 void Compass::OnInit()
@@ -19,6 +19,9 @@ void Compass::OnInit()
 
     // Advertice the ability to configure the sensor rate
     service = GetRosNodePtr().advertiseService("sensor/compass/Configure", &Compass::Configure, this);
+
+    // Advertice the ability to configure the sensor rate
+    srvData = GetRosNodePtr().advertiseService("sensor/compass/Data", &Compass::GetMeasurement, this);
 
     // Create a timer to broadcast the data
     timerSamp = GetRosNodePtr().createTimer(
@@ -59,11 +62,11 @@ bool Compass::Configure(hal_sensor_compass::Configure::Request &req, hal_sensor_
 }
 
 void Compass::Broadcast(const ros::TimerEvent& event)
-{                  
+{
     publisher.publish(message);
 }
 
 void Compass::Sample(const ros::TimerEvent& event)
-{                  
+{
     GetMeasurement(message);
 }

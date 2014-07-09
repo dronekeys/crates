@@ -15,7 +15,7 @@ namespace hal
     namespace sensor
     {
         class Compass : public hal::HAL
-        {     
+        {
         private:
 
             /// Templated message type
@@ -26,9 +26,12 @@ namespace hal
 
             /// Used to broadcast Status message
             ros::Publisher                  publisher;
-            
-            /// Ued to receive sensor rate update requests
+
+            /// Used to receive sensor rate update requests
             ros::ServiceServer              service;
+
+            /// Used to broadcast Data message
+            ros::ServiceServer              srvData;
 
             //! Send the sensor data over the messagng system
             /*!
@@ -49,7 +52,7 @@ namespace hal
               \return whether the rate updated was accepted
             */
             bool Configure(
-                hal_sensor_compass::Configure::Request  &req, 
+                hal_sensor_compass::Configure::Request  &req,
                 hal_sensor_compass::Configure::Response &res);
 
         protected:
