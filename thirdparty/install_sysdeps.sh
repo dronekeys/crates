@@ -10,7 +10,7 @@ echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | su
 echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 
 # Basic libraries
-sudo apt-get -qq -y install gdal-bin libgdal-dev python-gdal gradle build-essential \
+sudo apt-get -y install gdal-bin libgdal-dev python-gdal gradle build-essential \
     doxygen libtinyxml2-dev libkml-dev libboost-all-dev cmake mercurial pkg-config \
  	libprotoc-dev libprotobuf-dev protobuf-compiler libqt4-dev libtar-dev \
  	libcurl4-openssl-dev libcegui-mk2-dev libopenal-dev libtbb-dev \
