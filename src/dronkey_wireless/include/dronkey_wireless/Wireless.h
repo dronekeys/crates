@@ -6,13 +6,33 @@ namespace dronkey {
 	class Wireless {
 	private:
 		
+		/**
+		 * World Reference
+		 */
 		gazebo::physics::WorldPtr gWorld;
-
-		bool Send();
 		
+		/**
+		 * [areaNodes description]
+		 * @return [description]
+		 */
+		int areaNodes();
 	public:
 
-		Wireless(gazebo::physics::WorldPtr &world);
+		/**
+		 * Set the private world
+		 */
+		void SetWorld(gazebo::physics::WorldPtr &world);
+
+		/**
+		 * Send the data to correct nodes!!
+		 * @return Send Successfull or Not.
+		 */
+		bool Send();
+
+		/**
+		 * Constructor
+		 */
+		Wireless();
 
 	};
 }

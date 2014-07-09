@@ -93,6 +93,9 @@ namespace gazebo
 	// For storing collisions
 	sim::Contacts msgContacts;
 
+	//Wireless Simulator
+	dronkey::Wireless wirelessSimulator;
+
   public:
 
     // Constructor
@@ -267,6 +270,9 @@ namespace gazebo
 	  	// Publish clock for simulated ros time
 		topicContacts = rosNode->advertise<sim::Contacts>("Contacts",10);
 
+		//Initialize Wireless
+		wirelessSimulator.SetWorld(world);
+		
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time",  true);
     }
@@ -364,7 +370,7 @@ namespace gazebo
 		msgs::Factory msg;
 		msg.set_sdf(xmlPrinter.CStr());
 		pubFactory->Publish(msg);
-	
+		
 		// Wait until the model has been deleted
 		ros::Time timeout = ros::Time::now() + ros::Duration(ROS_TIMEOUT_SECONDS);
 		while (true)
@@ -496,8 +502,8 @@ namespace gazebo
 
 	bool Wireless(sim::Wireless::Request &req, sim::Wireless::Response &res)
 	{
-		ROS_INFO("HOLAA!!");
-		dronkey::Wireless simWireless(world);
+		//Handle Wireless
+		wirelessSimulator.Send();
 		return true;
 	}
 
