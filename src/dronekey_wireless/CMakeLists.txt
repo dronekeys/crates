@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(dronkey_wireless)
+project(dronekey_wireless)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -103,7 +103,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    dronkey_wireless
+    dronekey_wireless
   DEPENDS 
     roscpp
     message_runtime
@@ -125,7 +125,7 @@ link_directories(
   ${GAZEBO_LIBRARY_DIRS}
 )
 ## Declare a cpp library
-add_library(dronkey_wireless src/Wireless.cpp)
+add_library(dronekey_wireless src/Wireless.cpp)
 
 ## Declare a cpp executable
 # add_executable(uav_driver 
@@ -134,10 +134,10 @@ add_library(dronkey_wireless src/Wireless.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(dronkey_wireless dronkey_wireless_generate_messages_cpp)
+add_dependencies(dronekey_wireless dronekey_wireless_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(dronkey_wireless ${catkin_LIBRARIES})
+target_link_libraries(dronekey_wireless ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -154,7 +154,7 @@ target_link_libraries(dronkey_wireless ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS dronkey_wireless
+install(TARGETS dronekey_wireless
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -20,7 +20,7 @@
 #include <rosgraph_msgs/Clock.h>
 
 //	World Wireless Handler
-#include <dronkey_wireless/Wireless.h>
+#include <dronekey_wireless/Wireless.h>
 
 // ROS topics
 #include "sim/Contacts.h"
@@ -94,7 +94,7 @@ namespace gazebo
 	sim::Contacts msgContacts;
 
 	//Wireless Simulator
-	dronkey::Wireless wirelessSimulator;
+	dronekey::Wireless wirelessSimulator;
 
   public:
 

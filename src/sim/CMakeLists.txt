@@ -23,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
   hal_sensor_imu
   hal_sensor_orientation
   hal_sensor_transceiver
-  dronkey_wireless
+  dronekey_wireless
 ) 
 
 # Find Gazebo
@@ -181,7 +181,7 @@ catkin_package(
       hal_sensor_gnss
       hal_sensor_orientation
       hal_sensor_transceiver
-      dronkey_wireless
+      dronekey_wireless
 )
 
 ###########

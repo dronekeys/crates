@@ -21,7 +21,7 @@ void Compass::OnInit()
     service = GetRosNodePtr().advertiseService("sensor/compass/Configure", &Compass::Configure, this);
 
     // Advertice the ability to configure the sensor rate
-    srvData = GetRosNodePtr().advertiseService("sensor/compass/Data", &Compass::GetMeasurement, this);
+    //srvData = GetRosNodePtr().advertiseService("sensor/compass/Data", &Compass::GetMeasurement, this);
 
     // Create a timer to broadcast the data
     timerSamp = GetRosNodePtr().createTimer(

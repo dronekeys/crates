@@ -1,4 +1,5 @@
 # INSTRUCTION
+string IP
 string msg
 ---
 # RESULT
