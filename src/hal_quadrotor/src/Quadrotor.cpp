@@ -16,6 +16,8 @@ void Quadrotor::OnInit()
     // Initialise navigation
     actuation.Init(GetRosNodePtr(), CONTROLLER_IDLE);
 
+    communication.Init(GetRosNodePtr());
+
     // In both experiments and simulation the state and LL control can be queried
     srvGetEstimate = GetRosNodePtr().advertiseService("GetEstimate", &Quadrotor::RcvGetEstimate, this);
     srvGetControl  = GetRosNodePtr().advertiseService("GetControl", &Quadrotor::RcvGetControl, this);

@@ -270,8 +270,8 @@ namespace gazebo
 	  	// Publish clock for simulated ros time
 		topicContacts = rosNode->advertise<sim::Contacts>("Contacts",10);
 
-		//Initialize Wireless
-		wirelessSimulator.SetWorld(world);
+		//Initialize Wireles
+		wirelessSimulator.SetWireless(world, rosNode);
 		
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time",  true);

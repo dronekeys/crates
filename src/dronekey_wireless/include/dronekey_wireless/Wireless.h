@@ -3,11 +3,13 @@
 
 //Wireless ROS Service!!!
 #include <sim/Wireless.h>
+#include <hal_quadrotor/Packet.h>
 
 //Include ROS
 #include <ros/ros.h>
 //Include Gazebo Physics
 #include <gazebo/physics/physics.hh>
+
 
 #include <sstream>
 #include <string>
@@ -18,11 +20,21 @@ namespace dronekey {
 	private:
 		
 		/**
+		 * Ros Node Reference!
+		 */
+		boost::shared_ptr<ros::NodeHandle>    gRosNode;
+
+		/**
 		 * World Reference
 		 */
 		gazebo::physics::WorldPtr gWorld;
 	
+		/**
+		 * Store All wireless Models
+		 */
 		std::map<std::string, std::string> wirelessModels;
+
+
 		/**
 		 * [areaNodes description]
 		 * @return [description]
@@ -34,13 +46,13 @@ namespace dronekey {
 		 * @param  modelName Model ID
 		 * @return           whether it has a wireless or not
 		 */
-		bool isWireless(std::string &modelName);
+		bool isWireless(std::string &serviceURI);
 	public:
 
 		/**
 		 * Set the private world
 		 */
-		void SetWorld(gazebo::physics::WorldPtr &world);
+		void SetWireless(gazebo::physics::WorldPtr &world, boost::shared_ptr<ros::NodeHandle> rosNode);
 
 		/**
 		 * Send the data to correct nodes!!

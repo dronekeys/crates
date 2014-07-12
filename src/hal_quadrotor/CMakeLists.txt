@@ -84,6 +84,7 @@ add_service_files(
     GetEstimate.srv
     GetTruth.srv
     GetControl.srv
+    Packet.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -161,6 +162,7 @@ add_library(hal_quadrotor
   src/Actuation.cpp
   src/Navigation.cpp
   src/Quadrotor.cpp
+  src/Communication.cpp
 )
 
 ## Declare a cpp executable
