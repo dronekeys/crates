@@ -22,7 +22,7 @@ bool Wireless::isWireless(std::string &serviceURI)
 	return ros::service::exists(serviceURI, false);
 }
 
-bool Wireless::Send()
+bool Wireless::Send(std::string &IP, std::string &msg)
 {
 	ROS_INFO("SEND!!");
 	//Get All Models
@@ -42,6 +42,9 @@ bool Wireless::Send()
 			
 			ROS_INFO("NOT FOUND!!");
 			hal_quadrotor::Packet pkt;
+			
+			pkt.request.IP = IP;
+			pkt.request.msg = msg;
 
 			ros::ServiceClient srvWireless = gRosNode->serviceClient<hal_quadrotor::Packet>(serviceURI);
 			if(!srvWireless.call(pkt)){

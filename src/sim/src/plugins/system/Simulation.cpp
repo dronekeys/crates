@@ -503,7 +503,7 @@ namespace gazebo
 	bool Wireless(sim::Wireless::Request &req, sim::Wireless::Response &res)
 	{
 		//Handle Wireless
-		wirelessSimulator.Send();
+		res.isSent = wirelessSimulator.Send(req.IP, req.msg);
 		return true;
 	}
 

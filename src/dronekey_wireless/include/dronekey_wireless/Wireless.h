@@ -58,7 +58,7 @@ namespace dronekey {
 		 * Send the data to correct nodes!!
 		 * @return Send Successfull or Not.
 		 */
-		bool Send();
+		bool Send(std::string &IP, std::string &msg);
 
 		/**
 		 * Constructor
