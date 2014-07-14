@@ -36,21 +36,16 @@ void Navigate::StateCallback(const hal_quadrotor::State::ConstPtr& msg){
 	
 	if(msg->ctrl == 2 || msg->rch == 1){
 		ROS_INFO("GOAL REACHED!!");
-		if(msg->ctrl != 2 && msg->rch == 1){
-			if(!srvHover.call(req_Hover)){
-				ROS_FATAL("NO HOVER!!");
-			}
+		++movement_iterator;
+		if(movement.end() == movement_iterator){
+			ROS_INFO("BEGINING MOVEMENT");
+			movement_iterator = movement.begin();
 		}
 
-		if(movement.end() != movement_iterator){
-			++movement_iterator;
-			tmp = *movement_iterator;
-			ROS_INFO("!!!--CALLING NEW WAYPOINT--!!!");
-			if(!srvWaypoint.call(tmp)){
-				ROS_FATAL("NO WAYPOINT!!");
-			}
-		} else {
-			movement_iterator = movement.begin();
+		tmp = *movement_iterator;
+		ROS_INFO("!!!--CALLING NEW WAYPOINT--!!! - NEW COORDIANTES: [%f, %f, %f]",tmp.request.x, tmp.request.y, tmp.request.z);
+		if(!srvWaypoint.call(tmp)){
+			ROS_FATAL("NO WAYPOINT!!");
 		}
 	}
 }
