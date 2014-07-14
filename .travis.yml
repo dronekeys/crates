@@ -3,17 +3,18 @@ compiler:
     - gcc
 
 install:
-    git submodule init;
-    git submodule update;
-    cd thirdparty;
-    ./install_sysdeps.sh;
-    ./install_ros.sh;
-    ./install_gazebo.sh;
-    ./install_gpstk.sh;
-    source /opt/ros/indigo/setup.bash;
-    cd ../;
-    cd src;
-    catkin_init_workspace;
-    catkin_make -DCMAKE_BUILD_TYPE=Release;
-    cd ../;
-    source devel/setup.bash
+    echo  "Uncomment when travis supports ubuntu 14.04"
+    #git submodule init;
+    #git submodule update;
+    #cd thirdparty;
+    #./install_sysdeps.sh;
+    #./install_ros.sh;
+    #./install_gazebo.sh;
+    #./install_gpstk.sh;
+    #source /opt/ros/indigo/setup.bash;
+    #cd ../;
+    #cd src;
+    #catkin_init_workspace;
+    #catkin_make -DCMAKE_BUILD_TYPE=Release;
+    #cd ../;
+    #source devel/setup.bash
