@@ -9,8 +9,8 @@ In addition to offering this abstraction service, the HAL may also include type-
 
 CRATES is based upon several open source and actively-developed libraries. ROS is used for the entire messaging backbone, while Gazebo is used for simulation and visualisation. In addition, the GPS toolkit is used to simulate global navigation satellite systems, while GeographicLib is used to to project between coordinate frames and calculate gravitational and magnetic fields.
 
-Installation instructions (quick)
-=================================
+Installation instructions
+==========================
 
 Install Ubuntu 14.04 "Trusty Tahr" as an dual-boot (recommended) or in a Virtual Machine. If you choose to install in a VM, then the guest VM will need (a) at least 2GB ram, (b) two cores, (c) 3D support, and (d) guest drivers for 3D support. I have only managed to get CRATES working in vmware,  and so I would suggest using this. For Intel graphics cards mesa doesn't support GLSL 1.Please be sure to read the 'known issues' sections at the bottom of this page if you choose to run within a VM.
 
