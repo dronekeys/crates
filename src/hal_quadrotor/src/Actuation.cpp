@@ -35,6 +35,7 @@ void Actuation::Switch(ControllerType controller)
 		case CONTROLLER_VELOCITYHEIGHT: ROS_INFO("Switching to VelocityHeight controller."); break;
 		case CONTROLLER_VELOCITY: 		ROS_INFO("Switching to Velocity controller.");  	 break;
 		case CONTROLLER_WAYPOINT: 		ROS_INFO("Switching to Waypoint controller.");  	 break;
+		case CONTROLLER_DISABLED: 		ROS_INFO("Control disabled.");  	 				 break;
 		}
 	}
 
@@ -64,11 +65,17 @@ bool Actuation::GetControl(const hal_quadrotor::State &state,
 	// Check to see if the controller has reached its goal
 	if (ptr->HasGoalBeenReached())
 	{
+		// Dummy messages to ensure that the SetGoal() gets called on the new states.
+		// This fixed the hover bug, whichc forces the UAV to hover at (0,0,0)
+ 		hal_quadrotor::Hover::Request  h_req; 
+    	hal_quadrotor::Hover::Response h_res;
+
 		// At the end of takeoff / motion control, always switch back to hover
 		switch (current)
 		{
 		case CONTROLLER_TAKEOFF:
 			if (DEBUG) ROS_INFO("Goal reached. Switching to hover.");
+			cHover.SetGoal(h_req, h_res);
 			current = CONTROLLER_HOVER;
 			ptr = (Controller*) &cHover;
 			break;

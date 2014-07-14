@@ -22,7 +22,6 @@ bool Hover::SetGoal(
     hal_quadrotor::Hover::Request  &req, 
     hal_quadrotor::Hover::Response &res
 ) {
-
     // Carries for altitude PID
     iz = 0.0;
     ez = 0.0;

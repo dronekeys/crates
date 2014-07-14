@@ -1,0 +1,27 @@
+digraph hal_quadrotor
+{
+	rankdir=LR
+	node [shape = circle, width=1.65]; 
+	IDLE TAKEOFF HOVER LAND EMERGENCY WAYPOINT OTHER; 
+	node [shape = doublecircle, label="START"] START;
+	node [shape = doublecircle, label="END"] END;
+	START -> IDLE [ color="#0000ff" ];
+	IDLE -> TAKEOFF [ label = "Takeoff" ];
+	TAKEOFF -> HOVER [ label = "Finished", color="#0000ff" ];
+	HOVER -> OTHER [ label = "Other" ];
+	HOVER -> WAYPOINT [ label = "Waypoint" ];
+	OTHER -> HOVER [ label = "Hover" ];
+	OTHER -> WAYPOINT [ label = "Waypoint" ];
+	WAYPOINT -> OTHER [ label = "Other" ];
+	WAYPOINT -> HOVER [ label = "Hover" ];
+	HOVER -> LAND [ label = "Land" ];
+	LAND -> IDLE [ label = "Finished", color="#0000ff" ];
+	WAYPOINT -> HOVER [ label = "Finished", color="#0000ff" ];
+	IDLE -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	TAKEOFF -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	HOVER -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	OTHER -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	LAND -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	WAYPOINT -> EMERGENCY [ label = "Emergency", color="#ff0000" ];
+	EMERGENCY -> END [ color="#0000ff" ];
+}
