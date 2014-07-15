@@ -11,5 +11,7 @@ float64 w	    	# b-frame Z velocity
 float64 p	    	# b-frame roll angular velocity
 float64 q	    	# b-frame pitch angular velocity
 float64 r	    	# b-frame yaw angular velocity
+bool    rch         # has goal been reached
+int8    ctrl        # current controllertype
 float64 thrust	    # Current thrust force
 float64 remaining	# Flight time remaining

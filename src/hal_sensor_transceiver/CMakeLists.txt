@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_quadrotor)
+project(hal_sensor_transceiver)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,18 +14,10 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
+  message_generation
   std_msgs
-	message_generation
   hal
-  hal_sensor_altimeter
-  hal_sensor_compass
-  hal_sensor_gnss
-  hal_sensor_imu
-  hal_sensor_orientation
 ) 
-
-# Find GPS toolkit
-find_package(GeographicLib REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -61,30 +53,16 @@ add_message_files(
   DIRECTORY
     msg
   FILES  
-    State.msg
-    Control.msg
+    Data.msg
+    TData.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
-  DIRECTORY
+   DIRECTORY
     srv
   FILES
-    Emergency.srv
-    Takeoff.srv
-    Hover.srv
-    Land.srv
-    AnglesHeight.srv
-    Velocity.srv
-    VelocityHeight.srv
-    Waypoint.srv
-    SetEstimate.srv
-    SetTruth.srv
-    SetControl.srv
-    GetEstimate.srv
-    GetTruth.srv
-    GetControl.srv
-    Packet.srv
+    Configure.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -114,16 +92,10 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    hal_quadrotor
+    hal_sensor_transceiver
   DEPENDS 
     roscpp
     message_runtime
-    hal
-    hal_sensor_altimeter
-    hal_sensor_compass
-    hal_sensor_gnss
-    hal_sensor_imu
-    hal_sensor_orientation
 )
 
 ###########
@@ -132,55 +104,26 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  include 
+include_directories(include 
   ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${GEOGRAPHICLIB_INCLUDE_DIR} 
 )
-
-## Specify additional locations of library files
-link_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${catkin_LIBRARY_DIRS}
-  ${GEOGRAPHICLIB_LIBRARY_DIRS}
-)
-
 
 ## Declare a cpp library
-add_library(hal_quadrotor
-  src/control/Controller.cpp
-  src/control/Idle.cpp
-  src/control/Takeoff.cpp
-  src/control/Hover.cpp
-  src/control/Land.cpp
-  src/control/Emergency.cpp
-  src/control/AnglesHeight.cpp
-  src/control/Velocity.cpp
-  src/control/VelocityHeight.cpp
-  src/control/Waypoint.cpp
-  src/Actuation.cpp
-  src/Navigation.cpp
-  src/Quadrotor.cpp
-  src/Communication.cpp
-)
+add_library(hal_sensor_transceiver 
+  src/Receiver.cpp
+  src/Transmitter.cpp)
 
 ## Declare a cpp executable
 # add_executable(uav_driver 
-#	src/checksum.cpp
+# src/checksum.cpp
 #)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal_quadrotor 
-  hal_quadrotor_generate_messages_cpp
-)
+add_dependencies(hal_sensor_transceiver hal_sensor_transceiver_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_quadrotor 
-  ${catkin_LIBRARIES}
-  ${GEOGRAPHICLIB_LIBRARY}
-)
+target_link_libraries(hal_sensor_transceiver ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -197,7 +140,7 @@ target_link_libraries(hal_quadrotor
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS hal_quadrotor
+install(TARGETS hal_sensor_transceiver
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -222,8 +165,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-##catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
-##target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_quadrotor)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_uav_msgs.cpp)
+# if(TARGET ${PROJECT_NAME}-test)
+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+# endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

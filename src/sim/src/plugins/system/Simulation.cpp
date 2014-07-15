@@ -19,6 +19,8 @@
 // Global clock tick
 #include <rosgraph_msgs/Clock.h>
 
+//	World Wireless Handler
+#include <dronekey_wireless/Wireless.h>
 
 // ROS topics
 #include "sim/Contacts.h"
@@ -32,6 +34,7 @@
 #include "sim/Pause.h"
 #include "sim/Noise.h"
 #include "sim/Seed.h"
+#include "sim/Wireless.h"
 
 // Protobuf messages
 #include "noise.pb.h"
@@ -81,7 +84,7 @@ namespace gazebo
   	ros::Publisher topicClock, topicContacts;
 
   	// Five services we will offer to users of the simulator
-	ros::ServiceServer serviceReset, serviceResume, servicePause,
+	ros::ServiceServer serviceReset, serviceResume, servicePause, serviceWireless,
 		serviceInsert, serviceDelete,serviceStep, serviceNoise, serviceSeed;
 
 	// Two time representations
@@ -89,6 +92,9 @@ namespace gazebo
 
 	// For storing collisions
 	sim::Contacts msgContacts;
+
+	//Wireless Simulator
+	dronekey::Wireless wirelessSimulator;
 
   public:
 
@@ -255,9 +261,18 @@ namespace gazebo
 		);
 		serviceSeed = rosNode->advertiseService(adSeed);
 
+		//Receiver
+		ros::AdvertiseServiceOptions adSendPacket = ros::AdvertiseServiceOptions::create<sim::Wireless>(
+			"Wireless",boost::bind(&Simulation::Wireless,this,_1,_2),ros::VoidPtr(), &queue
+		);
+		serviceWireless = rosNode->advertiseService(adSendPacket);
+
 	  	// Publish clock for simulated ros time
 		topicContacts = rosNode->advertise<sim::Contacts>("Contacts",10);
 
+		//Initialize Wireles
+		wirelessSimulator.SetWireless(world, rosNode);
+		
 		// Set param for use_sim_time if not set by user already
 		rosNode->setParam("/use_sim_time",  true);
     }
@@ -355,7 +370,7 @@ namespace gazebo
 		msgs::Factory msg;
 		msg.set_sdf(xmlPrinter.CStr());
 		pubFactory->Publish(msg);
-	
+		
 		// Wait until the model has been deleted
 		ros::Time timeout = ros::Time::now() + ros::Duration(ROS_TIMEOUT_SECONDS);
 		while (true)
@@ -483,6 +498,13 @@ namespace gazebo
 		// Keep steps to a reasonable length
 		res.success = true;
 		res.status_message = std::string("Random generated seeded");
+	}
+
+	bool Wireless(sim::Wireless::Request &req, sim::Wireless::Response &res)
+	{
+		//Handle Wireless
+		res.isSent = wirelessSimulator.Send(req.IP, req.msg);
+		return true;
 	}
 
   };

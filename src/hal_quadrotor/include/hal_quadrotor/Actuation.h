@@ -20,24 +20,24 @@ namespace hal
   namespace quadrotor
   {
     // Define the gaussian types
-    typedef enum 
+    typedef enum
     {
-    	CONTROLLER_ANGLESHEIGHT,        
-    	CONTROLLER_EMERGENCY,            
-    	CONTROLLER_HOVER,                
-    	CONTROLLER_IDLE,                 
-      CONTROLLER_LAND,                  
+    	CONTROLLER_ANGLESHEIGHT,
+    	CONTROLLER_EMERGENCY,
+    	CONTROLLER_HOVER,
+    	CONTROLLER_IDLE,
+      CONTROLLER_LAND,
       CONTROLLER_TAKEOFF,
       CONTROLLER_VELOCITYHEIGHT,
       CONTROLLER_VELOCITY,
       CONTROLLER_WAYPOINT,
       CONTROLLER_DISABLED
-    } 
+    }
     ControllerType;
 
     // An abstract class for modelling noise
     class Actuation
-    {     
+    {
 
     private:
 
@@ -65,7 +65,7 @@ namespace hal
       /// The current controller
       ControllerType  current;
 
-    public:    
+    public:
 
       //! Initialise the controller factory
       /*!
@@ -80,6 +80,17 @@ namespace hal
       */
       void Switch(ControllerType controller);
 
+      //! Obtain current ControllerType
+      /*!
+          \return current ControllerType
+      */
+      ControllerType GetControllerType(void);
+
+      //! Obtain current controller
+      /*!
+          \return current Controller or NULL
+      */
+      Controller *GetController(void);
       //! Obtain control from state and timestep
       /*!
           \param state the current platform state
@@ -87,7 +98,7 @@ namespace hal
           \param control the output control from the controller
           \return if the state could be updated
       */
-      bool GetControl(const hal_quadrotor::State &state, 
+      bool GetControl(const hal_quadrotor::State &state,
           double dt, hal_quadrotor::Control &control);
 
       // CONTROLLER CALLBACKS //////////////////////////////////////
@@ -99,7 +110,7 @@ namespace hal
         \return whether the service was process successfully
       */
       bool RcvAnglesHeight(
-          hal_quadrotor::AnglesHeight::Request  &req, 
+          hal_quadrotor::AnglesHeight::Request  &req,
           hal_quadrotor::AnglesHeight::Response &res
       );
 
@@ -110,10 +121,10 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvEmergency(
-          hal_quadrotor::Emergency::Request  &req, 
+          hal_quadrotor::Emergency::Request  &req,
           hal_quadrotor::Emergency::Response &res
       );
-      
+
       //! Callback for new Hover request
       /*!
         \param req service request
@@ -121,10 +132,10 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvHover(
-          hal_quadrotor::Hover::Request  &req, 
+          hal_quadrotor::Hover::Request  &req,
           hal_quadrotor::Hover::Response &res
       );
-                  
+
       //! Callback for new Land request
       /*!
         \param req service request
@@ -132,7 +143,7 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvLand(
-          hal_quadrotor::Land::Request  &req, 
+          hal_quadrotor::Land::Request  &req,
           hal_quadrotor::Land::Response &res
       );
 
@@ -143,10 +154,10 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvTakeoff(
-          hal_quadrotor::Takeoff::Request  &req, 
+          hal_quadrotor::Takeoff::Request  &req,
           hal_quadrotor::Takeoff::Response &res
       );
-      
+
       //! Callback for new Velocity request
       /*!
         \param req service request
@@ -154,7 +165,7 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvVelocity(
-          hal_quadrotor::Velocity::Request  &req, 
+          hal_quadrotor::Velocity::Request  &req,
           hal_quadrotor::Velocity::Response &res
       );
 
@@ -165,7 +176,7 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvVelocityHeight(
-          hal_quadrotor::VelocityHeight::Request  &req, 
+          hal_quadrotor::VelocityHeight::Request  &req,
           hal_quadrotor::VelocityHeight::Response &res
       );
 
@@ -176,7 +187,7 @@ namespace hal
         \return whether the packet was process successfully
       */
       bool RcvWaypoint(
-          hal_quadrotor::Waypoint::Request  &req, 
+          hal_quadrotor::Waypoint::Request  &req,
           hal_quadrotor::Waypoint::Response &res
       );
 

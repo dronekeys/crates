@@ -24,6 +24,8 @@
 #include "sensors/GNSS.h"
 #include "sensors/IMU.h"
 #include "sensors/Orientation.h"
+#include "sensors/Receiver.h"
+#include "sensors/Transmitter.h"
 
 // Custom messages
 #include "noise.pb.h"
@@ -39,7 +41,9 @@ namespace gazebo
 		public hal::sensor::Compass,		/* Exposes Compass sensor      	 */
 		public hal::sensor::GNSS,			/* Exposes GNSS sensor      	 */
 		public hal::sensor::IMU,			/* Exposes IMU sensor      		 */
-		public hal::sensor::Orientation 	/* Exposes Orientation sensor    */
+		public hal::sensor::Orientation, 	/* Exposes Orientation sensor    */
+		public hal::sensor::Receiver, 		/* Exposes Receiver 			 */
+ 		public hal::sensor::Transmitter		/* Exposes Transmitter			 */
  	{
 
   	private:
@@ -61,6 +65,8 @@ namespace gazebo
 	    gazebo::GNSS    			sG;
 	    gazebo::IMU    				sI;
 	    gazebo::Orientation 		sO;
+	    gazebo::Receiver 			sR;
+	    gazebo::Transmitter			sT;
 
 	    // Gazebo communication
 		transport::NodePtr 			nodePtr;
@@ -138,7 +144,9 @@ namespace gazebo
 	    	hal::sensor::GNSS::Init(halName);
 	    	hal::sensor::IMU::Init(halName);
 	    	hal::sensor::Orientation::Init(halName);
-
+            hal::sensor::Receiver::Init(halName);
+            hal::sensor::Transmitter::Init(halName);
+         
 			// DYNAMICS/SENSOR CONFIGURATION ///////////////////////////////////////
 
 			// Configure the propulsion dynamics
@@ -164,6 +172,11 @@ namespace gazebo
 			
 			// Configure the orientation sensor
 			sO.Configure(linkPtr, root->GetElement("orientation"));
+
+			// Configure the Receiver sensor
+			sR.Configure(linkPtr, root->GetElement("WirelessReceiver"));
+
+			sT.Configure(linkPtr, root->GetElement("WirelessTransmitter"));
 
 			// INITIALISE WGS84 <-> LTP CONVERSION CONSTANTS /////////////////////
 
@@ -215,8 +228,14 @@ namespace gazebo
 			sI.Reset();
 			
 			// Reset the orientation sensor
-			sO.Reset();		
-	    }
+			sO.Reset();	
+
+			// Reset the Receiver sensor
+			sR.Reset();
+	    
+	    	//Reset the Tranmitter sensor
+	    	sT.Reset();
+	    }  
 
 	    /////////////////////////////////////////////////////////////////////////////////////
 	    // HAL CALLBACKS ////////////////////////////////////////////////////////////////////
@@ -274,6 +293,26 @@ namespace gazebo
 		    	GetNavPtr()->Process(msg);		// Also use for navigation
 		    	return true;
 		    }
+	    	return false;
+	    }
+
+	    //Called when the HAL wants an receiver reading
+	    bool GetMeasurement(hal_sensor_transceiver::Data &msg)
+	    {
+	    	if (sR.GetMeasurement(tim,msg))
+	    	{
+		    	return true;
+		    }
+	    	return false;
+	    }
+
+	    bool GetMeasurement(hal_sensor_transceiver::TData &msg)
+	    {
+
+	    	if (sT.GetMeasurement(tim, msg))
+	    	{
+	    		return true;
+	    	}
 	    	return false;
 	    }
 

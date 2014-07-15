@@ -22,6 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
   hal_sensor_gnss
   hal_sensor_imu
   hal_sensor_orientation
+  hal_sensor_transceiver
+  dronekey_wireless
 ) 
 
 # Find Gazebo
@@ -129,6 +131,7 @@ add_service_files(
     Resume.srv
     Reset.srv
     Pause.srv
+    Wireless.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -177,6 +180,8 @@ catkin_package(
       hal_sensor_imu
       hal_sensor_gnss
       hal_sensor_orientation
+      hal_sensor_transceiver
+      dronekey_wireless
 )
 
 ###########
@@ -253,6 +258,8 @@ add_library(sim_quadrotor
   src/plugins/model/sensors/GNSS.cpp
   src/plugins/model/sensors/IMU.cpp
   src/plugins/model/sensors/Orientation.cpp
+  src/plugins/model/sensors/Receiver.cpp
+  src/plugins/model/sensors/Transmitter.cpp
   src/plugins/model/Quadrotor.cpp
 )
 

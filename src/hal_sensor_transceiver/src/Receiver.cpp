@@ -1,32 +1,27 @@
-// Library headers
-#include <hal_sensor_compass/Compass.h>
+#include <hal_sensor_transceiver/Receiver.h>
 
 #define DEFAULT_SAMP_RATE  1
 #define DEFAULT_SEND_RATE  1
 
 using namespace hal::sensor;
 
-Compass::Compass() : hal::HAL()
+Receiver::Receiver() : hal::HAL()
 {
-	// Do nothign
+	//DO NOTHING
 }
 
-// Called when HAL loads
-void Compass::OnInit()
+void Receiver::OnInit()
 {
-    // Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
-    publisher = GetRosNodePtr().template advertise<hal_sensor_compass::Data>("sensor/compass/Data", DEFAULT_QUEUE_LENGTH);
+	//// Advertise this message on the ROS backbone (note the use of template here to fix GCC error)
+    publisher = GetRosNodePtr().template advertise<hal_sensor_transceiver::Data>("sensor/receiver/Data", DEFAULT_QUEUE_LENGTH);
 
     // Advertice the ability to configure the sensor rate
-    service = GetRosNodePtr().advertiseService("sensor/compass/Configure", &Compass::Configure, this);
-
-    // Advertice the ability to configure the sensor rate
-    //srvData = GetRosNodePtr().advertiseService("sensor/compass/Data", &Compass::GetMeasurement, this);
+    service = GetRosNodePtr().advertiseService("sensor/receiver/Configure", &Receiver::Configure, this);
 
     // Create a timer to broadcast the data
     timerSamp = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_SAMP_RATE),       // Callback rate
-        &Compass::Sample,                           // Callback
+        &Receiver::Sample,                               // Callback
         this,                                       // Callee
         false,                                      // Oneshot
         true                                        // Autostart
@@ -35,16 +30,16 @@ void Compass::OnInit()
     // Create a timer to broadcast the data
     timerSend = GetRosNodePtr().createTimer(
         ros::Duration(1.0/DEFAULT_SEND_RATE),       // Callback rate
-        &Compass::Broadcast,                        // Callback
+        &Receiver::Broadcast,                            // Callback
         this,                                       // Callee
         false,                                      // Oneshot
         true                                        // Autostart
     );
 }
 
-bool Compass::Configure(hal_sensor_compass::Configure::Request &req, hal_sensor_compass::Configure::Response &res)
+bool Receiver::Configure(hal_sensor_transceiver::Configure::Request &req, hal_sensor_transceiver::Configure::Response &res)
 {
-    timerSamp.stop();
+	timerSamp.stop();
     if (req.samprate > 0)
     {
         timerSamp.setPeriod(ros::Duration(1.0/req.samprate));
@@ -61,12 +56,12 @@ bool Compass::Configure(hal_sensor_compass::Configure::Request &req, hal_sensor_
     return true;
 }
 
-void Compass::Broadcast(const ros::TimerEvent& event)
+void Receiver::Broadcast(const ros::TimerEvent& event)
 {
-    publisher.publish(message);
+	publisher.publish(message);
 }
 
-void Compass::Sample(const ros::TimerEvent& event)
+void Receiver::Sample(const ros::TimerEvent& event)
 {
-    GetMeasurement(message);
+	GetMeasurement(message);
 }

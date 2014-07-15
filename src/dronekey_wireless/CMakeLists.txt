@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
 # Project name
-project(hal_quadrotor)
+project(dronekey_wireless)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -14,18 +14,21 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # Find catkin
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
+  message_generation
   std_msgs
-	message_generation
-  hal
-  hal_sensor_altimeter
-  hal_sensor_compass
-  hal_sensor_gnss
-  hal_sensor_imu
-  hal_sensor_orientation
+  geometry_msgs
 ) 
 
-# Find GPS toolkit
-find_package(GeographicLib REQUIRED)
+# Find Gazebo
+include (FindPkgConfig)
+if (PKG_CONFIG_FOUND)
+  pkg_check_modules(TinyXML tinyxml2)
+  pkg_check_modules(GAZEBO gazebo)
+  pkg_check_modules(OGRE OGRE)
+  pkg_check_modules(OGRE-Terrain OGRE-Terrain)
+  pkg_check_modules(CEGUI CEGUI)
+  pkg_check_modules(CEGUI-OGRE CEGUI-OGRE)
+endif()
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -57,35 +60,20 @@ find_package(GeographicLib REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  DIRECTORY
-    msg
-  FILES  
-    State.msg
-    Control.msg
-)
+#add_message_files(
+#  DIRECTORY
+#    msg
+# FILES  
+#    Packet.msg
+#)
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  DIRECTORY
-    srv
-  FILES
-    Emergency.srv
-    Takeoff.srv
-    Hover.srv
-    Land.srv
-    AnglesHeight.srv
-    Velocity.srv
-    VelocityHeight.srv
-    Waypoint.srv
-    SetEstimate.srv
-    SetTruth.srv
-    SetControl.srv
-    GetEstimate.srv
-    GetTruth.srv
-    GetControl.srv
-    Packet.srv
-)
+#add_service_files(
+#   DIRECTORY
+#    srv
+#  FILES
+#    Receiver.srv
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -95,10 +83,11 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-    std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#    std_msgs
+#    geometry_msgs
+#)
 
 ###################################
 ## catkin specific configuration ##
@@ -114,16 +103,10 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES
-    hal_quadrotor
+    dronekey_wireless
   DEPENDS 
     roscpp
     message_runtime
-    hal
-    hal_sensor_altimeter
-    hal_sensor_compass
-    hal_sensor_gnss
-    hal_sensor_imu
-    hal_sensor_orientation
 )
 
 ###########
@@ -132,55 +115,29 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  include 
+include_directories(include 
   ${catkin_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${GEOGRAPHICLIB_INCLUDE_DIR} 
+  ${GAZEBO_INCLUDE_DIRS}
 )
 
-## Specify additional locations of library files
+
 link_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${catkin_LIBRARY_DIRS}
-  ${GEOGRAPHICLIB_LIBRARY_DIRS}
+  ${GAZEBO_LIBRARY_DIRS}
 )
-
-
 ## Declare a cpp library
-add_library(hal_quadrotor
-  src/control/Controller.cpp
-  src/control/Idle.cpp
-  src/control/Takeoff.cpp
-  src/control/Hover.cpp
-  src/control/Land.cpp
-  src/control/Emergency.cpp
-  src/control/AnglesHeight.cpp
-  src/control/Velocity.cpp
-  src/control/VelocityHeight.cpp
-  src/control/Waypoint.cpp
-  src/Actuation.cpp
-  src/Navigation.cpp
-  src/Quadrotor.cpp
-  src/Communication.cpp
-)
+add_library(dronekey_wireless src/Wireless.cpp)
 
 ## Declare a cpp executable
 # add_executable(uav_driver 
-#	src/checksum.cpp
+# src/checksum.cpp
 #)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(hal_quadrotor 
-  hal_quadrotor_generate_messages_cpp
-)
+add_dependencies(dronekey_wireless dronekey_wireless_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(hal_quadrotor 
-  ${catkin_LIBRARIES}
-  ${GEOGRAPHICLIB_LIBRARY}
-)
+target_link_libraries(dronekey_wireless ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -197,7 +154,7 @@ target_link_libraries(hal_quadrotor
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS hal_quadrotor
+install(TARGETS dronekey_wireless
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -222,8 +179,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-##catkin_add_gtest(${PROJECT_NAME}_QuadrotorHAL-test test/TEST_QuadrotorHAL.cpp)
-##target_link_libraries(${PROJECT_NAME}_QuadrotorHAL-test hal_quadrotor)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_uav_msgs.cpp)
+# if(TARGET ${PROJECT_NAME}-test)
+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+# endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

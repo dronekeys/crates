@@ -11,6 +11,7 @@
 // Core quadrotor functionality
 #include <hal_quadrotor/Navigation.h>
 #include <hal_quadrotor/Actuation.h>
+#include <hal_quadrotor/Communication.h>
 
 // ROS Services
 #include <hal_quadrotor/SetTruth.h>
@@ -65,6 +66,9 @@ namespace hal
 
             /// Converts sensor measurements to a state estimate
             Navigation          navigation;
+
+            // Handles Communication Layer between Quadrotors
+            Communication       communication;
 
             // CORE CONTROLLER FUNCRIONS ///////////////////////////////////////
 

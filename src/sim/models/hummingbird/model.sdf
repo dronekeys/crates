@@ -227,6 +227,19 @@
         </errors>
       </orientation>
 
+	<!-- TRANSCEIVER parameters -->
+	<WirelessReceiver>
+		<essid>crates</essid>
+		<gain>2.5</gain>
+		<power>14.5</power>
+	</WirelessReceiver>
+
+	<WirelessTransmitter>
+		<essid>crates</essid>
+		<gain>2.5</gain>
+		<power>14.5</power>
+	</WirelessTransmitter>
+
     </plugin>
   
   </model>
